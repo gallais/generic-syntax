@@ -1,1 +1,8 @@
 *.agdai
+*~
+*.hash
+*.log
+*.pdf
+*.cls
+*.sty
+doc/latex/

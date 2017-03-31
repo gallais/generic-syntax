@@ -1,0 +1,892 @@
+\begin{abstract}
+Syntaxes with binding are omnipresent in Programming Languages
+research but also in the more practical setting of Embedded
+Domain Specific Languages. The advanced features available in
+some languages' type systems has made it possible to statically
+enforce well-scopedness. However the user still has to write a
+lot of boilerplate code to get common scope safe programs (e.g.
+renaming, substitution, CPS transformation, printing with names,
+etc.) and the proof that they are well-behaved.
+
+Building on an abstract but nonetheless expressive notion of
+semantics and a universe of syntaxes with binding, we demonstrate
+how to implement these traversals once and for all by generic
+programming, and how to derive their properties by generic proving.
+\end{abstract}
+
+\section{Introduction}
+
+Nowadays the software programmer developping an embedded DSL~\cite{hudak1996building}
+and the PL researcher formalising a calculus both know and
+leverage the host language's type system. Using Generalised
+Algebraic Data Types (GADTs) or the more general indexed
+families of Type Theory~\cite{dybjer1994inductive} for their deep embedding, they can
+\emph{statically} enforce some of the invariants present in
+their language. Managing the scope is a popular use case~\cite{altenkirch1999monadic} as
+directly manipulating raw de Bruijn indices is error-prone.
+
+This paper starts with primers on scope safe terms, scope preserving
+programs acting on them and a generic way to represent data types.
+These introductory sections help us build an understanding of the
+problem at hand as well as a toolkit that leads us to the original
+content of this paper: a universe of scope safe syntaxes with binding
+together with a generic notion of scope safe semantics for these syntaxes.
+This give us the opportunity to write generic implementations of renaming,
+substitution but also elaboration of a surface language to a core one,
+and normalisation by evaluation. We also explore other opportunities for
+generic programming: the interpretation of binding as self-reference leads
+to the ability to give a finite representation of potentially infinite
+objects.
+\todo{proofs}
+
+\section{A Primer on Scope Safe Terms}\label{section:primer-term}
+
+Scope safe terms are following a strict discipline which enforces statically
+that they may only refer to variables introduced by a binder beforehand. A
+scope safe language is a programming language in which all the valid terms
+are guaranteed to be scope safe.
+
+Altenkirch and Reus~\citeyear{altenkirch1999monadic} introduced the
+nowadays classic presentation of scope safe languages using inductive
+\emph{families}~\cite{dybjer1994inductive} to track scoping information
+at the type level. Instead of describing the type of abstract syntax trees
+of the language as the fixpoint of an endofunctor on $\Set{}$, they used
+an endofunctor on $\Set{}^{\Set{}}$ where the $\Set{}$ index corresponds
+to the set of variables in scope. Because the empty Set has no inhabitant,
+it is a natural representation of the empty scope. Conversely, the functor
+$M(X) = 1 + X$ is used to extend the running scope with an extra variable.
+
+This generic presentation of scope safe languages leads to the following
+definition of the untyped $\lambda$-calculus. The endofunctor
+$T(F) = \lambda X \in \Set{}. X + (F(X) \times F(X)) + F(1 + X)$
+offers a choice of three constructors. The first one corresponds to the variable
+case; it packages an inhabitant of $X$, the index $\Set{}$. The second corresponds
+to an application node; both the function and its argument live in the same
+scope as the overall expression. Last but not least, the third corresponds to
+a $\lambda$-abstraction; it extends the current scope with a fresh variable.
+The language is obtained as the fixpoint of $T$:
+\[
+   \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
+   \lambda X \in \Set{}. X + (F(X) \times F(X)) + F(1 + X)
+\]
+The operation of renaming free variables in a term then corresponds to
+the fixpoint's functoriality, and stability under substitution is given
+by the proof that the fixpoint forms a monad.
+
+\subsection{A Mechanized Variant of Altenkirch and Reus' Untyped Calculus}
+
+There is no reason to restrict this technique to fixpoints of endofunctors
+on $\Set{}^{\Set{}}$ apart from the fact that renaming and substitution
+correspond to well-known structures in that specific case. The more general
+case of fixpoints of (strictly positive) endofunctors on $\Set{}^I$ can be
+endowed with similar operations by using what Altenkirch, Chapman and
+Uustalu~\citeyear{Altenkirch2010, JFR4389} refer to as relative monads.
+
+In this paper, we pick $I = \mathbb{N}$ where the natural number used as
+an index is straightforwardly the number of (de Bruijn) variables in scope.
+Our implementation language is Agda~\cite{norell2009dependently} however
+these techniques are language independent: any dependently typed language
+whose logic is at least as powerful as Martin-L\"of Type
+Theory~\cite{martin1982constructive} equipped with inductive
+families~\cite{dybjer1994inductive} ought to do.
+
+In order to lighten the presentation, we weaponise the observation that the
+current scope is either threaded to subterms (e.g. in the application's case)
+or adjusted (e.g. in the $\lambda$-abstraction's case) by introducing two
+combinators. The first one is the pointwise lifting of the function space
+silently threading the underlying scope whereas the second one makes explicit
+the \emph{adjustment} made to it by a function. The use of $\_\vdash{}\_$\footnote{
+In Agda, underscores in a function's name denote the positions in which the
+function's arguments are to be inserted.} for the latter is meant to suggest
+its connection to the mathematical convention of only mentioning context
+\emph{extensions} when presenting judgements (see e.g. \cite{martin1982constructive}).
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[indexed.tex]{parrow}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[indexed.tex]{pextend}
+\end{minipage}
+%\ExecuteMetaData[indexed.tex]{pforall}
+\caption{Combinators to build indexed Sets}
+\end{figure}
+
+Using these combinators together with \AF{[\_]} which turns an indexed Set
+into a Set by implicitly quantifying over the index, the untyped
+$\lambda$-calculus can be represented using the following definitions:
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{var}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{tm}
+\end{minipage}
+\caption{Scope Aware Variables and Untyped $\lambda$-Terms\label{scoped-untyped}}
+\end{figure}
+
+The inductive family \AD{Var} corresponds to well scoped de Bruijn~\citeyear{de1972lambda}
+indices. Its first constructor (\AIC{z} for zero) states that we have a name to refer to
+the nearest binder in a non-empty scope. The second one (\AIC{s} for successor) lifts a
+name for a variable in a given scope into a name for it in the extended scope where
+an extra variable has been bound. Both of their types have been written using combinators,
+altought we will abstain from unfolding them in the future\footnote{That would defeat the
+purpose of introducing them in the first place, after all.}, we do so here in the hope
+it will help the reader get acquainted with them: they respectively normalise to
+$\forall n. \mathbf{Var}(\mathit{suc}(n))$ for \AIC{z},
+and $\forall n. \mathbf{Var}(n) \rightarrow \mathbf{Var}(\mathit{suc}(n))$ for \AIC{s}.
+
+The \AD{ℕ}-indexed family \AD{Lam} is the variant of Altenkirch and Reus' untyped
+$\lambda$-calculus. The two interesting constructors are the one lifting variables
+to terms and the $\lambda$-abstraction whose body lives in an extended context.
+
+\section{A Primer on Scope Safe Programs}\label{section:primer-program}
+
+This scope safe deep embedding of the untyped $\lambda$-calculus is
+naturally only a start: once the programmer has access to a good
+representation of the language she is interested in, she wants and
+needs to (re)implement standard traversals manipulating terms.
+Renaming and substitution are perhaps the two most iconic examples
+of such traversals. And now that well-scopedness is enforced in
+the terms' indices, all of these traversals have to be implemented
+in a scope safe manner. These constraints show up in the type of
+renaming and substitution which can be defined as follows:
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{ren}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{sub}
+\end{minipage}
+\caption{Scope Preserving Renaming and Substitution}
+\end{figure}
+
+Looking more closely at these two functions' code, it is quite evident
+that they have a very similar structure. In each case, we have used
+two (function specific) auxiliary definitions named \AF{⟦V⟧} and \AF{extend}
+respectively to highlight this fact. Abstracting away this shared structure
+would allow for these definitions to be refactored, and their common
+properties to be proved in one swift move.
+
+Previous efforts in dependently typed
+programming~\cite{mcbride2005type,benton2012strongly,allais2017type}
+have precisely achieved this goal and refactored renaming and substitution,
+but also normalisation by evaluation, printing with names or CPS conversion
+as various instances of a more general traversal. Unpublished results also
+demonstrate that typechecking in the style of Atkey~\citeyear{atkey2015algebraic}
+fits in that framework. To be able to make sense of this body of work, we
+need to introduce three new definitions:
+
+A \AF{Thinning} from $m$ to $n$ is a function from \AD{Var} $m$ to \AD{Var} $n$.
+It subsumes more structured notions such as the Category of
+Weakenings~\cite{altenkirch1995categorical} or Order Preserving
+Embeddings~\cite{chapman2009type}. The fact that the representation used
+is a function space grants us monoid laws ``for free'' as per Jeffrey's
+observation~\citeyear{jeffrey2011assoc}.
+
+The \AF{□} combinator turns any \AD{ℕ}-indexed Set into one that can absorb
+thinnings. It is akin to Kripke-style quantification over all possible future
+worlds and \AF{□} (\AB{D} \AF{→} \AB{D}) indeed corresponds to the Kripke
+function space used in normalisation by evaluation via a domain \AB{D}.
+
+The notion of \AF{Thinnable} is the property of being stable under thinnings.
+It is a crucial property for values to have if one wants to be able to push
+them under binders. Unsurprisingly, the \AF{□} combinator turns any
+\AD{ℕ}-indexed Set into a \AF{Thinnable} one; in other words: combined
+with the existence of an identity thinning this means that \AF{□} is a
+comonad.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{box}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{thinnable}
+\end{minipage}
+\caption{Thinnable and the Free Thinnable Construction}
+\end{figure}
+
+Equipped with these two new notions, we can define an abstract
+concept of semantics for our scope safe language. A semantics with
+values in $\mathcal{V}$ and computations in $\mathcal{C}$ is meant
+to give rise to a traversal which, provided a term and an environment
+of values for each one of the variables in scope, delivers a computation.
+The traversal \AF{sem} realises this specification generically for all
+Semantics.
+
+A Semantics is characterised by a set of constraints. First of all,
+values should be thinnable so that \AF{sem} may push the environment
+under binders. Second, the set of computations needs to be closed
+under various combinators which are the semantical counterparts of
+the language's constructors. Here the semantical counterpart of
+application is not particularly interesting. However the interpretation
+of the $\lambda$-abstraction is of interest: it is a variant on
+the Kripke function space one can find in normalisation by evaluation.
+In all possible thinnings of the scope at hand, it promise to deliver
+a computation whenever it is provided with a value for its newly
+bound variable. This is concisely expressed by the type
+(\AF{□} (\AB{\mathcal{V}} \AF{→} \AB{\mathcal{C}})).
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{rsem}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{sem}
+\end{minipage}
+\caption{Semantics for Lam and their Fundamental Lemma}
+\end{figure}
+
+Coming back to renaming and substitution, we can see that they do fit
+in the \AR{Sem} framework. We also include the definition of a very
+basic printer relying on a name supply to highlight the fact that
+computations can very well be effectful. Both Printing and Renaming
+highlight the importance of having a distinct notion of values and
+computations: the type of values in their respective environments
+are distinct from their type of computations.
+
+\begin{figure}[h]
+\begin{minipage}{0.40\textwidth}
+\ExecuteMetaData[motivation.tex]{semren}
+\ExecuteMetaData[motivation.tex]{semsub}
+\end{minipage}\hspace{1em}
+\begin{minipage}{0.50\textwidth}
+\ExecuteMetaData[motivation.tex]{semprint}
+\end{minipage}
+\caption{Renaming, Substitution and Printing as Instances of \AR{Sem}}
+\end{figure}
+
+All of these examples are already desribed at length by Allais, Chapman,
+McBride and McKinna~\citeyear{allais2017type} so we will not spend any
+more time on them. They have also obtained the simulation and fusion
+theorems demonstrating that these traversals are well-behaved as
+corollaries of more general results expressed in terms of that generic
+traversal. We will come back to this in Section~\ref{section:simulation}.
+
+One important observation to make is the tight connection between the
+constraint described by \AR{Sem} and the definition of \AD{Lam}: the
+semantical combinators correspond to the corresponding constructors
+where the recursive occurences of the inductive family have been replaced
+with either a computation or a Kripke function space whenever an
+extra variable was bound. This suggest that it ought to be possible
+to compute the definition of \AF{Sem} from the one of the datatype.
+
+\section{A Primer on the Universe of Data Types}
+
+In an unpublished article, McBride~\citeyear{mcbride2010ornamental}
+defines a universe of data types inspired by Dybjer and Setzer's
+finite axiomatisation of Inductive-Recursive definitions~\citeyear{Dybjer1999}.
+This explicit definition of \emph{codes} for data types empowers the
+user to write generic programs tackling \emph{all} of the data types
+one can define this way. In this section we recall the main aspects
+of this construction we are interested in to build up our generic
+representation of syntaxes with binding.
+
+The first component of this universe's definition is an inductive type
+of \AD{Desc}riptions of strictly positive functors on $\Set{}$. It has
+three constructors: one to store data (the rest of the description can
+depend upon this stored value), one to attach a recursive substructure
+and one to stop.
+
+These constructors give the programmer the ability to build up the data
+types she is used to. For instance, the functor corresponding to lists
+of elements in $A$ stores one bit of data: whether the current node is
+the empty list or not. Depending on that bit, the rest of the description
+is either the ``stop'' token or a pair of an element in $A$ and a
+recursive substructure (i.e. the tail of the list).
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[generic-data.tex]{desc}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[generic-data.tex]{listD}
+\end{minipage}
+\caption{Data Descriptions and List Description}
+\end{figure}
+
+The recursive function \AF{⟦\_⟧} makes the interpretation of the
+Descriptions formal by associating a value in $\Set{}^\Set{}$ to
+each one of them. Together with it, we can define the \AF{fmap}
+recursive function witnessing the fact that the meaning of a
+description is indeed functorial. This is the first example of
+generic programming over all the functors one can obtain as the
+meaning of a description.
+
+\begin{figure}[h]
+\begin{minipage}{0.35\textwidth}
+\ExecuteMetaData[generic-data.tex]{interp}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.55\textwidth}
+\ExecuteMetaData[generic-data.tex]{fmap}
+\end{minipage}
+\caption{Meaning of Descriptions and Proof of Functoriality}
+\end{figure}
+
+Because all of the functors obtained as meanings of descriptions are
+strictly positive, it is possible to take their least fixpoint \AD{μ}.
+We index this inductive definition of the least fixpoint with a
+size~\cite{DBLP:journals/corr/abs-1012-4896} so that functions such
+as \AF{fold}, the proof that \AD{μ} \AB{d} is the initial algebra
+corresponding to \AB{d}'s meaning, are seen as obviously terminating
+by the system thanks to a type-based argument. Indeed, the use of
+\AF{fmap} obscures the fact that recursive calls are only performed
+on strict subterms and without a type-based approach this concise
+definition would be rejected.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[generic-data.tex]{mu}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[generic-data.tex]{fold}
+\end{minipage}
+\caption{Fixpoint and Generic Fold}
+\end{figure}
+
+This demonstrates that this approach allows us to define generically
+the iteration principle associated to all the datatypes which arise
+as the fixpoint of a description's meaning. It seems appropriate to
+base our universe of scope safe syntaxes on a similar construction
+so that we may be able to define generically a notion of semantics
+for all the syntaxes with binding one may come up with.
+
+\section{A Universe of Scope Safe Syntaxes}
+
+Our universe of scope safe syntaxes follows the same principle
+as McBride's universe of datatypes except that we are not building
+endofunctors on $\Set{}$ but rather $\Set{}^ℕ$. Descriptions can
+be built using three constructors: the first one makes it possible
+to store data (and, as usual, the rest of the description may
+depend upon the value stored), the second takes a natural number
+$n$ and corresponds to a substructure with exactly $n$ additional
+variable in scope and the last one ends the definition.
+
+The meaning function \AF{⟦\_⟧} we associate to a description is not
+quite an endofunctor on $\Set{}^ℕ$; it is more general than that.
+Given an $X$ that interprets substructures with an extra $m$ bound
+variables in a scope that has $n$ bound variables already as $X\,m\,n$,
+we give a description a meaning as an $\Set{}^ℕ$.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[generic-syntax.tex]{desc}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[generic-syntax.tex]{interp}
+\end{minipage}
+\caption{Syntax Descriptions and their Meaning as Higher Functor}
+\end{figure}
+
+However if we pre-compose the meaning function with a notion
+of ``scope'' (denoted \AF{Scope} here) which turns any \AD{ℕ}-indexed
+family into a function of type \AD{ℕ} \AS{→} \AD{ℕ} \AS{→} $\Set{}$
+by simply summing the two indices, we recover an endofunctor on
+$\Set{}^ℕ$ and we can take a fixpoint of it. This time, instead
+of considering the initial algebra, we opt for the free relative
+monad~\cite{JFR4389}. We are, after all, interested in describing
+terms with a notion of variable.
+
+\begin{figure}[h]
+\begin{minipage}{0.55\textwidth}
+\ExecuteMetaData[generic-syntax.tex]{mu}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.35\textwidth}
+\ExecuteMetaData[generic-syntax.tex]{scope}
+\end{minipage}
+\caption{Term Trees: The Free Monads on Descriptions}
+\end{figure}
+
+Coming back to our the well-scoped untyped $\lambda$-calculus,
+we now have the ability to give a code describing it. Because
+the variable constructor will be introduced by the fixpoint
+building the free monad, we only have to describe two cases:
+the application case where we have two substructures which do
+not bind any extra argument and the $\lambda$-abstraction case
+which has exactly one substructure with precisely one extra
+bound variable. We can also define smart constructors corresponding
+to application and $\lambda$-abstraction respectively. They have
+the same type as the \AIC{A} and \AIC{L} constructors in our
+motivating example in Figure~\ref{scoped-untyped}.
+
+\begin{figure}[h]
+\begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{LC}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{applam}
+\end{minipage}
+\caption{Example: The Untyped Lambda Calculus}
+\end{figure}
+
+It is the second time (the first time being the definition of
+\AF{listD}, the underlying functor for lists) that we use a
+\AF{Bool} to distinguish between two constructors. In order
+to avoid having to re-encode the same logic time and time again,
+the next section introduces combinators demonstrating that
+descriptions are closed under sums and products.
+
+\subsection{Common Combinators and Their Properties}\label{desccomb}
+
+As we have seen previously, we can take the coproduct of two
+descriptions by using a dependent pair whose first component
+stores a \AF{Bool}ean tagging which branch was taken whilst
+the second one uses that information to return the description
+corresponding to that branch. We can define an appropriate
+eliminator \AF{case} which given two continuations picks the
+one corresponding to the chosen branch.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{sumcomb}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{case}
+\end{minipage}
+\caption{Descriptions are closed under Sums}
+\end{figure}
+
+Closure under product is however a bit more technical: it is
+defined by induction on the first description of the product.
+The definition is purely structural except for the ``stop''
+constructor which gets replaced the second description. Because
+of the indirect nature of the definition of closure under
+products, it is convenient to have functions going back and
+forth between the interpretation of a product of descriptions
+and the product of their respective interpretations.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{paircomb}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{pairunpair}
+\end{minipage}
+\caption{Descriptions are closed under Products}
+\end{figure}
+
+
+\section{Generic Scope Safe Programs for Syntaxes}\label{section:semantics}
+
+Based on the structure made explicit in the example worked out
+in Section~\ref{section:primer-program}, we can define a generic notion of
+semantics for all syntax descriptions. It is once more parametrised
+by two \AD{ℕ}-indexed families \AB{𝓥} and \AB{𝓒} corresponding
+respectively to values associated to bound variables and
+computations delivered by evaluating terms. These two families
+have to abide by three constraints
+\begin{itemize}
+\item Values should be thinnable for us to be able to push the
+      evaluation environment under binders;
+\item Values should embed into computations for us to be able
+      to the return the value associated to a variable as the
+      result of its evaluation;
+\item Last but not least, we should have an algebra turning
+      a term where substructures have been replaced with
+      either computations or kripke functional spaces (depending
+      on whether extra bound variables have been introduced)
+      into computations
+\end{itemize}
+Here we crucially use the fact that the meaning of a description is
+defined in terms of a function interpreting substructures which has
+the type \AD{ℕ} \AS{→} \AD{ℕ} \AS{→} $\Set{}$, i.e. that gets access
+to the current scope but also the exact number of newly-bound variables.
+We define such a function, \AF{Kripke}, by case analysis on the number
+of newly-bound variables: if it's $0$ then we expect the substructure
+to simply be a computation (the result of the evaluation function's
+recursive call) but if there are newly bound variables then we expect
+a function which takes one value for each one of them and delivers
+a computation corresponding to the evaluation of the body of the binder
+in the extended environment.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[environment.tex]{kripke}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{semantics}
+\end{minipage}
+\caption{A Generic Notion of Semantics}
+\end{figure}
+
+It is once more the case that the abstract notion of Semantics comes
+with a fundamental lemma: all \AD{ℕ}-indexed families \AB{𝓥} and
+\AB{𝓒} satisfying the three criteria we have put forward give rise
+to an evaluation function. Here the fundamental lemma is called \AF{sem}
+and it is defined mutually with a function \AF{body} turning a \AF{Scope}
+(i.e. a substructure in a potentially extended context) into a \AF{Kripke}
+(i.e. a subcomputation expecting a value for each newly bound variable).
+
+\begin{figure}[h]
+{\center \ExecuteMetaData[generic-syntax.tex]{sembody}}
+\hspace{-1em}\begin{minipage}{0.40\textwidth}
+\ExecuteMetaData[generic-syntax.tex]{sem}
+\end{minipage}\hspace{2em}
+\hspace{-1em}\begin{minipage}{0.50\textwidth}
+\ExecuteMetaData[generic-syntax.tex]{body}
+\end{minipage}
+\caption{Fundamental Lemma of Semantics}
+\end{figure}
+
+Renaming can be defined generically for all syntax descriptions as a
+semantics with \AF{Fin} as values and \AD{Tm} as computations. The
+two first constraints on \AF{Fin} described earlier are trivially
+satisfied. Because renaming strictly respects the structure of the
+term it goes through, the algebra is implemented using \AF{fmap}.
+When dealing with the body a binder, we simply ``reify'' the
+\AF{Kripke} function by evaluating it in an extended context and
+feeding it dummy values corresponding to the extra variables
+introduced by that context. This is reminiscent both of what we
+did in Section~\ref{section:primer-program} and the definition
+of reification in the setting of normalisation by evaluation
+\footnote{For more details, see Catarina Coquand's work on a
+fully formal presentation of normalisation by evaluation for a
+simply-typed $\lambda$-calculus with explicit substitutions~\cite{coquand2002formalised}}.
+
+Substitution can be defined in a similar manner. Of the two
+constraints applying to terms as values, the first one corresponds
+precisely to renaming and the second one is trivial. The algebra
+can once more be defined by using \AF{fmap} and reifying the bodies
+of binders. This reification process can be implemented generically
+for semantics which have ``VarLike'' values i.e. values that are
+thinnable and such that we can craft dummy ones in non-empty contexts.
+
+\begin{figure}[h]
+\begin{minipage}{0.40\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{varlike}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.50\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{reify}
+\end{minipage}
+
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{renaming}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{substitution}
+\end{minipage}
+\caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding}
+\end{figure}
+
+
+\section{Other Generic Programs}
+
+\subsection{Elaboration to a Core Language}
+
+One of the advantages of having a universe of programming languages
+descriptions is the ability to concisely define an \emph{extension}
+of an existing language by grafting extra constructors. This is made
+extremely simple by the disjoint sum combinator \AF{\_`+\_} which we
+have already seen in Section~\ref{desccomb}.
+
+An example of such an extension is the addition of let-bindings to
+an existing language. Let bindings allow the user to avoid repeating
+herself by naming a sub expression and then using that name to refer
+to the associated term.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{ntimes}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{letcode}
+\end{minipage}
+\caption{Parallel Let Binding}
+\end{figure}
+
+In a dependently typed language a type may depend on a value which
+in the presence of let bindings may be a variable standing for an
+expression. The user naturally does not want it to make any difference
+whether she used a variable referring to a let-bound expression or
+the expression itself. Various typechecking strategies can accomodate
+this expectation: in Coq~\cite{Coq:manual} let bindings are primitive
+constructs of the language and have their own typing and reduction
+rules whereas in Agda they are elaborated away to the core language
+by inlining.
+
+This latter approach to extending a language \AB{d} with let bindings
+by inlining them before typechecking can be implemented generically as
+a Semantics over (\AF{Let} \AB{d}) where values in the environment and
+computations both are let-free terms. The algebra of that semantics can
+be defined by parts: the old constructors are simply interpreted using
+the algebra defined generically for the \AF{Substitution} semantics whilst
+the newer one precisely provides the extra values to be added to the
+environment (we leave the definition of \AF{alg'} out because of a lack
+of space). The process of removing let binders is kickstarted with a
+dummy environment associating each variable to itself.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{unletcode}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{unlet}
+\end{minipage}
+\caption{Inlining Let Binding}
+\end{figure}
+
+In about 20 lines of code we have defined a generic extension of
+syntaxes with binding together with a semantics which corresponds
+to an elaborator translating away this new constructor. In their
+own setting working on a given language, Allais, Chapman, McBride
+and McKinna~\citeyear{allais2017type} have shown that it is similarly
+possible to implement a Continuation Passing Style transformation as
+a semantics.
+
+The ease with which one can define such generic transformations
+suggests that this setup could be a good candidate to implement
+generic compilation passes.\todo{cite nanopass?}
+
+\subsection{(Unsafe) Normalisation by Evaluation}
+
+A key type of traversal we have not studied yet is a language's
+evaluator. Our universe of syntaxes with binding does not impose
+that the user defined languages have a type system guaranteeing
+the language's totality. This is demonstrated by our running
+example: the untyped $\lambda$-calculus. As a consequence there
+is no hope for a safe generic framework to define normalisation
+functions.
+
+The clear connection between the \AF{Kripke} functional space
+characteristic of our semantics and the one that shows up in
+normalisation by evaluation suggests that we ought to be able
+to give the user a generic framework to define normalisation
+functions. By temporarily \textbf{disabling Agda's positivity
+checker}, we can give a generic reflexive domain.
+
+\begin{figure}[h]
+{\center \ExecuteMetaData[generic-syntax.tex]{domain}}
+\caption{Generic Reflexive Domain}
+\end{figure}
+
+This datatype definition is utterly unsafe but makes it possible
+to define a generic \AF{nbe} semantics as well as a reification
+function turning elements of the reflexive domain into terms.
+By composing them, we obtain the normalisation function which
+gives its name to normalisation by evaluation.
+
+The user still has to explicitly pass an interpretation of
+the various constructors because there is no way for us to
+know what the binders are supposed to represent: they may
+stand $\lambda$-abstractions, $\Sigma$-types, fixpoints, or
+anything else the user wants to define.
+
+
+\begin{figure}[h]
+\ExecuteMetaData[generic-syntax.tex]{nbe-setup}
+\caption{Generic Normalisation by Evaluation Framework}
+\end{figure}
+
+Using this setup, we can write a normaliser for the untyped
+$\lambda$-calculus: we use \AF{case} to distinguish between
+the semantical counterpart of the application constructor on
+one hand and the $\lambda$-abstraction one on the other.
+The latter is trivial: functions are already
+values! The semantical counterpart of application proceeds by
+case analysis on the function: if it corresponds to a
+$\lambda$-abstraction, we can fire the redex by using the kripke
+functional space; otherwise we grow the spine of stuck
+applications.
+
+
+\begin{figure}[h]
+\ExecuteMetaData[generic-syntax.tex]{nbelc}
+\caption{Normalisation by Evaluation for the Untyped $\lambda$-Calculus}
+\end{figure}
+
+
+
+\subsection{Binding as Self-Reference: Representing Cyclic Structures}
+
+Ghani, Hamana, Uustalu and Vene~\cite{ghani2006representing} have
+demonstrated how Altenkirch and Reus' type-level de Bruijn
+indices~\cite{altenkirch1999monadic} can be used to represent
+potentially cyclic structures by a finite object. In their
+representation each bound variable is a pointer to the node
+that introduced it. Because we are, at the top-level, only
+interested in structures with no ``dangling pointers'', we introduce
+the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
+\AD{Tm} \AB{d} \AF{∞} \AN{0}).
+
+A basic example of such a structure is a potentially cyclic list which
+offers a choice of two constructors: nil which ends the list and cons
+which combines a head and a tail but also acts as a binder for a
+self-reference. We can see this approach in action in the example \AF{01↺}
+which describes a cyclic list starting with 0, then 1, and then
+repeats the whole list again by referring to the first cons cell
+represented here by the variable \AIC{suc} \AIC{zero}.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-cofinite.tex]{clistD}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[generic-cofinite.tex]{zeroones}
+\end{minipage}
+\caption{Potentially Cyclic Lists: Description and Example}
+\end{figure}
+
+These finite representations are interesting in their own right
+and we can use the generic semantics framework defined earlier
+to manipulate them. A basic building block is the \AF{unroll}
+function which takes a closed tree, exposes its top node and
+unrolls any cycle which has it as its starting point. We can
+decompose it using the \AF{plug} function which, given a closed
+and an open term, closes the latter by plugging the former at
+each \AIC{`var} leaf. Because \AF{plug}'s fundamental nature
+is that of substituting a term for each leaf, it can naturally
+be implemented using \AF{Substitution}.
+
+\begin{figure}[h]
+\begin{minipage}{0.52\textwidth}
+  \ExecuteMetaData[generic-cofinite.tex]{plug}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.43\textwidth}
+  \ExecuteMetaData[generic-cofinite.tex]{unroll}
+\end{minipage}
+\caption{Plug and Unroll: Exposing a Cyclic Tree's Top Layer}
+\end{figure}
+
+However, one thing still out of our reach with the current tools we have
+is the underlying co-finite trees these finite objects are meant
+to represent. We can start by defining the coinductive type
+corresponding to them as the greatest fixpoint of a notion of
+layer. One layer of a co-finite tree is precisely given by the
+meaning of its description where we completely ignore the binding
+structure. We show with \AF{01⋯} which infinite list ought to
+correspond to the cyclic example \AF{01↺} given above.
+
+\begin{figure}[h]
+\begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[generic-cofinite.tex]{cotm}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.35\textwidth}
+  \ExecuteMetaData[generic-cofinite.tex]{zeroones2}
+\end{minipage}
+\caption{Co-finite Trees: Definition and Example}
+\end{figure}
+
+We can then make the connection between potentially cyclic
+structures and the co-finite trees by giving an \AF{unfold}
+function which, given a closed term, produces its unfolding.
+The definition proceeds by unrolling the term's top layer and
+co-recursively unfolding all the subterms.
+
+\begin{figure}[h]
+ \ExecuteMetaData[generic-cofinite.tex]{unfold}
+\caption{Generic Unfold of Potentially Cyclic Structures}
+\end{figure}
+
+We can see that this universe of descriptions allows us to
+implement generic functions once and for all. Even if the
+powerful notion of semantics described in Section~\ref{section:semantics}
+cannot encompass all the traversals we may interested in,
+it provides us with reusable building blocks: the definition
+of \AF{unfold} was made very simple by reusing the generic
+program \AF{fmap} and the \AF{Substitution} semantics.
+
+\section{Building Generic Proof about Generic Programs}\label{section:simulation}
+
+Allais, Chapman, McBride, and McKinna~\citeyear{allais2017type} have
+already shown that, for their specific language, introducing an abstract
+notion of Semantics not only reveals the shared structure of common
+traversals, it also allows them to give abstract proof frameworks for
+simulation or fusion lemmas. Their idea naturally extends to our generic
+presentation of semantics for all syntaxes.
+
+The most important concept in this section is \AF{Zip} which characterises
+layers which are structurally equal and such that their substructures are
+related by a predicate $P$. It is defined by induction on the description
+and case analysis on the two layers which are meant to be equal.
+
+\begin{figure}[h]
+ \ExecuteMetaData[generic-simulation.tex]{ziptype}
+\caption{Zip: Characterising Structurally Equal Values with Related Substructures}
+\end{figure}
+
+\subsection{Simulation Lemma}
+
+A \AF{Zip} constraint appears naturally when we want to say that a
+semantics can simulate another one. Given a relation
+%\AB{𝓡^𝓥}
+relating values in \AB{𝓥_1} and \AB{𝓥_2}, and a relation
+% \AB{𝓡^𝓒}
+relating computations in \AB{𝓒_1} and \AB{𝓒_2}, we can define
+a relation \AF{Kripke^R} relating values \AF{Kripke} \AB{𝓥_1} \AB{𝓒_1}
+and \AF{Kripke} \AB{𝓥_2} \AB{𝓒_2} by stating that they send
+related inputs to related outputs. We can then use \AF{Zip} to
+express the idea that two semantic objects of respective types
+\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥_1} \AB{𝓒_1}) and
+\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥_2} \AB{𝓒_2}) are
+synchronised.
+
+The formal definition of one semantics being able to simulate another
+can then state (among other constraints) that the \ARF{alg}ebras have
+to send synchronised semantic objects to related computations. We can
+prove a generic theorem showing that for each pair of semantics respecting
+the semantics, we get related computations given related inputs.
+Instantiating this generic simulation lemma, we can for instance get
+that Renaming is a special case of Substitution.
+
+\begin{figure}[h]
+ \ExecuteMetaData[generic-simulation.tex]{rensub}
+\caption{Renaming can be Simulated using Substitution}
+\end{figure}
+
+\subsection{Definition of Bisimilarity for co-finite objects}
+
+Although we were able to use propositional equality when studying
+syntactic traversals working on terms, it is not the appropriate
+notion of equality for co-finite trees. We can use \AF{Zip} to
+define generically a coinductive notion of bisimilarity for all
+co-finite trees obtained as unfolding of descriptions. And we
+can derive from \AF{Zip}'s properties the fact that this gives
+rise to an equivalence relation.
+
+\begin{figure}[h]
+ \ExecuteMetaData[generic-bisimilar.tex]{bisim}
+ \ExecuteMetaData[generic-bisimilar.tex]{eqrel}
+\caption{Bisimilarity, an Equivalence Relation for Co-finite Trees}
+\end{figure}
+
+
+\section{Conclusion}
+
+We have started from an example of a scope safe language (the
+untyped $\lambda$-calculus), have studied various common traversals
+and noticed their similarity. After introducing a notion of semantics
+and refactoring these traversals as various instances of the same
+fundamental lemma, we have observed the tight connection between the
+abstract definition of semantics and the shape of the language. By
+extending a universe of datatype descriptions to support a notion of
+binding, we have managed to give a generic presentation of syntaxes
+with binding as well as a large class of scope safe programs acting
+on them: from Renaming and Substitution, to Normalisation by Evaluation,
+and Elaboration to a core language. We have also seen how this setup
+could be applied to a different domain: the representation of potentially
+cyclic structures by finite artefacts. Last but not least, we have
+quickly seen how to construct proofs about these generic programs.
+The diverse influences leading to this body of work suggest many
+opportunities for future research:
+
+The question of a universe of syntaxes with binding which are not only
+well scoped but also intrinsically well typed by construction is an
+exciting challenge. The existing variation on the universe of datatypes
+giving a universe of inductive families~\cite{dybjer1994inductive}
+is a natural candidate.
+
+Our example of the elaboration of an enriched language to a core one,
+and Allais, Chapman, McBride and McKinna's implementation of a
+Continuation Passing Style conversion function begs the question of how
+many such common compilation passes can be implemented generically.
+An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
+could provide an appropriate framework to highlight the connection
+between various languages, some being seen as the extension of others.
+
+The potentially cyclic structures we have studied have been improved
+upon by Hamana~\citeyear{Hamana2009} who gave a presentation which
+preserves sharing: pointers can not only refer to nodes above them
+but also across from them in the cyclic tree. This yields a much more
+involved binding structure which would be interesting in its own right.
