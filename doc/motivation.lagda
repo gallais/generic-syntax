@@ -2,17 +2,12 @@
 module motivation where
 
 open import indexed
+open import var
+
 open import Data.Nat
 open import Function
 
 \end{code}
-%<*var>
-\begin{code}
-data Var : ℕ → Set where
-  z : [        suc ⊢ Var ]
-  s : [ Var ⟶  suc ⊢ Var ]
-\end{code}
-%</var>
 
 
 %<*tm>
@@ -65,19 +60,9 @@ module _ where
 \end{code}
 %</sub>
 
-%<*box>
 \begin{code}
-□ : (ℕ → Set) → (ℕ → Set)
-(□ T) m = {n : ℕ} → (Var m → Var n) → T n
+open import environment hiding (extend ; _>>_ ; refl)
 \end{code}
-%</box>
-
-%<*thinnable>
-\begin{code}
-Thinnable : (ℕ → Set) → Set
-Thinnable T = [ T ⟶ □ T ]
-\end{code}
-%</thinnable>
 
 %<*rsem>
 \begin{code}
@@ -96,8 +81,8 @@ module _ {𝓥 𝓒} (𝓢 : Sem 𝓥 𝓒) where
 
 %<*sem>
 \begin{code}
- sem : {m n : ℕ} → (Var m → 𝓥 n) → (Lam m → 𝓒 n)
- sem ρ (V k)    = ⟦V⟧ (ρ k)
+ sem : {m n : ℕ} → (m ─Env) 𝓥 n → (Lam m → 𝓒 n)
+ sem ρ (V k)    = ⟦V⟧ (lookup ρ k)
  sem ρ (A f t)  = ⟦A⟧ (sem ρ f) (sem ρ t)
  sem ρ (L b)    = ⟦L⟧ (λ σ v → sem (extend σ ρ v) b)
 \end{code}
@@ -105,19 +90,19 @@ module _ {𝓥 𝓒} (𝓢 : Sem 𝓥 𝓒) where
 \begin{code}
    where
 
-     extend : ∀ {m n p} → (Var n → Var p) → (Var m → 𝓥 n) → 𝓥 p → (Var (suc m) → 𝓥 p) 
-     extend σ ρ v z      = v
-     extend σ ρ v (s k)  = th^𝓥 (ρ k) σ
+     extend : ∀ {m n p} → (n ⊆ p) → (m ─Env) 𝓥 n → 𝓥 p → (suc m ─Env) 𝓥 p
+     lookup (extend σ ρ v) z      = v
+     lookup (extend σ ρ v) (s k)  = th^𝓥 (lookup ρ k) σ
 \end{code}
 
 %<*semren>
 \begin{code}
 Renaming : Sem Var Lam
 Renaming = record
-  { th^𝓥  = λ t f → f t
+  { th^𝓥  = th^Var
   ; ⟦V⟧    = V
   ; ⟦A⟧    = A
-  ; ⟦L⟧    = λ b → L (b s z) }
+  ; ⟦L⟧    = λ b → L (b (pack s) z) }
 \end{code}
 %</semren>
 %<*semsub>
@@ -127,7 +112,7 @@ Substitution = record
    { th^𝓥  = λ t ρ → sem Renaming ρ t
    ; ⟦V⟧    = id
    ; ⟦A⟧    = A
-   ; ⟦L⟧    = λ b → L (b s (V z)) }
+   ; ⟦L⟧    = λ b → L (b (pack s) (V z)) }
 \end{code}
 %</semsub>
 
@@ -149,7 +134,7 @@ Printing = record
    ; ⟦A⟧    =  λ mf mt → mf >>= λ f → mt >>= λ t →
                return $ f ++ "(" ++ t ++ ")"
    ; ⟦L⟧    =  λ mb → get >>= λ x → put (suc x) >>
-               let x' = show x in mb s x' >>= λ b →
+               let x' = show x in mb (pack s) x' >>= λ b →
                return $ "λ" ++ x' ++ "." ++ b }
 \end{code}
 %</semprint>
@@ -160,7 +145,7 @@ Printing = record
 
 \begin{code}
 print : Lam 0 → String
-print t = proj₁ $ sem Printing {m = 0} {n = 0} (λ ()) t 0
+print t = proj₁ $ sem Printing {m = 0} {n = 0} (pack λ ()) t 0
 
 _ : print (L (V z)) ≡ "λ0.0"
 _ = refl

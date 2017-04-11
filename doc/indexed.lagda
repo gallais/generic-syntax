@@ -16,30 +16,36 @@ infix  8 _⊢_
 \end{code}}
 
 \begin{code}
-κ : {ℓ : Level} → Set ℓ → (I → Set ℓ)
-κ S i = S
-
 _∙⊎_ : {ℓ ℓ′ : Level} → (I → Set ℓ) → (I → Set ℓ′) → (I → Set (ℓ′ ⊔ ℓ))
 (S ∙⊎ T) i = S i ⊎ T i
-
-_∙×_ :  {ℓ ℓ′ : Level} →(I → Set ℓ) → (I → Set ℓ′) → (I → Set (ℓ′ ⊔ ℓ))
-(S ∙× T) i = S i × T i
 \end{code}
-%<*parrow>
+%<*arrow>
 \begin{code}
 _⟶_ :  {ℓ ℓ′ : Level} → (I → Set ℓ) → (I → Set ℓ′) → (I → Set (ℓ′ ⊔ ℓ))
 (S ⟶ T) i = S i → T i
 \end{code}
-%</parrow>
-%<*pforall>
+%</arrow>
+%<*constant>
+\begin{code}
+κ : {ℓ : Level} → Set ℓ → (I → Set ℓ)
+κ S i = S
+\end{code}
+%</constant>
+%<*forall>
 \begin{code}
 [_] :  {ℓ : Level} → (I → Set ℓ) → Set ℓ
 [ T ] = ∀ {i} → T i
 \end{code}
-%</pforall>
-%<*pextend>
+%</forall>
+%<*product>
+\begin{code}
+_∙×_ :  {ℓ ℓ′ : Level} → (I → Set ℓ) → (I → Set ℓ′) → (I → Set (ℓ′ ⊔ ℓ))
+(S ∙× T) i = S i × T i
+\end{code}
+%</product>
+%<*adjust>
 \begin{code}
 _⊢_ :  {ℓ : Level} → (I → I) → (I → Set ℓ) → (I → Set ℓ)
 (f ⊢ T) i = T (f i)
 \end{code}
-%</pextend>
+%</adjust>

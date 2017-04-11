@@ -11,6 +11,7 @@ open import Data.Sum
 open import Function
 
 open import indexed
+open import var
 open import environment
 open import generic-syntax
 
@@ -82,8 +83,8 @@ module _ {T U : ℕ → Set} {𝓡 : Rel T U} {m n : ℕ} where
  _∙^R_ :  {ρ₁ : (m ─Env) T n} {ρ₂ : (m ─Env) U n} → ∀[ 𝓡 ] ρ₁ ρ₂ →
           {v₁ : T n} {v₂ : U n} → rel 𝓡 v₁ v₂ →
           ∀[ 𝓡 ] (ρ₁ ∙ v₁) (ρ₂ ∙ v₂)
- lookup^R (ρ ∙^R v) zero    = v
- lookup^R (ρ ∙^R v) (suc k) = lookup^R ρ k
+ lookup^R (ρ ∙^R v) z      = v
+ lookup^R (ρ ∙^R v) (s k)  = lookup^R ρ k
 
  _>>^R_ :  {p : ℕ}
            {ρ₁  : (m ─Env) T n} {ρ₂  : (m ─Env) U n} → ∀[ 𝓡 ] ρ₁ ρ₂ →
@@ -129,7 +130,7 @@ module _ {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : ℕ → Set} (𝓡^𝓥  : Rel 𝓥�
            ∀ m → {n : ℕ} {k₁ : Kripke 𝓥₁ 𝓒₁ m n} {k₂ : Kripke 𝓥₂ 𝓒₂ m n} →
            Kripke^R m k₁ k₂ → rel 𝓡^𝓒 (reify vl₁ m k₁) (reify vl₂ m k₂)
  reify^R vl^R zero       k^R = k^R
- reify^R vl^R m@(suc _)  k^R = k^R (freshʳ vl^Fin m) (VarLike^R.freshˡ^R vl^R m)
+ reify^R vl^R m@(suc _)  k^R = k^R (freshʳ vl^Var m) (VarLike^R.freshˡ^R vl^R m)
 
  record Simulate (d : Desc) (𝓢₁ : Sem d 𝓥₁ 𝓒₁) (𝓢₂ : Sem d 𝓥₂ 𝓒₂) : Set where
    field
@@ -182,29 +183,29 @@ module _ {𝓥₁ 𝓥₂ 𝓒 : ℕ → Set} (𝓡^𝓥 : Rel 𝓥₁ 𝓥₂) 
              (d : Desc) {b₁ : ⟦ d ⟧ (Kripke 𝓥₁ 𝓒) m} {b₂ : ⟦ d ⟧ (Kripke 𝓥₂ 𝓒) m} →
              Zip (Kripke^R 𝓡^𝓥 (mkRel _≡_)) d b₁ b₂ →
              fmap d {X = Kripke 𝓥₁ 𝓒} {Y = Scope 𝓒} (reify vl^𝓥₁) b₁ ≡ fmap d (reify vl^𝓥₂) b₂
- zip^reify eq (`σ A d)  (_≡_.refl , z)  = cong (_ ,_) (zip^reify eq (d _) z)
- zip^reify eq (`X m d)  (r , z)         = cong₂ _,_ (eq m r) (zip^reify eq d z)
- zip^reify eq `∎         z               = _≡_.refl
+ zip^reify eq (`σ A d)  (_≡_.refl , zp)  = cong (_ ,_) (zip^reify eq (d _) zp)
+ zip^reify eq (`X m d)  (r , zp)         = cong₂ _,_ (eq m r) (zip^reify eq d zp)
+ zip^reify eq `∎         zp               = _≡_.refl
 
 
-FinTm^R : (d : Desc) → Rel Fin (Tm d ∞)
-FinTm^R d = mkRel (_≡_ ∘ `var)
+VarTm^R : (d : Desc) → Rel Var (Tm d ∞)
+VarTm^R d = mkRel (_≡_ ∘ `var)
 
 Eq^R : {A : ℕ → Set} → Rel A A
 Eq^R = mkRel _≡_
 
-vl^FinTm : (d : Desc) → VarLike^R (FinTm^R d) vl^Fin vl^Tm 
-vl^FinTm d = record
+vl^VarTm : (d : Desc) → VarLike^R (VarTm^R d) vl^Var vl^Tm 
+vl^VarTm d = record
   { new^R  = _≡_.refl
   ; th^R   = λ σ → cong (Sem.sem (Renaming d) σ) }
 
 
-RenSub : (d : Desc) → Simulate (FinTm^R d) Eq^R d (Renaming d) (Substitution d)
+RenSub : (d : Desc) → Simulate (VarTm^R d) Eq^R d (Renaming d) (Substitution d)
 RenSub d = record
   { var^R = id
   ; th^R  = λ { _ _≡_.refl → _≡_.refl }
   ; alg^R = cong `con ∘ zip^reify (mkRel (_≡_ ∘ `var))
-            (λ p → reify^R (FinTm^R d) Eq^R (vl^FinTm d) p) d }
+            (λ p → reify^R (VarTm^R d) Eq^R (vl^VarTm d) p) d }
 
 \end{code}
 %<*rensub>

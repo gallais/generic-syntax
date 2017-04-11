@@ -10,6 +10,7 @@ prepare:
 
 paper-lagda:    
 	./lagda2tex indexed.lagda
+	./lagda2tex var.lagda
 	./lagda2tex motivation.lagda
 	./lagda2tex environment.lagda
 	./lagda2tex generic-data.lagda

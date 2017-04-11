@@ -7,6 +7,7 @@ open import Data.Fin
 open import Data.Product
 
 open import indexed
+open import var
 open import environment
 open import generic-syntax
 
@@ -27,7 +28,7 @@ CListD A = `∎ `+ `σ A (λ _ → `X 1 `∎)
 \begin{code}
 01↺ : TM (CListD ℕ)
 01↺  =  `con (false , 0 , `con (false , 1
-     ,  `var (suc zero) , _) , _)
+     ,  `var (s z) , _) , _)
 \end{code}
 %</zeroones>
 %<*cotm>

@@ -5,11 +5,12 @@ open import Level using (Level)
 open import Size
 open import Data.Bool
 open import Data.Nat as ℕ
-open import Data.Fin using (Fin ; zero ; suc ; raise ; inject+)
 open import Data.Unit
 open import Data.Sum as Sum
 open import Data.Product as Prod hiding (,_)
 open import Function
+
+open import var
 open import indexed 
 open import environment hiding (refl)
 
@@ -106,7 +107,7 @@ Scope T m = (m +_) ⊢ T
 %<*mu>
 \begin{code}
 data Tm (d : Desc) : Size → ℕ → Set where
-  `var : {i : Size} →  [ Fin                     ⟶ Tm d (↑ i)  ]
+  `var : {i : Size} →  [ Var                     ⟶ Tm d (↑ i)  ]
   `con : {i : Size} →  [ ⟦ d ⟧ (Scope (Tm d i))  ⟶ Tm d (↑ i)  ]
 \end{code}
 %</mu>
@@ -172,23 +173,23 @@ record VarLike (𝓥 : ℕ → Set) : Set where
   refl {suc n} = th^Env th^𝓥 refl extend ∙ new
 
   freshʳ : (k : ℕ) → ∀ {n} → (n ─Env) 𝓥 (k ℕ.+ n)
-  freshʳ k = th^Env th^𝓥 refl (pack (raise k))
+  freshʳ k = th^Env th^𝓥 refl (pack (injectʳ k))
 
   freshˡ : (k : ℕ) → ∀ {n} → (k ─Env) 𝓥 (k ℕ.+ n)
-  freshˡ k = th^Env th^𝓥 refl (pack (inject+ _))
+  freshˡ k = th^Env th^𝓥 refl (pack (injectˡ _))
 open VarLike public
 
-vl^Fin : VarLike Fin
-vl^Fin = record
-  { new    = zero
-  ; th^𝓥  = th^Fin
+vl^Var : VarLike Var
+vl^Var = record
+  { new    = z
+  ; th^𝓥  = th^Var
   }
 \end{code}
 %<*reify>
 \begin{code}
 reify : {𝓥 𝓒 : ℕ → Set} {n : ℕ} → VarLike 𝓥 → ∀ m → Kripke 𝓥 𝓒 m n → Scope 𝓒 m n
 reify vl^𝓥 zero       b = b
-reify vl^𝓥 m@(suc _)  b = b (freshʳ vl^Fin m) (freshˡ vl^𝓥 m)
+reify vl^𝓥 m@(suc _)  b = b (freshʳ vl^Var m) (freshˡ vl^𝓥 m)
 \end{code}
 %</reify>
 \begin{code}
@@ -208,19 +209,19 @@ record Syntactic (d : Desc) (𝓥 : ℕ → Set) : Set where
     alg' : ∀ e → [ ⟦ e ⟧ (Kripke 𝓥 (Tm d ∞)) ⟶ ⟦ e ⟧ ((_⊢ Tm d ∞) ∘ ℕ._+_) ]
     alg' e = fmap e (λ m → reify vl^𝓥 m)
 
-sy^Fin : ∀ {d} → Syntactic d Fin
-sy^Fin = record
+sy^Var : ∀ {d} → Syntactic d Var
+sy^Var = record
   { var    = `var
-  ; vl^𝓥  = vl^Fin
+  ; vl^𝓥  = vl^Var
   }
 \end{code}
 %<*renaming>
 \begin{code}
-Renaming : ∀ d → Sem d Fin (Tm d ∞)
+Renaming : ∀ d → Sem d Var (Tm d ∞)
 Renaming d = record
   { th^𝓥  = λ k ρ → lookup ρ k
   ; var    = `var
-  ; alg    = `con ∘ fmap d (reify vl^Fin) }
+  ; alg    = `con ∘ fmap d (reify vl^Var) }
 \end{code}
 %</renaming>
 \begin{code}
@@ -229,7 +230,7 @@ th^Tm t ρ = Sem.sem (Renaming _) ρ t
 
 vl^Tm : ∀ {d} → VarLike (Tm d ∞)
 vl^Tm = record
-  { new    = `var zero 
+  { new    = `var z
   ; th^𝓥  = th^Tm
   }
 
@@ -324,7 +325,7 @@ UnLet d = record
 
   apply : ∀ {d} n → [ Val d n ⟶ ⟦ (n times `X 0) `∎ ⟧ (Val d) ⟶ Tm d ∞ ]
   apply zero     kr vs = kr
-  apply (suc n)  kr vs = kr (refl vl^Fin) (env (suc n) vs)
+  apply (suc n)  kr vs = kr (refl vl^Var) (env (suc n) vs)
 
   alg' : ∀ {d} → [ ⟦ `σ ℕ (λ n → (n times `X 0) `∎ `× `X n `∎) ⟧ (Val d) ⟶ Tm d ∞ ]
   alg' (n , t)  =  let (es , b , _) = unpair ((n times `X 0) `∎) (`X n `∎) t
@@ -348,7 +349,7 @@ unlet = Sem.sem (UnLet _) (pack `var)
 \begin{code}
 {-# NO_POSITIVITY_CHECK #-}
 data Dm (d : Desc) : Size → ℕ → Set where 
-  V : {i : Size} → [ Fin                               ⟶  Dm d i      ]
+  V : {i : Size} → [ Var                               ⟶  Dm d i      ]
   C : {i : Size} → [ ⟦ d ⟧ (Kripke (Dm d i) (Dm d i))  ⟶  Dm d (↑ i)  ]
   ⊥ : {i : Size} → [                                      Dm d (↑ i)  ]
 \end{code}
@@ -357,12 +358,12 @@ data Dm (d : Desc) : Size → ℕ → Set where
 module _ {d : Desc} where
 
  th^Dm : {i : Size} → Thinnable (Dm d i)
- th^Dm (V k) ρ = V (th^Fin k ρ)
+ th^Dm (V k) ρ = V (th^Var k ρ)
  th^Dm (C t) ρ = C (fmap d (λ m kr → th^Kr m th^Dm kr ρ) t)
  th^Dm ⊥     ρ = ⊥
 
 vl^Dm : ∀ {d i} → VarLike (Dm d i)
-vl^Dm = record { new = V zero ; th^𝓥 = th^Dm }
+vl^Dm = record { new = V z ; th^𝓥 = th^Dm }
 
 
 open import Data.Maybe as Maybe
@@ -395,7 +396,7 @@ module _ {d : Desc} where
    }
 
 `id : LC 0
-`id = `lam (`var zero)
+`id = `lam (`var z)
 
 \end{code}
 %<*nbelc>
@@ -404,7 +405,7 @@ norm^LC : [ LC ⟶ Maybe ∘ LC ]
 norm^LC = norm $ case app (C ∘ (false ,_)) where
 
   app : [ ⟦ `X 0 (`X 0 `∎) ⟧ (Kripke (Dm LCD ∞) (Dm LCD ∞)) ⟶ Dm LCD ∞ ]
-  app (C (false , f , _)  , t  , _) = f (refl vl^Fin) (ε ∙ t)  -- redex
+  app (C (false , f , _)  , t  , _) = f (refl vl^Var) (ε ∙ t)  -- redex
   app (f                  , t  , _) = C (true , f , t , _)     -- stuck application
 \end{code}
 %</nbelc>
@@ -465,7 +466,7 @@ infer = record
   checkLam : [ □ ((1 ─Env) (const Type) ⟶ const Check) ∙× (const ⊤) ⟶ const Check ]
   checkLam (b , _) r =  r          >>= λ στ →
                         isArrow στ >>= uncurry λ σ τ →
-                        b (refl vl^Fin) (ε ∙ σ) (just τ)
+                        b (refl vl^Var) (ε ∙ σ) (just τ)
   
   checkAnn : Type × Check × ⊤ → Check
   checkAnn (σ , t , _) r = t (just σ) M.>> maybe (σ ==_) (just σ) r
@@ -473,12 +474,10 @@ infer = record
 typeinference : Tm Infer ∞ 0 → Maybe Type
 typeinference t = Sem.sem infer {0} {0} ε t nothing
 
-_ : let id = lam (`var zero) in
+_ : let id = lam (`var z) in
     typeinference (app (ann ((α ⇒ α) ⇒ (α ⇒ α)) id) id) ≡ just (α ⇒ α)
 _ = _≡_.refl
 
 \end{code}
-Ornaments as a way to describe language extensions and manage
-their elaboration.
 
 

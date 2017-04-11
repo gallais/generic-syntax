@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+set -u
 
 STDLIB=~/languages/agda/libs/agda-stdlib/src/
 DIRECTORY=$( dirname  "$1" )

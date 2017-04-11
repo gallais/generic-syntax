@@ -46,7 +46,8 @@ that they may only refer to variables introduced by a binder beforehand. A
 scope safe language is a programming language in which all the valid terms
 are guaranteed to be scope safe.
 
-Altenkirch and Reus~\citeyear{altenkirch1999monadic} introduced the
+Bellegarde and Hook~\citeyear{BELLEGARDE1994287}, Bird and Patterson~\citeyear{bird_paterson_1999},
+and Altenkirch and Reus~\citeyear{altenkirch1999monadic} introduced the
 nowadays classic presentation of scope safe languages using inductive
 \emph{families}~\cite{dybjer1994inductive} to track scoping information
 at the type level. Instead of describing the type of abstract syntax trees
@@ -69,9 +70,9 @@ The language is obtained as the fixpoint of $T$:
    \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
    \lambda X \in \Set{}. X + (F(X) \times F(X)) + F(1 + X)
 \]
-The operation of renaming free variables in a term then corresponds to
-the fixpoint's functoriality, and stability under substitution is given
-by the proof that the fixpoint forms a monad.
+The proof that the fixpoint is functorial then corresponds to renaming
+whilst the proof that it is monadic implements substitution: the variable
+constructor is return and bind defines parallel substitution.
 
 \subsection{A Mechanized Variant of Altenkirch and Reus' Untyped Calculus}
 
@@ -84,6 +85,10 @@ Uustalu~\citeyear{Altenkirch2010, JFR4389} refer to as relative monads.
 
 In this paper, we pick $I = \mathbb{N}$ where the natural number used as
 an index is straightforwardly the number of (de Bruijn) variables in scope.
+This natural number can be seen as a list associating to each variable in
+scope an element of the unit type; in a typed setting, it would carry the
+variable's type instead.
+
 Our implementation language is Agda~\cite{norell2009dependently} however
 these techniques are language independent: any dependently typed language
 whose logic is at least as powerful as Martin-L\"of Type
@@ -92,10 +97,15 @@ families~\cite{dybjer1994inductive} ought to do.
 
 In order to lighten the presentation, we weaponise the observation that the
 current scope is either threaded to subterms (e.g. in the application's case)
-or adjusted (e.g. in the $\lambda$-abstraction's case) by introducing two
-combinators. The first one is the pointwise lifting of the function space
-silently threading the underlying scope whereas the second one makes explicit
-the \emph{adjustment} made to it by a function. The use of $\_\vdash{}\_$\footnote{
+or adjusted (e.g. in the $\lambda$-abstraction's case) by introducing combinators
+to build indexed types. Although it may seem surprising at first to define
+infix operators of arity three, they are meant to be used partially applied,
+surrounded by \AF{[\_]} which turns an indexed Set into a Set by implicitly
+quantifying over the index. The first two combinators are the pointwise liftings
+of the function space and the product type respectively, both silently threading
+the underlying scope. The third one is simply the constant function turning a Set
+into an indexed Set by ignoring the index. Finally, the last one makes explicit
+the \emph{adjustment} made to the index by a function. The use of $\_\vdash{}\_$\footnote{
 In Agda, underscores in a function's name denote the positions in which the
 function's arguments are to be inserted.} for the latter is meant to suggest
 its connection to the mathematical convention of only mentioning context
@@ -103,22 +113,34 @@ its connection to the mathematical convention of only mentioning context
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[indexed.tex]{parrow}
+\ExecuteMetaData[indexed.tex]{arrow}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[indexed.tex]{pextend}
+\ExecuteMetaData[indexed.tex]{product}
 \end{minipage}
-%\ExecuteMetaData[indexed.tex]{pforall}
+
+\begin{minipage}{0.25\textwidth}
+\ExecuteMetaData[indexed.tex]{constant}
+\end{minipage}
+\begin{minipage}{0.40\textwidth}
+\ExecuteMetaData[indexed.tex]{adjust}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.25\textwidth}
+\ExecuteMetaData[indexed.tex]{forall}
+\end{minipage}
 \caption{Combinators to build indexed Sets}
 \end{figure}
 
-Using these combinators together with \AF{[\_]} which turns an indexed Set
-into a Set by implicitly quantifying over the index, the untyped
-$\lambda$-calculus can be represented using the following definitions:
+For instance, the fairly compact expression
+\AF{[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⟶} \AB{R} \AF{]}
+corresponds to the more verbose type
+\AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
+Using these combinators, the untyped $\lambda$-calculus can be represented
+using the following definitions:
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[motivation.tex]{var}
+\ExecuteMetaData[var.tex]{var}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[motivation.tex]{tm}
@@ -131,8 +153,7 @@ indices. Its first constructor (\AIC{z} for zero) states that we have a name to 
 the nearest binder in a non-empty scope. The second one (\AIC{s} for successor) lifts a
 name for a variable in a given scope into a name for it in the extended scope where
 an extra variable has been bound. Both of their types have been written using combinators,
-altought we will abstain from unfolding them in the future\footnote{That would defeat the
-purpose of introducing them in the first place, after all.}, we do so here in the hope
+altought we will abstain from unfolding them in the future, we do so here in the hope
 it will help the reader get acquainted with them: they respectively normalise to
 $\forall n. \mathbf{Var}(\mathit{suc}(n))$ for \AIC{z},
 and $\forall n. \mathbf{Var}(n) \rightarrow \mathbf{Var}(\mathit{suc}(n))$ for \AIC{s}.
@@ -179,10 +200,26 @@ demonstrate that typechecking in the style of Atkey~\citeyear{atkey2015algebraic
 fits in that framework. To be able to make sense of this body of work, we
 need to introduce three new definitions:
 
-A \AF{Thinning} from $m$ to $n$ is a function from \AD{Var} $m$ to \AD{Var} $n$.
+A \AF{Thinning} from $m$ to $n$ is a function from \AD{Var} $m$ to
+\AD{Var} $n$. It is a special case of a notion of environment that
+stores values living in a scope $n$ for each variable in a scope $m$
+which we introduce as a record type.
+
+\begin{figure}[h]
+\begin{minipage}{0.55\textwidth}
+\ExecuteMetaData[environment.tex]{env}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.35\textwidth}
+\ExecuteMetaData[environment.tex]{thinning}
+\end{minipage}
+\caption{Environments of Well Scoped Values and Thinnings}
+\end{figure}
+
 It subsumes more structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
-Embeddings~\cite{chapman2009type}. The fact that the representation used
+Embeddings~\cite{chapman2009type}. In particular, it does not prevent the
+user from defining arbitrary permutations or from introducing contractions
+although we will not use such instances. The fact that our representation
 is a function space grants us monoid laws ``for free'' as per Jeffrey's
 observation~\citeyear{jeffrey2011assoc}.
 
@@ -193,17 +230,17 @@ function space used in normalisation by evaluation via a domain \AB{D}.
 
 The notion of \AF{Thinnable} is the property of being stable under thinnings.
 It is a crucial property for values to have if one wants to be able to push
-them under binders. Unsurprisingly, the \AF{□} combinator turns any
+them under binders. Unsurprisingly, the \AF{□} combinator freely turns any
 \AD{ℕ}-indexed Set into a \AF{Thinnable} one; in other words: combined
 with the existence of an identity thinning this means that \AF{□} is a
 comonad.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[motivation.tex]{box}
+\ExecuteMetaData[environment.tex]{box}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[motivation.tex]{thinnable}
+\ExecuteMetaData[environment.tex]{thinnable}
 \end{minipage}
 \caption{Thinnable and the Free Thinnable Construction}
 \end{figure}
