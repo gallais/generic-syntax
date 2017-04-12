@@ -233,6 +233,10 @@ Renaming d = record
   { th^𝓥  = λ k ρ → lookup ρ k
   ; var    = `var
   ; alg    = `con ∘ fmap d (reify vl^Var) }
+
+ren :  {m n : ℕ} → ∀ d → (m ─Env) Var n →
+       Tm d ∞ m → Tm d ∞ n
+ren d = Sem.sem (Renaming d)
 \end{code}
 %</renaming>
 \begin{code}
@@ -259,6 +263,10 @@ Substitution d = record
   { th^𝓥  = λ t ρ → Sem.sem (Renaming d) ρ t
   ; var    = id
   ; alg    = `con ∘ fmap d (reify vl^Tm) }
+
+sub :  {m n : ℕ} → ∀ d → (m ─Env) (Tm d ∞) n →
+       Tm d ∞ m → Tm d ∞ n
+sub d = Sem.sem (Substitution d)
 \end{code}
 %</substitution>
 \begin{code}
@@ -310,14 +318,13 @@ _times_ : {ℓ : Level} {A : Set ℓ} → ℕ → (A → A) → (A → A)
 %</ntimes>
 %<*letcode>
 \begin{code}
-Let : Desc → Desc
-Let d =  `σ ℕ (λ n → (n times `X 0) `∎ `× `X n `∎)
-         `+ d
+Let : Desc
+Let = `σ ℕ (λ n → (n times `X 0) `∎ `× `X n `∎)
 \end{code}
 %</letcode>
 %<*unletcode>
 \begin{code}
-UnLet : ∀ d → Sem (Let d) (Tm d ∞) (Tm d ∞)
+UnLet : ∀ d → Sem (Let `+ d) (Tm d ∞) (Tm d ∞)
 UnLet d = record
   { th^𝓥  = th^Tm
   ; var    = id
@@ -346,7 +353,7 @@ UnLet d = record
 \end{code}
 %<*unlet>
 \begin{code}
-unlet : {d : Desc} → [ Tm (Let d) ∞ ⟶ Tm d ∞ ]
+unlet : {d : Desc} → [ Tm (Let `+ d) ∞ ⟶ Tm d ∞ ]
 unlet = Sem.sem (UnLet _) (pack `var)
 \end{code}
 %</unlet>

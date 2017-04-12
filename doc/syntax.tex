@@ -128,7 +128,7 @@ its connection to the mathematical convention of only mentioning context
 \begin{minipage}{0.25\textwidth}
 \ExecuteMetaData[indexed.tex]{forall}
 \end{minipage}
-\caption{Combinators to build indexed Sets}
+\caption{Combinators to build indexed Sets}\label{figure:indexed}
 \end{figure}
 
 For instance, the fairly compact expression
@@ -253,12 +253,17 @@ one.
 \end{figure}
 
 Equipped with these new notions, we can define an abstract
-concept of semantics for our scope safe language. A semantics with
-values in $\mathcal{V}$ and computations in $\mathcal{C}$ is meant
-to give rise to a traversal which, provided a term and an environment
-of values for each one of the variables in scope, delivers a computation.
-The traversal \AF{sem} realises this specification generically for all
-Semantics.
+concept of semantics for our scope safe language. Broadly
+speaking, a semantics turns our deeply embedded abstract
+syntax trees into the shallow embedding of the corresponding
+parametrised higher order abstract syntax term. We get various
+semantics by using different 'host languages' for this shallow
+embedding. A semantics with values in $\mathcal{V}$ and
+computations in $\mathcal{C}$ is meant to give rise to a
+traversal which, provided a term and an environment of values
+for each one of the variables in scope, delivers a computation.
+The traversal \AF{sem} realises this specification generically
+for all Semantics.
 
 A Semantics is characterised by a set of constraints. First of all,
 values should be thinnable so that \AF{sem} may push the environment
@@ -311,7 +316,7 @@ traversal. We will come back to this in Section~\ref{section:simulation}.
 
 One important observation to make is the tight connection between the
 constraint described by \AR{Sem} and the definition of \AD{Lam}: the
-semantical combinators correspond to the corresponding constructors
+semantical combinators are related to the corresponding constructors
 where the recursive occurences of the inductive family have been replaced
 with either a computation or a Kripke function space whenever an
 extra variable was bound. This suggest that it ought to be possible
@@ -319,12 +324,12 @@ to compute the definition of \AF{Sem} from the one of the datatype.
 
 \section{A Primer on the Universe of Data Types}
 
-In an unpublished article, McBride~\citeyear{mcbride2010ornamental}
-defines a universe of data types inspired by Dybjer and Setzer's
+Chapman, Dagand, McBride and Morris~\citeyear{Chapman:2010:GAL:1863543.1863547}
+defined a universe of data types inspired by Dybjer and Setzer's
 finite axiomatisation of Inductive-Recursive definitions~\citeyear{Dybjer1999}.
 This explicit definition of \emph{codes} for data types empowers the
 user to write generic programs tackling \emph{all} of the data types
-one can define this way. In this section we recall the main aspects
+one can obtain this way. In this section we recall the main aspects
 of this construction we are interested in to build up our generic
 representation of syntaxes with binding.
 
@@ -348,16 +353,17 @@ recursive substructure (i.e. the tail of the list).
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[generic-data.tex]{listD}
 \end{minipage}
-\caption{Data Descriptions and List Description}
+\caption{Data Descriptions and List Description}\label{figure:listD}
 \end{figure}
 
 The recursive function \AF{⟦\_⟧} makes the interpretation of the
 Descriptions formal by associating a value in $\Set{}^\Set{}$ to
-each one of them. Together with it, we can define the \AF{fmap}
-recursive function witnessing the fact that the meaning of a
-description is indeed functorial. This is the first example of
-generic programming over all the functors one can obtain as the
-meaning of a description.
+each one of them. They essentially give rise to unit terminated
+right nested tuples. Together with \AF{⟦\_⟧}, we can define the
+\AF{fmap} recursive function witnessing the fact that the meaning
+of a description is indeed functorial. This is the first example
+of generic programming over all the functors one can obtain as
+the meaning of a description.
 
 \begin{figure}[h]
 \begin{minipage}{0.35\textwidth}
@@ -395,7 +401,11 @@ the iteration principle associated to all the datatypes which arise
 as the fixpoint of a description's meaning. It seems appropriate to
 base our universe of scope safe syntaxes on a similar construction
 so that we may be able to define generically a notion of semantics
-for all the syntaxes with binding one may come up with.
+for all the syntaxes with binding one may come up with. Chapman,
+Dagand, McBride and Morris also give a more general universe which
+supports higher order branching (but still does not have a notion
+of variable). We decidedly stick to finitary constructors, thus
+sticking to the common understanding of `syntax'.
 
 \section{A Universe of Scope Safe Syntaxes}
 
@@ -405,14 +415,19 @@ endofunctors on $\Set{}$ but rather $\Set{}^ℕ$. Descriptions can
 be built using three constructors: the first one makes it possible
 to store data (and, as usual, the rest of the description may
 depend upon the value stored), the second takes a natural number
-$n$ and corresponds to a substructure with exactly $n$ additional
+$m$ and corresponds to a substructure with exactly $m$ additional
 variable in scope and the last one ends the definition.
 
 The meaning function \AF{⟦\_⟧} we associate to a description is not
 quite an endofunctor on $\Set{}^ℕ$; it is more general than that.
 Given an $X$ that interprets substructures with an extra $m$ bound
 variables in a scope that has $n$ bound variables already as $X\,m\,n$,
-we give a description a meaning as an $\Set{}^ℕ$.
+we give a description a meaning as an $\Set{}^ℕ$. The astute reader
+may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $n$; however
+refactoring \AF{⟦\_⟧} following this observation would lead to a
+definition harder to use with the combinators for indexed sets
+described in Figure~\ref{figure:indexed} which make our types
+much more readable.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -421,17 +436,17 @@ we give a description a meaning as an $\Set{}^ℕ$.
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[generic-syntax.tex]{interp}
 \end{minipage}
-\caption{Syntax Descriptions and their Meaning as Higher Functor}
+\caption{Syntax Descriptions and their Meaning as Functor}
 \end{figure}
 
-However if we pre-compose the meaning function with a notion
-of ``scope'' (denoted \AF{Scope} here) which turns any \AD{ℕ}-indexed
+If we pre-compose the meaning function \AF{⟦\_⟧} with a notion
+of `scope' (denoted \AF{Scope} here) which turns any \AD{ℕ}-indexed
 family into a function of type \AD{ℕ} \AS{→} \AD{ℕ} \AS{→} $\Set{}$
 by simply summing the two indices, we recover an endofunctor on
-$\Set{}^ℕ$ and we can take a fixpoint of it. This time, instead
+$\Set{}^ℕ$ and we can take its fixpoint. This time, instead
 of considering the initial algebra, we opt for the free relative
-monad~\cite{JFR4389}. We are, after all, interested in describing
-terms with a notion of variable.
+monad~\cite{JFR4389}: the \AIC{`var} constructor corresponds to
+return and we will define bind in the next section.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
@@ -440,26 +455,28 @@ terms with a notion of variable.
 \begin{minipage}{0.35\textwidth}
 \ExecuteMetaData[generic-syntax.tex]{scope}
 \end{minipage}
-\caption{Term Trees: The Free Monads on Descriptions}
+\caption{Term Trees: The Free Relative Monads on Descriptions}
 \end{figure}
 
-Coming back to our the well-scoped untyped $\lambda$-calculus,
-we now have the ability to give a code describing it. Because
-the variable constructor will be introduced by the fixpoint
-building the free monad, we only have to describe two cases:
+Coming back to the well-scoped untyped $\lambda$-calculus,
+we now have the ability to give its code. The variable
+constructor will be introduced by the free monad construction
+so we only have to describe two cases:
 the application case where we have two substructures which do
 not bind any extra argument and the $\lambda$-abstraction case
 which has exactly one substructure with precisely one extra
-bound variable. We can also define constructors corresponding
+bound variable.
+
+We can then define constructors corresponding
 to the original ones in Figure~\ref{scoped-untyped}: \AF{`V}
 for \AIC{V} the variable constructor, \AF{`A} for \AIC{A} the
-application one and \AF{`L} for \AIC{L} the $\lambda$-abstraction
-respectively. In Agda, we can actually almost define these as
+application one and \AF{`L} for \AIC{L} the $\lambda$-abstraction.
+In Agda, we can actually almost define these as
 pattern synonyms (the language currently does not allow the user
 to specify type annotations for her pattern synonyms), meaning
-that the encoding of the language in a universe does not force
-the end user to deal with the gnarly details of the internal
-representation.
+that the end user can seemlessly write pattern-matching programs
+on encoded terms without dealing with the gnarly details
+of the encoding.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
@@ -482,9 +499,9 @@ representation.
 \end{figure}
 
 It is the second time (the first time being the definition of
-\AF{listD}, the underlying functor for lists) that we use a
+\AF{listD} in Figure~\ref{figure:listD}) that we use a
 \AF{Bool} to distinguish between two constructors. In order
-to avoid having to re-encode the same logic time and time again,
+to avoid re-encoding the same logic,
 the next section introduces combinators demonstrating that
 descriptions are closed under sums and products.
 
@@ -511,7 +528,7 @@ one corresponding to the chosen branch.
 Closure under product is however a bit more technical: it is
 defined by induction on the first description of the product.
 The definition is purely structural except for the ``stop''
-constructor which gets replaced the second description. Because
+constructor which gets replaced by the second description. Because
 of the indirect nature of the definition of closure under
 products, it is convenient to have functions going back and
 forth between the interpretation of a product of descriptions
@@ -587,23 +604,21 @@ and it is defined mutually with a function \AF{body} turning a \AF{Scope}
 \hspace{-1em}\begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[generic-syntax.tex]{body}
 \end{minipage}
-\caption{Fundamental Lemma of Semantics}
+\caption{Fundamental Lemma of \AR{Sem}antics}
 \end{figure}
 
 Renaming can be defined generically for all syntax descriptions as a
-semantics with \AF{Fin} as values and \AD{Tm} as computations. The
-two first constraints on \AF{Fin} described earlier are trivially
+semantics with \AF{Var} as values and \AD{Tm} as computations. The
+two first constraints on \AF{Var} described earlier are trivially
 satisfied. Because renaming strictly respects the structure of the
 term it goes through, the algebra is implemented using \AF{fmap}.
-When dealing with the body a binder, we simply ``reify'' the
+When dealing with the body a binder, we simply `reify' the
 \AF{Kripke} function by evaluating it in an extended context and
 feeding it dummy values corresponding to the extra variables
 introduced by that context. This is reminiscent both of what we
 did in Section~\ref{section:primer-program} and the definition
 of reification in the setting of normalisation by evaluation
-\footnote{For more details, see Catarina Coquand's work on a
-fully formal presentation of normalisation by evaluation for a
-simply-typed $\lambda$-calculus with explicit substitutions~\cite{coquand2002formalised}}.
+(see e.g. Coquand's work~\citeyear{coquand2002formalised}).
 
 Substitution can be defined in a similar manner. Of the two
 constraints applying to terms as values, the first one corresponds
@@ -633,18 +648,19 @@ thinnable and such that we can craft dummy ones in non-empty contexts.
 
 \section{Other Generic Programs}
 
-\subsection{Elaboration to a Core Language}
+\subsection{Sugar and Desugaring as a Semantics}
 
 One of the advantages of having a universe of programming languages
 descriptions is the ability to concisely define an \emph{extension}
-of an existing language by grafting extra constructors. This is made
-extremely simple by the disjoint sum combinator \AF{\_`+\_} which we
-have already seen in Section~\ref{desccomb}.
-
+of an existing language by using \AD{Desc}ription transformers
+grafting extra constructors à la Swiestra~\citeyear{swierstra_2008}.
+This is made extremely simple by the
+disjoint sum combinator \AF{\_`+\_} which we have already seen
+in Section~\ref{desccomb}.
 An example of such an extension is the addition of let-bindings to
 an existing language. Let bindings allow the user to avoid repeating
-herself by naming a sub expression and then using that name to refer
-to the associated term.
+herself by naming sub-expressions and then using these names to refer
+to the associated terms.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -668,7 +684,7 @@ by inlining.
 
 This latter approach to extending a language \AB{d} with let bindings
 by inlining them before typechecking can be implemented generically as
-a Semantics over (\AF{Let} \AB{d}) where values in the environment and
+a Semantics over (\AF{Let} \AF{`+} \AB{d}) where values in the environment and
 computations both are let-free terms. The algebra of that semantics can
 be defined by parts: the old constructors are simply interpreted using
 the algebra defined generically for the \AF{Substitution} semantics whilst
@@ -678,10 +694,10 @@ of space). The process of removing let binders is kickstarted with a
 dummy environment associating each variable to itself.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.50\textwidth}
   \ExecuteMetaData[generic-syntax.tex]{unletcode}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.40\textwidth}
   \ExecuteMetaData[generic-syntax.tex]{unlet}
 \end{minipage}
 \caption{Inlining Let Binding}
@@ -697,31 +713,39 @@ a semantics.
 
 The ease with which one can define such generic transformations
 suggests that this setup could be a good candidate to implement
-generic compilation passes.\todo{cite nanopass?}
+generic compilation passes.
 
 \subsection{(Unsafe) Normalisation by Evaluation}
 
 A key type of traversal we have not studied yet is a language's
 evaluator. Our universe of syntaxes with binding does not impose
-that the user defined languages have a type system guaranteeing
-the language's totality. This is demonstrated by our running
+any typing discipline on the user defined languages and as such
+cannot guarantee their totality. This is embodied by our running
 example: the untyped $\lambda$-calculus. As a consequence there
 is no hope for a safe generic framework to define normalisation
 functions.
 
 The clear connection between the \AF{Kripke} functional space
 characteristic of our semantics and the one that shows up in
-normalisation by evaluation suggests that we ought to be able
-to give the user a generic framework to define normalisation
-functions. By temporarily \textbf{disabling Agda's positivity
-checker}, we can give a generic reflexive domain.
+normalisation by evaluation suggests we ought to manage to
+give a generic framework for normalisation by evaluation.
+By temporarily \textbf{disabling Agda's positivity checker},
+we can define a generic reflexive domain \AD{Dm} in which to
+interpret our syntaxes. It has three constructors corresponding
+respectively to a free variable, a constructor's counterpart where
+scopes have become \AF{Kripke} functional spaces on \AD{Dm} and
+an error token because the evaluation of untyped programs may
+(and usually does!) go wrong.
 
 \begin{figure}[h]
 {\center \ExecuteMetaData[generic-syntax.tex]{domain}}
 \caption{Generic Reflexive Domain}
 \end{figure}
 
-This datatype definition is utterly unsafe but makes it possible
+This datatype definition is utterly unsafe. The more conservative
+user will happily restrict herself to typed settings where the
+domain can be defined as a logical predicate or opt instead for
+a step-indexed approach. But this domain does make it possible
 to define a generic \AF{nbe} semantics as well as a reification
 function turning elements of the reflexive domain into terms.
 By composing them, we obtain the normalisation function which
@@ -731,7 +755,7 @@ The user still has to explicitly pass an interpretation of
 the various constructors because there is no way for us to
 know what the binders are supposed to represent: they may
 stand $\lambda$-abstractions, $\Sigma$-types, fixpoints, or
-anything else the user wants to define.
+anything else she may want to define.
 
 
 \begin{figure}[h]
@@ -757,96 +781,6 @@ applications.
 \end{figure}
 
 
-
-\subsection{Binding as Self-Reference: Representing Cyclic Structures}
-
-Ghani, Hamana, Uustalu and Vene~\cite{ghani2006representing} have
-demonstrated how Altenkirch and Reus' type-level de Bruijn
-indices~\cite{altenkirch1999monadic} can be used to represent
-potentially cyclic structures by a finite object. In their
-representation each bound variable is a pointer to the node
-that introduced it. Because we are, at the top-level, only
-interested in structures with no ``dangling pointers'', we introduce
-the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
-\AD{Tm} \AB{d} \AF{∞} \AN{0}).
-
-A basic example of such a structure is a potentially cyclic list which
-offers a choice of two constructors: nil which ends the list and cons
-which combines a head and a tail but also acts as a binder for a
-self-reference. We can see this approach in action in the example \AF{01↺}
-which describes a cyclic list starting with 0, then 1, and then
-repeats the whole list again by referring to the first cons cell
-represented here by the variable \AIC{suc} \AIC{zero}.
-
-\begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{clistD}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{zeroones}
-\end{minipage}
-\caption{Potentially Cyclic Lists: Description and Example}
-\end{figure}
-
-These finite representations are interesting in their own right
-and we can use the generic semantics framework defined earlier
-to manipulate them. A basic building block is the \AF{unroll}
-function which takes a closed tree, exposes its top node and
-unrolls any cycle which has it as its starting point. We can
-decompose it using the \AF{plug} function which, given a closed
-and an open term, closes the latter by plugging the former at
-each \AIC{`var} leaf. Because \AF{plug}'s fundamental nature
-is that of substituting a term for each leaf, it can naturally
-be implemented using \AF{Substitution}.
-
-\begin{figure}[h]
-\begin{minipage}{0.52\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{plug}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.43\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{unroll}
-\end{minipage}
-\caption{Plug and Unroll: Exposing a Cyclic Tree's Top Layer}
-\end{figure}
-
-However, one thing still out of our reach with the current tools we have
-is the underlying co-finite trees these finite objects are meant
-to represent. We can start by defining the coinductive type
-corresponding to them as the greatest fixpoint of a notion of
-layer. One layer of a co-finite tree is precisely given by the
-meaning of its description where we completely ignore the binding
-structure. We show with \AF{01⋯} which infinite list ought to
-correspond to the cyclic example \AF{01↺} given above.
-
-\begin{figure}[h]
-\begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{cotm}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{zeroones2}
-\end{minipage}
-\caption{Co-finite Trees: Definition and Example}
-\end{figure}
-
-We can then make the connection between potentially cyclic
-structures and the co-finite trees by giving an \AF{unfold}
-function which, given a closed term, produces its unfolding.
-The definition proceeds by unrolling the term's top layer and
-co-recursively unfolding all the subterms.
-
-\begin{figure}[h]
- \ExecuteMetaData[generic-cofinite.tex]{unfold}
-\caption{Generic Unfold of Potentially Cyclic Structures}
-\end{figure}
-
-We can see that this universe of descriptions allows us to
-implement generic functions once and for all. Even if the
-powerful notion of semantics described in Section~\ref{section:semantics}
-cannot encompass all the traversals we may interested in,
-it provides us with reusable building blocks: the definition
-of \AF{unfold} was made very simple by reusing the generic
-program \AF{fmap} and the \AF{Substitution} semantics.
-
 \section{Building Generic Proof about Generic Programs}\label{section:simulation}
 
 Allais, Chapman, McBride, and McKinna~\citeyear{allais2017type} have
@@ -856,10 +790,13 @@ traversals, it also allows them to give abstract proof frameworks for
 simulation or fusion lemmas. Their idea naturally extends to our generic
 presentation of semantics for all syntaxes.
 
-The most important concept in this section is \AF{Zip} which characterises
-layers which are structurally equal and such that their substructures are
-related by a predicate $P$. It is defined by induction on the description
-and case analysis on the two layers which are meant to be equal.
+The most important concept in this section is (\AF{Zip} \AB{d}), a relation
+transformer which characterises structurally equal layers such that their
+substructures are themselves related by the relation it is passed as an
+argument. It is defined by induction on the description and case analysis
+on the two layers which are meant to be equal. It inherits a lot of its
+relational arguments' properties: whenever \AB{R} is reflexive (respectively
+symmetric or transitive) so is \AF{Zip} \AB{d} \AB{R}.
 
 \begin{figure}[h]
  \ExecuteMetaData[generic-simulation.tex]{ziptype}
@@ -894,23 +831,6 @@ that Renaming is a special case of Substitution.
  \ExecuteMetaData[generic-simulation.tex]{rensub}
 \caption{Renaming can be Simulated using Substitution}
 \end{figure}
-
-\subsection{Definition of Bisimilarity for co-finite objects}
-
-Although we were able to use propositional equality when studying
-syntactic traversals working on terms, it is not the appropriate
-notion of equality for co-finite trees. We can use \AF{Zip} to
-define generically a coinductive notion of bisimilarity for all
-co-finite trees obtained as unfolding of descriptions. And we
-can derive from \AF{Zip}'s properties the fact that this gives
-rise to an equivalence relation.
-
-\begin{figure}[h]
- \ExecuteMetaData[generic-bisimilar.tex]{bisim}
- \ExecuteMetaData[generic-bisimilar.tex]{eqrel}
-\caption{Bisimilarity, an Equivalence Relation for Co-finite Trees}
-\end{figure}
-
 
 \section{Conclusion}
 

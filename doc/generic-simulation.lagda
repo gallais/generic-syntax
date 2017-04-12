@@ -21,10 +21,10 @@ module _ {X Y : ℕ → ℕ → Set} where
 \end{code}
 %<*ziptype>
 \begin{code}
- Zip : (P : (m : ℕ) → [ X m ⟶ Y m ⟶ κ Set ]) (d : Desc) → [ ⟦ d ⟧ X ⟶ ⟦ d ⟧ Y ⟶ κ Set ]
- Zip P `∎        x        y         = ⊤
- Zip P (`X k d)  (r , x)  (r' , y)  = P k r r' × Zip P d x y
- Zip P (`σ A d)  (a , x)  (a' , y)  = Σ[ eq ∈ a' ≡ a ] Zip P (d a) x (rew eq y)
+ Zip : (d : Desc) (R : (m : ℕ) → [ X m ⟶ Y m ⟶ κ Set ]) → [ ⟦ d ⟧ X ⟶ ⟦ d ⟧ Y ⟶ κ Set ]
+ Zip `∎        R x        y         = ⊤
+ Zip (`X k d)  R (r , x)  (r' , y)  = R k r r' × Zip d R x y
+ Zip (`σ A d)  R (a , x)  (a' , y)  = Σ[ eq ∈ a' ≡ a ] Zip (d a) R x (rew eq y)
    where rew = subst (λ a → ⟦ d a ⟧ _ _)
 \end{code}
 %</ziptype>
@@ -32,7 +32,7 @@ module _ {X Y : ℕ → ℕ → Set} where
  zip : {P : ∀ m → [ X m ⟶ Y m ⟶ κ Set ]} {T : ℕ → ℕ → Set} (d : Desc) {n p : ℕ}
        {f : (m : ℕ) → T m n → X m p} {g : (m : ℕ) → T m n → Y m p}
        (FG : (m : ℕ) (t : T m n) → P m (f m t) (g m t)) →
-       (t : ⟦ d ⟧ T n) → Zip P d (fmap d f t) (fmap d g t)
+       (t : ⟦ d ⟧ T n) → Zip d P (fmap d f t) (fmap d g t)
  zip (`σ A d)  FG (a , t) = _≡_.refl , zip (d a) FG t
  zip (`X m d)  FG (r , t) = FG m r , zip d FG t
  zip `∎        FG t        = tt
@@ -42,7 +42,7 @@ module _ {X : ℕ → ℕ → Set} where
  refl^Zip : {P : ∀ m → [ X m ⟶ X m ⟶ κ Set ]} →
             (refl^P : ∀ m {n} (x : X m n) → P m x x) →
             (d : Desc) {n : ℕ} (t : ⟦ d ⟧ X n) →
-            Zip P d t t
+            Zip d P t t
  refl^Zip refl^P (`σ A d)  (a , t) = _≡_.refl , refl^Zip refl^P (d a) t
  refl^Zip refl^P (`X m d)  (r , t) = refl^P m r , refl^Zip refl^P d t
  refl^Zip refl^P `∎         t      = tt
@@ -50,7 +50,7 @@ module _ {X : ℕ → ℕ → Set} where
  sym^Zip : {P : ∀ m → [ X m ⟶ X m ⟶ κ Set ]} →
            (sym^P : ∀ m {n} {x y : X m n} → P m x y → P m y x) →
            (d : Desc) {n : ℕ} {t u : ⟦ d ⟧ X n} →
-           Zip P d t u → Zip P d u t
+           Zip d P t u → Zip d P u t
  sym^Zip sym^P (`σ A d)  (_≡_.refl  , eq) = _≡_.refl , sym^Zip sym^P (d _) eq
  sym^Zip sym^P (`X m d)  (prs       , eq) = sym^P m prs , sym^Zip sym^P d eq
  sym^Zip sym^P `∎         eq               = tt
@@ -58,7 +58,7 @@ module _ {X : ℕ → ℕ → Set} where
  trans^Zip : {P : ∀ m → [ X m ⟶ X m ⟶ κ Set ]} →
            (trans^P : ∀ m {n} {x y z : X m n} → P m x y → P m y z → P m x z) →
            (d : Desc) {n : ℕ} {t u v : ⟦ d ⟧ X n} →
-           Zip P d t u → Zip P d u v → Zip P d t v
+           Zip d P t u → Zip d P u v → Zip d P t v
  trans^Zip trans^P (`σ A d)  (_≡_.refl  , t≈u) (_≡_.refl , u≈v) =
    _≡_.refl , trans^Zip trans^P (d _) t≈u u≈v
  trans^Zip trans^P (`X m d)  (prs       , t≈u) (psq      , u≈v) =
@@ -158,7 +158,7 @@ module _ {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : ℕ → Set} (𝓡^𝓥  : Rel 𝓥�
 %</algtwo>
 \begin{code}
              } →
-             Zip Kripke^R d b₁ b₂ → rel 𝓡^𝓒 (Sem.alg 𝓢₁ b₁) (Sem.alg 𝓢₂ b₂)
+             Zip d Kripke^R b₁ b₂ → rel 𝓡^𝓒 (Sem.alg 𝓢₁ b₁) (Sem.alg 𝓢₂ b₂)
 
 
    sim : {m n : ℕ} {ρ₁ : (m ─Env) 𝓥₁ n} {ρ₂ : (m ─Env) 𝓥₂ n}  → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ →
@@ -181,7 +181,7 @@ module _ {𝓥₁ 𝓥₂ 𝓒 : ℕ → Set} (𝓡^𝓥 : Rel 𝓥₁ 𝓥₂) 
                    Kripke^R 𝓡^𝓥 (mkRel _≡_) p t₁ t₂ →
                    reify vl^𝓥₁ p t₁ ≡ reify vl^𝓥₂ p t₂) →
              (d : Desc) {b₁ : ⟦ d ⟧ (Kripke 𝓥₁ 𝓒) m} {b₂ : ⟦ d ⟧ (Kripke 𝓥₂ 𝓒) m} →
-             Zip (Kripke^R 𝓡^𝓥 (mkRel _≡_)) d b₁ b₂ →
+             Zip d (Kripke^R 𝓡^𝓥 (mkRel _≡_)) b₁ b₂ →
              fmap d {X = Kripke 𝓥₁ 𝓒} {Y = Scope 𝓒} (reify vl^𝓥₁) b₁ ≡ fmap d (reify vl^𝓥₂) b₂
  zip^reify eq (`σ A d)  (_≡_.refl , zp)  = cong (_ ,_) (zip^reify eq (d _) zp)
  zip^reify eq (`X m d)  (r , zp)         = cong₂ _,_ (eq m r) (zip^reify eq d zp)
