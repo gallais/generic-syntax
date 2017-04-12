@@ -1,4 +1,4 @@
-\begin{abstract}
+    \begin{abstract}
 Syntaxes with binding are omnipresent in Programming Languages
 research but also in the more practical setting of Embedded
 Domain Specific Languages. The advanced features available in
@@ -33,11 +33,9 @@ content of this paper: a universe of scope safe syntaxes with binding
 together with a generic notion of scope safe semantics for these syntaxes.
 This give us the opportunity to write generic implementations of renaming,
 substitution but also elaboration of a surface language to a core one,
-and normalisation by evaluation. We also explore other opportunities for
-generic programming: the interpretation of binding as self-reference leads
-to the ability to give a finite representation of potentially infinite
-objects.
-\todo{proofs}
+and normalisation by evaluation. We also explore opportunities for
+generic proving by describing a framework to formally describe what
+it means for a semantics to be able to simulate another one.
 
 \section{A Primer on Scope Safe Terms}\label{section:primer-term}
 
@@ -844,9 +842,7 @@ extending a universe of datatype descriptions to support a notion of
 binding, we have managed to give a generic presentation of syntaxes
 with binding as well as a large class of scope safe programs acting
 on them: from Renaming and Substitution, to Normalisation by Evaluation,
-and Elaboration to a core language. We have also seen how this setup
-could be applied to a different domain: the representation of potentially
-cyclic structures by finite artefacts. Last but not least, we have
+and Elaboration to a core language. Last but not least, we have
 quickly seen how to construct proofs about these generic programs.
 The diverse influences leading to this body of work suggest many
 opportunities for future research:
@@ -864,9 +860,3 @@ many such common compilation passes can be implemented generically.
 An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
 could provide an appropriate framework to highlight the connection
 between various languages, some being seen as the extension of others.
-
-The potentially cyclic structures we have studied have been improved
-upon by Hamana~\citeyear{Hamana2009} who gave a presentation which
-preserves sharing: pointers can not only refer to nodes above them
-but also across from them in the cyclic tree. This yields a much more
-involved binding structure which would be interesting in its own right.
