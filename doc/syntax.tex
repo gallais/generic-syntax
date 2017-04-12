@@ -252,7 +252,7 @@ one.
 \caption{The \AF{□} comonad, Thinnable, and the free Thinnable.}
 \end{figure}
 
-Equipped with these two new notions, we can define an abstract
+Equipped with these new notions, we can define an abstract
 concept of semantics for our scope safe language. A semantics with
 values in $\mathcal{V}$ and computations in $\mathcal{C}$ is meant
 to give rise to a traversal which, provided a term and an environment
@@ -450,17 +450,33 @@ building the free monad, we only have to describe two cases:
 the application case where we have two substructures which do
 not bind any extra argument and the $\lambda$-abstraction case
 which has exactly one substructure with precisely one extra
-bound variable. We can also define smart constructors corresponding
-to application and $\lambda$-abstraction respectively. They have
-the same type as the \AIC{A} and \AIC{L} constructors in our
-motivating example in Figure~\ref{scoped-untyped}.
+bound variable. We can also define constructors corresponding
+to the original ones in Figure~\ref{scoped-untyped}: \AF{`V}
+for \AIC{V} the variable constructor, \AF{`A} for \AIC{A} the
+application one and \AF{`L} for \AIC{L} the $\lambda$-abstraction
+respectively. In Agda, we can actually almost define these as
+pattern synonyms (the language currently does not allow the user
+to specify type annotations for her pattern synonyms), meaning
+that the encoding of the language in a universe does not force
+the end user to deal with the gnarly details of the internal
+representation.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{LCD}
+\end{minipage}
+\begin{minipage}{0.35\textwidth}
   \ExecuteMetaData[generic-syntax.tex]{LC}
+\end{minipage}
+
+\begin{minipage}{0.30\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{var}
+\end{minipage}
+\begin{minipage}{0.30\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{app}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{applam}
+\begin{minipage}{0.30\textwidth}
+  \ExecuteMetaData[generic-syntax.tex]{lam}
 \end{minipage}
 \caption{Example: The Untyped Lambda Calculus}
 \end{figure}

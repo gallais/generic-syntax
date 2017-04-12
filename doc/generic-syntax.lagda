@@ -112,26 +112,37 @@ data Tm (d : Desc) : Size → ℕ → Set where
 \end{code}
 %</mu>
 
-%<*LC>
+%<*LCD>
 \begin{code}
 LCD : Desc
 LCD =  `σ Bool $ λ isApp →
        if isApp then `X 0 (`X 0 `∎) else `X 1 `∎
-
+\end{code}
+%</LCD>
+%<*LC>
+\begin{code}
 LC : ℕ → Set
 LC = Tm LCD ∞
 \end{code}
 %</LC>
-
-%<*applam>
+%<*var>
 \begin{code}
-`app : [ LC ⟶ LC ⟶ LC ]
-`app f t = `con (true , f , t , tt)
-
-`lam : [ suc ⊢ LC ⟶ LC ]
-`lam b = `con (false , b , tt)
+`V : [ Var ⟶ LC ]
+`V = `var
 \end{code}
-%</applam>
+%</var>
+%<*app>
+\begin{code}
+`A : [ LC ⟶ LC ⟶ LC ]
+`A f t = `con (true , f , t , tt)
+\end{code}
+%</app>
+%<*lam>
+\begin{code}
+`L : [ suc ⊢ LC ⟶ LC ]
+`L b = `con (false , b , tt)
+\end{code}
+%</lam>
 
 %<*semantics>
 \begin{code}
@@ -396,7 +407,7 @@ module _ {d : Desc} where
    }
 
 `id : LC 0
-`id = `lam (`var z)
+`id = `L (`var z)
 
 \end{code}
 %<*nbelc>
@@ -412,7 +423,7 @@ norm^LC = norm $ case app (C ∘ (false ,_)) where
 \begin{code}
 open import Relation.Binary.PropositionalEquality hiding ([_] ; refl)
 
-example : norm^LC (`app `id (`app `id `id)) ≡ just `id
+example : norm^LC (`A `id (`A `id `id)) ≡ just `id
 example = _≡_.refl
 
 infixr 5 _⇒_
