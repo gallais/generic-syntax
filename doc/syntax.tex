@@ -202,8 +202,11 @@ need to introduce three new definitions:
 
 A \AF{Thinning} from $m$ to $n$ is a function from \AD{Var} $m$ to
 \AD{Var} $n$. It is a special case of a notion of environment that
-stores values living in a scope $n$ for each variable in a scope $m$
-which we introduce as a record type.
+stores values living in a scope $n$ for each variable in a scope $m$.
+We introduce environment as records (this helps the host language's
+type inference reconstruct the type of values) and write
+(\AB{m} \AR{─Env}) \AB{𝓥} \AB{n} for such an environment with values
+in \AB{𝓥}.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
@@ -215,7 +218,7 @@ which we introduce as a record type.
 \caption{Environments of Well Scoped Values and Thinnings}
 \end{figure}
 
-It subsumes more structured notions such as the Category of
+\AF{Thinning}s subsume more structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
 Embeddings~\cite{chapman2009type}. In particular, it does not prevent the
 user from defining arbitrary permutations or from introducing contractions
@@ -227,22 +230,26 @@ The \AF{□} combinator turns any \AD{ℕ}-indexed Set into one that can absorb
 thinnings. It is akin to Kripke-style quantification over all possible future
 worlds and \AF{□} (\AB{D} \AF{→} \AB{D}) indeed corresponds to the Kripke
 function space used in normalisation by evaluation via a domain \AB{D}.
+Because we can define an identity \AF{Thinning} and \AF{Thinning}s do
+compose, \AF{□} is a comonad.
 
-The notion of \AF{Thinnable} is the property of being stable under thinnings.
+The notion of \AF{Thinnable} is the property of being stable under thinnings,
+in other words: \AF{□} is a comonad and \AF{Thinnable}s are its coalgebras.
 It is a crucial property for values to have if one wants to be able to push
-them under binders. Unsurprisingly, the \AF{□} combinator freely turns any
-\AD{ℕ}-indexed Set into a \AF{Thinnable} one; in other words: combined
-with the existence of an identity thinning this means that \AF{□} is a
-comonad.
+them under binders. Unsurprisingly, from the comonadic structure we get that
+the \AF{□} combinator freely turns any \AD{ℕ}-indexed Set into a \AF{Thinnable}
+one.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[environment.tex]{box}
+\ExecuteMetaData[environment.tex]{comonad}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[environment.tex]{thinnable}
+\ExecuteMetaData[environment.tex]{freeth}
 \end{minipage}
-\caption{Thinnable and the Free Thinnable Construction}
+\caption{The \AF{□} comonad, Thinnable, and the free Thinnable.}
 \end{figure}
 
 Equipped with these two new notions, we can define an abstract

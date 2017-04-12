@@ -22,6 +22,7 @@ paper-lagda:
 paper: prepare paper-lagda
 	cd latex \
 	&& ${SED} -f rules.sed -i ${PAPER}.tex \
+	&& ${SED} -f rules.sed -i syntax.tex \
 	&& ${SED} -f rules.sed -i indexed.tex \
 	&& ${SED} -f rules.sed -i motivation.tex \
         && ${SED} -f rules.sed -i environment.tex \

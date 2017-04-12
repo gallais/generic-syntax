@@ -67,22 +67,24 @@ extend = pack s
 (□ T) m = [ Thinning m ⟶ T ]
 \end{code}
 %</box>
+%<*comonad>
 \begin{code}
-
-extract : {T : ℕ → Set} → [ □ T ⟶ T ]
-extract = _$ refl
+extract    : {T : ℕ → Set} → [ □ T ⟶ T        ]
+duplicate  : {T : ℕ → Set} → [ □ T ⟶ □ (□ T)  ]
+\end{code}
+%</comonad>
+\begin{code}
+extract t = t refl
+duplicate t ρ σ = t (select ρ σ)
 
 join : {T : ℕ → Set} → [ □ (□ T) ⟶ □ T ]
 join = extract
-
-duplicate : {T : ℕ → Set} → [ □ T ⟶ □ (□ T) ]
-duplicate t ρ σ = t (select ρ σ)
 
 \end{code}
 %<*thinnable>
 \begin{code}
 Thinnable : (ℕ → Set) → Set
-Thinnable 𝓥 = [ 𝓥 ⟶ □ 𝓥 ]
+Thinnable T = [ T ⟶ □ T ]
 \end{code}
 %</thinnable>
 \begin{code}
@@ -92,11 +94,13 @@ th^Var v ρ = lookup ρ v
 
 th^Env : ∀ {m 𝓥} → Thinnable 𝓥 → Thinnable ((m ─Env) 𝓥)
 lookup (th^Env th^𝓥 ρ ren) k = th^𝓥 (lookup ρ k) ren
-
-th^□ : ∀ {T} → Thinnable (□ T)
+\end{code}
+%<*freeth>
+\begin{code}
+th^□ : {T : ℕ → Set} → Thinnable (□ T)
 th^□ = duplicate
 \end{code}
-
+%</freeth>
 %<*kripke>
 \begin{code}
 Kripke : (𝓥 𝓒 : ℕ → Set) → (ℕ → ℕ → Set)
