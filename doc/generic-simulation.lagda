@@ -119,55 +119,39 @@ module _ {𝓥₁ 𝓥₂ : ℕ → Set} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) wher
 
 module _ {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : ℕ → Set} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) (𝓡^𝓒  : Rel 𝓒₁ 𝓒₂) where
 
- Kripke^R : (m : ℕ) → {n : ℕ} → Kripke 𝓥₁ 𝓒₁ m n → Kripke 𝓥₂ 𝓒₂ m n → Set
- Kripke^R zero       k₁ k₂ = rel 𝓡^𝓒 k₁ k₂
- Kripke^R m@(suc _)  k₁ k₂ =
-   {p : ℕ} (σ : _ ⊆ p) {ρ₁ : (m ─Env) 𝓥₁ _} {ρ₂ : (m ─Env) 𝓥₂ _} →
-   ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → rel 𝓡^𝓒 (k₁ σ ρ₁) (k₂ σ ρ₂)
+\end{code}
+%<*kripkeR>
+\begin{code}
+ Kripke^R : (m : ℕ) → [ Kripke 𝓥₁ 𝓒₁ m ⟶ Kripke 𝓥₂ 𝓒₂ m ⟶ κ Set ]
+ Kripke^R zero     k₁ k₂ = rel 𝓡^𝓒 k₁ k₂
+ Kripke^R (suc _)  k₁ k₂ = {p : ℕ} → ∀ σ {ρ₁} {ρ₂} → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → rel 𝓡^𝓒 {p} (k₁ σ ρ₁) (k₂ σ ρ₂)
+\end{code}
+%</kripkeR>
 
-
+\begin{code}
  reify^R : {vl₁ : VarLike 𝓥₁} {vl₂ : VarLike 𝓥₂} (vl^R : VarLike^R 𝓡^𝓥 vl₁ vl₂) →
            ∀ m → {n : ℕ} {k₁ : Kripke 𝓥₁ 𝓒₁ m n} {k₂ : Kripke 𝓥₂ 𝓒₂ m n} →
            Kripke^R m k₁ k₂ → rel 𝓡^𝓒 (reify vl₁ m k₁) (reify vl₂ m k₂)
  reify^R vl^R zero       k^R = k^R
  reify^R vl^R m@(suc _)  k^R = k^R (freshʳ vl^Var m) (VarLike^R.freshˡ^R vl^R m)
-
- record Simulate (d : Desc) (𝓢₁ : Sem d 𝓥₁ 𝓒₁) (𝓢₂ : Sem d 𝓥₂ 𝓒₂) : Set where
-   field
-
-     th^R : {m n : ℕ} (σ : m ⊆ n) {v₁ : 𝓥₁ m} {v₂ : 𝓥₂ m} →
-            rel 𝓡^𝓥 v₁ v₂ → rel 𝓡^𝓥 (Sem.th^𝓥 𝓢₁ v₁ σ) (Sem.th^𝓥 𝓢₂ v₂ σ)
-
-     var^R : {m : ℕ} {v₁ : 𝓥₁ m} {v₂ : 𝓥₂ m} →
-             rel 𝓡^𝓥 v₁ v₂ → rel 𝓡^𝓒 (Sem.var 𝓢₁ v₁) (Sem.var 𝓢₂ v₂)
-
-     alg^R : {m : ℕ} {b₁ :
 \end{code}
-%<*algone>
+
+%<*recsim>
 \begin{code}
-             ⟦ d ⟧ (Kripke 𝓥₁ 𝓒₁) m
+ record Sim (d : Desc) (𝓢₁ : Sem d 𝓥₁ 𝓒₁) (𝓢₂ : Sem d 𝓥₂ 𝓒₂) : Set where
+   field  th^R   : {m n : ℕ} {v₁ : 𝓥₁ m} {v₂ : 𝓥₂ m} → (σ : Thinning m n) → rel 𝓡^𝓥 v₁ v₂ → rel 𝓡^𝓥 (Sem.th^𝓥 𝓢₁ v₁ σ) (Sem.th^𝓥 𝓢₂ v₂ σ)
+          var^R  : {m : ℕ} {v₁ : 𝓥₁ m} {v₂ : 𝓥₂ m} → rel 𝓡^𝓥 v₁ v₂ → rel 𝓡^𝓒 (Sem.var 𝓢₁ v₁) (Sem.var 𝓢₂ v₂)
+          alg^R  : {m : ℕ} {b₁ : ⟦ d ⟧ (Kripke 𝓥₁ 𝓒₁) m} {b₂ : ⟦ d ⟧ (Kripke 𝓥₂ 𝓒₂) m} → Zip d Kripke^R b₁ b₂ → rel 𝓡^𝓒 (Sem.alg 𝓢₁ b₁) (Sem.alg 𝓢₂ b₂)
 \end{code}
-%</algone>
+%</recsim>
+%<*simbody>
 \begin{code}
-             } {b₂ :
+   sim   :  {m n : ℕ} {ρ₁ : (m ─Env) 𝓥₁ n} {ρ₂ : (m ─Env) 𝓥₂ n} {i : Size} → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → (t : Tm d i m) → rel 𝓡^𝓒 (Sem.sem 𝓢₁ ρ₁ t) (Sem.sem 𝓢₂ ρ₂ t)
+   body  :  {n p : ℕ} {ρ₁ : (n ─Env) 𝓥₁ p} {ρ₂ : (n ─Env) 𝓥₂ p} {i : Size} → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → (m : ℕ) (t : Scope (Tm d i) m n) →
+            Kripke^R m (Sem.body 𝓢₁ ρ₁ m t) (Sem.body 𝓢₂ ρ₂ m t)
 \end{code}
-%<*algtwo>
+%</simbody>
 \begin{code}
-             ⟦ d ⟧ (Kripke 𝓥₂ 𝓒₂) m
-\end{code}
-%</algtwo>
-\begin{code}
-             } →
-             Zip d Kripke^R b₁ b₂ → rel 𝓡^𝓒 (Sem.alg 𝓢₁ b₁) (Sem.alg 𝓢₂ b₂)
-
-
-   sim : {m n : ℕ} {ρ₁ : (m ─Env) 𝓥₁ n} {ρ₂ : (m ─Env) 𝓥₂ n}  → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ →
-         {i : Size} (t : Tm d i m) → rel 𝓡^𝓒 (Sem.sem 𝓢₁ ρ₁ t) (Sem.sem 𝓢₂ ρ₂ t)
-
-   body : {n p : ℕ} {ρ₁ : (n ─Env) 𝓥₁ p} {ρ₂ : (n ─Env) 𝓥₂ p}  → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ →
-          {i : Size} (m : ℕ) (t : Scope (Tm d i) m n) →
-          Kripke^R m (Sem.body 𝓢₁ ρ₁ m t) (Sem.body 𝓢₂ ρ₂ m t)
-
    sim ρ (`var k) = var^R (lookup^R ρ k)
    sim ρ (`con t) = alg^R (zip d (body ρ) t)
   
@@ -200,7 +184,7 @@ vl^VarTm d = record
   ; th^R   = λ σ → cong (Sem.sem (Renaming d) σ) }
 
 
-RenSub : (d : Desc) → Simulate (VarTm^R d) Eq^R d (Renaming d) (Substitution d)
+RenSub : (d : Desc) → Sim (VarTm^R d) Eq^R d (Renaming d) (Substitution d)
 RenSub d = record
   { var^R = id
   ; th^R  = λ { _ _≡_.refl → _≡_.refl }
@@ -210,8 +194,8 @@ RenSub d = record
 \end{code}
 %<*rensub>
 \begin{code}
-rensub :  (d : Desc) {m n : ℕ} (ρ : m ⊆ n) (t : Tm d ∞ m) →
+rensub :  {m n : ℕ} (d : Desc) (ρ : Thinning m n) (t : Tm d ∞ m) →
           Sem.sem (Renaming d) ρ t ≡ Sem.sem (Substitution d) (`var <$> ρ) t
-rensub d ρ = Simulate.sim (RenSub d) (pack^R (λ _ → _≡_.refl))
+rensub d ρ = Sim.sim (RenSub d) (pack^R (λ _ → _≡_.refl))
 \end{code}
 %</rensub>

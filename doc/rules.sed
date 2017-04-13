@@ -36,7 +36,7 @@ s/∙×/\\dot\{×\}/g
 s/\\AgdaSymbol{λ} \\AgdaSymbol{\\{}\\AgdaBound{σ}\\AgdaSymbol{\\}} \\AgdaSymbol{\\{}\\AgdaBound{τ}\\AgdaSymbol{\\}} \\AgdaSymbol{→} //g
 #s/\\AgdaSymbol{\\{}\\AgdaBound{σ}\\AgdaSymbol{\\}} \\AgdaSymbol{\\{}\\AgdaBound{τ}\\AgdaSymbol{\\};}/\\AgdaSymbol{;}/g
 s/\\AgdaSymbol{λ} \\AgdaSymbol{\\{}\\AgdaBound{σ}\\AgdaSymbol{\\}} \\AgdaSymbol{→} //g
-#s/\\AgdaSymbol{\\{}\\AgdaBound{σ}\\AgdaSymbol{\\}} //g
+s/\\AgdaSymbol{\\{}\\AgdaBound{p}\\AgdaSymbol{\\}} //g
 s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<]*\\AgdaSymbol{\\}}\([^<=]*\)\\AgdaSymbol{=}/\1\2\\AgdaSymbol{=}/g
 s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<]*\\AgdaSymbol{\\}}[^<()→;]*\\AgdaSymbol{→} /\1/g
 s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<();]*\\AgdaSymbol{\\}}/\1/g
@@ -53,3 +53,4 @@ s/𝓢/\\mathcal\{S\}/g
 s/𝓒/\\mathcal\{C\}/g
 s/𝓥/\\mathcal\{V\}/g
 s/ε/\\varepsilon\{\}/g
+s/\\AgdaField{rel}//g
