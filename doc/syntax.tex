@@ -373,16 +373,9 @@ the meaning of a description.
 \caption{Meaning of Descriptions and Proof of Functoriality}
 \end{figure}
 
-Because all of the functors obtained as meanings of descriptions are
-strictly positive, it is possible to take their least fixpoint \AD{μ}.
-We index this inductive definition of the least fixpoint with a
-size~\cite{DBLP:journals/corr/abs-1012-4896} so that functions such
-as \AF{fold}, the proof that \AD{μ} \AB{d} is the initial algebra
-corresponding to \AB{d}'s meaning, are seen as obviously terminating
-by the system thanks to a type-based argument. Indeed, the use of
-\AF{fmap} obscures the fact that recursive calls are only performed
-on strict subterms and without a type-based approach this concise
-definition would be rejected.
+All the functors obtained as meanings of \AD{Desc}riptions are strictly
+positive so we can build their least fixpoint \AD{μ} which is the initial
+algebra corresponding to \AB{d}'s meaning as proven by \AF{fold} \AB{d}.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -393,6 +386,19 @@ definition would be rejected.
 \end{minipage}
 \caption{Fixpoint and Generic Fold}
 \end{figure}
+
+Here the \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
+to the inductive definition of \AD{μ} plays a crucial role in getting
+the termination checker to see that \AF{fold} is a total function.
+Indeed the recursive calls to \AF{fold} are performed indirectly via
+\AF{fmap} and it's only because the compiler knows that \AB{i}, the index
+at which the recursive calls are performed, is strictly smaller than
+\AF{↑} \AB{i} that it accepts the definition as total. Without this type
+based approach to termination checking the definition of \AF{fold} would
+be rejected and our only recourse would be to manually inline \AF{fmap}.
+However, in most definitions the \AD{Size} does not matter in which case
+we will simply use the primitive limit \AD{Size} \AF{∞} which is
+characterised by \AF{∞} = \AF{↑} \AF{∞}.
 
 This demonstrates that this approach allows us to define generically
 the iteration principle associated to all the datatypes which arise
@@ -444,7 +450,9 @@ by simply summing the two indices, we recover an endofunctor on
 $\Set{}^ℕ$ and we can take its fixpoint. This time, instead
 of considering the initial algebra, we opt for the free relative
 monad~\cite{JFR4389}: the \AIC{`var} constructor corresponds to
-return and we will define bind in the next section.
+return and we will define bind (also known as \AF{sub}) in the next
+section. We have once more a \AD{Size} index to get all the benefits
+of type based termination checking.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
