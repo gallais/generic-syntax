@@ -6,7 +6,7 @@ all: finish
 
 prepare:
 	mkdir -p latex/
-	cp cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.bst *.sed latex/
+	cp cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.sed latex/
 
 paper-lagda:    
 	./lagda2tex indexed.lagda
@@ -42,5 +42,5 @@ clean:
 	rm latex/${PAPER}.pdf
 
 fullclean:
-	rm -f *.agdai
+	rm -f *.agdai *.log *.hash *~ ${PAPER}.pdf
 	rm -rf latex/

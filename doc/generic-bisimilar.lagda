@@ -20,7 +20,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_ ; subst)
 %<*bisim>
 \begin{code}
 record ≈^∞Tm (d : Desc) (i : Size) (t u : ∞Tm d i) : Set where
-  coinductive; field force : {j : Size< i} → Zip (λ _ → ≈^∞Tm d j) d (∞Tm.force t) (∞Tm.force u)
+  coinductive; field force : {j : Size< i} → Zip d (λ _ → ≈^∞Tm d j) (∞Tm.force t) (∞Tm.force u)
 \end{code}
 %</bisim>
 

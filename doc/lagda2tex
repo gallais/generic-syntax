@@ -23,7 +23,3 @@ else
   echo FROM CACHE: "$DIRECTORY"/"$TARGET".tex
 fi
 echo "$CHECK" > "$TARGET".hash
-# Go back to the root directory and copy the generated tex
-cd - > /dev/null
-mkdir -p __build/"$DIRECTORY"
-cp "$DIRECTORY"/latex/"$TARGET".tex __build/"$DIRECTORY"/
