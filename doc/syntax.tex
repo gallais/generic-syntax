@@ -18,7 +18,7 @@ at \url{https://github.com/gallais/generic-syntax}.
 
 \section{Introduction}
 
-Nowadays the software programmer developping an embedded DSL~\cite{hudak1996building}
+Nowadays the software programmer writing an embedded DSL~\cite{hudak1996building}
 and the PL researcher formalising a calculus both know and
 leverage the host language's type system. Using Generalised
 Algebraic Data Types (GADTs) or the more general indexed
@@ -105,11 +105,12 @@ quantifying over the index. The first two combinators are the pointwise liftings
 of the function space and the product type respectively, both silently threading
 the underlying scope. The third one is simply the constant function turning a Set
 into an indexed Set by ignoring the index. Finally, the last one makes explicit
-the \emph{adjustment} made to the index by a function. The use of $\_\vdash{}\_$\footnote{
-In Agda, underscores in a function's name denote the positions in which the
-function's arguments are to be inserted.} for the latter is meant to suggest
-its connection to the mathematical convention of only mentioning context
-\emph{extensions} when presenting judgements (see e.g. \cite{martin1982constructive}).
+the \emph{adjustment} made to the index by a function. We use Agda's mixfix operator
+notation (where underscores denote argument positions) to suggest its connection
+to the mathematical convention of only mentioning context \emph{extensions} when
+presenting judgements (see e.g. \cite{martin1982constructive}) and write
+\AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T}
+the indexed set is operates on.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -192,7 +193,7 @@ would allow for these definitions to be refactored, and their common
 properties to be proved in one swift move.
 
 Previous efforts in dependently typed
-programming~\cite{mcbride2005type,benton2012strongly,allais2017type}
+programming~\cite{benton2012strongly,allais2017type}
 have precisely achieved this goal and refactored renaming and substitution,
 but also normalisation by evaluation, printing with names or CPS conversion
 as various instances of a more general traversal. Unpublished results also
@@ -234,7 +235,7 @@ Because we can define an identity \AF{Thinning} and \AF{Thinning}s do
 compose, \AF{□} is a comonad.
 
 The notion of \AF{Thinnable} is the property of being stable under thinnings,
-in other words: \AF{□} is a comonad and \AF{Thinnable}s are its coalgebras.
+in other words: \AF{Thinnable}s are the coalgebras of \AF{□}.
 It is a crucial property for values to have if one wants to be able to push
 them under binders. Unsurprisingly, from the comonadic structure we get that
 the \AF{□} combinator freely turns any \AD{ℕ}-indexed Set into a \AF{Thinnable}
@@ -249,7 +250,7 @@ one.
 \ExecuteMetaData[environment.tex]{thinnable}
 \ExecuteMetaData[environment.tex]{freeth}
 \end{minipage}
-\caption{The \AF{□} comonad, Thinnable, and the free Thinnable.}
+\caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable.}
 \end{figure}
 
 Equipped with these new notions, we can define an abstract
@@ -430,10 +431,10 @@ Given an $X$ that interprets substructures with an extra $m$ bound
 variables in a scope that has $n$ bound variables already as $X\,m\,n$,
 we give a description a meaning as an $\Set{}^ℕ$. The astute reader
 may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $n$; however
-refactoring \AF{⟦\_⟧} following this observation would lead to a
-definition harder to use with the combinators for indexed sets
-described in Figure~\ref{figure:indexed} which make our types
-much more readable.
+refactoring \AF{⟦\_⟧} to use the partially applied $X \_ n$ following
+this observation would lead to a definition harder to use with the
+combinators for indexed sets described in Figure~\ref{figure:indexed}
+which make our types much more readable.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
