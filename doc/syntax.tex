@@ -154,7 +154,7 @@ indices. Its first constructor (\AIC{z} for zero) states that we have a name to 
 the nearest binder in a non-empty scope. The second one (\AIC{s} for successor) lifts a
 name for a variable in a given scope into a name for it in the extended scope where
 an extra variable has been bound. Both of their types have been written using combinators,
-altought we will abstain from unfolding them in the future, we do so here in the hope
+although we will abstain from unfolding them in the future, we do so here in the hope
 it will help the reader get acquainted with them: they respectively normalise to
 $\forall n. \mathbf{Var}(\mathit{suc}(n))$ for \AIC{z},
 and $\forall n. \mathbf{Var}(n) \rightarrow \mathbf{Var}(\mathit{suc}(n))$ for \AIC{s}.
