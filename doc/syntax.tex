@@ -154,7 +154,7 @@ indices. Its first constructor (\AIC{z} for zero) states that we have a name to 
 the nearest binder in a non-empty scope. The second one (\AIC{s} for successor) lifts a
 name for a variable in a given scope into a name for it in the extended scope where
 an extra variable has been bound. Both of their types have been written using combinators,
-altought we will abstain from unfolding them in the future, we do so here in the hope
+although we will abstain from unfolding them in the future, we do so here in the hope
 it will help the reader get acquainted with them: they respectively normalise to
 $\forall n. \mathbf{Var}(\mathit{suc}(n))$ for \AIC{z},
 and $\forall n. \mathbf{Var}(n) \rightarrow \mathbf{Var}(\mathit{suc}(n))$ for \AIC{s}.
@@ -274,7 +274,7 @@ the language's constructors. Here the semantical counterpart of
 application is not particularly interesting. However the interpretation
 of the $\lambda$-abstraction is of interest: it is a variant on
 the Kripke function space one can find in normalisation by evaluation.
-In all possible thinnings of the scope at hand, it promise to deliver
+In all possible thinnings of the scope at hand, it promises to deliver
 a computation whenever it is provided with a value for its newly
 bound variable. This is concisely expressed by the type
 (\AF{□} (\AB{\mathcal{V}} \AF{→} \AB{\mathcal{C}})).
@@ -286,7 +286,7 @@ bound variable. This is concisely expressed by the type
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[motivation.tex]{sem}
 \end{minipage}
-\caption{Semantics for Lam and their Fundamental Lemma}
+\caption{Semantics for \AD{Lam} and their Fundamental Lemma}
 \end{figure}
 
 Coming back to renaming and substitution, we can see that they do fit
@@ -308,7 +308,7 @@ are distinct from their type of computations.
 \caption{Renaming, Substitution and Printing as Instances of \AR{Sem}}
 \end{figure}
 
-All of these examples are already desribed at length by Allais, Chapman,
+All of these examples are already described at length by Allais, Chapman,
 McBride and McKinna~\citeyear{allais2017type} so we will not spend any
 more time on them. They have also obtained the simulation and fusion
 theorems demonstrating that these traversals are well-behaved as
@@ -320,8 +320,8 @@ constraint described by \AR{Sem} and the definition of \AD{Lam}: the
 semantical combinators are related to the corresponding constructors
 where the recursive occurences of the inductive family have been replaced
 with either a computation or a Kripke function space whenever an
-extra variable was bound. This suggest that it ought to be possible
-to compute the definition of \AF{Sem} from the one of the datatype.
+extra variable was bound. This suggests that it ought to be possible
+to compute the definition of \AF{Sem} from the datatype.
 
 \section{A Primer on the Universe of Data Types}
 
@@ -571,7 +571,7 @@ have to abide by three constraints
       result of its evaluation;
 \item Last but not least, we should have an algebra turning
       a term where substructures have been replaced with
-      either computations or kripke functional spaces (depending
+      either computations or Kripke functional spaces (depending
       on whether extra bound variables have been introduced)
       into computations
 \end{itemize}
@@ -763,7 +763,7 @@ gives its name to normalisation by evaluation.
 The user still has to explicitly pass an interpretation of
 the various constructors because there is no way for us to
 know what the binders are supposed to represent: they may
-stand $\lambda$-abstractions, $\Sigma$-types, fixpoints, or
+stand for $\lambda$-abstractions, $\Sigma$-types, fixpoints, or
 anything else she may want to define.
 
 
@@ -779,7 +779,7 @@ one hand and the $\lambda$-abstraction one on the other.
 The latter is trivial: functions are already
 values! The semantical counterpart of application proceeds by
 case analysis on the function: if it corresponds to a
-$\lambda$-abstraction, we can fire the redex by using the kripke
+$\lambda$-abstraction, we can fire the redex by using the Kripke
 functional space; otherwise we grow the spine of stuck
 applications.
 
