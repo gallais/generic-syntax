@@ -33,7 +33,7 @@ These introductory sections help us build an understanding of the
 problem at hand as well as a toolkit that leads us to the original
 content of this paper: a universe of scope safe syntaxes with binding
 together with a generic notion of scope safe semantics for these syntaxes.
-This give us the opportunity to write generic implementations of renaming,
+This gives us the opportunity to write generic implementations of renaming,
 substitution but also elaboration of a surface language to a core one,
 and normalisation by evaluation. We also explore opportunities for
 generic proving by describing a framework to formally describe what
@@ -72,7 +72,7 @@ The language is obtained as the fixpoint of $T$:
 \]
 The proof that the fixpoint is functorial then corresponds to renaming
 whilst the proof that it is monadic implements substitution: the variable
-constructor is return and bind defines parallel substitution.
+constructor is return, and bind defines parallel substitution.
 
 \subsection{A Mechanized Variant of Altenkirch and Reus' Untyped Calculus}
 
@@ -110,7 +110,7 @@ notation (where underscores denote argument positions) to suggest its connection
 to the mathematical convention of only mentioning context \emph{extensions} when
 presenting judgements (see e.g. \cite{martin1982constructive}) and write
 \AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T}
-the indexed set is operates on.
+the indexed set it operates on.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -453,7 +453,7 @@ by simply summing the two indices, we recover an endofunctor on
 $\Set{}^ℕ$ and we can take its fixpoint. This time, instead
 of considering the initial algebra, we opt for the free relative
 monad~\cite{JFR4389}: the \AIC{`var} constructor corresponds to
-return and we will define bind (also known as \AF{sub}) in the next
+return, and we will define bind (also known as \AF{sub}) in the next
 section. We have once more a \AD{Size} index to get all the benefits
 of type based termination checking.
 
