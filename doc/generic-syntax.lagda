@@ -4,159 +4,159 @@ module generic-syntax where
 open import Level using (Level)
 open import Size
 open import Data.Bool
-open import Data.Nat as ℕ
+open import Data.List.Base as L hiding ([_])
+open import Data.List.All using (All ; [] ; _∷_)
 open import Data.Unit
 open import Data.Sum as Sum
 open import Data.Product as Prod hiding (,_)
 open import Function
+open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import var
 open import indexed 
-open import environment hiding (refl)
+open import environment as E hiding (refl)
 
 \end{code}
 %<*desc>
 \begin{code}
-data Desc : Set₁ where
-  `σ : (A : Set) (d : A → Desc)  →  Desc
-  `X : ℕ   → Desc                →  Desc
-  `∎ :                              Desc
+data Desc (I : Set) : Set₁ where
+  `σ : (A : Set) (d : A → Desc I)  → Desc I
+  `X : List I → I → Desc I         → Desc I
+  `∎ : I                            → Desc I
 \end{code}
 %</desc>
 \begin{code}
+module _ {I : Set} where
 
-infixr 6 _`×_
-infixr 5 _`+_
+ infixr 5 _`+_
 
-`K : Set → Desc
-`K A = `σ A (λ _ → `∎)
+ `K : Set → I → Desc I
+ `K A i = `σ A (λ _ → `∎ i)
 
 
 \end{code}
 %<*sumcomb>
 \begin{code}
-_`+_ : Desc → Desc → Desc
-d `+ e =  `σ Bool $ λ isLeft →
-          if isLeft then d else e
+ _`+_ : Desc I → Desc I → Desc I
+ d `+ e =  `σ Bool $ λ isLeft →
+           if isLeft then d else e
 \end{code}
 %</sumcomb>
 %<*paircomb>
 \begin{code}
-_`×_ : Desc → Desc → Desc
-`σ A d  `× e = `σ A (λ a → d a `× e)
-`X k d  `× e = `X k (d `× e)
-`∎      `× e = e
+ `Xs : List I → I → I → Desc I
+ `Xs js j i = foldr (`X []) (`X js j (`∎ i)) js
 \end{code}
 %</paircomb>
 %<*interp>
 \begin{code}
-⟦_⟧ : Desc → (ℕ → ℕ → Set) → (ℕ → Set)
-⟦ `σ A d  ⟧ X n = Σ[ a ∈ A ] (⟦ d a ⟧ X n)
-⟦ `X m d  ⟧ X n = X m n × ⟦ d ⟧ X n
-⟦ `∎      ⟧ X n = ⊤
+⟦_⟧ : {I : Set} → Desc I → (List I → I → List I → Set) → (I → List I → Set)
+⟦ `σ A d    ⟧ X i Γ = Σ[ a ∈ A ] (⟦ d a ⟧ X i Γ)
+⟦ `X Δ j d  ⟧ X i Γ = X Δ j Γ × ⟦ d ⟧ X i Γ
+⟦ `∎ i′     ⟧ X i Γ = i ≡ i′
 \end{code}
 %</interp>
 \begin{code}
 
-module _ (d e : Desc) {ρ : ℕ → ℕ → Set} where
+module _ {I : Set} {X : List I → I → List I → Set} {i j k : I} {Γ : List I} where
 \end{code}
 %<*pairunpair>
 \begin{code}
- pair    : [ ⟦ d ⟧ ρ ⟶ ⟦ e ⟧ ρ ⟶ ⟦ d `× e ⟧ ρ   ]
- unpair  : [ ⟦ d `× e ⟧ ρ ⟶ ⟦ d ⟧ ρ ∙× ⟦ e ⟧ ρ  ]
+ unXs :  (Δ : List I) → ⟦ `Xs Δ j i ⟧ X k Γ → All (λ i → X [] i Γ) Δ × X Δ j Γ × k ≡ i
 \end{code}
 %</pairunpair>
 \begin{code}
- pair = go d where
- 
-  go : ∀ d → [ ⟦ d ⟧ ρ ⟶ ⟦ e ⟧ ρ ⟶ ⟦ d `× e ⟧ ρ   ]
-  go (`σ A d) (a , a')  b = a , go (d a) a' b
-  go (`X x d) (r , a')  b = r , go d a' b
-  go `∎        a         b = b
+ unXs = go id where
 
- unpair = go d where
-
-  go : ∀ d → [ ⟦ d `× e ⟧ ρ ⟶ ⟦ d ⟧ ρ ∙× ⟦ e ⟧ ρ  ]
-  go (`σ A d) (a , ab)  = Prod.map (λ b → a , b) id (go (d a) ab)
-  go (`X x d) (r , ab)  = Prod.map (λ b → r , b) id (go d ab)
-  go `∎       ab        = tt , ab
+  go : (f : List I → List I) → (Δ : List I) →
+       ⟦ foldr (`X []) (`X (f Δ) j (`∎ i)) Δ ⟧ X k Γ → All (λ i → X [] i Γ) Δ × X (f Δ) j Γ × k ≡ i
+  go f []       (v , eq) = [] , v , eq
+  go f (σ ∷ Δ)  (t , v)  = Prod.map (t ∷_) id $ go (f ∘ (σ ∷_)) Δ v
 \end{code}
 %<*case>
 \begin{code}
-case : {d e : Desc} {ρ : ℕ → ℕ → Set} {A : Set} {n : ℕ} →  (⟦ d       ⟧ ρ n  → A) →
-                                                           (⟦ e       ⟧ ρ n  → A) →
-                                                           (⟦ d `+ e  ⟧ ρ n  → A)
+case : {I : Set} {d e : Desc I} {X : List I → I → List I → Set} {A : Set} {i : I} {Γ : List I} →
+  (⟦ d       ⟧ X i Γ → A) → (⟦ e       ⟧ X i Γ → A) → (⟦ d `+ e  ⟧ X i Γ → A)
 \end{code}
 %</case>
 \begin{code}
 case l r (true   , t) = l t
 case l r (false  , t) = r t
 
-fmap : (d : Desc) {X Y : ℕ → ℕ → Set} {n p : ℕ} → (∀ m → X m n → Y m p) → ⟦ d ⟧ X n → ⟦ d ⟧ Y p
-fmap (`σ A d)  f = Prod.map id (fmap (d _) f)
-fmap (`X m d)  f = Prod.map (f _) (fmap d f)
-fmap `∎        f = id
+fmap : {I : Set} (d : Desc I) {X Y : List I → I → List I → Set}
+       {Γ Δ : List I} {i : I} → (∀ Θ i → X Θ i Γ → Y Θ i Δ) → ⟦ d ⟧ X i Γ → ⟦ d ⟧ Y i Δ
+fmap (`σ A d)   f = Prod.map id (fmap (d _) f)
+fmap (`X Δ j d) f = Prod.map (f Δ j) (fmap d f)
+fmap (`∎ i)     f = id
 
 \end{code}
 %<*scope>
 \begin{code}
-Scope : (ℕ → Set) → (ℕ → ℕ → Set)
-Scope T m = (m +_) ⊢ T
+Scope : {I : Set} (T : I → List I → Set) → (List I → I → List I → Set)
+Scope T Δ i = (Δ ++_) ⊢ T i
 \end{code}
 %</scope>
 %<*mu>
 \begin{code}
-data Tm (d : Desc) : Size → ℕ → Set where
-  `var : {i : Size} →  [ Var                     ⟶ Tm d (↑ i)  ]
-  `con : {i : Size} →  [ ⟦ d ⟧ (Scope (Tm d i))  ⟶ Tm d (↑ i)  ]
+data Tm {I : Set} (d : Desc I) : Size → I → List I → Set where
+  `var : {s : Size} {i : I} →  [ Var i                    ⟶ Tm d (↑ s) i ]
+  `con : {s : Size} {i : I} →  [ ⟦ d ⟧ (Scope (Tm d s)) i ⟶ Tm d (↑ s) i ]
 \end{code}
 %</mu>
 
 %<*LCD>
 \begin{code}
-LCD : Desc
-LCD =  `σ Bool $ λ isApp →
-       if isApp then `X 0 (`X 0 `∎) else `X 1 `∎
+LCD : Desc ⊤
+LCD =  `σ Bool $ λ isApp → if isApp
+       then `X [] tt (`X [] tt (`∎ tt))
+       else `X (tt ∷ []) tt (`∎ tt)
 \end{code}
 %</LCD>
 %<*LC>
 \begin{code}
-LC : ℕ → Set
-LC = Tm LCD ∞
+LC : List ⊤ → Set
+LC = Tm LCD ∞ tt
 \end{code}
 %</LC>
 %<*var>
 \begin{code}
-`V : [ Var ⟶ LC ]
+`V : [ Var tt ⟶ LC ]
 `V = `var
 \end{code}
 %</var>
 %<*app>
 \begin{code}
 `A : [ LC ⟶ LC ⟶ LC ]
-`A f t = `con (true , f , t , tt)
+`A f t = `con (true , f , t , refl)
 \end{code}
 %</app>
 %<*lam>
 \begin{code}
-`L : [ suc ⊢ LC ⟶ LC ]
-`L b = `con (false , b , tt)
+`L : [ (tt ∷_) ⊢ LC ⟶ LC ]
+`L b = `con (false , b , refl)
 \end{code}
 %</lam>
 
 %<*semantics>
 \begin{code}
-record Sem (d : Desc) (𝓥 𝓒 : ℕ → Set) : Set where
-  field  th^𝓥   : Thinnable 𝓥
-         var    : [ 𝓥                   ⟶ 𝓒 ]
-         alg    : [ ⟦ d ⟧ (Kripke 𝓥 𝓒)  ⟶ 𝓒 ]
+Alg : {I : Set} (d : Desc I) (𝓥 𝓒 : I → List I → Set) → Set
+Alg {I} d 𝓥 𝓒 = {i : I} → [ ⟦ d ⟧ (Kripke 𝓥 𝓒) i ⟶ 𝓒 i ]
+
+record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I → List I → Set) : Set where
+  field  th^𝓥   : {i : I} → Thinnable (𝓥 i)
+         var    : {i : I} → [ 𝓥 i                  ⟶ 𝓒 i ]
+         alg    : Alg d 𝓥 𝓒
 \end{code}
 %</semantics>
 
 %<*sembody>
 \begin{code}
-  sem   : {m n : ℕ} {i : Size} → (m ─Env) 𝓥 n → Tm d i m → 𝓒 n
-  body  : {m n : ℕ} {i : Size} → (m ─Env) 𝓥 n → ∀ k → Scope (Tm d i) k m → Kripke 𝓥 𝓒 k n
+  _─Comp : (Γ : List I) (𝓒 : I → List I → Set) (Δ : List I) → Set
+  (Γ ─Comp) 𝓒 Δ = {s : Size} {i : I} → Tm d s i Γ → 𝓒 i Δ
+
+  sem   : {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
+  body  :  {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ →
+           ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
 \end{code}
 %</sembody>
 %<*sem>
@@ -167,30 +167,31 @@ record Sem (d : Desc) (𝓥 𝓒 : ℕ → Set) : Set where
 %</sem>
 %<*body>
 \begin{code}
-  body ρ 0        t = sem ρ t
-  body ρ (suc k)  t = λ ren vs → sem (vs >> th^Env th^𝓥 ρ ren) t
+  body ρ []       i t = sem ρ t
+  body ρ (_ ∷ _)  i t = λ ren vs → sem (vs >> th^Env th^𝓥 ρ ren) t
 \end{code}
 %</body>
 %<*varlike>
 \begin{code}
-record VarLike (𝓥 : ℕ → Set) : Set where
-  field  new   : [ suc ⊢ 𝓥 ]
-         th^𝓥  : Thinnable 𝓥
+
+record VarLike {I : Set} (𝓥 : I → List I → Set) : Set where
+  field  new   : {i : I} → [ (i ∷_) ⊢ 𝓥 i ]
+         th^𝓥  : {i : I} → Thinnable (𝓥 i)
 \end{code}
 %</varlike>
 \begin{code}
-  refl : ∀ {n} → (n ─Env) 𝓥 n
-  refl {zero}  = ε
-  refl {suc n} = th^Env th^𝓥 refl extend ∙ new
+  base : ∀ {Γ} → (Γ ─Env) 𝓥 Γ
+  base {[]}  = ε
+  base {σ ∷ Γ} = th^Env th^𝓥 base extend ∙ new
 
-  freshʳ : (k : ℕ) → ∀ {n} → (n ─Env) 𝓥 (k ℕ.+ n)
-  freshʳ k = th^Env th^𝓥 refl (pack (injectʳ k))
+  freshʳ : (Δ : List I) → ∀ {Γ} → (Γ ─Env) 𝓥 (Δ ++ Γ)
+  freshʳ Δ = th^Env th^𝓥 base (pack (injectʳ Δ))
 
-  freshˡ : (k : ℕ) → ∀ {n} → (k ─Env) 𝓥 (k ℕ.+ n)
-  freshˡ k = th^Env th^𝓥 refl (pack (injectˡ _))
+  freshˡ : (Δ : List I) → ∀ {Γ} → (Γ ─Env) 𝓥 (Γ ++ Δ)
+  freshˡ k = th^Env th^𝓥 base (pack (injectˡ _))
 open VarLike public
 
-vl^Var : VarLike Var
+vl^Var : {I : Set} → VarLike {I} Var
 vl^Var = record
   { new    = z
   ; th^𝓥  = th^Var
@@ -198,16 +199,17 @@ vl^Var = record
 \end{code}
 %<*reify>
 \begin{code}
-reify : {𝓥 𝓒 : ℕ → Set} {n : ℕ} → VarLike 𝓥 → ∀ m → Kripke 𝓥 𝓒 m n → Scope 𝓒 m n
-reify vl^𝓥 zero       b = b
-reify vl^𝓥 m@(suc _)  b = b (freshʳ vl^Var m) (freshˡ vl^𝓥 m)
+reify : {I : Set} {𝓥 𝓒 : I → List I → Set} → VarLike 𝓥 →
+        ∀ Δ i → [ Kripke 𝓥 𝓒 Δ i ⟶ Scope 𝓒 Δ i ]
+reify vl^𝓥 []        i b = b
+reify vl^𝓥 Δ@(_ ∷ _) i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
 \end{code}
 %</reify>
 \begin{code}
 
-record Syntactic (d : Desc) (𝓥 : ℕ → Set) : Set where
+record Syntactic {I : Set} (d : Desc I) (𝓥 : I → List I → Set) : Set where
   field
-    var    : [ 𝓥 ⟶ Tm d ∞ ]
+    var    : {i : I} → [ 𝓥 i ⟶ Tm d ∞ i ]
     vl^𝓥  : VarLike 𝓥
 
   semantics : Sem d 𝓥 (Tm d ∞)
@@ -217,10 +219,10 @@ record Syntactic (d : Desc) (𝓥 : ℕ → Set) : Set where
     ; alg   = `con ∘ alg' d
     } where
 
-    alg' : ∀ e → [ ⟦ e ⟧ (Kripke 𝓥 (Tm d ∞)) ⟶ ⟦ e ⟧ ((_⊢ Tm d ∞) ∘ ℕ._+_) ]
-    alg' e = fmap e (λ m → reify vl^𝓥 m)
+    alg' : {i : I} → ∀ e → [ ⟦ e ⟧ (Kripke 𝓥 (Tm d ∞)) i ⟶ ⟦ e ⟧ (Scope (Tm d ∞)) i ]
+    alg' e = fmap e (λ Θ i → reify vl^𝓥 Θ i)
 
-sy^Var : ∀ {d} → Syntactic d Var
+sy^Var : {I : Set} {d : Desc I} → Syntactic d Var
 sy^Var = record
   { var    = `var
   ; vl^𝓥  = vl^Var
@@ -228,45 +230,44 @@ sy^Var = record
 \end{code}
 %<*renaming>
 \begin{code}
-Renaming : ∀ d → Sem d Var (Tm d ∞)
+Renaming : {I : Set} (d : Desc I) → Sem d Var (Tm d ∞)
 Renaming d = record
   { th^𝓥  = λ k ρ → lookup ρ k
   ; var    = `var
-  ; alg    = `con ∘ fmap d (reify vl^Var) }
+  ; alg    = `con ∘ fmap d (λ Θ i → reify vl^Var Θ i) }
 
-ren :  {m n : ℕ} → ∀ d → (m ─Env) Var n →
-       Tm d ∞ m → Tm d ∞ n
-ren d = Sem.sem (Renaming d)
+ren :  {I : Set} {Γ Δ : List I} {i : I} → ∀ d → (Γ ─Env) Var Δ →
+       Tm d ∞ i Γ → Tm d ∞ i Δ
+ren d ρ t = Sem.sem (Renaming d) ρ t
 \end{code}
 %</renaming>
 \begin{code}
-th^Tm : ∀ {d} → Thinnable (Tm d ∞)
+th^Tm : {I : Set} {d : Desc I} {i : I} → Thinnable (Tm d ∞ i)
 th^Tm t ρ = Sem.sem (Renaming _) ρ t
 
-vl^Tm : ∀ {d} → VarLike (Tm d ∞)
+vl^Tm : {I : Set} {d : Desc I} → VarLike (Tm d ∞)
 vl^Tm = record
   { new    = `var z
   ; th^𝓥  = th^Tm
   }
 
-sy^Tm : ∀ {d} → Syntactic d (Tm d ∞)
+sy^Tm : {I : Set} {d : Desc I} → Syntactic d (Tm d ∞)
 sy^Tm = record
   { var    = id
   ; vl^𝓥  = vl^Tm
   }
-
 \end{code}
 %<*substitution>
 \begin{code}
-Substitution : ∀ d → Sem d (Tm d ∞) (Tm d ∞)
+Substitution : {I : Set} (d : Desc I) → Sem d (Tm d ∞) (Tm d ∞)
 Substitution d = record
   { th^𝓥  = λ t ρ → Sem.sem (Renaming d) ρ t
   ; var    = id
-  ; alg    = `con ∘ fmap d (reify vl^Tm) }
+  ; alg    = `con ∘ fmap d (λ Θ i → reify vl^Tm Θ i) }
 
-sub :  {m n : ℕ} → ∀ d → (m ─Env) (Tm d ∞) n →
-       Tm d ∞ m → Tm d ∞ n
-sub d = Sem.sem (Substitution d)
+sub : {I : Set} {Γ Δ : List I} {i : I} → ∀ d → (Γ ─Env) (Tm d ∞) Δ →
+      Tm d ∞ i Γ → Tm d ∞ i Δ
+sub d ρ t = Sem.sem (Substitution d) ρ t
 \end{code}
 %</substitution>
 \begin{code}
@@ -280,22 +281,24 @@ open import Data.Nat.Show
 
 open import Category.Applicative
 
-traverse : ∀ {A} → RawApplicative A → {X : ℕ → ℕ → Set} → (d : Desc) →
-           [ ⟦ d ⟧ (λ m n → A (X m n)) ⟶ A ∘ ⟦ d ⟧ X ]
+traverse : ∀ {A} {I : Set} → RawApplicative A →
+           {X : List I → I → List I → Set} {i : I} → (d : Desc I) →
+           [ ⟦ d ⟧ (λ Δ j Γ → A (X Δ j Γ)) i ⟶ A ∘ ⟦ d ⟧ X i ]
 traverse {A} app {X} = go where
 
   module A = RawApplicative app
   open A
 
-  go : ∀ d → [ ⟦ d ⟧ (λ m n → A (X m n)) ⟶ A ∘ ⟦ d ⟧ X ]
-  go (`σ A d)  (a , t)  = (λ b → a , b) A.<$> go (d a) t
-  go (`X k d)  (r , t)  = _,_ A.<$> r ⊛ go d t
-  go `∎        t        = pure tt
+  go : ∀ {i} d → [ ⟦ d ⟧ (λ Δ j Γ → A (X Δ j Γ)) i ⟶ A ∘ ⟦ d ⟧ X i ]
+  go (`σ A d)    (a , t)  = (λ b → a , b) A.<$> go (d a) t
+  go (`X Δ j d)  (r , t)  = _,_ A.<$> r ⊛ go d t
+  go (`∎ i)      t        = pure t
 
 
 \end{code}
 \begin{code}
-{- TODO: fix
+
+{- TODO: fix this
 Printing : {d : Desc} →
            [ ⟦ d ⟧ (λ _ _ → String) ⟶ const String ] →
            Sem d (λ _ → String) (λ _ → State ℕ String)
@@ -309,23 +312,18 @@ Printing {d} printer = record
 \begin{code}
 
 \end{code}
-%<*ntimes>
-\begin{code}
-_times_ : {ℓ : Level} {A : Set ℓ} → ℕ → (A → A) → (A → A)
-(zero   times f) d = d
-(suc n  times f) d = f ((n times f) d)
-\end{code}
-%</ntimes>
 %<*letcode>
 \begin{code}
-Let : Desc
-Let = `σ ℕ (λ n → (n times `X 0) `∎ `× `X n `∎)
+Let : {I : Set} → Desc I
+Let {I} =  `σ (List I) $ λ Δ →
+           `σ I        $ λ i →
+           `Xs Δ i i
 \end{code}
 %</letcode>
 %<*unletcode>
 \begin{code}
-UnLet : ∀ d → Sem (Let `+ d) (Tm d ∞) (Tm d ∞)
-UnLet d = record
+UnLet : (I : Set) (d : Desc I) → Sem (Let `+ d) (Tm d ∞) (Tm d ∞)
+UnLet I d = record
   { th^𝓥  = th^Tm
   ; var    = id
   ; alg    = case alg' (Sem.alg (Substitution d)) }
@@ -334,27 +332,27 @@ UnLet d = record
 \begin{code}
   where
 
-  Val : ∀ d → ℕ → ℕ → Set
+  Val : ∀ d → List I → I → List I → Set
   Val d = Kripke (Tm d ∞) (Tm d ∞)
 
-  env : ∀ {d} n → [ ⟦ (n times `X 0) `∎ ⟧ (Val d) ⟶ (n ─Env) (Val d 0) ]
-  env zero     vs        = ε
-  env (suc n)  (v , vs)  = env n vs ∙ v
+  env : {d : Desc I} (Δ : List I) → [ (λ Γ → All (λ i → Val d [] i Γ) Δ) ⟶ (Δ ─Env) (Val d []) ]
+  env []       vs        = ε
+  env (σ ∷ Δ)  (v ∷ vs)  = env Δ vs ∙ v
 
-  apply : ∀ {d} n → [ Val d n ⟶ ⟦ (n times `X 0) `∎ ⟧ (Val d) ⟶ Tm d ∞ ]
-  apply zero     kr vs = kr
-  apply (suc n)  kr vs = kr (refl vl^Var) (env (suc n) vs)
+  apply : {d : Desc I} (Δ : List I) {i : I} →
+          [ Val d Δ i ⟶ (λ Γ → All (λ i → Val d [] i Γ) Δ) ⟶ Tm d ∞ i ]
+  apply []        b vs = b
+  apply Δ@(_ ∷ _) b vs = b (base vl^Var) (env Δ vs)
 
-  alg' : ∀ {d} → [ ⟦ `σ ℕ (λ n → (n times `X 0) `∎ `× `X n `∎) ⟧ (Val d) ⟶ Tm d ∞ ]
-  alg' (n , t)  =  let (es , b , _) = unpair ((n times `X 0) `∎) (`X n `∎) t
-                   in apply n b es
-
+  alg' : {d : Desc I} {i : I} → [ ⟦ Let ⟧ (Val d) i ⟶ Tm d ∞ i ]
+  alg' (Δ , i , t) = let (es , b , eq) = unXs Δ t
+                     in subst (λ i → Tm _ ∞ i _) (sym eq) (apply Δ b es)
 
 \end{code}
 %<*unlet>
 \begin{code}
-unlet : {d : Desc} → [ Tm (Let `+ d) ∞ ⟶ Tm d ∞ ]
-unlet = Sem.sem (UnLet _) (pack `var)
+unlet : {I : Set} {d : Desc I} {i : I} → [ Tm (Let `+ d) ∞ i ⟶ Tm d ∞ i ]
+unlet = Sem.sem (UnLet _ _) (pack `var)
 \end{code}
 %</unlet>
 \begin{code}
@@ -366,22 +364,22 @@ unlet = Sem.sem (UnLet _) (pack `var)
 %<*domain>
 \begin{code}
 {-# NO_POSITIVITY_CHECK #-}
-data Dm (d : Desc) : Size → ℕ → Set where 
-  V : {i : Size} → [ Var                               ⟶  Dm d i      ]
-  C : {i : Size} → [ ⟦ d ⟧ (Kripke (Dm d i) (Dm d i))  ⟶  Dm d (↑ i)  ]
-  ⊥ : {i : Size} → [                                      Dm d (↑ i)  ]
+data Dm {I : Set} (d : Desc I) : Size → I →  List I → Set where 
+  V : {s : Size} {i : I} → [ Var i                              ⟶  Dm d s i      ]
+  C : {s : Size} {i : I} → [ ⟦ d ⟧ (Kripke (Dm d s) (Dm d s)) i ⟶  Dm d (↑ s) i  ]
+  ⊥ : {s : Size} {i : I} → [                                        Dm d (↑ s) i  ]
 \end{code}
 %</domain>
 \begin{code}
-module _ {d : Desc} where
+module _ {I : Set} {d : Desc I} where
 
- th^Dm : {i : Size} → Thinnable (Dm d i)
+ th^Dm : {s : Size} {i : I} → Thinnable (Dm d s i)
  th^Dm (V k) ρ = V (th^Var k ρ)
- th^Dm (C t) ρ = C (fmap d (λ m kr → th^Kr m th^Dm kr ρ) t)
+ th^Dm (C t) ρ = C (fmap d (λ Θ i kr → th^Kr Θ th^Dm kr ρ) t)
  th^Dm ⊥     ρ = ⊥
 
-vl^Dm : ∀ {d i} → VarLike (Dm d i)
-vl^Dm = record { new = V z ; th^𝓥 = th^Dm }
+ vl^Dm : {s : Size} → VarLike (Dm d s)
+ vl^Dm = record { new = V z ; th^𝓥 = th^Dm }
 
 
 open import Data.Maybe as Maybe
@@ -390,21 +388,21 @@ import Level
 module M = CM.RawMonad (Maybe.monad {Level.zero})
 open M
 
-module _ {d : Desc} where
+module _ {I : Set} {d : Desc I} where
 \end{code}
 %<*nbe-setup>
 \begin{code}
- reify^Dm  : {i : Size} → [ Dm d i ⟶ Maybe ∘ Tm d ∞ ]
- nbe       : [ ⟦ d ⟧ (Kripke (Dm d ∞) (Dm d ∞)) ⟶ Dm d ∞ ] → Sem d (Dm d ∞) (Dm d ∞)
+ reify^Dm  : {s : Size} {i : I} → [ Dm d s i ⟶ Maybe ∘ Tm d ∞ i ]
+ nbe       : Alg d (Dm d ∞) (Dm d ∞) → Sem d (Dm d ∞) (Dm d ∞)
 
- norm      : [ ⟦ d ⟧ (Kripke (Dm d ∞) (Dm d ∞)) ⟶ Dm d ∞ ] → [ Tm d ∞ ⟶ Maybe ∘ Tm d ∞ ]
- norm alg  = reify^Dm ∘ Sem.sem (nbe alg) (refl vl^Dm)
+ norm      : Alg d (Dm d ∞) (Dm d ∞) → {i : I} → [ Tm d ∞ i ⟶ Maybe ∘ Tm d ∞ i ]
+ norm alg  = reify^Dm ∘ Sem.sem (nbe alg) (base vl^Dm)
 \end{code}
 %</nbe-setup>
 \begin{code}
  reify^Dm (V k) = just (`var k)
  reify^Dm (C v) = `con M.<$> traverse (CM.RawMonad.rawIApplicative Maybe.monad) d
-                            (fmap d (λ m → reify^Dm ∘ reify vl^Dm m) v)
+                            (fmap d (λ Θ i → reify^Dm ∘ reify vl^Dm Θ i) v)
  reify^Dm ⊥     = nothing
 
  nbe alg = record
@@ -413,7 +411,7 @@ module _ {d : Desc} where
    ; alg    = alg
    }
 
-`id : LC 0
+`id : LC []
 `id = `L (`var z)
 
 \end{code}
@@ -422,9 +420,9 @@ module _ {d : Desc} where
 norm^LC : [ LC ⟶ Maybe ∘ LC ]
 norm^LC = norm $ case app (C ∘ (false ,_)) where
 
-  app : [ ⟦ `X 0 (`X 0 `∎) ⟧ (Kripke (Dm LCD ∞) (Dm LCD ∞)) ⟶ Dm LCD ∞ ]
-  app (C (false , f , _)  , t  , _) = f (refl vl^Var) (ε ∙ t)  -- redex
-  app (f                  , t  , _) = C (true , f , t , _)     -- stuck application
+  app : [ ⟦ `X [] tt (`X [] tt (`∎ tt)) ⟧ (Kripke (Dm LCD ∞) (Dm LCD ∞)) tt ⟶ Dm LCD ∞ tt ]
+  app (C (false , f , _)  , t  , _) = f (base vl^Var) (ε ∙ t)  -- redex
+  app (f                  , t  , _) = C (true , f , t , refl)  -- stuck application
 \end{code}
 %</nbelc>
 \begin{code}
@@ -449,24 +447,25 @@ isArrow (σ ⇒ τ) = just (σ , τ)
 isArrow _       = nothing
 
 
-Infer : Desc
-Infer =  `X 0 (`X 0 `∎)          -- app
-     `+  `X 1 `∎                 -- lam
-     `+  `σ Type (λ _ → `X 0 `∎) -- ann
+Infer : Desc ⊤
+Infer =  `X [] tt (`X [] tt (`∎ tt))       -- app
+     `+  `X (tt ∷ []) tt (`∎ tt)           -- lam
+     `+  `σ Type (λ _ → `X [] tt (`∎ tt))  -- ann
 
-app : [ Tm Infer ∞ ⟶ Tm Infer ∞ ⟶ Tm Infer ∞ ]
-app f t = `con (true , f , t , _)
+app : [ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
+app f t = `con (true , f , t , refl)
 
-lam : [ suc ⊢ Tm Infer ∞ ⟶ Tm Infer ∞ ]
-lam b = `con (false , true , b , _)
+lam : [ (tt ∷_) ⊢ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
+lam b = `con (false , true , b , refl)
 
-ann : [ const Type ⟶ Tm Infer ∞ ⟶ Tm Infer ∞ ]
-ann σ t = `con (false , false , σ , t , _)
+ann : [ κ Type ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
+ann σ t = `con (false , false , σ , t , refl)
 
 Check : Set
 Check = Maybe Type → Maybe Type
 
-infer : Sem Infer (const Type) (const Check)
+-- TODO: output a typed term?
+infer : Sem Infer (λ _ _ → Type) (λ _ _ → Check)
 infer = record
   { th^𝓥  = λ σ _ → σ
   ; var    = λ σ → maybe (σ ==_) (just σ)
@@ -475,27 +474,26 @@ infer = record
                    checkAnn } where
 
 
-  checkApp : Check × Check × ⊤ → Check
+  checkApp : Check × Check × tt ≡ tt → Check
   checkApp (f , t , _) r =
     f nothing  >>= λ σf →
     isArrow σf >>= uncurry λ σ τ →
     t (just σ) M.>> maybe (τ ==_) (just τ) r
 
-  checkLam : [ □ ((1 ─Env) (const Type) ⟶ const Check) ∙× (const ⊤) ⟶ const Check ]
+  checkLam : [ □ ((tt ∷ [] ─Env) (λ _ _ → Type) ⟶ const Check) ∙× (λ _ → tt ≡ tt) ⟶ const Check ]
   checkLam (b , _) r =  r          >>= λ στ →
                         isArrow στ >>= uncurry λ σ τ →
-                        b (refl vl^Var) (ε ∙ σ) (just τ)
+                        b (base vl^Var) (ε ∙ σ) (just τ)
   
-  checkAnn : Type × Check × ⊤ → Check
+  checkAnn : Type × Check × tt ≡ tt → Check
   checkAnn (σ , t , _) r = t (just σ) M.>> maybe (σ ==_) (just σ) r
 
-typeinference : Tm Infer ∞ 0 → Maybe Type
-typeinference t = Sem.sem infer {0} {0} ε t nothing
+typeinference : Tm Infer ∞ tt [] → Maybe Type
+typeinference t = Sem.sem infer {Δ = []} ε t nothing
 
 _ : let id = lam (`var z) in
     typeinference (app (ann ((α ⇒ α) ⇒ (α ⇒ α)) id) id) ≡ just (α ⇒ α)
 _ = _≡_.refl
-
 \end{code}
 
 

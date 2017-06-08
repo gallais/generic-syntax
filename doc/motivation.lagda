@@ -3,19 +3,27 @@ module motivation where
 
 open import indexed
 open import var
+open import environment as E hiding (_>>_ ; refl ; extend)
 
-open import Data.Nat
+open import Data.Nat.Base
+open import Data.List.Base hiding ([_] ; _++_)
 open import Function
 
+infixr 3 _⇒_
 \end{code}
-
-
+%<*type>
+\begin{code}
+data Type : Set where
+  α    : Type
+  _⇒_  : Type → Type → Type
+\end{code}
+%</type>
 %<*tm>
 \begin{code}
-data Lam : ℕ → Set where
-  V : [ Var        ⟶ Lam ]
-  A : [ Lam ⟶ Lam  ⟶ Lam ]
-  L : [ suc ⊢ Lam  ⟶ Lam ]
+data Lam : Type → List Type → Set where
+  V : {σ : Type} →    [ Var σ                  ⟶ Lam σ       ]
+  A : {σ τ : Type} →  [ Lam (σ ⇒ τ) ⟶ Lam σ  ⟶ Lam τ        ]
+  L : {σ τ : Type} →  [ (σ ∷_) ⊢ Lam τ         ⟶ Lam (σ ⇒ τ)  ]
 \end{code}
 %</tm>
 \begin{code}
@@ -24,17 +32,16 @@ module _ where
 
  private
 
-   extend : ∀ {m n} → (Var m → Var n) → (Var (suc m) → Var (suc n))
-   extend ρ z     = z
-   extend ρ (s k) = s (ρ k)
-
-   ⟦V⟧ : ∀ {n} → Var n → Lam n
+   ⟦V⟧ : ∀ {n} → [ Var n ⟶ Lam n ]
    ⟦V⟧ = V
+
+   extend : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
+   extend ρ = s <$> ρ ∙ z
 \end{code}
 %<*ren>
 \begin{code}
- ren : {m n : ℕ} → (Var m → Var n) → Lam m → Lam n
- ren ρ (V k)    = ⟦V⟧ (ρ k)
+ ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
+ ren ρ (V k)    = ⟦V⟧ (lookup ρ k)
  ren ρ (A f t)  = A (ren ρ f) (ren ρ t)
  ren ρ (L b)    = L (ren (extend ρ) b)
 \end{code}
@@ -43,18 +50,17 @@ module _ where
 module _ where
 
  private
+   
+   extend : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
+   extend ρ = ren E.extend <$> ρ ∙ V z
 
-   extend : ∀ {m n} → (Var m → Lam n) → (Var (suc m) → Lam (suc n))
-   extend ρ z     = V z
-   extend ρ (s k) = ren s (ρ k)
-
-   ⟦V⟧ : ∀ {n} → Lam n → Lam n
+   ⟦V⟧ : ∀ {n} → [ Lam n ⟶ Lam n ]
    ⟦V⟧ x = x
 \end{code}
 %<*sub>
 \begin{code}
- sub : {m n : ℕ} → (Var m → Lam n) → Lam m → Lam n
- sub ρ (V k)    = ⟦V⟧ (ρ k)
+ sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
+ sub ρ (V k)    = ⟦V⟧ (lookup ρ k)
  sub ρ (A f t)  = A (sub ρ f) (sub ρ t)
  sub ρ (L b)    = L (sub (extend ρ) b)
 \end{code}
@@ -66,11 +72,11 @@ open import environment hiding (extend ; _>>_ ; refl)
 
 %<*rsem>
 \begin{code}
-record Sem (𝓥 𝓒 : ℕ → Set) : Set where
-  field  th^𝓥 : Thinnable 𝓥
-         ⟦V⟧   : [ 𝓥          ⟶ 𝓒 ]
-         ⟦A⟧   : [ 𝓒 ⟶ 𝓒      ⟶ 𝓒 ]
-         ⟦L⟧   : [ □ (𝓥 ⟶ 𝓒)  ⟶ 𝓒 ]
+record Sem (𝓥 𝓒 : Type → List Type → Set) : Set where
+  field  th^𝓥 : {σ : Type} → Thinnable (𝓥 σ)
+         ⟦V⟧   : {σ : Type} → [ 𝓥 σ         ⟶ 𝓒 σ ]
+         ⟦A⟧   : {σ τ : Type} → [ 𝓒 (σ ⇒ τ) ⟶ 𝓒 σ     ⟶ 𝓒 τ ]
+         ⟦L⟧   : {σ τ : Type} →  [ □ (𝓥 σ ⟶ 𝓒 τ)  ⟶ 𝓒 (σ ⇒ τ) ]
 \end{code}
 %</rsem>
 
@@ -81,7 +87,7 @@ module _ {𝓥 𝓒} (𝓢 : Sem 𝓥 𝓒) where
 
 %<*sem>
 \begin{code}
- sem : {m n : ℕ} → (m ─Env) 𝓥 n → (Lam m → 𝓒 n)
+ sem : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
  sem ρ (V k)    = ⟦V⟧ (lookup ρ k)
  sem ρ (A f t)  = ⟦A⟧ (sem ρ f) (sem ρ t)
  sem ρ (L b)    = ⟦L⟧ (λ σ v → sem (extend σ ρ v) b)
@@ -90,9 +96,9 @@ module _ {𝓥 𝓒} (𝓢 : Sem 𝓥 𝓒) where
 \begin{code}
    where
 
-     extend : ∀ {m n p} → (n ⊆ p) → (m ─Env) 𝓥 n → 𝓥 p → (suc m ─Env) 𝓥 p
-     lookup (extend σ ρ v) z      = v
-     lookup (extend σ ρ v) (s k)  = th^𝓥 (lookup ρ k) σ
+   extend : {Γ Δ Θ : List Type} {σ : Type} →
+            Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
+   extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
 \end{code}
 
 %<*semren>
@@ -127,14 +133,14 @@ open import Relation.Binary.PropositionalEquality
 
 %<*semprint>
 \begin{code}
-Printing : Sem (λ _ → String) (λ _ → State ℕ String)
+Printing : Sem (λ _ _ → String) (λ _ _ → State ℕ String)
 Printing = record
    { th^𝓥  = λ t _ → t
    ; ⟦V⟧    = return
    ; ⟦A⟧    =  λ mf mt → mf >>= λ f → mt >>= λ t →
                return $ f ++ "(" ++ t ++ ")"
-   ; ⟦L⟧    =  λ mb → get >>= λ x → put (suc x) >>
-               let x' = show x in mb (pack s) x' >>= λ b →
+   ; ⟦L⟧    =  λ {σ} mb → get >>= λ x → put (suc x) >>
+               let x' = show x in mb (pack (s {j = σ})) x' >>= λ b →
                return $ "λ" ++ x' ++ "." ++ b }
 \end{code}
 %</semprint>
@@ -144,13 +150,13 @@ Printing = record
 
 
 \begin{code}
-print : Lam 0 → String
-print t = proj₁ $ sem Printing {m = 0} {n = 0} (pack λ ()) t 0
+print : (σ : Type) → Lam σ [] → String
+print _ t = proj₁ $ sem Printing {Δ = []} (pack λ ()) t 0
 
-_ : print (L (V z)) ≡ "λ0.0"
+_ : print (α ⇒ α) (L (V z)) ≡ "λ0.0"
 _ = refl
 
-_ : print (L (L (A (V (s z)) (A (V (s z)) (V z))))) ≡ "λ0.λ1.0(0(1))"
+_ : print ((α ⇒ α) ⇒ (α ⇒ α)) (L (L (A (V (s z)) (A (V (s z)) (V z))))) ≡ "λ0.λ1.0(0(1))"
 _ = refl
 \end{code}
 

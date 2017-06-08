@@ -1,8 +1,19 @@
 \begin{code}
+-- Heavily using indexed families can lead to fairly unreadable
+-- types. We design this library of combinators to lighten such
+-- types by only mentioning the important changes made to the
+-- index: whenever the index is kept the same, the combinators
+-- thread it silently, and [_] universally quantifies over it.
+
+-- For instance:
+-- [ f ⊢ S ∙⊎ T ⟶ U ∙× V ]
+-- corresponds to
+-- {i : I} → S (f i) ⊎ T i → U i × V i
+-- (cf. test at the end of the file)
 
 module indexed {I : Set} where
 
-open import Level
+open import Level using (Level ; _⊔_)
 open import Data.Sum using (_⊎_) public
 open import Data.Product using (_×_) public
 \end{code}
@@ -49,3 +60,10 @@ _⊢_ :  {ℓ : Level} → (I → I) → (I → Set ℓ) → (I → Set ℓ)
 (f ⊢ T) i = T (f i)
 \end{code}
 %</adjust>
+
+\begin{code}
+open import Agda.Builtin.Equality
+_ : ∀ {f : I → I} {S T U V : I → Set} →
+    [ f ⊢ S ∙⊎ T ⟶ U ∙× V ] ≡ ({i : I} → S (f i) ⊎ T i → U i × V i)
+_ = refl
+\end{code}

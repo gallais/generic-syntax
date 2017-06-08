@@ -1,19 +1,20 @@
 \begin{code}
-module environment where
+module environment {I : Set} where
 
-open import Data.Nat as ℕ
-open import Data.Sum
+open import Data.Nat.Base as ℕ
+open import Data.List.Base hiding ([_])
+open import Data.Sum as S
 open import Function
 
 open import indexed
-open import var
+open import var {I}
 
-infix 5 _─Env
+infix 3 _─Env
 \end{code}
 %<*env>
 \begin{code}
-record _─Env (m : ℕ) (𝓥 : ℕ → Set) (n : ℕ) : Set where
-  constructor pack; field lookup : Var m → 𝓥 n
+record _─Env (Γ : List I) (𝓥 : I → List I → Set) (Δ : List I) : Set where
+  constructor pack; field lookup : {i : I} → Var i Γ → 𝓥 i Δ
 \end{code}
 %</env>
 \begin{code}
@@ -22,95 +23,92 @@ open _─Env public
 \end{code}
 %<*thinning>
 \begin{code}
-Thinning : ℕ → ℕ → Set
-Thinning m n = (m ─Env) Var n
+Thinning : List I → List I → Set
+Thinning Γ Δ = (Γ ─Env) Var Δ
 \end{code}
 %</thinning>
 \begin{code}
 
-ε : ∀ {𝓥 n} → (0 ─Env) 𝓥 n
+ε : ∀ {𝓥 n} → ([] ─Env) 𝓥 n
 lookup ε ()
 
-_<$>_ : {𝓥 𝓦 : ℕ → Set} {m n p : ℕ} → (𝓥 n → 𝓦 p) → (m ─Env) 𝓥 n → (m ─Env) 𝓦 p
+_<$>_ : {𝓥 𝓦 : I → List I → Set} {Γ Δ Θ : List I} → ({i : I} → 𝓥 i Δ → 𝓦 i Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
 lookup (f <$> ρ) k = f (lookup ρ k)
 
-split : ∀ m {n} → Var (m ℕ.+ n) → Var m ⊎ Var n
-split zero    k     = inj₂ k
-split (suc m) z     = inj₁ z
-split (suc m) (s k) = map s id $ split m k
+split : ∀ {Δ} {i} Γ → Var i (Γ ++ Δ) → Var i Γ ⊎ Var i Δ
+split []      k     = inj₂ k
+split (σ ∷ Γ) z     = inj₁ z
+split (σ ∷ Γ) (s k) = S.map s id $ split Γ k
 
-_>>_ : ∀ {𝓥 m n p} → (m ─Env) 𝓥 p → (n ─Env) 𝓥 p → (m ℕ.+ n ─Env) 𝓥 p
+_>>_ : ∀ {𝓥 Γ Δ Θ} → (Γ ─Env) 𝓥 Θ → (Δ ─Env) 𝓥 Θ → (Γ ++ Δ ─Env) 𝓥 Θ
 lookup (ρ₁ >> ρ₂) k = [ lookup ρ₁ , lookup ρ₂ ]′ (split _ k)
 
 infixl 10 _∙_
-_∙_ : ∀ {𝓥 m n} → (m ─Env) 𝓥 n → 𝓥 n → (suc m ─Env) 𝓥 n
+_∙_ : ∀ {𝓥 Γ Δ σ} → (Γ ─Env) 𝓥 Δ → 𝓥 σ Δ → (σ ∷ Γ ─Env) 𝓥 Δ
 lookup (ρ ∙ v) z    = v
 lookup (ρ ∙ v) (s k) = lookup ρ k
 
-infix 2 _⊆_
-_⊆_ : ℕ → ℕ → Set
-m ⊆ n = (m ─Env) Var n
-
-refl : ∀ {m} → m ⊆ m
+refl : ∀ {Γ} → Thinning Γ Γ
 refl = pack id
 
-select : ∀ {m n p 𝓥} → m ⊆ n → (n ─Env) 𝓥 p → (m ─Env) 𝓥 p
+select : ∀ {Γ Δ Θ 𝓥} → Thinning Γ Δ → (Δ ─Env) 𝓥 Θ → (Γ ─Env) 𝓥 Θ
 lookup (select ren ρ) k = lookup ρ (lookup ren k)
 
-extend : ∀ {n} → n ⊆ suc n
+extend : ∀ {Γ σ} → Thinning Γ (σ ∷ Γ)
 extend = pack s
 
 \end{code}
 %<*box>
 \begin{code}
-□ : (ℕ → Set) → (ℕ → Set)
-(□ T) m = [ Thinning m ⟶ T ]
+□ : (List I → Set) → (List I → Set)
+(□ T) Γ = [ Thinning Γ ⟶ T ]
 \end{code}
 %</box>
 %<*comonad>
 \begin{code}
-extract    : {T : ℕ → Set} → [ □ T ⟶ T        ]
-duplicate  : {T : ℕ → Set} → [ □ T ⟶ □ (□ T)  ]
+extract    : {T : List I → Set} → [ □ T ⟶ T        ]
+duplicate  : {T : List I → Set} → [ □ T ⟶ □ (□ T)  ]
 \end{code}
 %</comonad>
 \begin{code}
 extract t = t refl
 duplicate t ρ σ = t (select ρ σ)
 
-join : {T : ℕ → Set} → [ □ (□ T) ⟶ □ T ]
+join : {T : List I → Set} → [ □ (□ T) ⟶ □ T ]
 join = extract
 
 \end{code}
 %<*thinnable>
 \begin{code}
-Thinnable : (ℕ → Set) → Set
+Thinnable : (List I → Set) → Set
 Thinnable T = [ T ⟶ □ T ]
 \end{code}
 %</thinnable>
 \begin{code}
 
-th^Var : Thinnable Var
+th^Var : {i : I} → Thinnable (Var i)
 th^Var v ρ = lookup ρ v
 
-th^Env : ∀ {m 𝓥} → Thinnable 𝓥 → Thinnable ((m ─Env) 𝓥)
+th^Env : ∀ {Γ 𝓥} → ({i : I} → Thinnable (𝓥 i)) → Thinnable ((Γ ─Env) 𝓥)
 lookup (th^Env th^𝓥 ρ ren) k = th^𝓥 (lookup ρ k) ren
 \end{code}
 %<*freeth>
 \begin{code}
-th^□ : {T : ℕ → Set} → Thinnable (□ T)
+th^□ : {T : List I → Set} → Thinnable (□ T)
 th^□ = duplicate
 \end{code}
 %</freeth>
 %<*kripke>
 \begin{code}
-Kripke : (𝓥 𝓒 : ℕ → Set) → (ℕ → ℕ → Set)
-Kripke 𝓥 𝓒 0 = 𝓒
-Kripke 𝓥 𝓒 m = □ ((m ─Env) 𝓥 ⟶ 𝓒)
+Kripke : (𝓥 : I → List I → Set) (𝓒 : I → List I → Set) → (List I → I → List I → Set)
+Kripke 𝓥 𝓒 [] i = 𝓒 i
+Kripke 𝓥 𝓒 Γ  i = □ ((Γ ─Env) 𝓥 ⟶ 𝓒 i)
 \end{code}
 %</kripke>
 
 \begin{code}
-th^Kr : {𝓥 𝓒 : ℕ → Set} (m : ℕ) → Thinnable 𝓒 → Thinnable (Kripke 𝓥 𝓒 m)
-th^Kr zero     th^𝓒 = th^𝓒
-th^Kr (suc _)  th^𝓒 = th^□
+th^Kr : {𝓥 : I → List I → Set} {𝓒 : I → List I → Set}
+        (Γ : List I) → ({i : I} → Thinnable (𝓒 i)) → {i : I} → Thinnable (Kripke 𝓥 𝓒 Γ i)
+th^Kr []       th^𝓒 = th^𝓒
+th^Kr (_ ∷ _)  th^𝓒 = th^□
 \end{code}
