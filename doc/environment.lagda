@@ -7,7 +7,7 @@ open import Data.Sum as S
 open import Function
 
 open import indexed
-open import var {I}
+open import var hiding (_<$>_)
 
 infix 3 _─Env
 \end{code}
@@ -35,7 +35,7 @@ lookup ε ()
 _<$>_ : {𝓥 𝓦 : I → List I → Set} {Γ Δ Θ : List I} → ({i : I} → 𝓥 i Δ → 𝓦 i Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
 lookup (f <$> ρ) k = f (lookup ρ k)
 
-split : ∀ {Δ} {i} Γ → Var i (Γ ++ Δ) → Var i Γ ⊎ Var i Δ
+split : ∀ {Δ} {i : I} Γ → Var i (Γ ++ Δ) → Var i Γ ⊎ Var i Δ
 split []      k     = inj₂ k
 split (σ ∷ Γ) z     = inj₁ z
 split (σ ∷ Γ) (s k) = S.map s id $ split Γ k

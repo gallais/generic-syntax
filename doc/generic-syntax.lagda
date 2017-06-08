@@ -448,9 +448,9 @@ isArrow _       = nothing
 
 
 Infer : Desc ⊤
-Infer =  `X [] tt (`X [] tt (`∎ tt))       -- app
-     `+  `X (tt ∷ []) tt (`∎ tt)           -- lam
-     `+  `σ Type (λ _ → `X [] tt (`∎ tt))  -- ann
+Infer  =   `X [] tt (`X [] tt (`∎ tt))       -- app
+       `+  `X (tt ∷ []) tt (`∎ tt)           -- lam
+       `+  `σ Type (λ _ → `X [] tt (`∎ tt))  -- ann
 
 app : [ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
 app f t = `con (true , f , t , refl)
