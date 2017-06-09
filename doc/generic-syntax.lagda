@@ -431,69 +431,71 @@ open import Relation.Binary.PropositionalEquality hiding ([_] ; refl)
 example : norm^LC (`A `id (`A `id `id)) ≡ just `id
 example = _≡_.refl
 
-infixr 5 _⇒_
-data Type : Set where
-  α    : Type
-  _⇒_  : Type → Type → Type
+module inference where
 
-infix 1 _==_
-_==_ : Type → Type → Maybe Type
-α     == α       = just α
-σ ⇒ τ == σ' ⇒ τ' = σ ⇒ τ <$ ((σ == σ') ⊗ (τ == τ'))
-_     == _       = nothing
+ infixr 5 _⇒_
+ data Type : Set where
+   α    : Type
+   _⇒_  : Type → Type → Type
 
-isArrow : Type → Maybe (Type × Type)
-isArrow (σ ⇒ τ) = just (σ , τ)
-isArrow _       = nothing
+ infix 1 _==_
+ _==_ : Type → Type → Maybe Type
+ α     == α       = just α
+ σ ⇒ τ == σ' ⇒ τ' = σ ⇒ τ <$ ((σ == σ') ⊗ (τ == τ'))
+ _     == _       = nothing
 
-
-Infer : Desc ⊤
-Infer  =   `X [] tt (`X [] tt (`∎ tt))       -- app
-       `+  `X (tt ∷ []) tt (`∎ tt)           -- lam
-       `+  `σ Type (λ _ → `X [] tt (`∎ tt))  -- ann
-
-app : [ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
-app f t = `con (true , f , t , refl)
-
-lam : [ (tt ∷_) ⊢ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
-lam b = `con (false , true , b , refl)
-
-ann : [ κ Type ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
-ann σ t = `con (false , false , σ , t , refl)
-
-Check : Set
-Check = Maybe Type → Maybe Type
-
--- TODO: output a typed term?
-infer : Sem Infer (λ _ _ → Type) (λ _ _ → Check)
-infer = record
-  { th^𝓥  = λ σ _ → σ
-  ; var    = λ σ → maybe (σ ==_) (just σ)
-  ; alg    = case  checkApp
-           $ case  checkLam
-                   checkAnn } where
+ isArrow : Type → Maybe (Type × Type)
+ isArrow (σ ⇒ τ) = just (σ , τ)
+ isArrow _       = nothing
 
 
-  checkApp : Check × Check × tt ≡ tt → Check
-  checkApp (f , t , _) r =
-    f nothing  >>= λ σf →
-    isArrow σf >>= uncurry λ σ τ →
-    t (just σ) M.>> maybe (τ ==_) (just τ) r
+ Infer : Desc ⊤
+ Infer  =   `X [] tt (`X [] tt (`∎ tt))       -- app
+        `+  `X (tt ∷ []) tt (`∎ tt)           -- lam
+        `+  `σ Type (λ _ → `X [] tt (`∎ tt))  -- ann
 
-  checkLam : [ □ ((tt ∷ [] ─Env) (λ _ _ → Type) ⟶ const Check) ∙× (λ _ → tt ≡ tt) ⟶ const Check ]
-  checkLam (b , _) r =  r          >>= λ στ →
-                        isArrow στ >>= uncurry λ σ τ →
-                        b (base vl^Var) (ε ∙ σ) (just τ)
+ app : [ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
+ app f t = `con (true , f , t , refl)
+
+ lam : [ (tt ∷_) ⊢ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
+ lam b = `con (false , true , b , refl)
+
+ ann : [ κ Type ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
+ ann σ t = `con (false , false , σ , t , refl)
+
+ Check : Set
+ Check = Maybe Type → Maybe Type
+
+ -- TODO: output a typed term?
+ infer : Sem Infer (λ _ _ → Type) (λ _ _ → Check)
+ infer = record
+   { th^𝓥  = λ σ _ → σ
+   ; var    = λ σ → maybe (σ ==_) (just σ)
+   ; alg    = case  checkApp
+            $ case  checkLam
+                    checkAnn } where
+
+
+   checkApp : Check × Check × tt ≡ tt → Check
+   checkApp (f , t , _) r =
+     f nothing  >>= λ σf →
+     isArrow σf >>= uncurry λ σ τ →
+     t (just σ) M.>> maybe (τ ==_) (just τ) r
+
+   checkLam : [ Kripke (λ _ _ → Type) (λ _ _ → Check) (tt ∷ []) tt ∙× _ ⟶ κ Check ]
+   checkLam (b , _) r =  r          >>= λ στ →
+                         isArrow στ >>= uncurry λ σ τ →
+                         b (base vl^Var) (ε ∙ σ) (just τ)
   
-  checkAnn : Type × Check × tt ≡ tt → Check
-  checkAnn (σ , t , _) r = t (just σ) M.>> maybe (σ ==_) (just σ) r
+   checkAnn : Type × Check × tt ≡ tt → Check
+   checkAnn (σ , t , _) r = t (just σ) M.>> maybe (σ ==_) (just σ) r
 
-typeinference : Tm Infer ∞ tt [] → Maybe Type
-typeinference t = Sem.sem infer {Δ = []} ε t nothing
+ typeinference : Tm Infer ∞ tt [] → Maybe Type
+ typeinference t = Sem.sem infer {Δ = []} ε t nothing
 
-_ : let id = lam (`var z) in
-    typeinference (app (ann ((α ⇒ α) ⇒ (α ⇒ α)) id) id) ≡ just (α ⇒ α)
-_ = _≡_.refl
+ _ : let id = lam (`var z) in
+     typeinference (app (ann ((α ⇒ α) ⇒ (α ⇒ α)) id) id) ≡ just (α ⇒ α)
+ _ = _≡_.refl
 \end{code}
 
 
