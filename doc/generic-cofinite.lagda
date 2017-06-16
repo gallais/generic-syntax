@@ -1,64 +1,68 @@
 \begin{code}
+module generic-cofinite where
+
 open import Size
 open import Data.Unit
 open import Data.Bool
-open import Data.Nat.Base
 open import Data.Fin
+open import Data.List hiding (unfold)
 open import Data.Product
 
 open import indexed
 open import var
-open import environment
+open import environment hiding (refl)
 open import generic-syntax
 
-open import Relation.Binary.PropositionalEquality using (_≡_ ; subst)
+open import Relation.Binary.PropositionalEquality
 
-
-TM : Desc → Set
-TM d = Tm d ∞ 0
+TM : {I : Set} → Desc I → I → Set
+TM d i = Tm d ∞ i []
 \end{code}
 %<*clistD>
 \begin{code}
-CListD : Set → Desc
-CListD A = `∎ `+ `σ A (λ _ → `X 1 `∎)
+CListD : Set → Desc ⊤
+CListD A = `∎ tt `+ `σ A (λ _ → `X (tt ∷ []) tt (`∎ tt))
 \end{code}
 %</clistD>
 \end{code}
 %<*zeroones>
 \begin{code}
-01↺ : TM (CListD ℕ)
-01↺  =  `con (false , 0 , `con (false , 1
-     ,  `var (s z) , _) , _)
+01↺ : TM (CListD ⊤) tt
+01↺  =  `con (false , tt , `con (false , tt
+     ,  `var (s z) , refl) , refl)
 \end{code}
 %</zeroones>
+\begin{code}
+module _ {I : Set} where
+\end{code}
 %<*cotm>
 \begin{code}
-record ∞Tm (d : Desc) (i : Size) : Set where
-  coinductive
-  constructor `con
-  field force : {j : Size< i} → ⟦ d ⟧ (λ _ _ → ∞Tm d j) 0
+ record ∞Tm (d : Desc I) (s : Size) (i : I) : Set where
+   coinductive
+   constructor `con
+   field force : {s′ : Size< s} → ⟦ d ⟧ (λ _ i _ → ∞Tm d s′ i) i []
 \end{code}
 %</cotm>
 %<*zeroones2>
 \begin{code}
-01⋯ : ∞Tm (CListD ℕ) ∞
-10⋯ : ∞Tm (CListD ℕ) ∞
-∞Tm.force 01⋯ = false , 0 , 10⋯ , _
-∞Tm.force 10⋯ = false , 1 , 01⋯ , _
+01⋯ : ∞Tm (CListD ⊤) ∞ tt
+10⋯ : ∞Tm (CListD ⊤) ∞ tt
+∞Tm.force 01⋯ = false , tt , 10⋯ , refl
+∞Tm.force 10⋯ = false , tt , 01⋯ , refl
 \end{code}
 %</zeroones2>
 \begin{code}
-module _ {d : Desc} where
+module _ {d : Desc ⊤} where
 \end{code}
 %<*plug>
 \begin{code}
- plug : TM d → ∀ m → Scope (Tm d ∞) m 0 → TM d
- plug t m = Sem.sem (Substitution d) (pack (λ _ → t))
+ plug : TM d tt → ∀ Δ i → Scope (Tm d ∞) Δ i [] → TM d i
+ plug t Δ i = Sem.sem (Substitution d) (pack (λ _ → t))
 \end{code}
 %</plug>
 %<*unroll>
 \begin{code}
- unroll : TM d → ⟦ d ⟧ (λ _ _ → TM d) 0
+ unroll : TM d tt → ⟦ d ⟧ (λ _ i _ → TM d i) tt []
  unroll t′@(`con t) = fmap d (plug t′) t
 \end{code}
 %</unroll>
@@ -67,34 +71,31 @@ module _ {d : Desc} where
 \end{code}
 %<*unfold>
 \begin{code}
- unfold : {i : Size} → TM d → ∞Tm d i
- ∞Tm.force (unfold t′) = fmap d (λ _ → unfold) (unroll t′)
+ unfold : {s : Size} → TM d tt → ∞Tm d s tt
+ ∞Tm.force (unfold t′) = fmap d (λ _ _ → unfold) (unroll t′)
 \end{code}
 %</unfold>
+\begin{code}
 -- Simple example: Potentially cyclic lists
 
-`listD : Set → Desc
-`listD A = `∎                 -- nil
-        `+ `σ A λ _ → `X 1 `∎ -- cons (includes pointer declaration)
+`listD : Set → Desc ⊤
+`listD A = `∎ tt                              -- nil
+        `+ `σ A λ _ → `X (tt ∷ []) tt (`∎ tt) -- cons (includes pointer declaration)
 
-pattern nil       = `con (true , tt) 
-pattern cons x xs = `con (false , x , xs , tt)
+pattern nil       = `con (true , refl) 
+pattern cons x xs = `con (false , x , xs , refl)
 
-`1∷2∷3 : Tm (`listD ℕ) ∞ 0
+open import Data.Nat
+
+`1∷2∷3 : TM (`listD ℕ) tt
 `1∷2∷3 = cons 1 (cons 2 (cons 3 nil))
 
-`1∷2⇖1 : Tm (`listD ℕ) ∞ 0
-`1∷2⇖1 = cons 1 (cons 2 (`var (suc zero)))
+`1∷2⇖1 : TM (`listD ℕ) tt
+`1∷2⇖1 = cons 1 (cons 2 (`var (s z)))
 
-∞1∷2 : ∞Tm (`listD ℕ) ∞
-∞2∷1 : ∞Tm (`listD ℕ) ∞
+∞1∷2 : ∞Tm (`listD ℕ) ∞ tt
+∞2∷1 : ∞Tm (`listD ℕ) ∞ tt
 
-∞Tm.force ∞1∷2 = (false , 1 , ∞2∷1 , tt)
-∞Tm.force ∞2∷1 = (false , 2 , ∞1∷2 , tt)
-
-eq₁ : ∀ {i} → ≈^∞Tm (`listD ℕ) i ∞1∷2 (unfold `1∷2⇖1)
-eq₂ : ∀ {i} → ≈^∞Tm (`listD ℕ) i ∞2∷1 (unfold (cons 2 (th^Tm `1∷2⇖1 ε)))
-
-≈^∞Tm.force eq₁ = _≡_.refl , _≡_.refl , eq₂ , tt
-≈^∞Tm.force eq₂ = _≡_.refl , _≡_.refl , eq₁ , tt
+∞Tm.force ∞1∷2 = (false , 1 , ∞2∷1 , refl)
+∞Tm.force ∞2∷1 = (false , 2 , ∞1∷2 , refl)
 \end{code}

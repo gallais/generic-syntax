@@ -200,7 +200,7 @@ vl^Var = record
 %<*reify>
 \begin{code}
 reify : {I : Set} {𝓥 𝓒 : I → List I → Set} → VarLike 𝓥 →
-        ∀ Δ i → [ Kripke 𝓥 𝓒 Δ i ⟶ Scope 𝓒 Δ i ]
+        {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
 reify vl^𝓥 []        i b = b
 reify vl^𝓥 Δ@(_ ∷ _) i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
 \end{code}

@@ -2,7 +2,7 @@
 module motivation where
 
 open import indexed
-open import var
+open import var hiding (_<$>_)
 open import environment as E hiding (_>>_ ; refl ; extend)
 
 open import Data.Nat.Base
