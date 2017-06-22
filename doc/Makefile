@@ -1,12 +1,11 @@
-STDLIB=~/languages/agda/libs/agda-stdlib-dev/src/
 SED=sed
-PAPER=fscd17
+PAPER=popl18
 
 all: finish
 
 prepare:
 	mkdir -p latex/
-	cp cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.sed latex/
+	cp cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.bst *.sed latex/
 
 paper-lagda:    
 	./lagda2tex indexed.lagda

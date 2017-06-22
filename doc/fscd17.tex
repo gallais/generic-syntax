@@ -62,6 +62,24 @@
 
 \maketitle
 
+\begin{abstract}
+Syntaxes with binding are omnipresent in Programming Languages
+research but also in the more practical setting of Embedded
+Domain Specific Languages. The advanced features available in
+some languages' type systems has made it possible to statically
+enforce well-scopedness. However the user still has to write a
+lot of boilerplate code to get common scope safe programs (e.g.
+renaming, substitution, CPS transformation, printing with names,
+etc.) and the proof that they are well-behaved.
+
+Building on an abstract but nonetheless expressive notion of
+semantics and a universe of syntaxes with binding, we demonstrate
+how to implement these traversals once and for all by generic
+programming, and how to derive their properties by generic proving.
+All of this work has been fully formalised in Agda and is available
+at \url{https://github.com/gallais/generic-syntax}.
+\end{abstract}
+
 \input{syntax}
 
 %%
