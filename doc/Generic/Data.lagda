@@ -1,5 +1,5 @@
 \begin{code}
-module generic-data where
+module Generic.Data where
 
 open import indexed
 open import Size

@@ -1,24 +1,22 @@
 \begin{code}
-module generic-cofinite where
+module Generic.Examples.Colist where
 
 open import Size
 open import Data.Unit
-open import Data.Nat.Base
 open import Data.Bool
-open import Data.Fin
+open import Data.Nat
 open import Data.Product
+open import Agda.Builtin.Equality
 
-open import indexed
 open import var
 open import environment hiding (refl)
-open import generic-syntax
+open import Generic.Syntax
+open import Generic.Semantics
+open import Generic.Cofinite
+open import Generic.Bisimilar hiding (refl)
 
-open import Relation.Binary.PropositionalEquality
 module _ where
  open import Data.List.Base
-
- TM : {I : Set} → Desc I → I → Set
- TM d i = Tm d ∞ i []
 \end{code}
 %<*clistD>
 \begin{code}
@@ -27,43 +25,6 @@ module _ where
            `+  `σ A (λ _ → `X (tt ∷ []) tt (`∎ tt))
 \end{code}
 %</clistD>
-\begin{code}
-module _ {I : Set} where
- open import Data.List.Base
-\end{code}
-%<*cotm>
-\begin{code}
- record ∞Tm (d : Desc I) (s : Size) (i : I) : Set where
-   coinductive
-   constructor `con
-   field force : {s′ : Size< s} → ⟦ d ⟧ (λ _ i _ → ∞Tm d s′ i) i []
-\end{code}
-%</cotm>
-\begin{code}
-module _ {d : Desc ⊤} where
- open import Data.List.Base hiding (unfold)
-\end{code}
-%<*plug>
-\begin{code}
- plug : TM d tt → ∀ Δ i → Scope (Tm d ∞) Δ i [] → TM d i
- plug t Δ i = Sem.sem (Substitution d) (pack (λ _ → t))
-\end{code}
-%</plug>
-%<*unroll>
-\begin{code}
- unroll : TM d tt → ⟦ d ⟧ (λ _ i _ → TM d i) tt []
- unroll t′@(`con t) = fmap d (plug t′) t
-\end{code}
-%</unroll>
-\begin{code}
- unroll t′@(`var ())
-\end{code}
-%<*unfold>
-\begin{code}
- unfold : {s : Size} → TM d tt → ∞Tm d s tt
- ∞Tm.force (unfold t′) = fmap d (λ _ _ → unfold) (unroll t′)
-\end{code}
-%</unfold>
 \begin{code}
 infixr 5 _∷_
 \end{code}
@@ -105,4 +66,14 @@ pattern ↶_ k      = `var k
 
 ∞Tm.force ∞1∷2 = (false , 1 , ∞2∷1 , refl)
 ∞Tm.force ∞2∷1 = (false , 2 , ∞1∷2 , refl)
+\end{code}
+
+\begin{code}
+-- Proofs about the simple example: Potentially cyclic lists
+
+eq₁ : ∀ {s} → ≈^∞Tm (CListD ℕ) s tt ∞1∷2 (unfold `1∷2⇖1)
+eq₂ : ∀ {s} → ≈^∞Tm (CListD ℕ) s tt ∞2∷1 (unfold (2 ∷ (th^Tm `1∷2⇖1 ε)))
+
+≈^∞Tm.force eq₁ = _≡_.refl , _≡_.refl , eq₂ , tt
+≈^∞Tm.force eq₂ = _≡_.refl , _≡_.refl , eq₁ , tt
 \end{code}

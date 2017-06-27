@@ -10,6 +10,7 @@ module var where
 
 open import indexed
 open import Data.List.Base hiding ([_])
+open import Data.List.All using (All ; _∷_)
 open import Function
 open import Agda.Builtin.Equality
 
@@ -23,6 +24,10 @@ data Var {I : Set} (i : I) : List I → Set where
 %</var>
 
 \begin{code}
+get : {I : Set} {B : I → Set} {i : I} → [ Var i ⟶ All B ⟶ κ (B i) ]
+get z     (b  ∷ _)  = b
+get (s v) (_  ∷ bs) = get v bs
+
 _<$>_ : {I J : Set} (f : I → J) {i : I} → [ Var i ⟶ Var (f i) ∘ map f ]
 f <$> z    = z
 f <$> s v  = s (f <$> v)
