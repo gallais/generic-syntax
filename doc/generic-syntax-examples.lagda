@@ -239,4 +239,86 @@ module system-f where
     ≈ (_ ∷ ♯ (_ ∷ ♯ (lam (lam (lam (`var z))) ∷ ♯ [])))
   _ = _ ∷ ♯ (_ ∷ ♯ (_ ∷ ♯ []))
 
+module inference where
+ open import Data.Maybe
+ open M
+
+ infixr 5 _⇒_
+ data Type : Set where
+   α    : Type
+   _⇒_  : Type → Type → Type
+
+ infix 1 _==_
+ _==_ : Type → Type → Maybe ⊤
+ α     == α       = just tt
+ σ ⇒ τ == σ' ⇒ τ' = tt <$ ((σ == σ') ⊗ (τ == τ'))
+ _     == _       = nothing
+
+ isArrow : Type → Maybe (Type × Type)
+ isArrow (σ ⇒ τ) = just (σ , τ)
+ isArrow _       = nothing
+\end{code}
+%<*bidirectional>
+\begin{code}
+ data Phase : Set where Check Infer : Phase
+
+ Lang : Desc Phase
+ Lang  =   `X [] Infer (`X [] Check (`∎ Infer))    -- apply
+       `+  `X (Infer ∷ []) Check (`∎ Check)        -- lamda
+       `+  `σ Type (λ _ → `X [] Check (`∎ Infer))  -- cut
+       `+  `X [] Infer (`∎ Check)                  -- embed
+\end{code}
+%</bidirectional>
+%<*typemode>
+\begin{code}
+ Type- : Phase → Set
+ Type- Check  = Type → Maybe ⊤
+ Type- Infer  = Maybe Type
+\end{code}
+%</typemode>
+%<*typecheck>
+\begin{code}
+ Typecheck : Sem Lang (λ _ _ → Type) (const ∘ Type-)
+ Sem.th^𝓥  Typecheck         = λ σ _ → σ
+ Sem.var    Typecheck {Check} = _==_
+ Sem.var    Typecheck {Infer} = just
+ Sem.alg    Typecheck         =
+   case app $ case lam $ case cut ann
+\end{code}
+%</typecheck>
+\begin{code}
+  where
+
+   app : {i : Phase} → (Maybe Type) × (Type → Maybe ⊤) × i ≡ Infer → Type- i
+   app (just (σ ⇒ τ)  , f , refl) = τ <$ f σ
+   app (_             , _ , refl) = nothing
+
+   lam : {i : Phase} {Γ : List Phase} → □ (_ ⟶ κ (Type- Check)) Γ × i ≡ Check → Type- i
+   lam (f , refl) (σ ⇒ τ)  = f (base vl^Var) (ε ∙ σ) τ
+
+   lam (_ , refl) _        = nothing
+
+   cut : {i : Phase} → Type × (Type → Maybe ⊤) × i ≡ Infer → Type- i
+   cut (σ , f , refl) = σ <$ f σ
+
+   ann : {i : Phase} → Maybe Type × i ≡ Check → Type- i
+   ann (just σ  , refl) = σ ==_
+   ann (_       , refl) = const nothing
+\end{code}
+%<*langsyntax>
+\begin{code}
+ pattern app f t  = `con (true , f , t , refl)
+ pattern lam b    = `con (false , true , b , refl)
+ pattern cut σ t  = `con (false , false , true , σ , t , refl)
+ pattern emb t    = `con (false , false , false , t , refl)
+\end{code}
+%</langsyntax>
+\begin{code}
+ type- : (p : Phase) → Tm Lang ∞ p [] → Type- p
+ type- p t = Sem.sem Typecheck {Δ = []} ε t
+
+ _ : let  id  : Tm Lang ∞ Check []
+          id  = lam (emb (`var z))
+     in Is-just $ type- Check (emb (app (cut ((α ⇒ α) ⇒ (α ⇒ α)) id) id)) (α ⇒ α)
+ _ = just tt
 \end{code}
