@@ -332,10 +332,10 @@ recursive substructure (i.e. the tail of the list).
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[generic-data.tex]{desc}
+\ExecuteMetaData[Generic/Data.tex]{desc}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[generic-data.tex]{listD}
+\ExecuteMetaData[Generic/Data.tex]{listD}
 \end{minipage}
 \caption{Data Descriptions and List Description}\label{figure:listD}
 \end{figure}
@@ -351,10 +351,10 @@ the meaning of a description.
 
 \begin{figure}[h]
 \begin{minipage}{0.35\textwidth}
-\ExecuteMetaData[generic-data.tex]{interp}
+\ExecuteMetaData[Generic/Data.tex]{interp}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.55\textwidth}
-\ExecuteMetaData[generic-data.tex]{fmap}
+\ExecuteMetaData[Generic/Data.tex]{fmap}
 \end{minipage}
 \caption{Meaning of Descriptions and Proof of Functoriality}
 \end{figure}
@@ -365,10 +365,10 @@ algebra corresponding to \AB{d}'s meaning as proven by \AF{fold} \AB{d}.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[generic-data.tex]{mu}
+\ExecuteMetaData[Generic/Data.tex]{mu}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[generic-data.tex]{fold}
+\ExecuteMetaData[Generic/Data.tex]{fold}
 \end{minipage}
 \caption{Fixpoint and Generic Fold}
 \end{figure}
@@ -421,10 +421,10 @@ which make our types much more readable.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[generic-syntax.tex]{desc}
+\ExecuteMetaData[Generic/Syntax.tex]{desc}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[generic-syntax.tex]{interp}
+\ExecuteMetaData[Generic/Syntax.tex]{interp}
 \end{minipage}
 \caption{Syntax Descriptions and their Meaning as Functor}
 \end{figure}
@@ -442,10 +442,10 @@ of type based termination checking.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
-\ExecuteMetaData[generic-syntax.tex]{mu}
+\ExecuteMetaData[Generic/Syntax.tex]{mu}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.35\textwidth}
-\ExecuteMetaData[generic-syntax.tex]{scope}
+\ExecuteMetaData[Generic/Syntax.tex]{scope}
 \end{minipage}
 \caption{Term Trees: The Free Relative Monads on Descriptions}
 \end{figure}
@@ -472,20 +472,20 @@ of the encoding.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{LCD}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCD}
 \end{minipage}
 \begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{LC}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LC}
 \end{minipage}
 
 \begin{minipage}{0.30\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{var}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{var}
 \end{minipage}
 \begin{minipage}{0.30\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{app}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{app}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.30\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{lam}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{lam}
 \end{minipage}
 \caption{Example: The Untyped Lambda Calculus}
 \end{figure}
@@ -509,10 +509,10 @@ one corresponding to the chosen branch.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{sumcomb}
+  \ExecuteMetaData[Generic/Syntax.tex]{sumcomb}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{case}
+  \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
 \caption{Descriptions are closed under Sums}
 \end{figure}
@@ -528,10 +528,10 @@ and the product of their respective interpretations.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{paircomb}
+  \ExecuteMetaData[Generic/Syntax.tex]{paircomb}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{pairunpair}
+  \ExecuteMetaData[Generic/Syntax.tex]{pairunpair}
 \end{minipage}
 \caption{Descriptions are closed under Products}
 \end{figure}
@@ -575,7 +575,7 @@ in the extended environment.
   \ExecuteMetaData[environment.tex]{kripke}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{semantics}
+  \ExecuteMetaData[Generic/Semantics.tex]{semantics}
 \end{minipage}
 \caption{A Generic Notion of Semantics}
 \end{figure}
@@ -589,12 +589,12 @@ and it is defined mutually with a function \AF{body} turning a \AF{Scope}
 (i.e. a subcomputation expecting a value for each newly bound variable).
 
 \begin{figure}[h]
-{\center \ExecuteMetaData[generic-syntax.tex]{sembody}}
+{\center \ExecuteMetaData[Generic/Semantics.tex]{sembody}}
 \hspace{-1em}\begin{minipage}{0.40\textwidth}
-\ExecuteMetaData[generic-syntax.tex]{sem}
+\ExecuteMetaData[Generic/Semantics.tex]{sem}
 \end{minipage}\hspace{2em}
 \hspace{-1em}\begin{minipage}{0.50\textwidth}
-\ExecuteMetaData[generic-syntax.tex]{body}
+\ExecuteMetaData[Generic/Semantics.tex]{body}
 \end{minipage}
 \caption{Fundamental Lemma of \AR{Sem}antics}
 \end{figure}
@@ -622,17 +622,17 @@ thinnable and such that we can craft dummy ones in non-empty contexts.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{varlike}
+  \ExecuteMetaData[varlike.tex]{varlike}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.50\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{reify}
+  \ExecuteMetaData[Generic/Semantics.tex]{reify}
 \end{minipage}
 
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{renaming}
+  \ExecuteMetaData[Generic/Semantics.tex]{renaming}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{substitution}
+  \ExecuteMetaData[Generic/Semantics.tex]{substitution}
 \end{minipage}
 \caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding}
 \end{figure}
@@ -656,10 +656,10 @@ to the associated terms.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{ntimes}
+  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{ntimes}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{letcode}
+  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{letcode}
 \end{minipage}
 \caption{Parallel Let Binding}
 \end{figure}
@@ -687,10 +687,10 @@ dummy environment associating each variable to itself.
 
 \begin{figure}[h]
 \begin{minipage}{0.50\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{unletcode}
+  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unletcode}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.40\textwidth}
-  \ExecuteMetaData[generic-syntax.tex]{unlet}
+  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unlet}
 \end{minipage}
 \caption{Inlining Let Binding}
 \end{figure}
@@ -730,7 +730,7 @@ an error token because the evaluation of untyped programs may
 (and usually does!) go wrong.
 
 \begin{figure}[h]
-{\center \ExecuteMetaData[generic-syntax.tex]{domain}}
+{\center \ExecuteMetaData[Generic/Examples/NbyE.tex]{domain}}
 \caption{Generic Reflexive Domain}
 \end{figure}
 
@@ -751,7 +751,7 @@ anything else she may want to define.
 
 
 \begin{figure}[h]
-\ExecuteMetaData[generic-syntax.tex]{nbe-setup}
+\ExecuteMetaData[Generic/Examples/NbyE.tex]{nbe-setup}
 \caption{Generic Normalisation by Evaluation Framework}
 \end{figure}
 
@@ -768,7 +768,7 @@ applications.
 
 
 \begin{figure}[h]
-\ExecuteMetaData[generic-syntax.tex]{nbelc}
+\ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
 \caption{Normalisation by Evaluation for the Untyped $\lambda$-Calculus}
 \end{figure}
 
@@ -782,9 +782,9 @@ or a returned \AD{Type} if the expression considered is \AIC{Infer}.
 \todo{more}
 
 \begin{figure}[h]
-\ExecuteMetaData[generic-syntax.tex]{bidirectional}
-\ExecuteMetaData[generic-syntax.tex]{typemode}
-\ExecuteMetaData[generic-syntax.tex]{typecheck}
+\ExecuteMetaData[Generic/Examples/ElaborationType.tex]{bidirectional}
+\ExecuteMetaData[Generic/Examples/ElaborationType.tex]{typemode}
+\ExecuteMetaData[Generic/Examples/ElaborationType.tex]{typecheck}
 \caption{Type- Inference / Checking as a Semantics}
 \end{figure}
 
@@ -810,11 +810,11 @@ represented here by the variable \AIC{suc} \AIC{zero}.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{clistD}
-  \ExecuteMetaData[generic-cofinite.tex]{clistpat}
+  \ExecuteMetaData[Generic/Cofinite.tex]{clistD}
+  \ExecuteMetaData[Generic/Cofinite.tex]{clistpat}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{zeroones}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones}
 \end{minipage}
 \caption{Potentially Cyclic Lists: Description and Example}
 \end{figure}
@@ -832,10 +832,10 @@ be implemented using \AF{Substitution}.
 
 \begin{figure}[h]
 \begin{minipage}{0.52\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{plug}
+  \ExecuteMetaData[Generic/Cofinite.tex]{plug}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.43\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{unroll}
+  \ExecuteMetaData[Generic/Cofinite.tex]{unroll}
 \end{minipage}
 \caption{Plug and Unroll: Exposing a Cyclic Tree's Top Layer}
 \end{figure}
@@ -851,10 +851,10 @@ correspond to the cyclic example \AF{01↺} given above.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{cotm}
+  \ExecuteMetaData[Generic/Cofinite.tex]{cotm}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[generic-cofinite.tex]{zeroones2}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones2}
 \end{minipage}
 \caption{Co-finite Trees: Definition and Example}
 \end{figure}
@@ -866,7 +866,7 @@ The definition proceeds by unrolling the term's top layer and
 co-recursively unfolding all the subterms.
 
 \begin{figure}[h]
- \ExecuteMetaData[generic-cofinite.tex]{unfold}
+ \ExecuteMetaData[Generic/Cofinite.tex]{unfold}
 \caption{Generic Unfold of Potentially Cyclic Structures}
 \end{figure}
 
@@ -898,7 +898,7 @@ relational arguments' properties: whenever \AB{R} is reflexive (respectively
 symmetric or transitive) so is \AF{Zip} \AB{d} \AB{R}.
 
 \begin{figure}[h]
- \ExecuteMetaData[generic-simulation.tex]{ziptype}
+ \ExecuteMetaData[Generic/Zip.tex]{ziptype}
 \caption{Zip: Characterising Structurally Equal Values with Related Substructures}
 \end{figure}
 
@@ -914,7 +914,7 @@ the relation transformer \AF{∀[\_]} which lifts a relation on values
 to one on environments.
 
 \begin{figure}[h]
- \ExecuteMetaData[generic-simulation.tex]{kripkeR}
+ \ExecuteMetaData[varlike.tex]{kripkeR}
 \caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
 \end{figure}
 
@@ -929,7 +929,7 @@ related computations. Together with self-explanatory constraints on
 constraint:
 
 \begin{figure}[h]
- \ExecuteMetaData[generic-simulation.tex]{recsim}
+ \ExecuteMetaData[Generic/Simulation.tex]{recsim}
 \caption{A Generic Notion of Simulation}
 \end{figure}
 
@@ -940,8 +940,8 @@ proven with a statement about \AF{Scope}s, and \AD{Size}s play a crucial
 role in ensuring that the function is indeed total.
 
 \begin{figure}[h]
- \ExecuteMetaData[generic-simulation.tex]{simbody}
- \ExecuteMetaData[generic-simulation.tex]{rensub}
+ \ExecuteMetaData[Generic/Simulation.tex]{simbody}
+ \ExecuteMetaData[Generic/Simulation.tex]{rensub}
 \caption{Fundamental Lemma of \AF{Sim}ulations and Renaming as a Substitution as its Corollary}
 \end{figure}
 
@@ -970,8 +970,8 @@ can derive from \AF{Zip}'s properties the fact that this gives
 rise to an equivalence relation.
 
 \begin{figure}[h]
- \ExecuteMetaData[generic-bisimilar.tex]{bisim}
- \ExecuteMetaData[generic-bisimilar.tex]{eqrel}
+ \ExecuteMetaData[Generic/Bisimilar.tex]{bisim}
+ \ExecuteMetaData[Generic/Bisimilar.tex]{eqrel}
 \caption{Bisimilarity, an Equivalence Relation for Co-finite Trees}
 \end{figure}
 

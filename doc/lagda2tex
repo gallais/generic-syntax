@@ -4,10 +4,9 @@ set -u
 
 AGDA=agda-2.5.2
 DIRECTORY=$( dirname  "$1" )
-TARGET=$( basename "$1" .lagda )
+NAME=$( basename "$1" .lagda )
+TARGET=${DIRECTORY}/${NAME}
 
-# Move to the directory
-cd "$DIRECTORY"
 # Compute the checksum of the target
 CHECK=`md5sum "$TARGET".lagda | awk '{ print $1 }'`
 # If the hash file does not exist, create a dummy one
@@ -17,9 +16,9 @@ fi
 # If the tex file hasn't been generated yet or if the
 # file has changed, then (re)generate it.
 if [ ! -f latex/"$TARGET".tex ] || [ $CHECK != `cat "$TARGET".hash` ]; then
-  echo REGENERATE: "$DIRECTORY"/"$TARGET".tex
-  ${AGDA} -i . --latex "$TARGET".lagda > "$TARGET".log
+  echo REGENERATE: "$TARGET".tex
+  ${AGDA} -i . --allow-unsolved-metas --latex "$TARGET".lagda > "$TARGET".log
 else
-  echo FROM CACHE: "$DIRECTORY"/"$TARGET".tex
+  echo FROM CACHE: "$TARGET".tex
 fi
 echo "$CHECK" > "$TARGET".hash
