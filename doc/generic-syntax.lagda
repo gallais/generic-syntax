@@ -76,18 +76,27 @@ module _ {I : Set} {X : List I → I → List I → Set} {i j k : I} {Γ : List 
 %<*case>
 \begin{code}
 case : {I : Set} {d e : Desc I} {X : List I → I → List I → Set} {A : Set} {i : I} {Γ : List I} →
-  (⟦ d       ⟧ X i Γ → A) → (⟦ e       ⟧ X i Γ → A) → (⟦ d `+ e  ⟧ X i Γ → A)
+   (⟦ d       ⟧ X i Γ → A) → (⟦ e       ⟧ X i Γ → A) → (⟦ d `+ e  ⟧ X i Γ → A)
 \end{code}
 %</case>
 \begin{code}
 case l r (true   , t) = l t
 case l r (false  , t) = r t
 
-fmap : {I : Set} (d : Desc I) {X Y : List I → I → List I → Set}
-       {Γ Δ : List I} {i : I} → (∀ Θ i → X Θ i Γ → Y Θ i Δ) → ⟦ d ⟧ X i Γ → ⟦ d ⟧ Y i Δ
-fmap (`σ A d)   f = Prod.map id (fmap (d _) f)
-fmap (`X Δ j d) f = Prod.map (f Δ j) (fmap d f)
-fmap (`∎ i)     f = id
+module _ {I : Set} {X Y : List I → I → List I → Set} where
+
+ fmap : (d : Desc I) {Γ Δ : List I} {i : I} → (∀ Θ i → X Θ i Γ → Y Θ i Δ) → ⟦ d ⟧ X i Γ → ⟦ d ⟧ Y i Δ
+ fmap (`σ A d)   f = Prod.map id (fmap (d _) f)
+ fmap (`X Δ j d) f = Prod.map (f Δ j) (fmap d f)
+ fmap (`∎ i)     f = id
+
+module _ {I : Set} {X Y Z : List I → I → List I → Set} where
+
+ fmap² : (d : Desc I) {Γ Δ Θ : List I} {i : I} (f : ∀ Φ i → X Φ i Γ → Y Φ i Δ) (g : ∀ Φ i → Y Φ i Δ → Z Φ i Θ)
+         (t : ⟦ d ⟧ X i Γ) → fmap  {I} {Y} {Z} d g (fmap d f t) ≡ fmap d (λ Φ i → g Φ i ∘ f Φ i) t
+ fmap² (`σ A d)    f g (a , t)  = cong (_ ,_) (fmap² (d a) f g t)
+ fmap² (`X Δ j d)  f g (r , t)  = cong (_ ,_) (fmap² d f g t)
+ fmap² (`∎ i)      f g t        = refl
 
 \end{code}
 %<*scope>

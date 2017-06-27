@@ -3,9 +3,9 @@ module generic-cofinite where
 
 open import Size
 open import Data.Unit
+open import Data.Nat.Base
 open import Data.Bool
 open import Data.Fin
-open import Data.List hiding (unfold)
 open import Data.Product
 
 open import indexed
@@ -14,26 +14,22 @@ open import environment hiding (refl)
 open import generic-syntax
 
 open import Relation.Binary.PropositionalEquality
+module _ where
+ open import Data.List.Base
 
-TM : {I : Set} → Desc I → I → Set
-TM d i = Tm d ∞ i []
+ TM : {I : Set} → Desc I → I → Set
+ TM d i = Tm d ∞ i []
 \end{code}
 %<*clistD>
 \begin{code}
-CListD : Set → Desc ⊤
-CListD A = `∎ tt `+ `σ A (λ _ → `X (tt ∷ []) tt (`∎ tt))
+ CListD : Set → Desc ⊤
+ CListD A  =   `∎ tt
+           `+  `σ A (λ _ → `X (tt ∷ []) tt (`∎ tt))
 \end{code}
 %</clistD>
-\end{code}
-%<*zeroones>
-\begin{code}
-01↺ : TM (CListD ⊤) tt
-01↺  =  `con (false , tt , `con (false , tt
-     ,  `var (s z) , refl) , refl)
-\end{code}
-%</zeroones>
 \begin{code}
 module _ {I : Set} where
+ open import Data.List.Base
 \end{code}
 %<*cotm>
 \begin{code}
@@ -43,16 +39,9 @@ module _ {I : Set} where
    field force : {s′ : Size< s} → ⟦ d ⟧ (λ _ i _ → ∞Tm d s′ i) i []
 \end{code}
 %</cotm>
-%<*zeroones2>
-\begin{code}
-01⋯ : ∞Tm (CListD ⊤) ∞ tt
-10⋯ : ∞Tm (CListD ⊤) ∞ tt
-∞Tm.force 01⋯ = false , tt , 10⋯ , refl
-∞Tm.force 10⋯ = false , tt , 01⋯ , refl
-\end{code}
-%</zeroones2>
 \begin{code}
 module _ {d : Desc ⊤} where
+ open import Data.List.Base hiding (unfold)
 \end{code}
 %<*plug>
 \begin{code}
@@ -76,25 +65,43 @@ module _ {d : Desc ⊤} where
 \end{code}
 %</unfold>
 \begin{code}
--- Simple example: Potentially cyclic lists
+infixr 5 _∷_
+\end{code}
+%<*clistpat>
+\begin{code}
+pattern []        = `con (true , refl)
+pattern _∷_ x xs  = `con (false , x , xs , refl)
+pattern ↶_ k      = `var k
+\end{code}
+%</clistpat>
+%<*zeroones>
+\begin{code}
+[0,1]  : TM (CListD ℕ) tt
+01↺    : TM (CListD ℕ) tt
 
-`listD : Set → Desc ⊤
-`listD A = `∎ tt                              -- nil
-        `+ `σ A λ _ → `X (tt ∷ []) tt (`∎ tt) -- cons (includes pointer declaration)
+[0,1]  =  0 ∷ 1 ∷ []
+01↺    =  0 ∷ 1 ∷ ↶ s z
+\end{code}
+%</zeroones>
 
-pattern nil       = `con (true , refl) 
-pattern cons x xs = `con (false , x , xs , refl)
+%<*zeroones2>
+\begin{code}
+01⋯ : ∞Tm (CListD ℕ) ∞ tt
+10⋯ : ∞Tm (CListD ℕ) ∞ tt
+∞Tm.force 01⋯ = false , 0 , 10⋯ , refl
+∞Tm.force 10⋯ = false , 1 , 01⋯ , refl
+\end{code}
+%</zeroones2>
 
-open import Data.Nat
+\begin{code}
+`1∷2∷3 : TM (CListD ℕ) tt
+`1∷2∷3 = 1 ∷ 2 ∷ 3 ∷ []
 
-`1∷2∷3 : TM (`listD ℕ) tt
-`1∷2∷3 = cons 1 (cons 2 (cons 3 nil))
+`1∷2⇖1 : TM (CListD ℕ) tt
+`1∷2⇖1 = 1 ∷ 2 ∷ ↶ s z
 
-`1∷2⇖1 : TM (`listD ℕ) tt
-`1∷2⇖1 = cons 1 (cons 2 (`var (s z)))
-
-∞1∷2 : ∞Tm (`listD ℕ) ∞ tt
-∞2∷1 : ∞Tm (`listD ℕ) ∞ tt
+∞1∷2 : ∞Tm (CListD ℕ) ∞ tt
+∞2∷1 : ∞Tm (CListD ℕ) ∞ tt
 
 ∞Tm.force ∞1∷2 = (false , 1 , ∞2∷1 , refl)
 ∞Tm.force ∞2∷1 = (false , 2 , ∞1∷2 , refl)

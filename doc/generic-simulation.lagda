@@ -69,7 +69,7 @@ module _ {I : Set} {X : List I → I → List I → Set}
 record Rel {I : Set} (T U : I → List I → Set) : Set₁ where
   constructor mkRel
   field rel : {i : I} → [ T i ⟶ U i ⟶ κ Set ]
-open Rel
+open Rel public
 
 module _ {I : Set} {T U : I → List I → Set} where
 
@@ -168,7 +168,7 @@ module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒 : I → List I → Set} (𝓡^𝓥  : R
                    reify vl^𝓥₁ Δ σ t₁ ≡ reify vl^𝓥₂ Δ σ t₂) →
              (d : Desc I) {σ : I} {b₁ : ⟦ d ⟧ (Kripke 𝓥₁ 𝓒) σ Γ} {b₂ : ⟦ d ⟧ (Kripke 𝓥₂ 𝓒) σ Γ} →
              Zip d (Kripke^R 𝓡^𝓥 (mkRel _≡_)) b₁ b₂ →
-             fmap d {X = Kripke 𝓥₁ 𝓒} {Y = Scope 𝓒} (reify vl^𝓥₁) b₁ ≡ fmap d (reify vl^𝓥₂) b₂
+             fmap {X = Kripke 𝓥₁ 𝓒} {Y = Scope 𝓒} d (reify vl^𝓥₁) b₁ ≡ fmap d (reify vl^𝓥₂) b₂
  zip^reify eq (`σ A d)    (refl , zp)  = cong (_ ,_) (zip^reify eq (d _) zp)
  zip^reify eq (`X δ i d)  (r , zp)         = cong₂ _,_ (eq δ i r) (zip^reify eq d zp)
  zip^reify eq (`∎ i′)      zp               = uip _ _ where
