@@ -231,10 +231,9 @@ sy^Var = record
 %<*renaming>
 \begin{code}
 Renaming : {I : Set} (d : Desc I) → Sem d Var (Tm d ∞)
-Renaming d = record
-  { th^𝓥  = λ k ρ → lookup ρ k
-  ; var    = `var
-  ; alg    = `con ∘ fmap d (λ Θ i → reify vl^Var Θ i) }
+Sem.th^𝓥  (Renaming d) = λ k ρ → lookup ρ k
+Sem.var   (Renaming d) = `var
+Sem.alg   (Renaming d) = `con ∘ fmap d (reify vl^Var)
 
 ren :  {I : Set} {Γ Δ : List I} {i : I} → ∀ d → (Γ ─Env) Var Δ →
        Tm d ∞ i Γ → Tm d ∞ i Δ
@@ -246,24 +245,20 @@ th^Tm : {I : Set} {d : Desc I} {i : I} → Thinnable (Tm d ∞ i)
 th^Tm t ρ = Sem.sem (Renaming _) ρ t
 
 vl^Tm : {I : Set} {d : Desc I} → VarLike (Tm d ∞)
-vl^Tm = record
-  { new    = `var z
-  ; th^𝓥  = th^Tm
-  }
+new   vl^Tm = `var z
+th^𝓥  vl^Tm = th^Tm
 
 sy^Tm : {I : Set} {d : Desc I} → Syntactic d (Tm d ∞)
-sy^Tm = record
-  { var    = id
-  ; vl^𝓥  = vl^Tm
-  }
+Syntactic.var   sy^Tm = id
+Syntactic.vl^𝓥  sy^Tm = vl^Tm
+
 \end{code}
 %<*substitution>
 \begin{code}
 Substitution : {I : Set} (d : Desc I) → Sem d (Tm d ∞) (Tm d ∞)
-Substitution d = record
-  { th^𝓥  = λ t ρ → Sem.sem (Renaming d) ρ t
-  ; var    = id
-  ; alg    = `con ∘ fmap d (λ Θ i → reify vl^Tm Θ i) }
+Sem.th^𝓥  (Substitution d) = λ t ρ → Sem.sem (Renaming d) ρ t
+Sem.var   (Substitution d) = id
+Sem.alg   (Substitution d) = `con ∘ fmap d (reify vl^Tm)
 
 sub : {I : Set} {Γ Δ : List I} {i : I} → ∀ d → (Γ ─Env) (Tm d ∞) Δ →
       Tm d ∞ i Γ → Tm d ∞ i Δ
@@ -323,10 +318,9 @@ Let {I} =  `σ (List I) $ λ Δ →
 %<*unletcode>
 \begin{code}
 UnLet : (I : Set) (d : Desc I) → Sem (Let `+ d) (Tm d ∞) (Tm d ∞)
-UnLet I d = record
-  { th^𝓥  = th^Tm
-  ; var    = id
-  ; alg    = case alg' (Sem.alg (Substitution d)) }
+Sem.th^𝓥  (UnLet I d) = th^Tm
+Sem.var   (UnLet I d) = id
+Sem.alg   (UnLet I d) = case alg' (Sem.alg (Substitution d))
 \end{code}
 %</unletcode>
 \begin{code}
@@ -439,63 +433,74 @@ module inference where
    _⇒_  : Type → Type → Type
 
  infix 1 _==_
- _==_ : Type → Type → Maybe Type
- α     == α       = just α
- σ ⇒ τ == σ' ⇒ τ' = σ ⇒ τ <$ ((σ == σ') ⊗ (τ == τ'))
+ _==_ : Type → Type → Maybe ⊤
+ α     == α       = just tt
+ σ ⇒ τ == σ' ⇒ τ' = tt <$ ((σ == σ') ⊗ (τ == τ'))
  _     == _       = nothing
 
  isArrow : Type → Maybe (Type × Type)
  isArrow (σ ⇒ τ) = just (σ , τ)
  isArrow _       = nothing
+\end{code}
+%<*bidirectional>
+\begin{code}
+ data Phase : Set where Check Infer : Phase
 
+ Lang : Desc Phase
+ Lang  =   `X [] Infer (`X [] Check (`∎ Infer))    -- apply
+       `+  `X (Infer ∷ []) Check (`∎ Check)        -- lamda
+       `+  `σ Type (λ _ → `X [] Check (`∎ Infer))  -- cut
+       `+  `X [] Infer (`∎ Check)                  -- embed
+\end{code}
+%</bidirectional>
+%<*typemode>
+\begin{code}
+ Type- : Phase → Set
+ Type- Check  = Type → Maybe ⊤
+ Type- Infer  = Maybe Type
+\end{code}
+%</typemode>
+%<*typecheck>
+\begin{code}
+ Typecheck : Sem Lang (λ _ _ → Type) (const ∘ Type-)
+ Sem.th^𝓥  Typecheck         = λ σ _ → σ
+ Sem.var    Typecheck {Check} = _==_
+ Sem.var    Typecheck {Infer} = just
+ Sem.alg    Typecheck         =
+   case app $ case lam $ case cut ann
+\end{code}
+%</typecheck>
+\begin{code}
+  where
 
- Infer : Desc ⊤
- Infer  =   `X [] tt (`X [] tt (`∎ tt))       -- app
-        `+  `X (tt ∷ []) tt (`∎ tt)           -- lam
-        `+  `σ Type (λ _ → `X [] tt (`∎ tt))  -- ann
+   app : {i : Phase} → (Maybe Type) × (Type → Maybe ⊤) × i ≡ Infer → Type- i
+   app (just (σ ⇒ τ)  , f , refl) = τ <$ f σ
+   app (_             , _ , refl) = nothing
 
- app : [ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
- app f t = `con (true , f , t , refl)
+   lam : {i : Phase} {Γ : List Phase} → □ (_ ⟶ κ (Type- Check)) Γ × i ≡ Check → Type- i
+   lam (f , refl) (σ ⇒ τ)  = f (base vl^Var) (ε ∙ σ) τ
 
- lam : [ (tt ∷_) ⊢ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
- lam b = `con (false , true , b , refl)
+   lam (_ , refl) _        = nothing
 
- ann : [ κ Type ⟶ Tm Infer ∞ tt ⟶ Tm Infer ∞ tt ]
- ann σ t = `con (false , false , σ , t , refl)
+   cut : {i : Phase} → Type × (Type → Maybe ⊤) × i ≡ Infer → Type- i
+   cut (σ , f , refl) = σ <$ f σ
 
- Check : Set
- Check = Maybe Type → Maybe Type
+   ann : {i : Phase} → Maybe Type × i ≡ Check → Type- i
+   ann (just σ  , refl) = σ ==_
+   ann (_       , refl) = const nothing
 
- -- TODO: output a typed term?
- infer : Sem Infer (λ _ _ → Type) (λ _ _ → Check)
- infer = record
-   { th^𝓥  = λ σ _ → σ
-   ; var    = λ σ → maybe (σ ==_) (just σ)
-   ; alg    = case  checkApp
-            $ case  checkLam
-                    checkAnn } where
+ pattern app f t  = `con (true , f , t , refl)
+ pattern lam b    = `con (false , true , b , refl)
+ pattern cut σ t  = `con (false , false , true , σ , t , refl)
+ pattern emb t    = `con (false , false , false , t , refl)
 
+ type- : (p : Phase) → Tm Lang ∞ p [] → Type- p
+ type- p t = Sem.sem Typecheck {Δ = []} ε t
 
-   checkApp : Check × Check × tt ≡ tt → Check
-   checkApp (f , t , _) r =
-     f nothing  >>= λ σf →
-     isArrow σf >>= uncurry λ σ τ →
-     t (just σ) M.>> maybe (τ ==_) (just τ) r
-
-   checkLam : [ Kripke (λ _ _ → Type) (λ _ _ → Check) (tt ∷ []) tt ∙× _ ⟶ κ Check ]
-   checkLam (b , _) r =  r          >>= λ στ →
-                         isArrow στ >>= uncurry λ σ τ →
-                         b (base vl^Var) (ε ∙ σ) (just τ)
-  
-   checkAnn : Type × Check × tt ≡ tt → Check
-   checkAnn (σ , t , _) r = t (just σ) M.>> maybe (σ ==_) (just σ) r
-
- typeinference : Tm Infer ∞ tt [] → Maybe Type
- typeinference t = Sem.sem infer {Δ = []} ε t nothing
-
- _ : let id = lam (`var z) in
-     typeinference (app (ann ((α ⇒ α) ⇒ (α ⇒ α)) id) id) ≡ just (α ⇒ α)
- _ = _≡_.refl
+ _ : let  id  : Tm Lang ∞ Check []
+          id  = lam (emb (`var z))
+     in Is-just $ type- Check (emb (app (cut ((α ⇒ α) ⇒ (α ⇒ α)) id) id)) (α ⇒ α)
+ _ = just tt
 \end{code}
 
 
