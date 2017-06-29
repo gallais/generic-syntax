@@ -16,10 +16,10 @@ open import Generic.Syntax
 \end{code}
 %<*semantics>
 \begin{code}
-Alg : {I : Set} (d : Desc I) (𝓥 𝓒 : I → List I → Set) → Set
+Alg : {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) → Set
 Alg {I} d 𝓥 𝓒 = {i : I} → [ ⟦ d ⟧ (Kripke 𝓥 𝓒) i ⟶ 𝓒 i ]
 
-record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I → List I → Set) : Set where
+record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
   field  th^𝓥   : {i : I} → Thinnable (𝓥 i)
          var    : {i : I} → [ 𝓥 i                  ⟶ 𝓒 i ]
          alg    : Alg d 𝓥 𝓒
@@ -28,7 +28,7 @@ record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I → List I → Set) : Set where
 
 %<*sembody>
 \begin{code}
-  _─Comp : (Γ : List I) (𝓒 : I → List I → Set) (Δ : List I) → Set
+  _─Comp : (Γ : List I) (𝓒 : I ─Scoped) (Δ : List I) → Set
   (Γ ─Comp) 𝓒 Δ = {s : Size} {i : I} → Tm d s i Γ → 𝓒 i Δ
 
   sem   :  {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
@@ -60,7 +60,7 @@ module _ {I : Set} where
 \end{code}
 %<*reify>
 \begin{code}
- reify : {𝓥 𝓒 : I → List I → Set} → VarLike 𝓥 →
+ reify : {𝓥 𝓒 : I ─Scoped} → VarLike 𝓥 →
          {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
  reify vl^𝓥 []        i b = b
  reify vl^𝓥 Δ@(_ ∷ _) i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
@@ -68,7 +68,7 @@ module _ {I : Set} where
 
 %</reify>
 \begin{code}
- record Syntactic (d : Desc I) (𝓥 : I → List I → Set) : Set where
+ record Syntactic (d : Desc I) (𝓥 : I ─Scoped) : Set where
    field
      var    : {i : I} → [ 𝓥 i ⟶ Tm d ∞ i ]
      vl^𝓥  : VarLike 𝓥

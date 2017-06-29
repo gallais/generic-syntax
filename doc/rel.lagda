@@ -9,12 +9,12 @@ open import var hiding (_<$>_)
 open import environment
 open import Agda.Builtin.Equality
 
-record Rel {I : Set} (T U : I → List I → Set) : Set₁ where
+record Rel {I : Set} (T U : I ─Scoped) : Set₁ where
   constructor mkRel
   field rel : {i : I} → [ T i ⟶ U i ⟶ κ Set ]
 open Rel public
 
-module _ {I : Set} {T U : I → List I → Set} where
+module _ {I : Set} {T U : I ─Scoped} where
 
  record ∀[_] (𝓡 : Rel T U) {Γ Δ : List I}
              (ρ₁ : (Γ ─Env) T Δ) (ρ₂ : (Γ ─Env) U Δ) : Set where
@@ -22,7 +22,7 @@ module _ {I : Set} {T U : I → List I → Set} where
    field lookup^R : ∀ {i} k → rel 𝓡 {i} (lookup ρ₁ k) (lookup ρ₂ k)
  open ∀[_] public
 
-module _ {I : Set} {T U : I → List I → Set} 
+module _ {I : Set} {T U : I ─Scoped}
          {𝓡 : Rel T U} {Γ Δ : List I} where
 
  _∙^R_ :  {ρ₁ : (Γ ─Env) T Δ} {ρ₂ : (Γ ─Env) U Δ} → ∀[ 𝓡 ] ρ₁ ρ₂ →
@@ -47,7 +47,7 @@ module _ {I : Set} {T U : I → List I → Set}
 
 module _ {I : Set} where
 
- Eq^R : {A : I → List I → Set} → Rel A A
+ Eq^R : {A : I ─Scoped} → Rel A A
  Eq^R = mkRel _≡_
 
 \end{code}

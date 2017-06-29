@@ -26,7 +26,7 @@ data Desc (I : Set) : Set₁ where
 %</desc>
 %<*interp>
 \begin{code}
-⟦_⟧ : {I : Set} → Desc I → (List I → I → List I → Set) → (I → List I → Set)
+⟦_⟧ : {I : Set} → Desc I → (List I → I ─Scoped) → I ─Scoped
 ⟦ `σ A d    ⟧ X i Γ = Σ[ a ∈ A ] (⟦ d a ⟧ X i Γ)
 ⟦ `X Δ j d  ⟧ X i Γ = X Δ j Γ × ⟦ d ⟧ X i Γ
 ⟦ `∎ i′     ⟧ X i Γ = i ≡ i′
@@ -38,13 +38,13 @@ data Desc (I : Set) : Set₁ where
 \end{code}
 %<*scope>
 \begin{code}
-Scope : {I : Set} (T : I → List I → Set) → (List I → I → List I → Set)
+Scope : {I : Set} (T : I ─Scoped) → (List I → I ─Scoped)
 Scope T Δ i = (Δ ++_) ⊢ T i
 \end{code}
 %</scope>
 %<*mu>
 \begin{code}
-data Tm {I : Set} (d : Desc I) : Size → I → List I → Set where
+data Tm {I : Set} (d : Desc I) : Size → I ─Scoped where
   `var : {s : Size} {i : I} →  [ Var i                    ⟶ Tm d (↑ s) i ]
   `con : {s : Size} {i : I} →  [ ⟦ d ⟧ (Scope (Tm d s)) i ⟶ Tm d (↑ s) i ]
 \end{code}
@@ -71,7 +71,7 @@ module _ {I : Set} where
 %</sumcomb>
 %<*case>
 \begin{code}
- case : {d e : Desc I} {X : List I → I → List I → Set} {A : Set} {i : I} {Γ : List I} →
+ case : {d e : Desc I} {X : List I → I ─Scoped} {A : Set} {i : I} {Γ : List I} →
         (⟦ d       ⟧ X i Γ → A) → (⟦ e       ⟧ X i Γ → A) → (⟦ d `+ e  ⟧ X i Γ → A)
 \end{code}
 %</case>
@@ -88,7 +88,7 @@ module _ {I : Set} where
 \end{code}
 %</paircomb>
 \begin{code}
-module _ {I : Set} {X : List I → I → List I → Set} {i j k : I} {Γ : List I} where
+module _ {I : Set} {X : List I → I ─Scoped} {i j k : I} {Γ : List I} where
 \end{code}
 %<*pairunpair>
 \begin{code}
@@ -108,7 +108,7 @@ module _ {I : Set} {X : List I → I → List I → Set} {i j k : I} {Γ : List 
 \begin{code}
 -- Descriptions give rise to traversable functors
 
-module _ {I : Set} {X Y : List I → I → List I → Set} where
+module _ {I : Set} {X Y : List I → I ─Scoped} where
 
  fmap : (d : Desc I) {Γ Δ : List I} {i : I} → (∀ Θ i → X Θ i Γ → Y Θ i Δ) → ⟦ d ⟧ X i Γ → ⟦ d ⟧ Y i Δ
  fmap (`σ A d)   f = P.map id (fmap (d _) f)
@@ -116,13 +116,13 @@ module _ {I : Set} {X Y : List I → I → List I → Set} where
  fmap (`∎ i)     f = id
 
 
-module _ {I : Set} {X : List I → I → List I → Set} where
+module _ {I : Set} {X : List I → I ─Scoped} where
  fmap-id : (d : Desc I) {Γ : List I} {i : I} (v : ⟦ d ⟧ X i Γ) → fmap d (λ _ _ x → x) v ≡ v
  fmap-id (`σ A d)    (a , v)  = cong (a ,_) (fmap-id (d a) v)
  fmap-id (`X Δ j d)  (r , v)  = cong (r ,_) (fmap-id d v)
  fmap-id (`∎ x)      v        = refl
 
-module _ {I : Set} {X Y Z : List I → I → List I → Set} where
+module _ {I : Set} {X Y Z : List I → I ─Scoped} where
 
  fmap² : (d : Desc I) {Γ Δ Θ : List I} {i : I}
          (f : ∀ Φ i → X Φ i Γ → Y Φ i Δ) (g : ∀ Φ i → Y Φ i Δ → Z Φ i Θ)
@@ -134,7 +134,7 @@ module _ {I : Set} {X Y Z : List I → I → List I → Set} where
 
 open import Category.Applicative
 
-module _ {I : Set} {X : List I → I → List I → Set} {A : Set → Set} (app : RawApplicative A) where
+module _ {I : Set} {X : List I → I ─Scoped} {A : Set → Set} (app : RawApplicative A) where
 
  module A = RawApplicative app
  open A

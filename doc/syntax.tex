@@ -57,20 +57,26 @@ The proof that the fixpoint is functorial then corresponds to renaming
 whilst the proof that it is monadic implements substitution: the variable
 constructor is return, and bind defines parallel substitution.
 
-\subsection{A Mechanized Variant of Altenkirch and Reus' Untyped Calculus}
+\subsection{A Mechanized Typed Variant of Altenkirch and Reus' Calculus}
 
 There is no reason to restrict this technique to fixpoints of endofunctors
 on $\Set{}^{\Set{}}$ apart from the fact that renaming and substitution
 correspond to well-known structures in that specific case. The more general
-case of fixpoints of (strictly positive) endofunctors on $\Set{}^I$ can be
+case of fixpoints of (strictly positive) endofunctors on $\Set{}^J$ can be
 endowed with similar operations by using what Altenkirch, Chapman and
 Uustalu~\citeyear{Altenkirch2010, JFR4389} refer to as relative monads.
 
-In this paper, we pick $I = \mathbb{N}$ where the natural number used as
-an index is straightforwardly the number of (de Bruijn) variables in scope.
-This natural number can be seen as a list associating to each variable in
-scope an element of the unit type; in a typed setting, it would carry the
-variable's type instead.
+In this paper, we pick $J = \mathit{List} I$ which is straightforwardly the list
+of the sort (/ kind / types depending of the application) of the de Bruijn variables
+in scope. We can recover an untyped approach by picking $I$ to be the unit type.
+Because of this typed setting, our functors will actually take an extra $I$ argument
+corresponding to the type of the expression being built. This is summed up by
+the large type \AB{I}\AF{─Scoped}:
+
+\begin{figure}[h]
+\ExecuteMetaData[var.tex]{scoped}
+\caption{Type of Well Typed and Scope Families}
+\end{figure}
 
 Our implementation language is Agda~\cite{norell2009dependently} however
 these techniques are language independent: any dependently typed language
@@ -119,43 +125,47 @@ For instance, the fairly compact expression
 \AF{[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⟶} \AB{R} \AF{]}
 corresponds to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
-Using these combinators, the untyped $\lambda$-calculus can be represented
-using the following definitions:
+
+Because the context comes second in the definition of \AF{\_─Scoped}, we
+can readily use these combinators to thread, modify or quantify over the
+scope when defining such families. We give two examples:
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[var.tex]{var}
-\end{minipage}\hspace{2em}
+\end{minipage}
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[motivation.tex]{tm}
 \end{minipage}
-\caption{Scope Aware Variables and Untyped $\lambda$-Terms\label{scoped-untyped}}
+\caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
 \end{figure}
 
-The inductive family \AD{Var} corresponds to well scoped de Bruijn~\citeyear{de1972lambda}
+The inductive family \AD{Var} corresponds to well scoped and well typed
+de Bruijn~\citeyear{de1972lambda}
 indices. Its first constructor (\AIC{z} for zero) states that we have a name to refer to
 the nearest binder in a non-empty scope. The second one (\AIC{s} for successor) lifts a
 name for a variable in a given scope into a name for it in the extended scope where
 an extra variable has been bound. Both of their types have been written using combinators,
 although we will abstain from unfolding them in the future, we do so here in the hope
 it will help the reader get acquainted with them: they respectively normalise to
-$\forall n. \mathbf{Var}(\mathit{suc}(n))$ for \AIC{z},
-and $\forall n. \mathbf{Var}(n) \rightarrow \mathbf{Var}(\mathit{suc}(n))$ for \AIC{s}.
+$\forall i, xs. \mathbf{Var}(i, i :: \mathit{xs})$ for \AIC{z},
+and $\forall i, j, xs. \mathbf{Var}(i, \mathit{xs}) \rightarrow \mathbf{Var}(i, j :: \mathit{xs})$ for \AIC{s}.
 
-The \AD{ℕ}-indexed family \AD{Lam} is the variant of Altenkirch and Reus' untyped
-$\lambda$-calculus. The two interesting constructors are the one lifting variables
-to terms and the $\lambda$-abstraction whose body lives in an extended context.
+The \AD{Type} \AF{─Scoped} family \AD{Lam} is the well typed variant of Altenkirch
+and Reus' untyped $\lambda$-calculus. The two interesting constructors are the one
+lifting variables to terms and the $\lambda$-abstraction whose body lives in an
+extended context.
 
-\section{A Primer on Scope Safe Programs}\label{section:primer-program}
+\section{A Primer on Type and Scope Safe Programs}\label{section:primer-program}
 
-This scope safe deep embedding of the untyped $\lambda$-calculus is
+This type and scope safe deep embedding of the simply typed $\lambda$-calculus is
 naturally only a start: once the programmer has access to a good
 representation of the language she is interested in, she wants and
 needs to (re)implement standard traversals manipulating terms.
 Renaming and substitution are perhaps the two most iconic examples
-of such traversals. And now that well-scopedness is enforced in
+of such traversals. And now that well typedness and scopedness is enforced in
 the terms' indices, all of these traversals have to be implemented
-in a scope safe manner. These constraints show up in the type of
+in a type and scope safe manner. These constraints show up in the type of
 renaming and substitution which can be defined as follows:
 
 \begin{figure}[h]
@@ -165,7 +175,18 @@ renaming and substitution which can be defined as follows:
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[motivation.tex]{sub}
 \end{minipage}
-\caption{Scope Preserving Renaming and Substitution}
+\caption{Type and Scope Preserving Renaming and Substitution}
+\end{figure}
+
+We wrote (\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ} for an environment with values
+in \AB{𝓥}. It associates to each variable in the scope \AB{Γ} a value of
+the appropriate type living in the scope \AB{Δ}. We define environemnts
+as records to help the host language's type inference reconstruct the type
+of values.
+
+\begin{figure}[h]
+\ExecuteMetaData[environment.tex]{env}
+\caption{Well Typed and Scoped Environments of Values}
 \end{figure}
 
 Looking more closely at these two functions' code, it is quite evident
@@ -182,35 +203,23 @@ but also normalisation by evaluation, printing with names or CPS conversion
 as various instances of a more general traversal. Unpublished results also
 demonstrate that typechecking in the style of Atkey~\citeyear{atkey2015algebraic}
 fits in that framework. To be able to make sense of this body of work, we
-need to introduce three new definitions:
-
-A \AF{Thinning} from $m$ to $n$ is a function from \AD{Var} $m$ to
-\AD{Var} $n$. It is a special case of a notion of environment that
-stores values living in a scope $n$ for each variable in a scope $m$.
-We introduce environment as records (this helps the host language's
-type inference reconstruct the type of values) and write
-(\AB{m} \AR{─Env}) \AB{𝓥} \AB{n} for such an environment with values
-in \AB{𝓥}.
+need to introduce three new notions: \AF{Thinning}s, the \AF{□} functor and
+\AF{Thinnable}s.
 
 \begin{figure}[h]
-\begin{minipage}{0.55\textwidth}
-\ExecuteMetaData[environment.tex]{env}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.35\textwidth}
 \ExecuteMetaData[environment.tex]{thinning}
-\end{minipage}
-\caption{Environments of Well Scoped Values and Thinnings}
+\caption{Thinnings: A Special Case of Environments}
 \end{figure}
 
 \AF{Thinning}s subsume more structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
 Embeddings~\cite{chapman2009type}. In particular, it does not prevent the
 user from defining arbitrary permutations or from introducing contractions
-although we will not use such instances. The fact that our representation
-is a function space grants us monoid laws ``for free'' as per Jeffrey's
+although we will not use such instances. Our representation is a function
+space which grants us monoid laws ``for free'' as per Jeffrey's
 observation~\citeyear{jeffrey2011assoc}.
 
-The \AF{□} combinator turns any \AD{ℕ}-indexed Set into one that can absorb
+The \AF{□} combinator turns any (\AD{List} \AB{I})-indexed Set into one that can absorb
 thinnings. It is akin to Kripke-style quantification over all possible future
 worlds and \AF{□} (\AB{D} \AF{→} \AB{D}) indeed corresponds to the Kripke
 function space used in normalisation by evaluation via a domain \AB{D}.
@@ -221,8 +230,8 @@ The notion of \AF{Thinnable} is the property of being stable under thinnings,
 in other words: \AF{Thinnable}s are the coalgebras of \AF{□}.
 It is a crucial property for values to have if one wants to be able to push
 them under binders. Unsurprisingly, from the comonadic structure we get that
-the \AF{□} combinator freely turns any \AD{ℕ}-indexed Set into a \AF{Thinnable}
-one.
+the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
+\AF{Thinnable} one.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}

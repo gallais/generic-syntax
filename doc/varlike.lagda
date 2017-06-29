@@ -12,7 +12,7 @@ module _ {I : Set} where
 \end{code}
 %<*varlike>
 \begin{code}
- record VarLike (𝓥 : I → List I → Set) : Set where
+ record VarLike (𝓥 : I ─Scoped) : Set where
    field  new   : {i : I} → [ (i ∷_) ⊢ 𝓥 i ]
           th^𝓥  : {i : I} → Thinnable (𝓥 i)
 \end{code}
@@ -33,7 +33,7 @@ module _ {I : Set} where
  new   vl^Var = z
  th^𝓥  vl^Var = th^Var
 
-module _ {I : Set} {𝓥₁ 𝓥₂ : I → List I → Set} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) where
+module _ {I : Set} {𝓥₁ 𝓥₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) where
 
  record VarLike^R (vl₁ : VarLike 𝓥₁) (vl₂ : VarLike 𝓥₂) : Set where
    field  new^R  : {i : I} {Γ : List I} → rel 𝓡^𝓥 {i} {i ∷ Γ} (new vl₁) (new vl₂)
@@ -51,7 +51,7 @@ module _ {I : Set} {𝓥₁ 𝓥₂ : I → List I → Set} (𝓡^𝓥  : Rel �
    freshʳ^R n = th^R _ <$>^R base^R
 
 
-module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I → List I → Set} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) (𝓡^𝓒  : Rel 𝓒₁ 𝓒₂) where
+module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) (𝓡^𝓒  : Rel 𝓒₁ 𝓒₂) where
 
 \end{code}
 %<*kripkeR>

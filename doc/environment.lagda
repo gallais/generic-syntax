@@ -13,7 +13,7 @@ infix 3 _─Env
 \end{code}
 %<*env>
 \begin{code}
-record _─Env (Γ : List I) (𝓥 : I → List I → Set) (Δ : List I) : Set where
+record _─Env (Γ : List I) (𝓥 : I ─Scoped) (Δ : List I) : Set where
   constructor pack; field lookup : {i : I} → Var i Γ → 𝓥 i Δ
 \end{code}
 %</env>
@@ -32,7 +32,7 @@ Thinning Γ Δ = (Γ ─Env) Var Δ
 ε : ∀ {𝓥 n} → ([] ─Env) 𝓥 n
 lookup ε ()
 
-_<$>_ : {𝓥 𝓦 : I → List I → Set} {Γ Δ Θ : List I} → ({i : I} → 𝓥 i Δ → 𝓦 i Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
+_<$>_ : {𝓥 𝓦 : I ─Scoped} {Γ Δ Θ : List I} → ({i : I} → 𝓥 i Δ → 𝓦 i Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
 lookup (f <$> ρ) k = f (lookup ρ k)
 
 split : ∀ {Δ} {i : I} Γ → Var i (Γ ++ Δ) → Var i Γ ⊎ Var i Δ
@@ -100,14 +100,14 @@ th^□ = duplicate
 %</freeth>
 %<*kripke>
 \begin{code}
-Kripke : (𝓥 : I → List I → Set) (𝓒 : I → List I → Set) → (List I → I → List I → Set)
+Kripke : (𝓥 𝓒 : I ─Scoped) → (List I → I ─Scoped)
 Kripke 𝓥 𝓒 [] i = 𝓒 i
 Kripke 𝓥 𝓒 Γ  i = □ ((Γ ─Env) 𝓥 ⟶ 𝓒 i)
 \end{code}
 %</kripke>
 
 \begin{code}
-th^Kr : {𝓥 : I → List I → Set} {𝓒 : I → List I → Set}
+th^Kr : {𝓥 𝓒 : I ─Scoped}
         (Γ : List I) → ({i : I} → Thinnable (𝓒 i)) → {i : I} → Thinnable (Kripke 𝓥 𝓒 Γ i)
 th^Kr []       th^𝓒 = th^𝓒
 th^Kr (_ ∷ _)  th^𝓒 = th^□

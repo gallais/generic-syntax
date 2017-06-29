@@ -15,18 +15,27 @@ open import Function
 open import Agda.Builtin.Equality
 
 \end{code}
+%<*scoped>
+\begin{code}
+_─Scoped : Set → Set₁
+I ─Scoped = I → List I → Set
+\end{code}
+%</scoped>
+\begin{code}
+module _ {I : Set} where
+\end{code}
 %<*var>
 \begin{code}
-data Var {I : Set} (i : I) : List I → Set where
-  z :            [            (i ∷_) ⊢ Var i ]
-  s : {j : I} →  [ Var i ⟶  (j ∷_) ⊢ Var i ]
+ data Var : I ─Scoped where
+   z : {i : I} →    [          (i ∷_) ⊢ Var i ]
+   s : {i j : I} →  [ Var i ⟶  (j ∷_) ⊢ Var i ]
 \end{code}
 %</var>
 
 \begin{code}
-get : {I : Set} {B : I → Set} {i : I} → [ Var i ⟶ All B ⟶ κ (B i) ]
-get z     (b  ∷ _)  = b
-get (s v) (_  ∷ bs) = get v bs
+ get : {B : I → Set} {i : I} → [ Var i ⟶ All B ⟶ κ (B i) ]
+ get z     (b  ∷ _)  = b
+ get (s v) (_  ∷ bs) = get v bs
 
 _<$>_ : {I J : Set} (f : I → J) {i : I} → [ Var i ⟶ Var (f i) ∘ map f ]
 f <$> z    = z

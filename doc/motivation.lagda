@@ -20,10 +20,10 @@ data Type : Set where
 %</type>
 %<*tm>
 \begin{code}
-data Lam : Type → List Type → Set where
-  V : {σ : Type} →    [ Var σ                  ⟶ Lam σ       ]
+data Lam : Type ─Scoped where
+  V : {σ : Type} →    [ Var σ                ⟶ Lam σ        ]
   A : {σ τ : Type} →  [ Lam (σ ⇒ τ) ⟶ Lam σ  ⟶ Lam τ        ]
-  L : {σ τ : Type} →  [ (σ ∷_) ⊢ Lam τ         ⟶ Lam (σ ⇒ τ)  ]
+  L : {σ τ : Type} →  [ (σ ∷_) ⊢ Lam τ       ⟶ Lam (σ ⇒ τ)  ]
 \end{code}
 %</tm>
 \begin{code}
@@ -72,7 +72,7 @@ open import environment hiding (extend ; _>>_ ; refl)
 
 %<*rsem>
 \begin{code}
-record Sem (𝓥 𝓒 : Type → List Type → Set) : Set where
+record Sem (𝓥 𝓒 : Type ─Scoped) : Set where
   field  th^𝓥 : {σ : Type} → Thinnable (𝓥 σ)
          ⟦V⟧   : {σ : Type} → [ 𝓥 σ         ⟶ 𝓒 σ ]
          ⟦A⟧   : {σ τ : Type} → [ 𝓒 (σ ⇒ τ) ⟶ 𝓒 σ     ⟶ 𝓒 τ ]
