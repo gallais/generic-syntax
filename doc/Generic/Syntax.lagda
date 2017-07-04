@@ -19,9 +19,9 @@ open import environment as E hiding (refl)
 %<*desc>
 \begin{code}
 data Desc (I : Set) : Set₁ where
-  `σ : (A : Set) (d : A → Desc I)  → Desc I
-  `X : List I → I → Desc I         → Desc I
-  `∎ : I                            → Desc I
+  `σ : (A : Set) → (A → Desc I)  → Desc I
+  `X : List I → I → Desc I       → Desc I
+  `∎ : I                         → Desc I
 \end{code}
 %</desc>
 %<*interp>
@@ -38,15 +38,16 @@ data Desc (I : Set) : Set₁ where
 \end{code}
 %<*scope>
 \begin{code}
-Scope : {I : Set} (T : I ─Scoped) → (List I → I ─Scoped)
+Scope :  {I : Set} (T : I ─Scoped) →
+         (List I → I ─Scoped)
 Scope T Δ i = (Δ ++_) ⊢ T i
 \end{code}
 %</scope>
 %<*mu>
 \begin{code}
 data Tm {I : Set} (d : Desc I) : Size → I ─Scoped where
-  `var : {s : Size} {i : I} →  [ Var i                    ⟶ Tm d (↑ s) i ]
-  `con : {s : Size} {i : I} →  [ ⟦ d ⟧ (Scope (Tm d s)) i ⟶ Tm d (↑ s) i ]
+  `var : {s : Size} {i : I} →  [ Var i                     ⟶ Tm d (↑ s) i ]
+  `con : {s : Size} {i : I} →  [ ⟦ d ⟧ (Scope (Tm d s)) i  ⟶ Tm d (↑ s) i ]
 \end{code}
 %</mu>
 

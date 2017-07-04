@@ -13,9 +13,9 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 %<*desc>
 \begin{code}
 data Desc (I J : Set) : Set₁ where
-  `σ : (A : Set) (d : A → Desc I J)  →  Desc I J
-  `X : J → Desc I J                  →  Desc I J
-  `∎ : I                             →  Desc I J
+  `σ : (A : Set) → (A → Desc I J)  →  Desc I J
+  `X : J → Desc I J                →  Desc I J
+  `∎ : I                           →  Desc I J
 \end{code}
 %</desc>
 \begin{code}
@@ -38,15 +38,15 @@ module _ {I J : Set} where
  ⟦_⟧ : Desc I J → (J → Set) → (I → Set)
  ⟦ `σ A d  ⟧ X i = Σ[ a ∈ A ] (⟦ d a ⟧ X i)
  ⟦ `X j d  ⟧ X i = X j × ⟦ d ⟧ X i
- ⟦ `∎ i′    ⟧ X i = i ≡ i′
+ ⟦ `∎ i′   ⟧ X i = i ≡ i′
 \end{code}
 %</interp>
 %<*fmap>
 \begin{code}
  fmap : {X Y : J → Set} → (d : Desc I J) → [ X ⟶ Y ] → [ ⟦ d ⟧ X ⟶ ⟦ d ⟧ Y ]
- fmap (`σ A d) f (a , v)  = (a , fmap (d a) f v)
- fmap (`X j d) f (r , v)  = (f r , fmap d f v)
- fmap (`∎ i)   f t        = t
+ fmap (`σ A d)  f (a , v)  = (a , fmap (d a) f v)
+ fmap (`X j d)  f (r , v)  = (f r , fmap d f v)
+ fmap (`∎ i)    f t        = t
 \end{code}
 %</fmap>
 

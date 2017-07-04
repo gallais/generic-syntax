@@ -13,6 +13,7 @@ paper-lagda:
 paper: prepare paper-lagda
 	cd latex \
 	&& ${SED} -f rules.sed -i ${PAPER}.tex \
+	&& ${SED} -f rules.sed -i syntax.tex \
         && latexmk -bibtex -xelatex -pdf -e '$$pdflatex=q/xelatex %O %S/' $(PAPER).tex \
         && cd ..
 

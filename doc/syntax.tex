@@ -8,14 +8,17 @@ Algebraic Data Types (GADTs) or the more general indexed
 families of Type Theory~\cite{dybjer1994inductive} for their deep embedding, they can
 \emph{statically} enforce some of the invariants present in
 their language. Managing the scope is a popular use case~\cite{altenkirch1999monadic} as
-directly manipulating raw de Bruijn indices is error-prone.
+directly manipulating raw de Bruijn indices is error-prone;
+solutions range from enforced well scopedness to full type
+and scope correctness.
 
-This paper starts with primers on scope safe terms, scope preserving
-programs acting on them and a generic way to represent data types.
-These introductory sections help us build an understanding of the
-problem at hand as well as a toolkit that leads us to the original
-content of this paper: a universe of scope safe syntaxes with binding
-together with a generic notion of scope safe semantics for these syntaxes.
+This paper starts with primers on scope safe terms, a scope and type
+safe variant as well as invariant preserving programs acting on them
+and a generic way to represent data types. These introductory sections
+help us build an understanding of the problem at hand as well as a
+toolkit that leads us to the original content of this paper: a universe
+of scope safe syntaxes with binding together with a generic notion of
+scope safe semantics for these syntaxes.
 This gives us the opportunity to write generic implementations of renaming,
 substitution but also elaboration of a surface language to a core one,
 and normalisation by evaluation. We also explore opportunities for
@@ -75,7 +78,7 @@ the large type \AB{I}\AF{─Scoped}:
 
 \begin{figure}[h]
 \ExecuteMetaData[var.tex]{scoped}
-\caption{Type of Well Typed and Scope Families}
+\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
 \end{figure}
 
 Our implementation language is Agda~\cite{norell2009dependently} however
@@ -93,13 +96,14 @@ surrounded by \AF{[\_]} which turns an indexed Set into a Set by implicitly
 quantifying over the index. The first two combinators are the pointwise liftings
 of the function space and the product type respectively, both silently threading
 the underlying scope. The third one is simply the constant function turning a Set
-into an indexed Set by ignoring the index. Finally, the last one makes explicit
-the \emph{adjustment} made to the index by a function. We use Agda's mixfix operator
-notation (where underscores denote argument positions) to suggest its connection
-to the mathematical convention of only mentioning context \emph{extensions} when
-presenting judgements (see e.g. \cite{martin1982constructive}) and write
-\AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T}
-the indexed set it operates on.
+into an indexed Set by ignoring the index. The fourth one makes explicit
+the \emph{adjustment} made to the index by a function. We use Agda's mixfix
+operator notation (where underscores denote argument positions) to suggest its
+connection to the mathematical convention of only mentioning context \emph{extensions}
+when presenting judgements (see e.g. \cite{martin1982constructive}) and write
+\AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed set
+it operates on. The last one implicitly quantifies over the index,
+turning a family into a Set.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -121,14 +125,16 @@ the indexed set it operates on.
 \caption{Combinators to build indexed Sets}\label{figure:indexed}
 \end{figure}
 
-For instance, the fairly compact expression
+
+These combinators lead to more readable type declarations. For instance,
+the compact expression
 \AF{[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⟶} \AB{R} \AF{]}
 corresponds to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
 Because the context comes second in the definition of \AF{\_─Scoped}, we
 can readily use these combinators to thread, modify or quantify over the
-scope when defining such families. We give two examples:
+scope when defining such families:
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -140,23 +146,23 @@ scope when defining such families. We give two examples:
 \caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
 \end{figure}
 
-The inductive family \AD{Var} corresponds to well scoped and well typed
+The inductive family \AD{Var} corresponds to well scoped and well kinded
 de Bruijn~\citeyear{de1972lambda}
 indices. Its first constructor (\AIC{z} for zero) states that we have a name to refer to
 the nearest binder in a non-empty scope. The second one (\AIC{s} for successor) lifts a
 name for a variable in a given scope into a name for it in the extended scope where
-an extra variable has been bound. Both of their types have been written using combinators,
-although we will abstain from unfolding them in the future, we do so here in the hope
+an extra variable has been bound. Both of their types have been written using combinators.
+Although we will abstain from unfolding them in the future, we do so here in the hope
 it will help the reader get acquainted with them: they respectively normalise to
 $\forall i, xs. \mathbf{Var}(i, i :: \mathit{xs})$ for \AIC{z},
 and $\forall i, j, xs. \mathbf{Var}(i, \mathit{xs}) \rightarrow \mathbf{Var}(i, j :: \mathit{xs})$ for \AIC{s}.
 
-The \AD{Type} \AF{─Scoped} family \AD{Lam} is the well typed variant of Altenkirch
+The \AD{Type} \AF{─Scoped} family \AD{Lam} is the simply typed variant of Altenkirch
 and Reus' untyped $\lambda$-calculus. The two interesting constructors are the one
 lifting variables to terms and the $\lambda$-abstraction whose body lives in an
 extended context.
 
-\section{A Primer on Type and Scope Safe Programs}\label{section:primer-program}
+\section{A Primer on Kind and Scope Safe Programs}\label{section:primer-program}
 
 This type and scope safe deep embedding of the simply typed $\lambda$-calculus is
 naturally only a start: once the programmer has access to a good
@@ -182,7 +188,7 @@ We wrote (\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ} for an environment with values
 in \AB{𝓥}. It associates to each variable in the scope \AB{Γ} a value of
 the appropriate type living in the scope \AB{Δ}. We define environemnts
 as records to help the host language's type inference reconstruct the type
-of values.
+of values they store.
 
 \begin{figure}[h]
 \ExecuteMetaData[environment.tex]{env}
@@ -202,7 +208,7 @@ have precisely achieved this goal and refactored renaming and substitution,
 but also normalisation by evaluation, printing with names or CPS conversion
 as various instances of a more general traversal. Unpublished results also
 demonstrate that typechecking in the style of Atkey~\citeyear{atkey2015algebraic}
-fits in that framework. To be able to make sense of this body of work, we
+fits in that framework. To make sense of this body of work, we
 need to introduce three new notions: \AF{Thinning}s, the \AF{□} functor and
 \AF{Thinnable}s.
 
@@ -213,7 +219,7 @@ need to introduce three new notions: \AF{Thinning}s, the \AF{□} functor and
 
 \AF{Thinning}s subsume more structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
-Embeddings~\cite{chapman2009type}. In particular, it does not prevent the
+Embeddings~\cite{chapman2009type}. In particular, they do not prevent the
 user from defining arbitrary permutations or from introducing contractions
 although we will not use such instances. Our representation is a function
 space which grants us monoid laws ``for free'' as per Jeffrey's
@@ -226,8 +232,8 @@ function space used in normalisation by evaluation via a domain \AB{D}.
 Because we can define an identity \AF{Thinning} and \AF{Thinning}s do
 compose, \AF{□} is a comonad.
 
-The notion of \AF{Thinnable} is the property of being stable under thinnings,
-in other words: \AF{Thinnable}s are the coalgebras of \AF{□}.
+The notion of \AF{Thinnable} is the property of being stable under thinnings;
+in other words \AF{Thinnable}s are the coalgebras of \AF{□}.
 It is a crucial property for values to have if one wants to be able to push
 them under binders. Unsurprisingly, from the comonadic structure we get that
 the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
@@ -304,8 +310,8 @@ All of these examples are already described at length by Allais, Chapman,
 McBride and McKinna~\citeyear{allais2017type} so we will not spend any
 more time on them. They have also obtained the simulation and fusion
 theorems demonstrating that these traversals are well-behaved as
-corollaries of more general results expressed in terms of that generic
-traversal. We will come back to this in Section~\ref{section:simulation}.
+corollaries of more general results expressed in terms of \AF{sem}.
+We will come back to this in Section~\ref{section:simulation}.
 
 One important observation to make is the tight connection between the
 constraint described by \AR{Sem} and the definition of \AD{Lam}: the
@@ -313,7 +319,7 @@ semantical combinators are related to the corresponding constructors
 where the recursive occurences of the inductive family have been replaced
 with either a computation or a Kripke function space whenever an
 extra variable was bound. This suggests that it ought to be possible
-to compute the definition of \AF{Sem} from the datatype.
+to compute the definition of \AF{Sem} from the datatype's.
 
 \section{A Primer on the Universe of Data Types}
 
@@ -327,59 +333,59 @@ of this construction we are interested in to build up our generic
 representation of syntaxes with binding.
 
 The first component of this universe's definition is an inductive type
-of \AD{Desc}riptions of strictly positive functors on $\Set{}$. It has
-three constructors: one to store data (the rest of the description can
-depend upon this stored value), one to attach a recursive substructure
-and one to stop.
-
-These constructors give the programmer the ability to build up the data
-types she is used to. For instance, the functor corresponding to lists
-of elements in $A$ stores one bit of data: whether the current node is
-the empty list or not. Depending on that bit, the rest of the description
-is either the ``stop'' token or a pair of an element in $A$ and a
-recursive substructure (i.e. the tail of the list).
-
-\begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[Generic/Data.tex]{desc}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[Generic/Data.tex]{listD}
-\end{minipage}
-\caption{Data Descriptions and List Description}\label{figure:listD}
-\end{figure}
+of \AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to
+$\Set{}^I$. It has three constructors: one to store data (the rest of
+the description can depend upon this stored value), one to attach a
+recursive substructure indexed by $J$ and one to stop, enforcing the
+value of the index the current structure uses.
 
 The recursive function \AF{⟦\_⟧} makes the interpretation of the
-Descriptions formal by associating a value in $\Set{}^\Set{}$ to
-each one of them. They essentially give rise to unit terminated
-right nested tuples. Together with \AF{⟦\_⟧}, we can define the
-\AF{fmap} recursive function witnessing the fact that the meaning
-of a description is indeed functorial. This is the first example
-of generic programming over all the functors one can obtain as
-the meaning of a description.
+Descriptions formal. They essentially give rise to equality
+terminated right nested tuples of stored data and substructures.
 
 \begin{figure}[h]
-\begin{minipage}{0.35\textwidth}
-\ExecuteMetaData[Generic/Data.tex]{interp}
+\hspace{-1em}\begin{minipage}{0.50\textwidth}
+\ExecuteMetaData[Generic/Data.tex]{desc}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.55\textwidth}
-\ExecuteMetaData[Generic/Data.tex]{fmap}
+\begin{minipage}{0.40\textwidth}
+\ExecuteMetaData[Generic/Data.tex]{interp}
 \end{minipage}
-\caption{Meaning of Descriptions and Proof of Functoriality}
+\caption{Datatype Descriptions and their Meaning as Functors}\label{figure:desc}
+\end{figure}
+
+These constructors give the programmer the ability to build up the data
+types she is used to, using a dummy index of unit type whenever she does
+not need the extra expressivity. For instance, the functor corresponding
+to lists of elements in $A$ stores one bit of data: whether the current
+node is the empty list or not. Depending on that bit, the rest of the
+description is either the ``stop'' token or a pair of an element in $A$
+and a recursive substructure (i.e. the tail of the list).
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Data.tex]{listD}
+\caption{The Description corresponding to Lists}\label{figure:listD}
+\end{figure}
+
+Together with \AF{⟦\_⟧} which acts on $\Set{}^J$, we can define the
+function \AF{fmap} by recursion over a code \AB{d}. It describes the
+action of the functor corresponding to \AB{d} over functions. This is
+the first example of generic programming over all the functors one can
+obtain as the meaning of a description.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Data.tex]{fmap}
+\caption{Action on Arrows of the Functor corresponding to a \AF{Descr}iption}
 \end{figure}
 
 All the functors obtained as meanings of \AD{Desc}riptions are strictly
-positive so we can build their least fixpoint \AD{μ} which is the initial
-algebra corresponding to \AB{d}'s meaning as proven by \AF{fold} \AB{d}.
+positive. So we can build the least fixpoint of the ones that are endofunctors
+(i.e. the ones for which $I$ equals $J$). This fixpoint is called \AD{μ}
+and its initiality is proven by the definition of \AF{fold} \AB{d}.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Generic/Data.tex]{mu}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Generic/Data.tex]{fold}
-\end{minipage}
-\caption{Fixpoint and Generic Fold}
+\caption{Least Fixpoint of an Endofunctor and Corresponding Generic Fold}
 \end{figure}
 
 Here the \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
@@ -393,7 +399,7 @@ based approach to termination checking the definition of \AF{fold} would
 be rejected and our only recourse would be to manually inline \AF{fmap}.
 However, in most definitions the \AD{Size} does not matter in which case
 we will simply use the primitive limit \AD{Size} \AF{∞} which is
-characterised by \AF{∞} = \AF{↑} \AF{∞}.
+characterised by \AF{∞} = \AF{↑} \AF{∞}. \todo{More pointers}
 
 This demonstrates that this approach allows us to define generically
 the iteration principle associated to all the datatypes which arise
@@ -403,10 +409,11 @@ so that we may be able to define generically a notion of semantics
 for all the syntaxes with binding one may come up with. Chapman,
 Dagand, McBride and Morris also give a more general universe which
 supports higher order branching (but still does not have a notion
-of variable). We decidedly stick to finitary constructors, thus
-sticking to the common understanding of `syntax'.
+of variable). We decidedly stick to finitely branching constructors
+(but still potentially infinitary ones because of the \AIC{`σ}
+constructor) thus sticking to the common understanding of `syntax'.
 
-\section{A Universe of Scope Safe Syntaxes}
+\section{A Universe of Scope Safe and Well Kinded Syntaxes}
 
 Our universe of scope safe syntaxes follows the same principle
 as McBride's universe of datatypes except that we are not building
@@ -417,8 +424,14 @@ depend upon the value stored), the second takes a natural number
 $m$ and corresponds to a substructure with exactly $m$ additional
 variable in scope and the last one ends the definition.
 
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Syntax.tex]{desc}
+\caption{Syntax Descriptions}
+\end{figure}
+
+\todo{FIX THIS}
 The meaning function \AF{⟦\_⟧} we associate to a description is not
-quite an endofunctor on $\Set{}^ℕ$; it is more general than that.
+quite an endofunctor on \AB{I} \AF{─Scoped}; it is more general than that.
 Given an $X$ that interprets substructures with an extra $m$ bound
 variables in a scope that has $n$ bound variables already as $X\,m\,n$,
 we give a description a meaning as an $\Set{}^ℕ$. The astute reader
@@ -429,25 +442,21 @@ combinators for indexed sets described in Figure~\ref{figure:indexed}
 which make our types much more readable.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[Generic/Syntax.tex]{desc}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Generic/Syntax.tex]{interp}
-\end{minipage}
-\caption{Syntax Descriptions and their Meaning as Functor}
+\caption{Decsription's Meanings as ``Functors''}
 \end{figure}
 
 If we pre-compose the meaning function \AF{⟦\_⟧} with a notion
-of `scope' (denoted \AF{Scope} here) which turns any \AD{ℕ}-indexed
-family into a function of type \AD{ℕ} \AS{→} \AD{ℕ} \AS{→} $\Set{}$
-by simply summing the two indices, we recover an endofunctor on
-$\Set{}^ℕ$ and we can take its fixpoint. This time, instead
-of considering the initial algebra, we opt for the free relative
-monad~\cite{JFR4389}: the \AIC{`var} constructor corresponds to
-return, and we will define bind (also known as \AF{sub}) in the next
-section. We have once more a \AD{Size} index to get all the benefits
-of type based termination checking.
+of `scope' (denoted \AF{Scope} here) which turns any \AB{I} \AF{─Scoped}
+family into a function of type \AD{List} \AB{I} \AS{→} \AB{I} \AF{─Scoped}
+by simply appending the two \AD{List} indices, we recover an endofunctor on
+\AB{I} \AF{─Scoped} and we can take its fixpoint. Because we want to define
+the terms of a language with variables, instead of considering the initial
+algebra, this time we opt for the free relative
+monad~\cite{JFR4389} (with respect to the functor \AF{Var}): the \AIC{`var}
+constructor corresponds to return, and we will define bind (also known as
+the parallel substitution \AF{sub}) in the next section. We have once more
+a \AD{Size} index to get all the benefits of type based termination checking.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
@@ -456,17 +465,27 @@ of type based termination checking.
 \begin{minipage}{0.35\textwidth}
 \ExecuteMetaData[Generic/Syntax.tex]{scope}
 \end{minipage}
-\caption{Term Trees: The Free Relative Monads on Descriptions}
+\caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}
 \end{figure}
 
-Coming back to the well-scoped untyped $\lambda$-calculus,
-we now have the ability to give its code. The variable
-constructor will be introduced by the free monad construction
-so we only have to describe two cases:
+Coming back to the well-scoped untyped (and simply typed)
+$\lambda$-calculus, we now have the ability to give its code.
+The variable constructor will be introduced by the free monad
+construction so we only have to describe two cases:
 the application case where we have two substructures which do
 not bind any extra argument and the $\lambda$-abstraction case
 which has exactly one substructure with precisely one extra
 bound variable.
+
+\begin{figure}[h]
+\begin{minipage}{0.40\textwidth}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCD}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.50\textwidth}
+  \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
+\end{minipage}
+\caption{Examples: The Untyped and Simply Typed Lambda Calculi}
+\end{figure}
 
 We can then define constructors corresponding
 to the original ones in Figure~\ref{scoped-untyped}: \AF{`V}
@@ -480,23 +499,13 @@ on encoded terms without dealing with the gnarly details
 of the encoding.
 
 \begin{figure}[h]
-\begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCD}
-\end{minipage}
-\begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LC}
-\end{minipage}
-
-\begin{minipage}{0.30\textwidth}
-  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{var}
-\end{minipage}
-\begin{minipage}{0.30\textwidth}
-  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{app}
+\begin{minipage}{0.40\textwidth}
+ \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCpat}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.30\textwidth}
-  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{lam}
+\begin{minipage}{0.50\textwidth}
+\ExecuteMetaData[Generic/Examples/STLC.tex]{patST}
 \end{minipage}
-\caption{Example: The Untyped Lambda Calculus}
+\caption{Pattern Synonyms for the Untyped and Simply-Typed Lambda Calculus}
 \end{figure}
 
 It is the second time (the first time being the definition of
