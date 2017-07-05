@@ -415,28 +415,27 @@ constructor) thus sticking to the common understanding of `syntax'.
 
 \section{A Universe of Scope Safe and Well Kinded Syntaxes}
 
-Our universe of scope safe syntaxes follows the same principle
-as McBride's universe of datatypes except that we are not building
-endofunctors on $\Set{}$ but rather $\Set{}^ℕ$. Descriptions can
-be built using three constructors: the first one makes it possible
-to store data (and, as usual, the rest of the description may
-depend upon the value stored), the second takes a natural number
-$m$ and corresponds to a substructure with exactly $m$ additional
-variable in scope and the last one ends the definition.
+Our universe of scope safe and well kinded syntaxes follows the same principle
+as Chapman, Dagand, McBride and Morris' universe of datatypes except that we
+are not building endofunctors on $\Set{}$ anymore but rather
+on \AB{I} \AF{─Scoped}. Descriptions can be built using three constructors:
+the first one makes it possible to store data (and, as usual, the rest of
+the description may depend upon the value stored), the second takes a list
+of the newly bound variables' kinds as well as the kind of the substructure
+living in that extended scope and the last one ends the definition.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{desc}
 \caption{Syntax Descriptions}
 \end{figure}
 
-\todo{FIX THIS}
 The meaning function \AF{⟦\_⟧} we associate to a description is not
 quite an endofunctor on \AB{I} \AF{─Scoped}; it is more general than that.
-Given an $X$ that interprets substructures with an extra $m$ bound
-variables in a scope that has $n$ bound variables already as $X\,m\,n$,
-we give a description a meaning as an $\Set{}^ℕ$. The astute reader
-may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $n$; however
-refactoring \AF{⟦\_⟧} to use the partially applied $X \_ n$ following
+Given an $X$ that interprets substructures of kind $j$ with an extra $Δ$ bound
+variables in a scope that has $Γ$ bound variables already as $X\,Δ\,j\,Γ$,
+we give a description a meaning as an \AB{I} \AF{─Scoped}. The astute reader
+may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $Γ$; however
+refactoring \AF{⟦\_⟧} to use the partially applied $X\,\_\,\_\,Γ$ following
 this observation would lead to a definition harder to use with the
 combinators for indexed sets described in Figure~\ref{figure:indexed}
 which make our types much more readable.
@@ -468,14 +467,16 @@ a \AD{Size} index to get all the benefits of type based termination checking.
 \caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}
 \end{figure}
 
-Coming back to the well-scoped untyped (and simply typed)
-$\lambda$-calculus, we now have the ability to give its code.
-The variable constructor will be introduced by the free monad
-construction so we only have to describe two cases:
-the application case where we have two substructures which do
-not bind any extra argument and the $\lambda$-abstraction case
-which has exactly one substructure with precisely one extra
-bound variable.
+Coming back to our original examples, we now have the ability to give
+codes for the well-scoped untyped $\lambda$-calculus and, just as well,
+the intrinsically typed simply typed $\lambda$-calculus.
+The variable case will be added by the free monad construction so we
+only have to describe two constructors: application where we have two
+substructures which do not bind any extra argument and $\lambda$-abstraction
+which has exactly one substructure with precisely one extra bound variable.
+In the typed case, we use \AIC{‵σ} to store crucial type information about
+the substructures and make sure that e.g. the application's functional
+argument's kind is a function type.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
@@ -488,15 +489,17 @@ bound variable.
 \end{figure}
 
 We can then define constructors corresponding
-to the original ones in Figure~\ref{scoped-untyped}: \AF{`V}
-for \AIC{V} the variable constructor, \AF{`A} for \AIC{A} the
-application one and \AF{`L} for \AIC{L} the $\lambda$-abstraction.
-In Agda, we can actually almost define these as
-pattern synonyms (the language currently does not allow the user
-to specify type annotations for her pattern synonyms), meaning
-that the end user can seemlessly write pattern-matching programs
-on encoded terms without dealing with the gnarly details
-of the encoding.
+to the original ones in Figure~\ref{scoped-untyped}: \AIC{`V}
+for \AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the
+application one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.
+In Agda, we can use pattern synonyms to define these. This means that
+the end user can seemlessly write pattern-matching programs on encoded
+terms without dealing with the gnarly details of the encoding.
+These pattern definitions can omit some arguments by using ``\AS{\_}'',
+in which case they will be filled in by unification just like any other
+implicit argument: there is no extra cost to using an encoding!
+The only downside is that the language currently does not allow the
+user to specify type annotations for her pattern synonyms.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
@@ -505,7 +508,7 @@ of the encoding.
 \begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[Generic/Examples/STLC.tex]{patST}
 \end{minipage}
-\caption{Pattern Synonyms for the Untyped and Simply-Typed Lambda Calculus}
+\caption{Respective Pattern Synonyms for the Untyped and Simply-Typed Lambda Calculus}
 \end{figure}
 
 It is the second time (the first time being the definition of
@@ -513,7 +516,8 @@ It is the second time (the first time being the definition of
 \AF{Bool} to distinguish between two constructors. In order
 to avoid re-encoding the same logic,
 the next section introduces combinators demonstrating that
-descriptions are closed under sums and products.
+descriptions are closed under finite sums and finite products
+of recursive positions.
 
 \subsection{Common Combinators and Their Properties}\label{desccomb}
 
@@ -535,14 +539,11 @@ one corresponding to the chosen branch.
 \caption{Descriptions are closed under Sums}
 \end{figure}
 
-Closure under product is however a bit more technical: it is
-defined by induction on the first description of the product.
-The definition is purely structural except for the ``stop''
-constructor which gets replaced by the second description. Because
-of the indirect nature of the definition of closure under
-products, it is convenient to have functions going back and
-forth between the interpretation of a product of descriptions
-and the product of their respective interpretations.
+Closure under product does not hold in general. Indeed, the
+equality constraints introduced by the two end tokens of two
+descriptions may be incompatible. So far, a limited form of
+closure (closure under finite product of recursive positions)
+has been sufficient for all of our use cases.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -673,12 +674,7 @@ herself by naming sub-expressions and then using these names to refer
 to the associated terms.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{ntimes}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{letcode}
-\end{minipage}
 \caption{Parallel Let Binding}
 \end{figure}
 
@@ -1008,6 +1004,10 @@ preserves sharing: pointers can not only refer to nodes above them
 but also across from them in the cyclic tree. This yields a much more
 involved binding structure which would be interesting in its own right.
 
+
+\section{Use cases}
+
+\todo{system F, etc.}
 
 \section{Conclusion}
 

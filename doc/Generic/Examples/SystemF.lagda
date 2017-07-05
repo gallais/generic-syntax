@@ -64,8 +64,8 @@ redex (Lam b)         = [Lam] <$> redex b
 redex _ = nothing
 
 fire : {Γ : List Kind} {t : SF Term Γ} → Redex t → SF Term Γ
-fire (applam b u)  = Sem.sem (Substitution system-F) (base vl^Tm ∙ u) b
-fire (AppLam b u)  = Sem.sem (Substitution system-F) (base vl^Tm ∙ u) b
+fire (applam b u)  = sub (base vl^Tm ∙ u) b
+fire (AppLam b u)  = sub (base vl^Tm ∙ u) b
 fire ([app-l] f t) = app (fire f) t
 fire ([app-r] f t) = app f (fire t)
 fire ([lam] b)     = lam (fire b)

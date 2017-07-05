@@ -6,7 +6,7 @@ open import Data.Bool
 open import Data.List.All
 open import Data.List.Base as L hiding ([_])
 open import Data.Product as P hiding (,_)
-open import Function
+open import Function hiding (case_of_)
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import var
@@ -70,16 +70,22 @@ module _ {I : Set} where
            if isLeft then d else e
 \end{code}
 %</sumcomb>
+\begin{code}
+module _ {I : Set} {d e : Desc I} {X : List I → I ─Scoped}
+         {A : Set} {i : I} {Γ : List I} where
+\end{code}
 %<*case>
 \begin{code}
- case : {d e : Desc I} {X : List I → I ─Scoped} {A : Set} {i : I} {Γ : List I} →
-        (⟦ d       ⟧ X i Γ → A) → (⟦ e       ⟧ X i Γ → A) → (⟦ d `+ e  ⟧ X i Γ → A)
+ case :  (⟦ d       ⟧ X i Γ → A) →
+         (⟦ e       ⟧ X i Γ → A) →
+         (⟦ d `+ e  ⟧ X i Γ → A)
 \end{code}
 %</case>
 \begin{code}
  case l r (true   , t) = l t
  case l r (false  , t) = r t
 
+module _ {I : Set} where
 -- Descriptions are closed under products of recursive positions
 \end{code}
 %<*paircomb>
@@ -93,7 +99,8 @@ module _ {I : Set} {X : List I → I ─Scoped} {i j k : I} {Γ : List I} where
 \end{code}
 %<*pairunpair>
 \begin{code}
- unXs :  (Δ : List I) → ⟦ `Xs Δ j i ⟧ X k Γ → All (λ i → X [] i Γ) Δ × X Δ j Γ × k ≡ i
+ unXs :  (Δ : List I) → ⟦ `Xs Δ j i ⟧ X k Γ →
+         All (λ i → X [] i Γ) Δ × X Δ j Γ × k ≡ i
 \end{code}
 %</pairunpair>
 \begin{code}

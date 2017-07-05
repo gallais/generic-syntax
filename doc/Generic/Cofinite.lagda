@@ -26,7 +26,7 @@ module _ {d : Desc ⊤} where
 %<*plug>
 \begin{code}
  plug : TM d tt → ∀ Δ i → Scope (Tm d ∞) Δ i [] → TM d i
- plug t Δ i = Sem.sem (Substitution d) (pack (λ _ → t))
+ plug t Δ i = Sem.sem Substitution (pack (λ _ → t))
 \end{code}
 %</plug>
 %<*unroll>

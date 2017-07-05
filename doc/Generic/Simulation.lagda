@@ -46,26 +46,26 @@ module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I → List I → Set} (�
    body ρ []       i t = sim ρ t
    body ρ (σ ∷ Δ)  i t = λ σ ρ′ → sim (ρ′ >>^R (th^R σ <$>^R ρ)) t
 
-module _ {I : Set} where
+module _ {I : Set} {d : Desc I} where
 
- VarTm^R : (d : Desc I) → Rel Var (Tm d ∞)
- VarTm^R d = mkRel (_≡_ ∘ `var)
+ VarTm^R : Rel Var (Tm d ∞)
+ VarTm^R = mkRel (_≡_ ∘ `var)
 
- vl^VarTm : (d : Desc I) → VarLike^R (VarTm^R d) vl^Var vl^Tm 
- VarLike^R.new^R  (vl^VarTm d) = refl
- VarLike^R.th^R   (vl^VarTm d) = λ σ → cong (Sem.sem (Renaming d) σ)
+ vl^VarTm : VarLike^R VarTm^R vl^Var vl^Tm 
+ VarLike^R.new^R  vl^VarTm = refl
+ VarLike^R.th^R   vl^VarTm = λ σ → cong (ren σ)
 
 
- RenSub : (d : Desc I) → Sim (VarTm^R d) Eq^R d (Renaming d) (Substitution d)
- Sim.var^R  (RenSub d) = id
- Sim.th^R   (RenSub d) = λ { _ refl → refl }
- Sim.alg^R  (RenSub d) = cong `con ∘ zip^reify (mkRel (_≡_ ∘ `var))
-                         (reify^R (VarTm^R d) Eq^R (vl^VarTm d)) d
+ RenSub : Sim VarTm^R Eq^R d Renaming Substitution
+ Sim.var^R  RenSub = id
+ Sim.th^R   RenSub = λ { _ refl → refl }
+ Sim.alg^R  RenSub = cong `con ∘ zip^reify (mkRel (_≡_ ∘ `var))
+                         (reify^R VarTm^R Eq^R vl^VarTm) d
 \end{code}
 %<*rensub>
 \begin{code}
- rensub :  {Γ Δ : List I} (d : Desc I) (ρ : Thinning Γ Δ) {i : I} (t : Tm d ∞ i Γ) →
-           Sem.sem (Renaming d) ρ t ≡ Sem.sem (Substitution d) (`var <$> ρ) t
- rensub d ρ = Sim.sim (RenSub d) (pack^R (λ _ → refl))
+ rensub :  {Γ Δ : List I} (ρ : Thinning Γ Δ) {i : I} (t : Tm d ∞ i Γ) →
+           Sem.sem Renaming ρ t ≡ Sem.sem Substitution (`var <$> ρ) t
+ rensub ρ = Sim.sim RenSub (pack^R (λ _ → refl))
 \end{code}
 %</rensub>

@@ -78,44 +78,46 @@ module _ {I : Set} where
    Sem.th^𝓥  semantics = th^𝓥 vl^𝓥
    Sem.alg   semantics = `con ∘ fmap d (reify vl^𝓥)
 
-sy^Var : {I : Set} {d : Desc I} → Syntactic d Var
-Syntactic.var    sy^Var = `var
-Syntactic.vl^𝓥  sy^Var = vl^Var
+module _ {I : Set} {d : Desc I} where
+
+ sy^Var : Syntactic d Var
+ Syntactic.var    sy^Var = `var
+ Syntactic.vl^𝓥  sy^Var = vl^Var
 \end{code}
 %<*renaming>
 \begin{code}
-Renaming : {I : Set} (d : Desc I) → Sem d Var (Tm d ∞)
-Sem.th^𝓥  (Renaming d) = λ k ρ → lookup ρ k
-Sem.var   (Renaming d) = `var
-Sem.alg   (Renaming d) = `con ∘ fmap d (reify vl^Var)
+ Renaming : Sem d Var (Tm d ∞)
+ Sem.th^𝓥  Renaming = λ k ρ → lookup ρ k
+ Sem.var   Renaming = `var
+ Sem.alg   Renaming = `con ∘ fmap d (reify vl^Var)
 
-ren :  {I : Set} {Γ Δ : List I} {i : I} → ∀ d → (Γ ─Env) Var Δ →
-       Tm d ∞ i Γ → Tm d ∞ i Δ
-ren d ρ t = Sem.sem (Renaming d) ρ t
+ ren :  {Γ Δ : List I} {i : I} → (Γ ─Env) Var Δ →
+        Tm d ∞ i Γ → Tm d ∞ i Δ
+ ren ρ t = Sem.sem Renaming ρ t
 \end{code}
 %</renaming>
 \begin{code}
-th^Tm : {I : Set} {d : Desc I} {i : I} → Thinnable (Tm d ∞ i)
-th^Tm t ρ = Sem.sem (Renaming _) ρ t
+ th^Tm : {i : I} → Thinnable (Tm d ∞ i)
+ th^Tm t ρ = Sem.sem Renaming ρ t
 
-vl^Tm : {I : Set} {d : Desc I} → VarLike (Tm d ∞)
-new   vl^Tm = `var z
-th^𝓥  vl^Tm = th^Tm
+ vl^Tm : VarLike (Tm d ∞)
+ new   vl^Tm = `var z
+ th^𝓥  vl^Tm = th^Tm
 
-sy^Tm : {I : Set} {d : Desc I} → Syntactic d (Tm d ∞)
-Syntactic.var   sy^Tm = id
-Syntactic.vl^𝓥  sy^Tm = vl^Tm
+ sy^Tm : Syntactic d (Tm d ∞)
+ Syntactic.var   sy^Tm = id
+ Syntactic.vl^𝓥  sy^Tm = vl^Tm
 
 \end{code}
 %<*substitution>
 \begin{code}
-Substitution : {I : Set} (d : Desc I) → Sem d (Tm d ∞) (Tm d ∞)
-Sem.th^𝓥  (Substitution d) = λ t ρ → Sem.sem (Renaming d) ρ t
-Sem.var   (Substitution d) = id
-Sem.alg   (Substitution d) = `con ∘ fmap d (reify vl^Tm)
+ Substitution : Sem d (Tm d ∞) (Tm d ∞)
+ Sem.th^𝓥  Substitution = λ t ρ → Sem.sem Renaming ρ t
+ Sem.var   Substitution = id
+ Sem.alg   Substitution = `con ∘ fmap d (reify vl^Tm)
 
-sub : {I : Set} {Γ Δ : List I} {i : I} → ∀ d → (Γ ─Env) (Tm d ∞) Δ →
-      Tm d ∞ i Γ → Tm d ∞ i Δ
-sub d ρ t = Sem.sem (Substitution d) ρ t
+ sub : {Γ Δ : List I} {i : I} → (Γ ─Env) (Tm d ∞) Δ →
+       Tm d ∞ i Γ → Tm d ∞ i Δ
+ sub ρ t = Sem.sem Substitution ρ t
 \end{code}
 %</substitution>

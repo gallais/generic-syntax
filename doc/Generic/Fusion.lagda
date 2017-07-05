@@ -55,13 +55,13 @@ module _  {I : Set} {𝓥₁ 𝓥₂ 𝓥₃ 𝓒₁ 𝓒₂ 𝓒₃ : I → Lis
 
 module _ {I : Set} (d : Desc I) where
 
- Ren² : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d (Renaming d) (Renaming d) (Renaming d)
+ Ren² : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d Renaming Renaming Renaming
  Fus.quote₁ Ren² = λ _ t → t
  Fus.vl^𝓥₁ Ren² = vl^Var
  Fus.var^R  Ren² = λ ρ^R v → cong `var (lookup^R ρ^R v)
  Fus.alg^R  Ren² = λ z → cong `con {!!}
 
  ren² : ∀ {Γ Δ Θ i} (t : Tm d ∞ i Γ) (ρ₁ : Thinning Γ Δ) (ρ₂ : Thinning Δ Θ) →
-        ren d ρ₂ (ren d ρ₁ t) ≡ ren d (select ρ₁ ρ₂) t
+        ren ρ₂ (ren ρ₁ t) ≡ ren (select ρ₁ ρ₂) t
  ren² t ρ₁ ρ₂ = Fus.fus Ren² (pack^R (λ _ → refl)) t
 \end{code}

@@ -21,17 +21,19 @@ module _ {I : Set} where
 %<*letcode>
 \begin{code}
  Let : Desc I
- Let =  `σ (List I) $ λ Δ →
-        `σ I        $ λ i →
-        `Xs Δ i i
+ Let = `σ (List I) $ λ Δ → `σ I $ λ i → `Xs Δ i i
 \end{code}
 %</letcode>
+\begin{code}
+module _ {I : Set} {d : Desc I} where
+\end{code}
 %<*unletcode>
 \begin{code}
-UnLet : (I : Set) (d : Desc I) → Sem (Let `+ d) (Tm d ∞) (Tm d ∞)
-Sem.th^𝓥  (UnLet I d) = th^Tm
-Sem.var   (UnLet I d) = id
-Sem.alg   (UnLet I d) = case alg' (Sem.alg (Substitution d))
+ UnLet : Sem (Let `+ d) (Tm d ∞) (Tm d ∞)
+ Sem.th^𝓥  UnLet = th^Tm
+ Sem.var   UnLet = id
+ Sem.alg   UnLet =
+   case alg' (Sem.alg Substitution)
 \end{code}
 %</unletcode>
 \begin{code}
@@ -56,7 +58,7 @@ Sem.alg   (UnLet I d) = case alg' (Sem.alg (Substitution d))
 \end{code}
 %<*unlet>
 \begin{code}
-unlet : {I : Set} {d : Desc I} {i : I} → [ Tm (Let `+ d) ∞ i ⟶ Tm d ∞ i ]
-unlet = Sem.sem (UnLet _ _) (pack `var)
+ unlet : {i : I} → [ Tm (Let `+ d) ∞ i ⟶ Tm d ∞ i ]
+ unlet = Sem.sem UnLet (pack `var)
 \end{code}
 %</unlet>
