@@ -113,3 +113,21 @@ th^Kr : {𝓥 𝓒 : I ─Scoped}
 th^Kr []       th^𝓒 = th^𝓒
 th^Kr (_ ∷ _)  th^𝓒 = th^□
 \end{code}
+
+
+\begin{code}
+open import Category.Applicative
+
+module _ {𝓥 : I ─Scoped} {A : Set → Set} (app : RawApplicative A) where
+
+ private module A = RawApplicative app
+ open A
+
+ traverse : {Γ Δ : List I} → (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
+ traverse = go _ where
+
+   go : ∀ Γ {Δ} → (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
+   go []       ρ = pure ε
+   go (σ ∷ Γ)  ρ = flip _∙_ A.<$> lookup ρ z ⊛ go Γ (select extend ρ)
+
+\end{code}

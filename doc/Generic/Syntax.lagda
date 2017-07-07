@@ -11,7 +11,7 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import var
 open import indexed 
-open import environment as E hiding (refl)
+open import environment as E hiding (refl ; traverse)
 
 -- Descriptions and their Interpretation
 

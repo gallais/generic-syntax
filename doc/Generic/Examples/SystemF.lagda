@@ -80,6 +80,9 @@ eval Γ t with redex t
 ... | just r  = t ∷ ♯ eval Γ (fire r)
 ... | nothing = t ∷ ♯ []
 
+`id : SF Term []
+`id = Lam (lam (`var z))
+
 _ : eval [] (lam (lam (app (lam (app (`var z) (`var z))) (lam (`var z)))))
   ≈ (_ ∷ ♯ (_ ∷ ♯ (lam (lam (lam (`var z))) ∷ ♯ [])))
 _ = _ ∷ ♯ (_ ∷ ♯ (_ ∷ ♯ []))
