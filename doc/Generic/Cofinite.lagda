@@ -15,9 +15,9 @@ module _ {I : Set} where
 %<*cotm>
 \begin{code}
  record ∞Tm (d : Desc I) (s : Size) (i : I) : Set where
-   coinductive
-   constructor `con
-   field force : {s′ : Size< s} → ⟦ d ⟧ (λ _ i _ → ∞Tm d s′ i) i []
+   coinductive; constructor `con
+   field force :  {s' : Size< s} →
+                  ⟦ d ⟧ (λ _ i _ → ∞Tm d s' i) i []
 \end{code}
 %</cotm>
 \begin{code}
@@ -41,6 +41,6 @@ module _ {d : Desc ⊤} where
 %<*unfold>
 \begin{code}
  unfold : {s : Size} → TM d tt → ∞Tm d s tt
- ∞Tm.force (unfold t′) = fmap d (λ _ _ → unfold) (unroll t′)
+ ∞Tm.force (unfold t) = fmap d (λ _ _ → unfold) (unroll t)
 \end{code}
 %</unfold>

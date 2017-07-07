@@ -1,5 +1,5 @@
 \begin{code}
-module Generic.Examples.TypeCheckin where
+module Generic.Examples.TypeChecking where
 
 open import Size
 open import Function
@@ -62,22 +62,30 @@ pattern `emb t    = `con (false , false , false , t , refl)
 Type- : Phase → Set
 Type- Check  = Type →  Maybe ⊤
 Type- Infer  =         Maybe Type
-
+\end{code}
+%</typemode>
+%<*varmode>
+\begin{code}
 Var- : Phase → Set
 Var- _ = Type
 \end{code}
-%</typemode>
+%</varmode>
 %<*typecheck>
 \begin{code}
 Typecheck : Sem Lang (const ∘ Var-) (const ∘ Type-)
-Typecheck = record
-  { th^𝓥  = λ v ρ → v
-  ; var    = λ { {Infer} → just ; {Check} → _==_ }
-  ; alg    = case app $ case lam $ case cut emb }
 \end{code}
 %</typecheck>
 \begin{code}
+Typecheck = record
+  { th^𝓥  = λ v ρ → v
+  ; var    = var
+  ; alg    = case app $ case lam $ case cut emb }
+
   where
+
+   var : {i : Phase} → Var- i → Type- i
+   var {Infer} = just
+   var {Check} = _==_
 
    app : {i : Phase} → Type- Infer × Type- Check × i ≡ Infer → Type- i
    app (f , t , refl) =  f            >>= λ σ⇒τ →

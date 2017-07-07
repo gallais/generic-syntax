@@ -521,7 +521,7 @@ of recursive positions.
 
 \subsection{Common Combinators and Their Properties}\label{desccomb}
 
-As we have seen previously, we can take the coproduct of two
+As seen previously, we can take the coproduct \AF{\_`+\_} of two
 descriptions by using a dependent pair whose first component
 stores a \AF{Bool}ean tagging which branch was taken whilst
 the second one uses that information to return the description
@@ -543,7 +543,9 @@ Closure under product does not hold in general. Indeed, the
 equality constraints introduced by the two end tokens of two
 descriptions may be incompatible. So far, a limited form of
 closure (closure under finite product of recursive positions)
-has been sufficient for all of our use cases.
+has been sufficient for all of our use cases. As with coproducts,
+the appropriate eliminator \AF{unXs} takes a value in the encoding
+and extracts its constituents.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -552,70 +554,102 @@ has been sufficient for all of our use cases.
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{pairunpair}
 \end{minipage}
-\caption{Descriptions are closed under Products}
+\caption{Descriptions are closed under Finite Products of Recursive Positions}
 \end{figure}
 
-
-\section{Generic Scope Safe Programs for Syntaxes}\label{section:semantics}
+\section{Generic Scope Safe and Well Kinded Programs for Syntaxes}\label{section:semantics}
 
 Based on the structure made explicit in the example worked out
 in Section~\ref{section:primer-program}, we can define a generic notion of
 semantics for all syntax descriptions. It is once more parametrised
-by two \AD{ℕ}-indexed families \AB{𝓥} and \AB{𝓒} corresponding
+by two \AB{I}\AF{─Scoped} families \AB{𝓥} and \AB{𝓒} corresponding
 respectively to values associated to bound variables and
 computations delivered by evaluating terms. These two families
 have to abide by three constraints
 \begin{itemize}
-\item Values should be thinnable for us to be able to push the
+\item Values should be thinnable so that we can push the
       evaluation environment under binders;
-\item Values should embed into computations for us to be able
+\item Values should embed into Computations for us to be able
       to the return the value associated to a variable as the
       result of its evaluation;
 \item Last but not least, we should have an algebra turning
       a term where substructures have been replaced with
-      either computations or Kripke functional spaces (depending
+      either Computations or Kripke functional spaces (depending
       on whether extra bound variables have been introduced)
-      into computations
+      into Computations
 \end{itemize}
-Here we crucially use the fact that the meaning of a description is
+We crucially use the fact that the meaning of a description is
 defined in terms of a function interpreting substructures which has
-the type \AD{ℕ} \AS{→} \AD{ℕ} \AS{→} $\Set{}$, i.e. that gets access
-to the current scope but also the exact number of newly-bound variables.
+the type \AF{List} \AB{I} \AS{→} \AB{I}\AF{─Scoped}, i.e. that gets access
+to the current scope but also the exact list of the newly bound variables' kinds.
 We define such a function, \AF{Kripke}, by case analysis on the number
-of newly-bound variables: if it's $0$ then we expect the substructure
-to simply be a computation (the result of the evaluation function's
+of newly bound variables: if it's $0$ we expect the substructure
+to be a computation (the result of the evaluation function's
 recursive call) but if there are newly bound variables then we expect
-a function which takes one value for each one of them and delivers
-a computation corresponding to the evaluation of the body of the binder
-in the extended environment.
+a function which takes one value for each one of these extra variables
+and delivers a computation corresponding to the evaluation of the body
+of the binder in the extended environment.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.35\textwidth}
   \ExecuteMetaData[environment.tex]{kripke}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.55\textwidth}
   \ExecuteMetaData[Generic/Semantics.tex]{semantics}
 \end{minipage}
 \caption{A Generic Notion of Semantics}
 \end{figure}
 
 It is once more the case that the abstract notion of Semantics comes
-with a fundamental lemma: all \AD{ℕ}-indexed families \AB{𝓥} and
+with a fundamental lemma: all \AB{I}\AF{─Scoped} families \AB{𝓥} and
 \AB{𝓒} satisfying the three criteria we have put forward give rise
-to an evaluation function. Here the fundamental lemma is called \AF{sem}
-and it is defined mutually with a function \AF{body} turning a \AF{Scope}
-(i.e. a substructure in a potentially extended context) into a \AF{Kripke}
-(i.e. a subcomputation expecting a value for each newly bound variable).
+to an evaluation function. We introduce a notion of computation
+\AF{\_─Comp} analogous to that of environments: instead of associating
+values to variables, it associates computations to terms.
 
 \begin{figure}[h]
-{\center \ExecuteMetaData[Generic/Semantics.tex]{sembody}}
-\hspace{-1em}\begin{minipage}{0.40\textwidth}
-\ExecuteMetaData[Generic/Semantics.tex]{sem}
+\ExecuteMetaData[Generic/Semantics.tex]{comp}
+\caption{\AF{\_─Comp}: Associating Computations to Terms}
+\end{figure}
+
+We can then define the type of the fundamental lemma (called \AF{sem}) as
+a function from environments to computations. It is defined mutually with a
+function \AF{body} turning a \AF{Scope} (i.e. a substructure in a
+potentially extended context) into a \AF{Kripke} (i.e. a subcomputation
+expecting a value for each newly bound variable).
+
+\begin{figure}
+\ExecuteMetaData[Generic/Semantics.tex]{semtype}
+\caption{Statement of the Fundamental Lemma of \AR{Sem}antics}
+\end{figure}
+
+The proof \AF{sem} of this fundamental lemma is straightforward now
+that we have clearly identified what the problem's structure is and
+which constraints to enforce. If the term considered is a variable,
+we simply lookup the associated value in the evaluation environment
+and turn it into a computation using \ARF{var}. If it is a proper
+node then we call \AF{fmap} to evaluate the substructures using
+\AF{body} and then call the \ARF{alg}ebra to combine these results.
+The auxiliary lemma \AF{body} distinguishes two cases: if no new
+variable has been bound in the recursive substructure, it is simply
+a matter of calling \AF{sem} recursively, otherwise we are provided
+with a \AF{Thinning}, some additional values and evaluate the
+substructure in the thinned and extended evaluation environment.
+
+Because \AF{fmap} introduces one level of indirection between the
+recursive calls and the subterms they are acting upon, the fact
+that our terms are indexed by a \AF{Size} is crucial in getting the
+termination checker to see that our proof is indeed trivially
+well-founded.
+
+\begin{figure}[h]
+\begin{minipage}{0.35\textwidth}
+\hspace{-2em}\ExecuteMetaData[Generic/Semantics.tex]{sem}
 \end{minipage}\hspace{2em}
-\hspace{-1em}\begin{minipage}{0.50\textwidth}
+\begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Generic/Semantics.tex]{body}
 \end{minipage}
-\caption{Fundamental Lemma of \AR{Sem}antics}
+\caption{Proof of the Fundamental Lemma of \AR{Sem}antics}
 \end{figure}
 
 Renaming can be defined generically for all syntax descriptions as a
@@ -635,18 +669,9 @@ Substitution can be defined in a similar manner. Of the two
 constraints applying to terms as values, the first one corresponds
 precisely to renaming and the second one is trivial. The algebra
 can once more be defined by using \AF{fmap} and reifying the bodies
-of binders. This reification process can be implemented generically
-for semantics which have ``VarLike'' values i.e. values that are
-thinnable and such that we can craft dummy ones in non-empty contexts.
+of binders.
 
 \begin{figure}[h]
-\begin{minipage}{0.40\textwidth}
-  \ExecuteMetaData[varlike.tex]{varlike}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.50\textwidth}
-  \ExecuteMetaData[Generic/Semantics.tex]{reify}
-\end{minipage}
-
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics.tex]{renaming}
 \end{minipage}\hspace{2em}
@@ -656,10 +681,22 @@ thinnable and such that we can craft dummy ones in non-empty contexts.
 \caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding}
 \end{figure}
 
+The reification process mentioned in the definition of renaming
+and substitution can be implemented generically for \AR{Sem}antics
+families which have \AR{VarLike} values i.e. values that are thinnable
+and such that we can craft dummy ones in non-empty contexts.
+
+\begin{figure}[h]
+\begin{minipage}{0.40\textwidth}
+  \ExecuteMetaData[varlike.tex]{varlike}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.50\textwidth}
+  \ExecuteMetaData[Generic/Semantics.tex]{reify}
+\end{minipage}
+\caption{Generic Reification thanks to \AR{VarLike} Values}
+\end{figure}
 
 \section{Other Generic Programs}
-
-\subsection{Sugar and Desugaring as a Semantics}
 
 One of the advantages of having a universe of programming languages
 descriptions is the ability to concisely define an \emph{extension}
@@ -669,9 +706,16 @@ This is made extremely simple by the
 disjoint sum combinator \AF{\_`+\_} which we have already seen
 in Section~\ref{desccomb}.
 An example of such an extension is the addition of let-bindings to
-an existing language. Let bindings allow the user to avoid repeating
-herself by naming sub-expressions and then using these names to refer
-to the associated terms.
+an existing language.
+
+\subsection{Sugar and Desugaring as a Semantics}
+
+Let bindings allow the user to avoid repeating herself by naming
+sub-expressions and then using these names to refer to the associated
+terms. Preprocessors adding these type of mechanisms to existing
+languages (from C to CSS) are rather popular. We introduce \AF{Let},
+a description of such let bindings which can be used to extend any
+language description \AB{d} to \AF{Let} \AF{`+} \AB{d}:
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{letcode}
@@ -700,10 +744,10 @@ of space). The process of removing let binders is kickstarted with a
 dummy environment associating each variable to itself.
 
 \begin{figure}[h]
-\begin{minipage}{0.50\textwidth}
+\begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unletcode}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.40\textwidth}
+\begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unlet}
 \end{minipage}
 \caption{Inlining Let Binding}
@@ -716,7 +760,6 @@ own setting working on a given language, Allais, Chapman, McBride
 and McKinna~\citeyear{allais2017type} have shown that it is similarly
 possible to implement a Continuation Passing Style transformation as
 a semantics.
-
 The ease with which one can define such generic transformations
 suggests that this setup could be a good candidate to implement
 generic compilation passes.
@@ -726,15 +769,15 @@ generic compilation passes.
 A key type of traversal we have not studied yet is a language's
 evaluator. Our universe of syntaxes with binding does not impose
 any typing discipline on the user defined languages and as such
-cannot guarantee their totality. This is embodied by our running
-example: the untyped $\lambda$-calculus. As a consequence there
+cannot guarantee their totality. This is embodied by one of our running
+examples: the untyped $\lambda$-calculus. As a consequence there
 is no hope for a safe generic framework to define normalisation
 functions.
 
 The clear connection between the \AF{Kripke} functional space
 characteristic of our semantics and the one that shows up in
 normalisation by evaluation suggests we ought to manage to
-give a generic framework for normalisation by evaluation.
+give an unsafe generic framework for normalisation by evaluation.
 By temporarily \textbf{disabling Agda's positivity checker},
 we can define a generic reflexive domain \AD{Dm} in which to
 interpret our syntaxes. It has three constructors corresponding
@@ -780,7 +823,6 @@ $\lambda$-abstraction, we can fire the redex by using the Kripke
 functional space; otherwise we grow the spine of stuck
 applications.
 
-
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
 \caption{Normalisation by Evaluation for the Untyped $\lambda$-Calculus}
@@ -788,19 +830,41 @@ applications.
 
 \subsection{An Algebraic Approach to Typechecking}
 
-Following Bob Atkey, we can consider type checking and inference
-as the semantics of bi-directional (thus bi-sorted) language.
-The computation type here correspond to either a checking function
-or a returned \AD{Type} if the expression considered is \AIC{Infer}.
-
-\todo{more}
+Following Bob Atkey~\citeyear{atkey2015algebraic}, we can consider
+type checking and inference as the semantics of a
+bi-directional~\cite{pierce2000local} language. We represent it as
+a bi-sorted language using a notion of \AD{Phase} to distinguish
+between terms for which we will be able to \AIC{Infer} the type
+and the ones for which we will have to \AIC{Check} a type candidate.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Examples/ElaborationType.tex]{bidirectional}
-\ExecuteMetaData[Generic/Examples/ElaborationType.tex]{typemode}
-\ExecuteMetaData[Generic/Examples/ElaborationType.tex]{typecheck}
+\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{bidirectional}
+\caption{A Bidirectional Simply-Typed Language}
+\end{figure}
+
+The values stored in the environment will be \AD{Type} information
+for bound variables whilst the generated computations will, depending
+on the phase, either take a type candidate and \AIC{Check} it is valid
+or \AIC{Infer} a type for their argument.
+
+\begin{figure}[h]
+\begin{minipage}{0.40\textwidth}
+\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{varmode}
+\end{minipage}
+\begin{minipage}{0.50\textwidth}
+\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{typemode}
+\end{minipage}
+\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{typecheck}
 \caption{Type- Inference / Checking as a Semantics}
 \end{figure}
+
+In about a dozen lines of code we have defined a typechecker for
+this simple language by leveraging the \AF{Sem}antics framework.
+The code attach to this paper also contains a variant with more
+informative types: instead of simply generating a type or checking
+that a candidate will do, we can use our \AD{Desc}riptions to
+describe a language of evidence and generate not only an expression's
+term but also a well scoped and well typed term of that type.
 
 \subsection{Binding as Self-Reference: Representing Cyclic Structures}
 
@@ -815,22 +879,22 @@ the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
 \AD{Tm} \AB{d} \AF{∞} \AN{0}).
 
 A basic example of such a structure is a potentially cyclic list which
-offers a choice of two constructors: nil which ends the list and cons
-which combines a head and a tail but also acts as a binder for a
-self-reference. We can see this approach in action in the example \AF{01↺}
-which describes a cyclic list starting with 0, then 1, and then
+offers a choice of two constructors: \AIC{[]} which ends the list and
+\AIC{\_::\_} which combines a head and a tail but also acts as a binder
+for a self-reference. We can see this approach in action in the example
+\AF{01↺} which describes a cyclic list starting with 0, then 1, and then
 repeats the whole list again by referring to the first cons cell
-represented here by the variable \AIC{suc} \AIC{zero}.
+represented here by the de Bruijn variable 1 (i.e. \AIC{s} \AIC{z}).
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[Generic/Cofinite.tex]{clistD}
-  \ExecuteMetaData[Generic/Cofinite.tex]{clistpat}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistD}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistpat}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.35\textwidth}
   \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones}
 \end{minipage}
-\caption{Potentially Cyclic Lists: Description and Example}
+\caption{Potentially Cyclic Lists: Description, Pattern Synonyms and Examples}
 \end{figure}
 
 These finite representations are interesting in their own right
@@ -887,12 +951,10 @@ co-recursively unfolding all the subterms.
 We can see that this universe of descriptions allows us to
 implement generic functions once and for all. Even if the
 powerful notion of semantics described in Section~\ref{section:semantics}
-cannot encompass all the traversals we may interested in,
+cannot encompass all the traversals we may be interested in,
 it provides us with reusable building blocks: the definition
 of \AF{unfold} was made very simple by reusing the generic
 program \AF{fmap} and the \AF{Substitution} semantics.
-
-
 
 \section{Building Generic Proofs about Generic Programs}\label{section:simulation}
 

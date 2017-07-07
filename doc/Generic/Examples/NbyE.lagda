@@ -21,9 +21,9 @@ open import Generic.Semantics
 \begin{code}
 {-# NO_POSITIVITY_CHECK #-}
 data Dm {I : Set} (d : Desc I) : Size → I →  List I → Set where 
-  V : {s : Size} {i : I} → [ Var i                              ⟶  Dm d s i      ]
-  C : {s : Size} {i : I} → [ ⟦ d ⟧ (Kripke (Dm d s) (Dm d s)) i ⟶  Dm d (↑ s) i  ]
-  ⊥ : {s : Size} {i : I} → [                                        Dm d (↑ s) i  ]
+  V : {s : Size} {i : I} → [ Var i                               ⟶  Dm d s      i  ]
+  C : {s : Size} {i : I} → [ ⟦ d ⟧ (Kripke (Dm d s) (Dm d s)) i  ⟶  Dm d (↑ s)  i  ]
+  ⊥ : {s : Size} {i : I} → [                                        Dm d (↑ s)   i  ]
 \end{code}
 %</domain>
 \begin{code}
@@ -81,6 +81,6 @@ norm^LC = norm $ case app (C ∘ (false ,_)) where
 \begin{code}
 open import Relation.Binary.PropositionalEquality hiding ([_] ; refl)
 
-example : norm^LC (`A `id (`A `id `id)) ≡ just `id
-example = refl
+_ : norm^LC (`A `id (`A `id `id)) ≡ just `id
+_ = refl
 \end{code}

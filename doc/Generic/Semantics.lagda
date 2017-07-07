@@ -13,45 +13,49 @@ open import indexed
 open import environment as E hiding (refl)
 open import Generic.Syntax
 
+module _ {I : Set} where
+
+ Alg : (d : Desc I) (𝓥 𝓒 : I ─Scoped) → Set
+ Alg d 𝓥 𝓒 = {i : I} → [ ⟦ d ⟧ (Kripke 𝓥 𝓒) i ⟶ 𝓒 i ]
+
+module _ {I : Set} {d : Desc I} where
 \end{code}
+%<*comp>
+\begin{code}
+ _─Comp : List I → I ─Scoped → List I → Set
+ (Γ ─Comp) 𝓒 Δ = {s : Size} {i : I} → Tm d s i Γ → 𝓒 i Δ
+\end{code}
+%</comp>
 %<*semantics>
 \begin{code}
-Alg : {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) → Set
-Alg {I} d 𝓥 𝓒 = {i : I} → [ ⟦ d ⟧ (Kripke 𝓥 𝓒) i ⟶ 𝓒 i ]
-
 record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
-  field  th^𝓥   : {i : I} → Thinnable (𝓥 i)
-         var    : {i : I} → [ 𝓥 i                  ⟶ 𝓒 i ]
-         alg    : Alg d 𝓥 𝓒
+ field  th^𝓥   : {i : I} → Thinnable (𝓥 i)
+        var    : {i : I} → [ 𝓥 i                   ⟶ 𝓒 i ]
+        alg    : {i : I} → [ ⟦ d ⟧ (Kripke 𝓥 𝓒) i  ⟶ 𝓒 i ]
 \end{code}
 %</semantics>
-
-%<*sembody>
+%<*semtype>
 \begin{code}
-  _─Comp : (Γ : List I) (𝓒 : I ─Scoped) (Δ : List I) → Set
-  (Γ ─Comp) 𝓒 Δ = {s : Size} {i : I} → Tm d s i Γ → 𝓒 i Δ
-
-  sem   :  {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
-  body  :  {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ →
-           ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
+ sem   :  {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
+ body  :  {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
 \end{code}
-%</sembody>
+%</semtype>
 %<*sem>
 \begin{code}
-  sem ρ (`var k) = var (lookup ρ k)
-  sem ρ (`con t) = alg (fmap d (body ρ) t)
+ sem ρ (`var k) = var (lookup ρ k)
+ sem ρ (`con t) = alg (fmap d (body ρ) t)
 \end{code}
 %</sem>
 %<*body>
 \begin{code}
-  body ρ []       i t = sem ρ t
-  body ρ (_ ∷ _)  i t = λ ren vs → sem (vs >> th^Env th^𝓥 ρ ren) t
+ body ρ []       i t = sem ρ t
+ body ρ (_ ∷ _)  i t = λ σ vs → sem (vs >> th^Env th^𝓥 ρ σ) t
 \end{code}
 %</body>
 %<*closed>
 \begin{code}
-  closed : ([] ─Comp) 𝓒 []
-  closed = sem ε
+ closed : ([] ─Comp) 𝓒 []
+ closed = sem ε
 \end{code}
 %</closed>
 \begin{code}
@@ -62,8 +66,8 @@ module _ {I : Set} where
 \begin{code}
  reify : {𝓥 𝓒 : I ─Scoped} → VarLike 𝓥 →
          {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
- reify vl^𝓥 []        i b = b
- reify vl^𝓥 Δ@(_ ∷ _) i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
+ reify vl^𝓥 []         i b = b
+ reify vl^𝓥 Δ@(_ ∷ _)  i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
 \end{code}
 
 %</reify>
@@ -87,13 +91,14 @@ module _ {I : Set} {d : Desc I} where
 %<*renaming>
 \begin{code}
  Renaming : Sem d Var (Tm d ∞)
- Sem.th^𝓥  Renaming = λ k ρ → lookup ρ k
- Sem.var   Renaming = `var
- Sem.alg   Renaming = `con ∘ fmap d (reify vl^Var)
+ Renaming = record
+   { th^𝓥  = λ k ρ → lookup ρ k
+   ; var   = `var
+   ; alg   = `con ∘ fmap d (reify vl^Var) }
 
- ren :  {Γ Δ : List I} {i : I} → (Γ ─Env) Var Δ →
-        Tm d ∞ i Γ → Tm d ∞ i Δ
- ren ρ t = Sem.sem Renaming ρ t
+ ren :  {Γ Δ : List I} → (Γ ─Env) Var Δ →
+        (Γ ─Comp) (Tm d ∞) Δ
+ ren = Sem.sem Renaming
 \end{code}
 %</renaming>
 \begin{code}
@@ -112,12 +117,13 @@ module _ {I : Set} {d : Desc I} where
 %<*substitution>
 \begin{code}
  Substitution : Sem d (Tm d ∞) (Tm d ∞)
- Sem.th^𝓥  Substitution = λ t ρ → Sem.sem Renaming ρ t
- Sem.var   Substitution = id
- Sem.alg   Substitution = `con ∘ fmap d (reify vl^Tm)
+ Substitution = record
+   { th^𝓥  = λ t ρ → ren ρ t
+   ; var   = id
+   ; alg   = `con ∘ fmap d (reify vl^Tm) }
 
- sub : {Γ Δ : List I} {i : I} → (Γ ─Env) (Tm d ∞) Δ →
-       Tm d ∞ i Γ → Tm d ∞ i Δ
- sub ρ t = Sem.sem Substitution ρ t
+ sub :  {Γ Δ : List I} → (Γ ─Env) (Tm d ∞) Δ →
+        (Γ ─Comp) (Tm d ∞) Δ
+ sub = Sem.sem Substitution
 \end{code}
 %</substitution>
