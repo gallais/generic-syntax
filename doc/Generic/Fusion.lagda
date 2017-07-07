@@ -25,6 +25,11 @@ module _  {I : Set} {𝓥₁ 𝓥₂ 𝓥₃ 𝓒₁ 𝓒₂ 𝓒₃ : I → Lis
  record Fus (d : Desc I) (𝓢₁ : Sem d 𝓥₁ 𝓒₁) (𝓢₂ : Sem d 𝓥₂ 𝓒₂) (𝓢₃ : Sem d 𝓥₃ 𝓒₃) : Set where
    field  quote₁  : (i : I) → [ 𝓒₁ i ⟶ Tm d ∞ i ]
           vl^𝓥₁  : VarLike 𝓥₁
+          th^R    : {Γ Δ Θ Ξ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} →
+                    (σ : Thinning Θ Ξ) → 𝓡^Env ρ₁ ρ₂ ρ₃ → 𝓡^Env ρ₁ (th^Env (Sem.th^𝓥 𝓢₂) ρ₂ σ) (th^Env (Sem.th^𝓥 𝓢₃) ρ₃ σ)
+          >>^R   : {Γ Δ Θ Ξ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} →
+                    {ρ₄ : (Ξ ─Env) 𝓥₂ Θ} {ρ₅ : (Ξ ─Env) 𝓥₃ Θ} → 𝓡^Env ρ₁ ρ₂ ρ₃ → ∀[ 𝓡^𝓥 ] ρ₄ ρ₅ →
+                    𝓡^Env (freshˡ vl^𝓥₁ Δ {Ξ} >> th^Env (Sem.th^𝓥 𝓢₁) ρ₁ (freshʳ vl^Var Ξ)) (ρ₄ >> ρ₂) (ρ₅ >> ρ₃)
           var^R   : {Γ Δ Θ : List I} {i : I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} →
                     𝓡^Env ρ₁ ρ₂ ρ₃ → (v : Var i Γ) →
                     rel 𝓡^𝓒 (Sem.sem 𝓢₂ ρ₂ (quote₁ i (Sem.var 𝓢₁ (lookup ρ₁ v)))) (Sem.var 𝓢₃ (lookup ρ₃ v))
@@ -50,7 +55,7 @@ module _  {I : Set} {𝓥₁ 𝓥₂ 𝓥₃ 𝓒₁ 𝓒₂ 𝓒₃ : I → Lis
      rew = subst (λ v → Zip d (Kripke^R 𝓡^𝓥 𝓡^𝓒) v _) (sym eq)
 
    body ρ^R []       i b = fus ρ^R b
-   body ρ^R (σ ∷ Δ)  i b = λ ren vs^R → {!!}
+   body ρ^R (σ ∷ Δ)  i b = λ ren vs^R → fus (>>^R (th^R ren ρ^R) vs^R) b
 
 
 module _ {I : Set} (d : Desc I) where
@@ -58,8 +63,10 @@ module _ {I : Set} (d : Desc I) where
  Ren² : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d Renaming Renaming Renaming
  Fus.quote₁ Ren² = λ _ t → t
  Fus.vl^𝓥₁ Ren² = vl^Var
- Fus.var^R  Ren² = λ ρ^R v → cong `var (lookup^R ρ^R v)
- Fus.alg^R  Ren² = λ z → cong `con {!!}
+ Fus.th^R Ren² = λ σ ρ^R → pack^R (λ k → cong (lookup σ) (lookup^R ρ^R k))
+ Fus.>>^R Ren² = λ ρ^R vs^R → pack^R (λ k → {!!})
+ Fus.var^R Ren² = λ ρ^R v → cong `var (lookup^R ρ^R v)
+ Fus.alg^R Ren² = λ z → cong `con {!!}
 
  ren² : ∀ {Γ Δ Θ i} (t : Tm d ∞ i Γ) (ρ₁ : Thinning Γ Δ) (ρ₂ : Thinning Δ Θ) →
         ren ρ₂ (ren ρ₁ t) ≡ ren (select ρ₁ ρ₂) t
