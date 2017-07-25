@@ -55,7 +55,6 @@ module _ {I : Set} {d : Desc I} where
  VarLike^R.new^R  vl^VarTm = refl
  VarLike^R.th^R   vl^VarTm = λ σ → cong (ren σ)
 
-
  RenSub : Sim VarTm^R Eq^R d Renaming Substitution
  Sim.var^R  RenSub = id
  Sim.th^R   RenSub = λ { _ refl → refl }

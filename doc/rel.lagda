@@ -48,7 +48,7 @@ module _ {I : Set} {T U : I ─Scoped}
 module _ {I : Set} where
 
  Eq^R : {A : I ─Scoped} → Rel A A
- Eq^R = mkRel _≡_
+ rel Eq^R = _≡_
 
 \end{code}
 

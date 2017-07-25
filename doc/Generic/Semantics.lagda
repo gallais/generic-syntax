@@ -87,6 +87,10 @@ module _ {I : Set} {d : Desc I} where
  sy^Var : Syntactic d Var
  Syntactic.var    sy^Var = `var
  Syntactic.vl^𝓥  sy^Var = vl^Var
+
+-- Records are better for the paper, definitions using
+-- copatterns are better for the legibility of goals...
+module OnlyForDisplayRenaming {I : Set} {d : Desc I} where
 \end{code}
 %<*renaming>
 \begin{code}
@@ -102,6 +106,17 @@ module _ {I : Set} {d : Desc I} where
 \end{code}
 %</renaming>
 \begin{code}
+module _ {I : Set} {d : Desc I} where
+
+ Renaming : Sem d Var (Tm d ∞)
+ Sem.th^𝓥  Renaming = λ k ρ → lookup ρ k
+ Sem.var   Renaming = `var
+ Sem.alg   Renaming = `con ∘ fmap d (reify vl^Var)
+
+ ren :  {Γ Δ : List I} → (Γ ─Env) Var Δ →
+        (Γ ─Comp) (Tm d ∞) Δ
+ ren = Sem.sem Renaming
+
  th^Tm : {i : I} → Thinnable (Tm d ∞ i)
  th^Tm t ρ = Sem.sem Renaming ρ t
 
@@ -113,6 +128,8 @@ module _ {I : Set} {d : Desc I} where
  Syntactic.var   sy^Tm = id
  Syntactic.vl^𝓥  sy^Tm = vl^Tm
 
+-- Same thing as with Renaming
+module OnlyForDisplaySubstitution {I : Set} {d : Desc I} where
 \end{code}
 %<*substitution>
 \begin{code}
@@ -127,3 +144,15 @@ module _ {I : Set} {d : Desc I} where
  sub = Sem.sem Substitution
 \end{code}
 %</substitution>
+\begin{code}
+module _ {I : Set} {d : Desc I} where
+
+ Substitution : Sem d (Tm d ∞) (Tm d ∞)
+ Sem.th^𝓥  Substitution = λ t ρ → ren ρ t
+ Sem.var   Substitution = id
+ Sem.alg   Substitution = `con ∘ fmap d (reify vl^Tm)
+
+ sub :  {Γ Δ : List I} → (Γ ─Env) (Tm d ∞) Δ →
+        (Γ ─Comp) (Tm d ∞) Δ
+ sub = Sem.sem Substitution
+\end{code}

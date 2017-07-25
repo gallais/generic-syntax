@@ -2,11 +2,12 @@
 module varlike where
 
 open import Data.List.Base hiding ([_])
+open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import indexed
 open import var
 open import rel
-open import environment
+open import environment hiding (refl)
 
 module _ {I : Set} where
 \end{code}
@@ -50,6 +51,11 @@ module _ {I : Set} {𝓥₁ 𝓥₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ �
    freshʳ^R : (Γ : List I) {Δ : List I} → ∀[ 𝓡^𝓥 ] (freshʳ vl₁ Γ {Δ}) (freshʳ vl₂ Γ)
    freshʳ^R n = th^R _ <$>^R base^R
 
+
+module _ {I : Set} {𝓥 : I ─Scoped} (vl^𝓥  : VarLike 𝓥) where
+ vl^Refl : VarLike^R Eq^R vl^𝓥 vl^𝓥
+ VarLike^R.new^R  vl^Refl = refl
+ VarLike^R.th^R   vl^Refl = λ σ → cong (λ v → th^𝓥 vl^𝓥 v σ)
 
 module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) (𝓡^𝓒  : Rel 𝓒₁ 𝓒₂) where
 
