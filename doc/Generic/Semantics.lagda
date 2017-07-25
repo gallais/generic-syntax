@@ -10,7 +10,7 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import var
 open import indexed
-open import environment as E hiding (refl)
+open import environment as E
 open import Generic.Syntax
 
 module _ {I : Set} where
@@ -123,6 +123,10 @@ module _ {I : Set} {d : Desc I} where
  vl^Tm : VarLike (Tm d ∞)
  new   vl^Tm = `var z
  th^𝓥  vl^Tm = th^Tm
+
+ lookup-base^Tm : {Γ : List I} {σ : I} (k : Var σ Γ) → lookup (base vl^Tm) k ≡ `var k
+ lookup-base^Tm z                              = refl
+ lookup-base^Tm (s k) rewrite lookup-base^Tm k = refl
 
  sy^Tm : Syntactic d (Tm d ∞)
  Syntactic.var   sy^Tm = id

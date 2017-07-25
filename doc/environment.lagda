@@ -5,6 +5,7 @@ open import Data.Nat.Base as ℕ
 open import Data.List.Base hiding ([_])
 open import Data.Sum as S
 open import Function
+open import Agda.Builtin.Equality
 
 open import indexed
 open import var hiding (_<$>_)
@@ -40,16 +41,29 @@ split []      k     = inj₂ k
 split (σ ∷ Γ) z     = inj₁ z
 split (σ ∷ Γ) (s k) = S.map s id $ split Γ k
 
+split-injectˡ :  (Γ : List I) {Δ : List I} {σ : I} (v : Var σ Δ) → split Δ (injectˡ Γ v) ≡ inj₁ v
+split-injectˡ Γ z                               = refl
+split-injectˡ Γ (s v) rewrite split-injectˡ Γ v = refl
+
+split-injectʳ : {Γ : List I} (Δ : List I) {σ : I} (v : Var σ Γ) → split Δ (injectʳ Δ v) ≡ inj₂ v
+split-injectʳ []      v                           = refl
+split-injectʳ (_ ∷ Δ) v rewrite split-injectʳ Δ v = refl
+
 _>>_ : ∀ {𝓥 Γ Δ Θ} → (Γ ─Env) 𝓥 Θ → (Δ ─Env) 𝓥 Θ → (Γ ++ Δ ─Env) 𝓥 Θ
 lookup (ρ₁ >> ρ₂) k = [ lookup ρ₁ , lookup ρ₂ ]′ (split _ k)
+
+injectˡ->> : ∀ {𝓥 Γ Δ Θ i} (ρ₁ : (Γ ─Env) 𝓥 Θ) (ρ₂ : (Δ ─Env) 𝓥 Θ) (v : Var i Γ) →
+             lookup (ρ₁ >> ρ₂) (injectˡ Δ v) ≡ lookup ρ₁ v
+injectˡ->> {Δ = Δ} ρ₁ ρ₂ v rewrite split-injectˡ Δ v = refl
+
+injectʳ->> : ∀ {𝓥 Γ Δ Θ i} (ρ₁ : (Γ ─Env) 𝓥 Θ) (ρ₂ : (Δ ─Env) 𝓥 Θ) (v : Var i Δ) →
+             lookup (ρ₁ >> ρ₂) (injectʳ Γ v) ≡ lookup ρ₂ v
+injectʳ->> {Γ = Γ} ρ₁ ρ₂ v rewrite split-injectʳ Γ v = refl
 
 infixl 10 _∙_
 _∙_ : ∀ {𝓥 Γ Δ σ} → (Γ ─Env) 𝓥 Δ → 𝓥 σ Δ → (σ ∷ Γ ─Env) 𝓥 Δ
 lookup (ρ ∙ v) z    = v
 lookup (ρ ∙ v) (s k) = lookup ρ k
-
-refl : ∀ {Γ} → Thinning Γ Γ
-refl = pack id
 
 select : ∀ {Γ Δ Θ 𝓥} → Thinning Γ Δ → (Δ ─Env) 𝓥 Θ → (Γ ─Env) 𝓥 Θ
 lookup (select ren ρ) k = lookup ρ (lookup ren k)
@@ -71,7 +85,7 @@ duplicate  : {T : List I → Set} → [ □ T ⟶ □ (□ T)  ]
 \end{code}
 %</comonad>
 \begin{code}
-extract t = t refl
+extract t = t (pack id)
 duplicate t ρ σ = t (select ρ σ)
 
 join : {T : List I → Set} → [ □ (□ T) ⟶ □ T ]

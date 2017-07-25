@@ -10,7 +10,7 @@ open import indexed
 open import var hiding (_<$>_)
 open import varlike
 open import rel
-open import environment hiding (refl)
+open import environment
 open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Zip

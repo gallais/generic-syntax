@@ -2,12 +2,13 @@
 module varlike where
 
 open import Data.List.Base hiding ([_])
+open import Data.Sum
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import indexed
 open import var
 open import rel
-open import environment hiding (refl)
+open import environment
 
 module _ {I : Set} where
 \end{code}
@@ -33,6 +34,26 @@ module _ {I : Set} where
  vl^Var : VarLike Var
  new   vl^Var = z
  th^𝓥  vl^Var = th^Var
+ lookup-base^Var : {Γ : List I} {σ : I} (k : Var σ Γ) → lookup (base vl^Var) k ≡ k
+ lookup-base^Var z     = refl
+ lookup-base^Var (s k) = cong s (lookup-base^Var k)
+
+module _ {I : Set} {𝓥 : I ─Scoped} where
+ open ≡-Reasoning
+
+ split-freshʳ : (Δ : List I) {Γ : List I} {i : I} (v : Var i Γ) →
+                split Δ (lookup (freshʳ vl^Var Δ) v) ≡ inj₂ v
+ split-freshʳ Δ v =
+   begin
+     split Δ (injectʳ Δ (lookup (base vl^Var) v)) ≡⟨ split-injectʳ Δ (lookup (base vl^Var) v) ⟩
+     inj₂ (lookup (base vl^Var) v)                ≡⟨ cong inj₂ (lookup-base^Var v) ⟩
+     inj₂ v
+   ∎
+
+ freshʳ->> : (Δ : List I) {Γ Θ : List I}
+             (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) {i : I} (v : Var i Γ) →
+             lookup (ρ₁ >> ρ₂) (lookup (freshʳ vl^Var Δ) v) ≡ lookup ρ₂ v
+ freshʳ->> Δ ρ₁ ρ₂ v rewrite split-freshʳ Δ v = refl
 
 module _ {I : Set} {𝓥₁ 𝓥₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) where
 

@@ -11,7 +11,7 @@ open import indexed
 open import rel
 open import var hiding (_<$>_)
 open import varlike
-open import environment hiding (refl)
+open import environment
 
 open import Generic.Syntax
 open import Generic.Semantics
@@ -68,7 +68,33 @@ module _ {I : Set} (d : Desc I) where
  Fus.quote₁ Ren² = λ _ t → t
  Fus.vl^𝓥₁ Ren² = vl^Var
  Fus.th^R Ren² = λ σ ρ^R → pack^R (λ k → cong (lookup σ) (lookup^R ρ^R k))
- Fus.>>^R Ren² = λ ρ^R vs^R → pack^R (λ k → {!!})
+ Fus.>>^R Ren² {Γ} {Δ} {Θ} {Ξ} {ρ₁} {ρ₂} {ρ₃} {ρ₄} {ρ₅} = λ ρ^R vs^R → pack^R (aux ρ^R vs^R) where
+
+   aux : ∀[ Eq^R ] (select ρ₁ ρ₂) ρ₃ → ∀[ Eq^R ] ρ₄ ρ₅ → {i : I} (k : Var i (Ξ ++ Γ)) →
+         [ lookup ρ₄ , lookup ρ₂ ]′ (split Ξ ([ lookup (freshˡ vl^Var Δ) , (lookup (freshʳ vl^Var Ξ) ∘′ (lookup ρ₁)) ]′ (split Ξ k)))
+       ≡ [ lookup ρ₅ , lookup ρ₃ ]′ (split Ξ k)
+   aux ρ^R vs^R k with split Ξ k
+   ... | inj₁ kˡ =
+     begin
+       [ lookup ρ₄ , lookup ρ₂ ] (split Ξ (injectˡ Δ (lookup (base vl^Var) kˡ)))
+           ≡⟨ cong [ lookup ρ₄ , lookup ρ₂ ]′ (split-injectˡ Δ (lookup (base vl^Var) kˡ)) ⟩
+       lookup ρ₄ (lookup (base vl^Var) kˡ)
+           ≡⟨ cong (lookup ρ₄) (lookup-base^Var kˡ) ⟩
+       lookup ρ₄ kˡ
+           ≡⟨ lookup^R vs^R kˡ ⟩
+       lookup ρ₅ kˡ
+     ∎
+   ... | inj₂ kʳ =
+     begin
+       [ lookup ρ₄ , lookup ρ₂ ] (split Ξ (injectʳ Ξ (lookup (base vl^Var) (lookup ρ₁ kʳ))))
+           ≡⟨ cong [ lookup ρ₄ , lookup ρ₂ ]′ (split-injectʳ Ξ (lookup (base vl^Var) (lookup ρ₁ kʳ))) ⟩
+       lookup ρ₂ (lookup (base vl^Var) (lookup ρ₁ kʳ))
+           ≡⟨ cong (lookup ρ₂) (lookup-base^Var (lookup ρ₁ kʳ)) ⟩
+       lookup ρ₂ (lookup ρ₁ kʳ)
+           ≡⟨ lookup^R ρ^R kʳ ⟩
+       lookup ρ₃ kʳ
+     ∎
+
  Fus.var^R Ren² = λ ρ^R v → cong `var (lookup^R ρ^R v)
  Fus.alg^R Ren² {b₁ = b₁} {b₃} {ρ} = λ zipped → cong `con $
    begin
@@ -87,7 +113,33 @@ module _ {I : Set} (d : Desc I) where
  Fus.quote₁  RenSub = λ _ t → t
  Fus.vl^𝓥₁  RenSub = vl^Var
  Fus.th^R    RenSub = λ σ ρ^R → pack^R (λ k → cong (ren σ) (lookup^R ρ^R k))
- Fus.>>^R   RenSub = λ ρ^R vs^R → pack^R (λ k → {!!})
+ Fus.>>^R   RenSub {Γ} {Δ} {Θ} {Ξ} {ρ₁} {ρ₂} {ρ₃} {ρ₄} {ρ₅} = λ ρ^R vs^R → pack^R (aux ρ^R vs^R) where
+
+   aux : ∀[ Eq^R ] (select ρ₁ ρ₂) ρ₃ → ∀[ Eq^R ] ρ₄ ρ₅ → {i : I} (k : Var i (Ξ ++ Γ)) →
+         [ lookup ρ₄ , lookup ρ₂ ]′ (split Ξ ([ lookup (freshˡ vl^Var Δ) , (lookup (freshʳ vl^Var Ξ) ∘′ (lookup ρ₁)) ]′ (split Ξ k)))
+       ≡ [ lookup ρ₅ , lookup ρ₃ ]′ (split Ξ k)
+   aux ρ^R vs^R k with split Ξ k
+   ... | inj₁ kˡ =
+     begin
+       [ lookup ρ₄ , lookup ρ₂ ] (split Ξ (injectˡ Δ (lookup (base vl^Var) kˡ)))
+           ≡⟨ cong [ lookup ρ₄ , lookup ρ₂ ]′ (split-injectˡ Δ (lookup (base vl^Var) kˡ)) ⟩
+       lookup ρ₄ (lookup (base vl^Var) kˡ)
+           ≡⟨ cong (lookup ρ₄) (lookup-base^Var kˡ) ⟩
+       lookup ρ₄ kˡ
+           ≡⟨ lookup^R vs^R kˡ ⟩
+       lookup ρ₅ kˡ
+     ∎
+   ... | inj₂ kʳ =
+     begin
+       [ lookup ρ₄ , lookup ρ₂ ] (split Ξ (injectʳ Ξ (lookup (base vl^Var) (lookup ρ₁ kʳ))))
+           ≡⟨ cong [ lookup ρ₄ , lookup ρ₂ ]′ (split-injectʳ Ξ (lookup (base vl^Var) (lookup ρ₁ kʳ))) ⟩
+       lookup ρ₂ (lookup (base vl^Var) (lookup ρ₁ kʳ))
+           ≡⟨ cong (lookup ρ₂) (lookup-base^Var (lookup ρ₁ kʳ)) ⟩
+       lookup ρ₂ (lookup ρ₁ kʳ)
+           ≡⟨ lookup^R ρ^R kʳ ⟩
+       lookup ρ₃ kʳ
+     ∎
+
  Fus.var^R   RenSub = λ ρ^R v → lookup^R ρ^R v
  Fus.alg^R   RenSub {b₁ = b₁} {b₃} {ρ} = λ zipped → cong `con $
    begin
@@ -111,7 +163,33 @@ module _ {I : Set} (d : Desc I) where
      ren σ (ren ρ₂ (lookup ρ₁ k))    ≡⟨ cong (ren σ) (lookup^R ρ^R k) ⟩
      ren σ (lookup ρ₃ k)
    ∎
- Fus.>>^R   SubRen = λ ρ^R vs^R → pack^R (λ k → {!!})
+ Fus.>>^R   SubRen {Γ} {Δ} {Θ} {Ξ} {ρ₁} {ρ₂} {ρ₃} {ρ₄} {ρ₅} = λ ρ^R vs^R → pack^R (aux ρ^R vs^R) where
+
+   aux : ∀[ Eq^R ] (ren ρ₂ <$> ρ₁) ρ₃ → ∀[ VarTm^R ] ρ₄ ρ₅ → {i : I} (k : Var i (Ξ ++ Γ)) →
+         ren (ρ₄ >> ρ₂) ([ (ren (pack (injectˡ Δ)) ∘ (lookup (base vl^Tm)))
+                         , (ren (freshʳ vl^Var Ξ)  ∘ (lookup ρ₁))
+                         ] (split Ξ k))
+         ≡ [ lookup ρ₅ , lookup ρ₃ ]′ (split Ξ k)
+   aux ρ^R vs^R k with split Ξ k
+   ... | inj₁ kˡ =
+     begin
+       ren (ρ₄ >> ρ₂) (ren (pack (injectˡ Δ)) (lookup (base vl^Tm) kˡ))
+            ≡⟨ Fus.fus Ren² (pack^R (injectˡ->> ρ₄ ρ₂)) (lookup (base vl^Tm) kˡ) ⟩
+       ren ρ₄ (lookup (base vl^Tm) kˡ)
+            ≡⟨ cong (ren ρ₄) (lookup-base^Tm kˡ) ⟩
+       ren ρ₄ (`var kˡ)
+            ≡⟨ lookup^R vs^R kˡ ⟩
+       lookup ρ₅ kˡ
+     ∎
+   ... | inj₂ kʳ =
+     begin
+       ren (ρ₄ >> ρ₂) (ren (freshʳ vl^Var Ξ) (lookup ρ₁ kʳ))
+            ≡⟨ Fus.fus Ren² (pack^R (freshʳ->> Ξ ρ₄ ρ₂)) (lookup ρ₁ kʳ) ⟩
+       ren ρ₂ (lookup ρ₁ kʳ)
+            ≡⟨ lookup^R ρ^R kʳ ⟩
+       lookup ρ₃ kʳ
+     ∎
+
  Fus.var^R   SubRen = λ ρ^R v → lookup^R ρ^R v
  Fus.alg^R   SubRen {b₁ = b₁} {b₃} {ρ} = λ zipped → cong `con $
    begin
@@ -135,7 +213,30 @@ module _ {I : Set} (d : Desc I) where
      ren σ (sub ρ₂ (lookup ρ₁ k))     ≡⟨ cong (ren σ) (lookup^R ρ^R k)   ⟩
      ren σ (lookup ρ₃ k)
    ∎
- Fus.>>^R Sub² = λ ρ^R vs^R → pack^R (λ k → {!!})
+ Fus.>>^R Sub² {Γ} {Δ} {Θ} {Ξ} {ρ₁} {ρ₂} {ρ₃} {ρ₄} {ρ₅} = λ ρ^R vs^R → pack^R (aux ρ^R vs^R) where
+
+   aux : ∀[ Eq^R ] (sub ρ₂ <$> ρ₁) ρ₃ → ∀[ Eq^R ] ρ₄ ρ₅ → {i : I} (k : Var i (Ξ ++ Γ)) →
+         sub (ρ₄ >> ρ₂) ([ lookup (freshˡ vl^Tm Δ) , ren (freshʳ vl^Var Ξ) ∘ lookup ρ₁ ]′ (split Ξ k))
+         ≡ [ lookup ρ₅ , lookup ρ₃ ]′ (split Ξ k)
+   aux ρ^R vs^R k with split Ξ k
+   ... | inj₁ kˡ =
+     begin
+       sub (ρ₄ >> ρ₂) (ren (pack (injectˡ Δ)) (lookup (base vl^Tm) kˡ))
+            ≡⟨ Fus.fus RenSub (pack^R (injectˡ->> ρ₄ ρ₂)) (lookup (base vl^Tm) kˡ) ⟩
+       sub ρ₄ (lookup (base vl^Tm) kˡ)
+            ≡⟨ cong (sub ρ₄) (lookup-base^Tm kˡ) ⟩
+       sub ρ₄ (`var kˡ)
+            ≡⟨ lookup^R vs^R kˡ ⟩
+       lookup ρ₅ kˡ
+     ∎
+   ... | inj₂ kʳ =
+     begin
+       sub (ρ₄ >> ρ₂) (ren (freshʳ vl^Var Ξ) (lookup ρ₁ kʳ))
+            ≡⟨ Fus.fus RenSub (pack^R (freshʳ->> Ξ ρ₄ ρ₂)) (lookup ρ₁ kʳ) ⟩
+       sub ρ₂ (lookup ρ₁ kʳ)
+            ≡⟨ lookup^R ρ^R kʳ ⟩
+       lookup ρ₃ kʳ
+     ∎
  Fus.var^R Sub² = λ ρ^R v → lookup^R ρ^R v
  Fus.alg^R Sub² {b₁ = b₁} {b₃} {ρ} = λ zipped → cong `con $
    begin
