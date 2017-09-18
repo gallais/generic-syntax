@@ -36,9 +36,6 @@ pattern _`∙_ f t = `con ((_ , _) , false , f , t , refl)
 Term : Type ─Scoped
 Term = Tm TermD ∞
 
-`id : ∀ {σ} → [ Term (σ ⇒ σ) ]
-`id = `λ (`var z)
-
 _[_/0] : ∀ {σ τ} → [ (σ ∷_) ⊢ Term τ ⟶ Term σ ⟶ Term τ ]
 t [ u /0] = sub (base vl^Tm ∙ u) t
 
@@ -83,20 +80,6 @@ ren-↝-invert t ρ eq ([∙]₂ r) =
   let (f′ , t′ , eq∙ , eqf , eqt) = ren-invert-∙ t ρ eq
       (g′ , eq , r′)              = ren-↝-invert f′ ρ eqf r
   in g′ `∙ t′ , cong₂ _`∙_ eq eqt , subst (_↝ g′ `∙ t′) eq∙ ([∙]₂ r′)
-
-th-↝ : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : Thinning Γ Δ) → t ↝ u → ren ρ t ↝ ren ρ u
-th-↝ {t = `λ t `∙ u} ρ β =  subst (ren ρ (`λ t `∙ u) ↝_) eq β where
-
-  eq : ren _ t [ ren ρ u /0] ≡ ren ρ (t [ u /0])
-  eq = begin
-    ren _ t [ ren ρ u /0]               ≡⟨ rensub TermD t _ _ ⟩
-    sub {!!} t                          ≡⟨ {!!} ⟩ -- need: sub-ext
-    sub (ren ρ <$> (base vl^Tm ∙ u)) t  ≡⟨ sym (subren TermD t _ _) ⟩
-    ren ρ (t [ u /0])     ∎
-
-th-↝ ρ ([λ] r)  = [λ] (th-↝ _ r)
-th-↝ ρ ([∙]₁ r) = [∙]₁ (th-↝ ρ r)
-th-↝ ρ ([∙]₂ r) = [∙]₂ (th-↝ ρ r)
 
 data SN {σ Γ} (t : Term σ Γ) : Set where
   sn : (∀ u → t ↝ u → SN u) → SN t
