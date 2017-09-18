@@ -8,6 +8,7 @@ open import indexed
 open import environment
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Unit
 open import Generic.Zip
 open import Generic.Simulation hiding (rensub)
 open import Generic.Fusion
@@ -84,12 +85,6 @@ ren-↝-invert t ρ eq ([∙]₂ r) =
 data SN {σ Γ} (t : Term σ Γ) : Set where
   sn : (∀ u → t ↝ u → SN u) → SN t
 
-Unit : Type ─Scoped
-Unit _ _ = ⊤
-
-UnitSem : Sem TermD Unit Unit
-UnitSem = _
-
 Red : Rel Term Unit -- predicate = binary relation with boring second component
 𝓡 : ∀ {σ} → [ Term σ ⟶ κ Set ]
 
@@ -126,7 +121,7 @@ theorem2-6 t ρ rs = Sim.sim prf rs t where
 
     alg^R : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ₁ : (Γ ─Env) Term Δ} {ρ₂} → ∀[ Red ] ρ₁ ρ₂ →
             let v₁ = fmap TermD (Sem.body Substitution ρ₁) b
-                v₂ = fmap TermD (Sem.body UnitSem ρ₂) b
+                v₂ = fmap TermD (Sem.body SemUnit ρ₂) b
             in Zip TermD (Kripke^R Red Red) v₁ v₂  → 𝓡 (Sem.alg Substitution v₁)
     alg^R t@((σ , τ) , true , b , refl)      {ρ₁} ρ^R (refl , refl , b^R , _)       =
       λ ρ {u} u^R →
