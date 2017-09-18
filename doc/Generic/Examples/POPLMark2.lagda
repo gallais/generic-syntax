@@ -8,6 +8,8 @@ open import indexed
 open import environment
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Zip
+open import Generic.Simulation hiding (rensub)
 open import Generic.Fusion
 open import Data.Unit
 open import Agda.Builtin.Bool
@@ -28,8 +30,8 @@ TermD =  `σ (Type × Type) λ { (σ , τ) →
          `+ `X [] (σ ⇒ τ) (`X [] σ (`∎ τ)) }
 
 infixl 10 _`∙_
-pattern `λ t     = `con ((_ , _) , (true , t , refl))
-pattern _`∙_ f t = `con ((_ , _) , (false , f , t , refl))
+pattern `λ  b    = `con ((_ , _) , true , b , refl)
+pattern _`∙_ f t = `con ((_ , _) , false , f , t , refl)
 
 Term : Type ─Scoped
 Term = Tm TermD ∞
@@ -102,6 +104,9 @@ data SN {σ Γ} (t : Term σ Γ) : Set where
 Unit : Type ─Scoped
 Unit _ _ = ⊤
 
+UnitSem : Sem TermD Unit Unit
+UnitSem = _
+
 Red : Rel Term Unit -- predicate = binary relation with boring second component
 𝓡 : ∀ {σ} → [ Term σ ⟶ κ Set ]
 
@@ -123,4 +128,28 @@ lemma2-3 : ∀ σ {Γ Δ} (ρ : Thinning Γ Δ) (t : Term σ Γ) → 𝓡 t → 
 lemma2-3 α       ρ t T = lemma2-2 ρ t T
 lemma2-3 (σ ⇒ τ) ρ t T = λ ρ′ U → subst (λ t → 𝓡 (t `∙ _)) (sym (ren² TermD t ρ ρ′)) (T (select ρ ρ′) U)
 
+lemma2-4 : ∀ {Γ Δ Θ} (ρ : Thinning Δ Θ) (vs : (Γ ─Env) Term Δ) →
+           ∀[ Red ] vs _ → ∀[ Red ] (th^Env th^Tm vs ρ) _
+lemma2-4 ρ vs rs = lemma2-3 _ ρ _ <$>^R rs
+
+theorem2-6 : ∀ {σ Γ Δ} (t : Term σ Γ) (ρ : (Γ ─Env) Term Δ) →
+             ∀[ Red ] ρ _ → 𝓡 (sub ρ t)
+theorem2-6 t ρ rs = Sim.sim prf rs t where
+
+  prf : Sim Red Red TermD Substitution _
+  Sim.th^R  prf = λ ρ → lemma2-3 _ ρ _
+  Sim.var^R prf = id
+  Sim.alg^R prf = alg^R where
+
+    alg^R : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ₁ : (Γ ─Env) Term Δ} {ρ₂} → ∀[ Red ] ρ₁ ρ₂ →
+            let v₁ = fmap TermD (Sem.body Substitution ρ₁) b
+                v₂ = fmap TermD (Sem.body UnitSem ρ₂) b
+            in Zip TermD (Kripke^R Red Red) v₁ v₂  → 𝓡 (Sem.alg Substitution v₁)
+    alg^R t@((σ , τ) , true , b , refl)      {ρ₁} ρ^R (refl , refl , b^R , _)       =
+      λ ρ {u} u^R →
+        let bu : 𝓡 (sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b)
+            bu = b^R ρ (ε^R ∙^R u^R)
+        in 𝓡 (ren ρ (sub ρ₁ (`λ b)) `∙ u) ∋ {!!} -- need 𝓡 β-expand
+    alg^R ((σ , τ) , false , f , t , refl) {ρ₁} ρ^R (refl , refl , f^R , t^R , _) =
+      subst (λ f → 𝓡 (f `∙ sub ρ₁ t)) {!!} (f^R (base vl^Var) t^R) -- need: ren-id
 \end{code}
