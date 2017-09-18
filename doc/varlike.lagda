@@ -29,6 +29,9 @@ module _ {I : Set} where
 
    freshˡ : (Δ : List I) → ∀ {Γ} → (Γ ─Env) 𝓥 (Γ ++ Δ)
    freshˡ k = th^Env th^𝓥 base (pack (injectˡ _))
+
+   singleton : ∀ {Γ σ} → 𝓥 σ Γ → (σ ∷ Γ ─Env) 𝓥 Γ
+   singleton v = base ∙ v
  open VarLike public
 
  vl^Var : VarLike Var

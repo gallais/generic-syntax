@@ -10,7 +10,7 @@ open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Semantics.Unit
 open import Generic.Zip
-open import Generic.Simulation hiding (rensub)
+open import Generic.Simulation hiding (rensub ; RenSub)
 open import Generic.Fusion
 open import Data.Unit
 open import Agda.Builtin.Bool
@@ -44,7 +44,7 @@ infix 5 _[_
 infix 6 _/0]
 
 _/0] : ∀ {σ Γ} → Term σ Γ → (σ ∷ Γ ─Env) Term Γ
-u /0] = base vl^Tm ∙ u
+_/0] = singleton vl^Tm
 
 _[_ : ∀ {σ τ Γ} → Term τ (σ ∷ Γ) → (σ ∷ Γ ─Env) Term Γ → Term τ Γ
 t [ ρ = sub ρ t
@@ -72,12 +72,34 @@ ren-invert-λ (`λ b′)  ρ refl = b′ , refl , refl
                                 
 ren-↝-invert :  ∀ {σ Γ Δ} (t′ : Term σ Γ) {t u : Term σ Δ} (ρ : Thinning Γ Δ) →
                 t ≡ ren ρ t′ → t ↝ u → ∃ λ u′ → u ≡ ren ρ u′ × t′ ↝ u′
-ren-↝-invert t ρ eq β        =
+ren-↝-invert {Γ = Γ} {Δ} t {`λ b `∙ u} ρ eq (β {σ = σ}) =
   let (f′ , t′ , eq∙ , eqf , eqt) = ren-invert-∙ t ρ eq
       (b′ , eqλ , eqb)            = ren-invert-λ f′ ρ eqf
+
       eqβ : `λ b′ `∙ t′ ≡ t
       eqβ = trans (cong (_`∙ t′) eqλ) eq∙
-  in b′ [ t′ /0] , {!!} , subst (_↝ b′ [ t′ /0]) eqβ β
+
+      ρ′ : Thinning (σ ∷ Γ) (σ ∷ Δ)
+      ρ′ = lift vl^Var (σ ∷ []) ρ
+
+      eq^R : ∀[ Eq^R ] (select ρ′ (ren ρ t′ /0])) (ren ρ <$> (t′ /0]))
+      eq^R = pack^R λ
+        { z      → refl
+        ; (s k) → begin
+          lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ k)) ≡⟨ lookup-base^Tm _ ⟩
+          `var (lookup (base vl^Var) (lookup ρ k))                ≡⟨ cong `var (lookup-base^Var _) ⟩
+          `var (lookup ρ k)                                       ≡⟨ sym (cong (ren ρ) (lookup-base^Tm k)) ⟩
+          ren ρ (lookup (base vl^Tm) k)                           ∎
+        }
+
+      eq : b [ u /0] ≡ ren ρ (b′ [ t′ /0])
+      eq = begin
+       b [ u /0]                         ≡⟨ cong₂ (λ b u → b [ u /0]) eqb eqt ⟩
+       ren ρ′ b′ [ ren ρ t′ /0]          ≡⟨ Fus.fus (RenSub TermD) eq^R b′ ⟩
+       sub (ren ρ <$> (t′ /0])) b′       ≡⟨ sym (subren TermD b′ (t′ /0]) ρ) ⟩
+       ren ρ (b′ [ t′ /0])               ∎
+
+  in b′ [ t′ /0] , eq , subst (_↝ b′ [ t′ /0]) eqβ β
 ren-↝-invert t ρ eq ([λ] r)  =
   let (t′ , eqλ , eqt) = ren-invert-λ t ρ eq
       (u′ , eq , r′)   = ren-↝-invert t′ _ eqt r
@@ -105,9 +127,14 @@ rel Red {σ ⇒ τ} {Γ} t _ = ∀ {Δ} (ρ : Thinning Γ Δ) {u} → 𝓡 u →
 SN-`λ : ∀ {σ τ} {Γ} {t : Term τ (σ ∷ Γ)} → SN t → SN (`λ t)
 SN-`λ (sn t^R) = sn λ { u ([λ] r) → SN-`λ (t^R _ r) }
 
+-- TODO: generic proof!
+ren-id : ∀ {σ Γ} (t : Term σ Γ) → ren (base vl^Var) t ≡ t
+ren-id (`var k) = cong `var (lookup-base^Var k)
+ren-id (`λ t)   = cong `λ {!!}
+ren-id (f `∙ t) = cong₂ _`∙_ (ren-id f) (ren-id t)
+
 lemma2-1 : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} {u : Term σ Γ} → 𝓡 t → 𝓡 u → 𝓡 (t `∙ u)
-lemma2-1 T U = let TU = T (base vl^Var) U
-               in subst (λ t → 𝓡 (t `∙ _)) {!!} TU -- need: ren-id
+lemma2-1 {t = t} T U = subst (λ t → 𝓡 (t `∙ _)) (ren-id t) (T (base vl^Var) U)
 
 lemma2-2 : ∀ {σ Γ Δ} (ρ : Thinning Γ Δ) {t : Term σ Γ} → SN t → SN (ren ρ t)
 lemma2-2 ρ (sn U) = sn $ λ u r →
@@ -182,7 +209,7 @@ theorem2-6 t ρ rs = Sim.sim prf rs t where
                 v₂ = fmap TermD (Sem.body SemUnit ρ₂) b
             in Zip TermD (Kripke^R Red Red) v₁ v₂  → 𝓡 (Sem.alg Substitution v₁)
     alg^R ((σ , τ) , false , f , t , refl) {ρ₁} ρ^R (refl , refl , f^R , t^R , _) =
-      subst (λ f → 𝓡 (f `∙ sub ρ₁ t)) {!!} (f^R (base vl^Var) t^R) -- need: ren-id
+      subst (λ f → 𝓡 (f `∙ sub ρ₁ t)) (ren-id _) (f^R (base vl^Var) t^R)
 
     alg^R t@((σ , τ) , true , b , refl)      {ρ₁} ρ^R (refl , refl , b^R , _)       =
       λ ρ {u} u^R →
