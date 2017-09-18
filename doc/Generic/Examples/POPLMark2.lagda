@@ -56,11 +56,7 @@ ren-invert-∙ (`λ _)     ρ ()
 ren-invert-∙ (f′ `∙ t′) ρ refl = f′ , t′ , refl , refl , refl
 
 ren-invert-λ : ∀ {σ τ Γ Δ} (u : Term (σ ⇒ τ) Γ) {b : Term τ (σ ∷ Δ)} (ρ : Thinning Γ Δ) →
-               `λ b ≡ ren ρ u → ∃ λ b′ → `λ b′ ≡ u ×
-               let s : Thinning (σ ∷ Γ) (σ ∷ Δ)
-                   s = freshˡ vl^Var Δ {σ ∷ []} >> th^Env th^Var ρ (freshʳ vl^Var (σ ∷ []))
-                       -- should this be defined somewhere?
-               in b ≡ ren s b′
+               `λ b ≡ ren ρ u → ∃ λ b′ → `λ b′ ≡ u × b ≡ ren (lift vl^Var (σ ∷ []) ρ) b′
 ren-invert-λ (`var _) ρ ()
 ren-invert-λ (_ `∙ _) ρ ()
 ren-invert-λ (`λ b′)  ρ refl = b′ , refl , refl

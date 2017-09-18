@@ -23,6 +23,12 @@ module _ {I : Set} {T U : I ─Scoped} where
  open ∀[_] public
 
 module _ {I : Set} {T U : I ─Scoped}
+         {𝓡 : Rel T U} {Δ : List I} where
+
+ ε^R : {ρ₁ : ([] ─Env) T Δ} {ρ₂ : ([] ─Env) U Δ} → ∀[ 𝓡 ] ρ₁ ρ₂
+ lookup^R ε^R ()
+
+module _ {I : Set} {T U : I ─Scoped}
          {𝓡 : Rel T U} {Γ Δ : List I} where
 
  _∙^R_ :  {ρ₁ : (Γ ─Env) T Δ} {ρ₂ : (Γ ─Env) U Δ} → ∀[ 𝓡 ] ρ₁ ρ₂ →

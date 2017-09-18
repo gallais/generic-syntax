@@ -38,6 +38,11 @@ module _ {I : Set} where
  lookup-base^Var z     = refl
  lookup-base^Var (s k) = cong s (lookup-base^Var k)
 
+module _ {I : Set} {𝓥 : I ─Scoped} (vl^𝓥 : VarLike 𝓥) where
+
+ lift : (Θ : List I) → ∀ {Γ Δ} → (Γ ─Env) 𝓥 Δ → (Θ ++ Γ ─Env) 𝓥 (Θ ++ Δ)
+ lift Θ {Γ} {Δ} ρ = freshˡ vl^𝓥 Δ {Θ} >> th^Env (th^𝓥 vl^𝓥) ρ (freshʳ vl^Var Θ)
+
 module _ {I : Set} {𝓥 : I ─Scoped} where
  open ≡-Reasoning
 
