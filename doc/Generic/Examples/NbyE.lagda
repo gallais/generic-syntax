@@ -12,7 +12,7 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 open import indexed
 open import var
 open import varlike
-open import environment hiding (refl ; traverse)
+open import environment hiding (traverse)
 open import Generic.Syntax
 open import Generic.Semantics
 

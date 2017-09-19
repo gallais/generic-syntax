@@ -12,7 +12,7 @@ open import Data.Maybe as Maybe hiding (All)
 
 open import indexed
 open import var hiding (_<$>_)
-open import environment hiding (refl ; _<$>_ ; _>>_)
+open import environment hiding (_<$>_ ; _>>_)
 open import Generic.Syntax
 open import Generic.Semantics
 

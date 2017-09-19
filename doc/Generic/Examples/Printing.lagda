@@ -22,7 +22,7 @@ open ST
 M = State (Stream String)
 
 open import var hiding (get)
-open import environment as E hiding (refl)
+open import environment as E
 open import varlike
 open import Generic.Syntax as S
 open import Generic.Semantics

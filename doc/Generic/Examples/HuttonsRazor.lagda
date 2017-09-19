@@ -10,7 +10,7 @@ open import Data.Nat
 open import Data.List
 open import Relation.Binary.PropositionalEquality
 
-open import environment hiding (refl)
+open import environment
 open import Generic.Syntax
 open import Generic.Semantics
 

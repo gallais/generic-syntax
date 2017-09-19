@@ -9,7 +9,7 @@ open import Data.Fin
 open import Data.Product hiding (zip)
 
 open import indexed
-open import environment hiding (refl)
+open import environment
 open import Generic.Syntax
 open import Generic.Cofinite
 open import Generic.Zip

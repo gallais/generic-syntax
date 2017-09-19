@@ -9,7 +9,7 @@ open import Data.Product
 open import Agda.Builtin.Equality
 
 open import var
-open import environment hiding (refl)
+open import environment
 open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Cofinite

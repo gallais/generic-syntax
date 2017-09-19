@@ -6,7 +6,7 @@ open import Data.Unit
 open import Data.List.Base hiding (unfold)
 
 open import var
-open import environment hiding (refl)
+open import environment
 open import Generic.Syntax
 open import Generic.Semantics
 

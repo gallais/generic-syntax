@@ -3,7 +3,7 @@ module motivation where
 
 open import indexed
 open import var hiding (_<$>_ ; get)
-open import environment as E hiding (_>>_ ; refl ; extend)
+open import environment as E hiding (_>>_ ; extend)
 
 open import Data.Nat.Base
 open import Data.List.Base hiding ([_] ; _++_)
@@ -67,7 +67,7 @@ module _ where
 %</sub>
 
 \begin{code}
-open import environment hiding (extend ; _>>_ ; refl)
+open import environment hiding (extend ; _>>_)
 \end{code}
 
 %<*rsem>
