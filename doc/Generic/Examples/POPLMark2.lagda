@@ -40,15 +40,6 @@ pattern _`∙_ f t = `con ((_ , _) , false , f , t , refl)
 Term : Type ─Scoped
 Term = Tm TermD ∞
 
-infix 5 _[_
-infix 6 _/0]
-
-_/0] : ∀ {σ Γ} → Term σ Γ → (σ ∷ Γ ─Env) Term Γ
-_/0] = singleton vl^Tm
-
-_[_ : ∀ {σ τ Γ} → Term τ (σ ∷ Γ) → (σ ∷ Γ ─Env) Term Γ → Term τ Γ
-t [ ρ = sub ρ t
-
 infix 3 _↝_
 data _↝_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ] where
 -- computational
@@ -75,29 +66,14 @@ ren-↝-invert :  ∀ {σ Γ Δ} (t′ : Term σ Γ) {t u : Term σ Δ} (ρ : Th
 ren-↝-invert {Γ = Γ} {Δ} t {`λ b `∙ u} ρ eq (β {σ = σ}) =
   let (f′ , t′ , eq∙ , eqf , eqt) = ren-invert-∙ t ρ eq
       (b′ , eqλ , eqb)            = ren-invert-λ f′ ρ eqf
-
       eqβ : `λ b′ `∙ t′ ≡ t
       eqβ = trans (cong (_`∙ t′) eqλ) eq∙
 
-      ρ′ : Thinning (σ ∷ Γ) (σ ∷ Δ)
-      ρ′ = lift vl^Var (σ ∷ []) ρ
-
-      eq^R : ∀[ Eq^R ] (select ρ′ (ren ρ t′ /0])) (ren ρ <$> (t′ /0]))
-      eq^R = pack^R λ
-        { z      → refl
-        ; (s k) → begin
-          lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ k)) ≡⟨ lookup-base^Tm _ ⟩
-          `var (lookup (base vl^Var) (lookup ρ k))                ≡⟨ cong `var (lookup-base^Var _) ⟩
-          `var (lookup ρ k)                                       ≡⟨ sym (cong (ren ρ) (lookup-base^Tm k)) ⟩
-          ren ρ (lookup (base vl^Tm) k)                           ∎
-        }
-
       eq : b [ u /0] ≡ ren ρ (b′ [ t′ /0])
       eq = begin
-       b [ u /0]                         ≡⟨ cong₂ (λ b u → b [ u /0]) eqb eqt ⟩
-       ren ρ′ b′ [ ren ρ t′ /0]          ≡⟨ Fus.fus (RenSub TermD) eq^R b′ ⟩
-       sub (ren ρ <$> (t′ /0])) b′       ≡⟨ sym (subren TermD b′ (t′ /0]) ρ) ⟩
-       ren ρ (b′ [ t′ /0])               ∎
+       b [ u /0]               ≡⟨ cong₂ (λ b u → b [ u /0]) eqb eqt ⟩
+       ren _ b′ [ ren ρ t′ /0] ≡⟨ sym (renβ TermD b′ t′ ρ) ⟩
+       ren ρ (b′ [ t′ /0])     ∎
 
   in b′ [ t′ /0] , eq , subst (_↝ b′ [ t′ /0]) eqβ β
 ren-↝-invert t ρ eq ([λ] r)  =

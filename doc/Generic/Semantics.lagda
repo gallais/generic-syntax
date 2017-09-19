@@ -159,4 +159,13 @@ module _ {I : Set} {d : Desc I} where
  sub :  {Γ Δ : List I} → (Γ ─Env) (Tm d ∞) Δ →
         (Γ ─Comp) (Tm d ∞) Δ
  sub = Sem.sem Substitution
+
+ infix 5 _[_
+ infix 6 _/0]
+
+ _/0] : ∀ {σ Γ} → Tm d ∞ σ Γ → (σ ∷ Γ ─Env) (Tm d ∞) Γ
+ _/0] = singleton vl^Tm
+
+ _[_ : ∀ {σ τ Γ} → Tm d ∞ τ (σ ∷ Γ) → (σ ∷ Γ ─Env) (Tm d ∞) Γ → Tm d ∞ τ Γ
+ t [ ρ = sub ρ t
 \end{code}

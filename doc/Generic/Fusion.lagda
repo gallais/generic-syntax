@@ -250,4 +250,30 @@ module _ {I : Set} (d : Desc I) where
  sub² : ∀ {Γ Δ Θ i} (t : Tm d ∞ i Γ) (ρ₁ : (Γ ─Env) (Tm d ∞) Δ) (ρ₂ : (Δ ─Env) (Tm d ∞) Θ) →
           sub ρ₂ (sub ρ₁ t) ≡ sub (sub ρ₂ <$> ρ₁) t
  sub² t ρ₁ ρ₂ = Fus.fus Sub² (pack^R (λ k → refl)) t
+
+
+-- Corollary
+
+ renβ : ∀ {Γ Δ i j} (b : Tm d ∞ j (i ∷ Γ)) (u : Tm d ∞ i Γ) (ρ : Thinning Γ Δ) →
+        ren ρ (b [ u /0]) ≡ ren (lift vl^Var (i ∷ []) ρ) b [ ren ρ u /0]
+ renβ {Γ} {Δ} {i} b u ρ =
+   begin
+     ren ρ (b [ u /0])         ≡⟨ subren b (u /0]) ρ ⟩
+     sub (ren ρ <$> (u /0])) b ≡⟨ sym (Fus.fus RenSub eq^R b) ⟩
+     ren ρ′ b [ ren ρ u /0]
+   ∎ where
+
+      ρ′ : Thinning (i ∷ Γ) (i ∷ Δ)
+      ρ′ = lift vl^Var (i ∷ []) ρ
+
+      eq^R : ∀[ Eq^R ] (select ρ′ (ren ρ u /0])) (ren ρ <$> (u /0]))
+      eq^R = pack^R λ
+        { z      → refl
+        ; (s k) → begin
+          lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ k)) ≡⟨ lookup-base^Tm _ ⟩
+          `var (lookup (base vl^Var) (lookup ρ k))                ≡⟨ cong `var (lookup-base^Var _) ⟩
+          `var (lookup ρ k)                                       ≡⟨ sym (cong (ren ρ) (lookup-base^Tm k)) ⟩
+          ren ρ (lookup (base vl^Tm) k)                           ∎
+        }
+
 \end{code}
