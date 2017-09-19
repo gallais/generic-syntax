@@ -10,7 +10,7 @@ open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Semantics.Unit
 open import Generic.Zip
-open import Generic.Simulation hiding (rensub ; RenSub)
+open import Generic.Simulation as Sim hiding (rensub ; RenSub)
 open import Generic.Fusion
 open import Data.Unit
 open import Agda.Builtin.Bool
@@ -188,7 +188,7 @@ lemma2-4 : ∀ {Γ Δ Θ} (ρ : Thinning Δ Θ) (vs : (Γ ─Env) Term Δ) →
            ∀[ Red ] vs _ → ∀[ Red ] (th^Env th^Tm vs ρ) _
 lemma2-4 ρ vs rs = lemma2-3 _ ρ _ <$>^R rs
 
-lemma2-5 : ∀ {σ τ Γ} {t : Term τ (σ ∷ Γ)} {u : Term σ Γ} → SN u → 𝓡 (t [ u /0]) → 𝓡 (`λ t `∙ u)
+lemma2-5 : ∀ τ {σ Γ} {t : Term τ (σ ∷ Γ)} {u : Term σ Γ} → SN u → 𝓡 (t [ u /0]) → 𝓡 (`λ t `∙ u)
 lemma2-5 = {!!}
 
 theorem2-6 : ∀ {σ Γ Δ} (t : Term σ Γ) (ρ : (Γ ─Env) Term Δ) →
@@ -207,20 +207,38 @@ theorem2-6 t ρ rs = Sim.sim prf rs t where
     alg^R ((σ , τ) , false , f , t , refl) {ρ₁} ρ^R (refl , refl , f^R , t^R , _) =
       subst (λ f → 𝓡 (f `∙ sub ρ₁ t)) (ren-id _) (f^R (base vl^Var) t^R)
 
-    alg^R t@((σ , τ) , true , b , refl)      {ρ₁} ρ^R (refl , refl , b^R , _)       =
-      λ ρ {u} u^R →
-        let bu : 𝓡 (sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b)
-            bu = b^R ρ (ε^R ∙^R u^R)
+    alg^R t@((σ , τ) , true , b , refl)      {ρ₁} _ (refl , refl , b^R , _) ρ {u} u^R =
+       𝓡 (ren ρ (sub ρ₁ (`λ b)) `∙ u) ∋ lemma2-5 τ (𝓡⇒SN σ u u^R)
+      (𝓡 (ren ρ′ (sub ρ₁′ b) [ u /0]) ∋ subst 𝓡 eq bu) where
 
-            ρ′  = lift vl^Var (σ ∷ []) ρ
-            ρ₁′ = lift vl^Tm (σ ∷ []) ρ₁
+        bu : 𝓡 (sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b)
+        bu = b^R ρ (ε^R ∙^R u^R)
 
-            eq : sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b ≡ ren ρ′ (sub ρ₁′ b) [ u /0]
-            eq = sym $ begin
+        ρ′  = lift vl^Var (σ ∷ []) ρ
+        ρ₁′ = lift vl^Tm (σ ∷ []) ρ₁
+
+        ρ^R : ∀[ VarTm^R ] ρ (select (freshʳ vl^Var (σ ∷ [])) (select ρ′ (u /0])))
+        lookup^R ρ^R k = sym $ begin
+          lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ (lookup (base vl^Var) k)))
+            ≡⟨ lookup-base^Tm _ ⟩
+          `var (lookup (base vl^Var) (lookup ρ (lookup (base vl^Var) k)))
+            ≡⟨ cong `var (lookup-base^Var _) ⟩
+          `var (lookup ρ (lookup (base vl^Var) k))
+            ≡⟨ cong (`var ∘ lookup ρ) (lookup-base^Var k) ⟩
+          `var (lookup ρ k) ∎
+
+        ρ^R′ : ∀[ Eq^R ] (sub (select ρ′ (u /0])) <$> ρ₁′) ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ)
+        lookup^R ρ^R′ z     = refl
+        lookup^R ρ^R′ (s k) = begin
+          sub (select ρ′ (u /0])) (lookup ρ₁′ (s k))    ≡⟨⟩
+          sub (select ρ′ (u /0])) (ren _ (lookup ρ₁ k)) ≡⟨ rensub TermD (lookup ρ₁ k) _ _ ⟩
+          sub _ (lookup ρ₁ k)                           ≡⟨ sym $ Sim.sim Sim.RenSub ρ^R (lookup ρ₁ k) ⟩
+          ren ρ (lookup ρ₁ k) ∎
+
+        eq : sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b ≡ ren ρ′ (sub ρ₁′ b) [ u /0]
+        eq = sym $ begin
               ren ρ′ (sub ρ₁′ b) [ u /0]           ≡⟨ rensub TermD (sub ρ₁′ b) ρ′ (u /0]) ⟩
-              sub (select ρ′ (u /0])) (sub ρ₁′ b)  ≡⟨ Fus.fus (Sub² TermD) {!!} b ⟩ -- technical lemma
+              sub (select ρ′ (u /0])) (sub ρ₁′ b)  ≡⟨ Fus.fus (Sub² TermD) ρ^R′ b ⟩
               sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b ∎
 
-        in 𝓡 (ren ρ (sub ρ₁ (`λ b)) `∙ u) ∋ lemma2-5 (𝓡⇒SN σ u u^R)
-          (𝓡 (ren ρ′ (sub ρ₁′ b) [ u /0]) ∋ subst 𝓡 eq bu)
 \end{code}
