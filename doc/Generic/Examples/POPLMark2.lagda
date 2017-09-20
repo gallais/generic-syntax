@@ -96,7 +96,7 @@ ren-↝-invert t ρ eq ([∙]₂ r u) =
   in g′ `∙ t′ , cong₂ _`∙_ eq eqt , subst (_↝ g′ `∙ t′) eq∙ ([∙]₂ r′ t′)
 
 data SN {σ Γ} (t : Term σ Γ) : Set where
-  sn : (∀ u → t ↝ u → SN u) → SN t
+  sn : (∀ {u} → t ↝ u → SN u) → SN t
 
 Red : Rel Term Unit -- predicate = binary relation with boring second component
 𝓡 : ∀ {σ} → [ Term σ ⟶ κ Set ]
@@ -107,7 +107,7 @@ rel Red {σ ⇒ τ} {Γ} t _ = ∀ {Δ} (ρ : Thinning Γ Δ) {u} → 𝓡 u →
 𝓡 t = rel Red t _
 
 SN-`λ : ∀ {σ τ} {Γ} {t : Term τ (σ ∷ Γ)} → SN t → SN (`λ t)
-SN-`λ (sn t^R) = sn λ { u ([λ] r) → SN-`λ (t^R _ r) }
+SN-`λ (sn t^R) = sn λ { ([λ] r) → SN-`λ (t^R r) }
 
 -- TODO: generic proof!
 ren-id' : ∀ {σ Γ} {ρ : Thinning Γ Γ} → ∀[ Eq^R ] ρ (base vl^Var) →
@@ -127,9 +127,9 @@ lemma2-1 : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} {u : Term σ Γ} → 𝓡 t 
 lemma2-1 {t = t} T U = subst (λ t → 𝓡 (t `∙ _)) (ren-id t) (T (base vl^Var) U)
 
 lemma2-2 : ∀ {σ Γ Δ} (ρ : Thinning Γ Δ) {t : Term σ Γ} → SN t → SN (ren ρ t)
-lemma2-2 ρ (sn U) = sn $ λ u r →
-  let (u′ , eq , r′) = ren-↝-invert _ ρ refl r
-  in subst SN (sym eq) $ lemma2-2 ρ (U u′ r′)
+lemma2-2 ρ (sn u^SN) = sn $ λ r →
+  let (_ , eq , r′) = ren-↝-invert _ ρ refl r
+  in subst SN (sym eq) $ lemma2-2 ρ (u^SN r′)
 
 lemma2-3 : ∀ σ {Γ Δ} (ρ : Thinning Γ Δ) (t : Term σ Γ) → 𝓡 t → 𝓡 (ren ρ t)
 lemma2-3 α       ρ t T = lemma2-2 ρ T
@@ -142,7 +142,7 @@ lemma2-3 (σ ⇒ τ) ρ t T = λ ρ′ U → subst (λ t → 𝓡 (t `∙ _)) (s
 ηexp^↝ r = [λ] ([∙]₂ (th^↝ extend r) (`var z))
 
 SN-η : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} → SN (ηexp t) → SN t
-SN-η (sn pr) = sn (λ u r → SN-η (pr (ηexp u) (ηexp^↝ r)))
+SN-η (sn pr) = sn (λ r → SN-η (pr (ηexp^↝ r)))
 
 data NE : ∀ {σ Γ} → Term σ Γ → Set where
   `var : ∀ {σ Γ} (k : Var σ Γ) → NE (`var k)
@@ -161,10 +161,10 @@ th^NE ρ (ne `$ t) = th^NE ρ ne `$ ren ρ t
 SN-`∙ : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} → NE t → SN t → {u : Term σ Γ} → SN u → SN (t `∙ u)
 SN-`∙ t^NE t^SN u^SN = sn (aux t^NE t^SN u^SN) where
 
-  aux : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} → NE t → SN t → {u : Term σ Γ} → SN u → ∀ v → t `∙ u ↝ v → SN v
-  aux ()   t^SN      u^SN      _ (β _ _)
-  aux t^NE t^SN      (sn u^SN) _ ([∙]₁ f r) = sn (aux t^NE t^SN (u^SN _ r))
-  aux t^NE (sn t^SN) u^SN      _ ([∙]₂ r t) = sn (aux (NE-↝ r t^NE) (t^SN _ r) u^SN)
+  aux : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} {u : Term σ Γ} → NE t → SN t → SN u → ∀ {v} → t `∙ u ↝ v → SN v
+  aux ()   t^SN      u^SN      (β _ _)
+  aux t^NE t^SN      (sn u^SN) ([∙]₁ f r) = sn (aux t^NE t^SN (u^SN r))
+  aux t^NE (sn t^SN) u^SN      ([∙]₂ r t) = sn (aux (NE-↝ r t^NE) (t^SN r) u^SN)
 
 𝓡⇒SN : ∀ σ {Γ} (t : Term σ Γ) → 𝓡 t → SN t
 NE⇒𝓡 : ∀ σ {Γ} (t : Term σ Γ) → NE t → SN t → 𝓡 t
@@ -173,7 +173,7 @@ NE⇒𝓡 : ∀ σ {Γ} (t : Term σ Γ) → NE t → SN t → 𝓡 t
 𝓡⇒SN (σ ⇒ τ) t t^R = SN-η ηt where
 
   𝓡[t∙z] : 𝓡 (ren extend t `∙ `var z)
-  𝓡[t∙z] = lemma2-1 (lemma2-3 _ extend t t^R) (NE⇒𝓡 σ (`var z) (`var z) (sn λ _ ()))
+  𝓡[t∙z] = lemma2-1 (lemma2-3 (σ ⇒ τ) extend t t^R) (NE⇒𝓡 σ (`var z) (`var z) (sn λ ()))
 
   ηt : SN (`λ (ren extend t `∙ `var z))
   ηt = SN-`λ (𝓡⇒SN τ (ren extend t `∙ `var z) 𝓡[t∙z])
@@ -240,5 +240,4 @@ theorem2-6 t ρ rs = Sim.sim prf rs t where
               ren ρ′ (sub ρ₁′ b) [ u /0]           ≡⟨ rensub TermD (sub ρ₁′ b) ρ′ (u /0]) ⟩
               sub (select ρ′ (u /0])) (sub ρ₁′ b)  ≡⟨ Fus.fus (Sub² TermD) ρ^R′ b ⟩
               sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b ∎
-
 \end{code}
