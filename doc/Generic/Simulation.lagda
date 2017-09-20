@@ -51,10 +51,7 @@ module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I → List I → Set} (�
 
 module _ {I : Set} {d : Desc I} where
 
- VarTm^R : Rel Var (Tm d ∞)
- VarTm^R = mkRel (_≡_ ∘ `var)
-
- vl^VarTm : VarLike^R VarTm^R vl^Var vl^Tm 
+ vl^VarTm : VarLike^R VarTm^R vl^Var (vl^Tm {d = d})
  VarLike^R.new^R  vl^VarTm = refl
  VarLike^R.th^R   vl^VarTm = λ σ → cong (ren σ)
 

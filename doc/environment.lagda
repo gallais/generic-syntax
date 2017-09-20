@@ -5,7 +5,7 @@ open import Data.Nat.Base as ℕ
 open import Data.List.Base hiding ([_])
 open import Data.Sum as S
 open import Function
-open import Agda.Builtin.Equality
+open import Relation.Binary.PropositionalEquality as PEq hiding ([_])
 
 open import indexed
 open import var hiding (_<$>_)
@@ -48,6 +48,25 @@ split-injectˡ Γ (s v) rewrite split-injectˡ Γ v = refl
 split-injectʳ : {Γ : List I} (Δ : List I) {σ : I} (v : Var σ Γ) → split Δ (injectʳ Δ v) ≡ inj₂ v
 split-injectʳ []      v                           = refl
 split-injectʳ (_ ∷ Δ) v rewrite split-injectʳ Δ v = refl
+
+injectˡ-split : ∀ {Δ} {i : I} Γ (v : Var i (Γ ++ Δ)) {k₁ : Var i Γ} → split Γ v ≡ inj₁ k₁ → injectˡ Δ k₁ ≡ v
+injectˡ-split []      v     ()
+injectˡ-split (σ ∷ Γ) z     refl = refl
+injectˡ-split (σ ∷ Γ) (s v) eq with split Γ v | inspect (split Γ) v
+injectˡ-split (σ ∷ Γ) (s v) refl | inj₁ _ | PEq.[ eq ] = cong s (injectˡ-split Γ v eq)
+injectˡ-split (σ ∷ Γ) (s v) ()   | inj₂ _ | _
+
+injectʳ-split : ∀ {Δ} {i : I} Γ (v : Var i (Γ ++ Δ)) {k₂ : Var i Δ} → split Γ v ≡ inj₂ k₂ → injectʳ Γ k₂ ≡ v
+injectʳ-split []      v     refl = refl
+injectʳ-split (σ ∷ Γ) z     ()
+injectʳ-split (σ ∷ Γ) (s v) eq with split Γ v | inspect (split Γ) v
+injectʳ-split (σ ∷ Γ) (s v) ()   | inj₁ _ | _
+injectʳ-split (σ ∷ Γ) (s v) refl | inj₂ _ | PEq.[ eq ] = cong s (injectʳ-split Γ v eq)
+
+inject-split : ∀ {Δ} {i : I} Γ (v : Var i (Γ ++ Δ)) → [ injectˡ Δ , injectʳ Γ ]′ (split Γ v) ≡ v
+inject-split Γ v with split Γ v | inspect (split Γ) v
+... | inj₁ k₁ | PEq.[ eq ] = injectˡ-split Γ v eq
+... | inj₂ k₂ | PEq.[ eq ] = injectʳ-split Γ v eq
 
 _>>_ : ∀ {𝓥 Γ Δ Θ} → (Γ ─Env) 𝓥 Θ → (Δ ─Env) 𝓥 Θ → (Γ ++ Δ ─Env) 𝓥 Θ
 lookup (ρ₁ >> ρ₂) k = [ lookup ρ₁ , lookup ρ₂ ]′ (split _ k)

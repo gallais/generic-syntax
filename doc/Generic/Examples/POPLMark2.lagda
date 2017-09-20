@@ -11,6 +11,7 @@ open import Generic.Semantics
 open import Generic.Semantics.Unit
 open import Generic.Zip
 open import Generic.Simulation as Sim hiding (rensub ; RenSub)
+open import Generic.Identity using (ren-id)
 open import Generic.Fusion
 open import Data.Unit
 open import Agda.Builtin.Bool
@@ -108,20 +109,6 @@ rel Red {σ ⇒ τ} {Γ} t _ = ∀ {Δ} (ρ : Thinning Γ Δ) {u} → 𝓡 u →
 
 SN-`λ : ∀ {σ τ} {Γ} {t : Term τ (σ ∷ Γ)} → SN t → SN (`λ t)
 SN-`λ (sn t^R) = sn λ { ([λ] r) → SN-`λ (t^R r) }
-
--- TODO: generic proof!
-ren-id' : ∀ {σ Γ} {ρ : Thinning Γ Γ} → ∀[ Eq^R ] ρ (base vl^Var) →
-          (t : Term σ Γ) → ren ρ t ≡ t
-ren-id' ρ^R (`var k) = cong `var (trans (lookup^R ρ^R k) (lookup-base^Var k))
-ren-id' ρ^R (f `∙ t) = cong₂ _`∙_ (ren-id' ρ^R f) (ren-id' ρ^R t)
-ren-id' ρ^R (`λ b)   = cong `λ $ ren-id' ρ^R′ b where
-
-  ρ^R′ : ∀[ Eq^R ] _ (base vl^Var)
-  lookup^R ρ^R′ z     = refl
-  lookup^R ρ^R′ (s k) = cong s (trans (lookup-base^Var _) (lookup^R ρ^R k))
-
-ren-id : ∀ {σ Γ} (t : Term σ Γ) → ren (base vl^Var) t ≡ t
-ren-id = ren-id' (pack^R λ _ → refl)
 
 lemma2-1 : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} {u : Term σ Γ} → 𝓡 t → 𝓡 u → 𝓡 (t `∙ u)
 lemma2-1 {t = t} T U = subst (λ t → 𝓡 (t `∙ _)) (ren-id t) (T (base vl^Var) U)

@@ -37,6 +37,7 @@ module _ {I : Set} where
  vl^Var : VarLike Var
  new   vl^Var = z
  th^𝓥  vl^Var = th^Var
+
  lookup-base^Var : {Γ : List I} {σ : I} (k : Var σ Γ) → lookup (base vl^Var) k ≡ k
  lookup-base^Var z     = refl
  lookup-base^Var (s k) = cong s (lookup-base^Var k)
@@ -82,6 +83,7 @@ module _ {I : Set} {𝓥₁ 𝓥₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ �
 
 
 module _ {I : Set} {𝓥 : I ─Scoped} (vl^𝓥  : VarLike 𝓥) where
+
  vl^Refl : VarLike^R Eq^R vl^𝓥 vl^𝓥
  VarLike^R.new^R  vl^Refl = refl
  VarLike^R.th^R   vl^Refl = λ σ → cong (λ v → th^𝓥 vl^𝓥 v σ)

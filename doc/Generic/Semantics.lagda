@@ -7,8 +7,10 @@ open import Data.List.Base as L hiding ([_])
 open import Data.Product as P hiding (,_)
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
+open ≡-Reasoning
 
 open import var
+open import rel
 open import indexed
 open import environment as E
 open import Generic.Syntax
@@ -127,6 +129,12 @@ module _ {I : Set} {d : Desc I} where
  lookup-base^Tm : {Γ : List I} {σ : I} (k : Var σ Γ) → lookup (base vl^Tm) k ≡ `var k
  lookup-base^Tm z                              = refl
  lookup-base^Tm (s k) rewrite lookup-base^Tm k = refl
+
+ base^VarTm^R : ∀ {Γ} → ∀[ VarTm^R ] (base vl^Var {Γ}) (base vl^Tm)
+ lookup^R base^VarTm^R k = begin
+   `var (lookup (base vl^Var) k) ≡⟨ cong `var (lookup-base^Var k) ⟩
+   `var k                        ≡⟨ sym (lookup-base^Tm k) ⟩
+   lookup (base vl^Tm) k ∎
 
  sy^Tm : Syntactic d (Tm d ∞)
  Syntactic.var   sy^Tm = id

@@ -1,12 +1,14 @@
 \begin{code}
 module rel where
 
+open import Size
 open import Data.Sum
 open import Data.List.Base hiding ([_])
 
 open import indexed
 open import var hiding (_<$>_)
 open import environment
+open import Generic.Syntax
 open import Agda.Builtin.Equality
 
 record Rel {I : Set} (T U : I ─Scoped) : Set₁ where
@@ -55,6 +57,11 @@ module _ {I : Set} where
 
  Eq^R : {A : I ─Scoped} → Rel A A
  rel Eq^R = _≡_
+
+module _ {I : Set} {d : Desc I} where
+
+ VarTm^R : Rel Var (Tm d ∞)
+ rel VarTm^R v t = `var v ≡ t
 
 \end{code}
 

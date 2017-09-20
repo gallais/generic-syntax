@@ -16,7 +16,8 @@ open import environment
 open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Zip
-open import Generic.Simulation using (reify^R ; VarTm^R ; vl^VarTm)
+open import Generic.Simulation using (reify^R ; vl^VarTm)
+open import Generic.Identity
 
 module _  {I : Set} {𝓥₁ 𝓥₂ 𝓥₃ 𝓒₁ 𝓒₂ 𝓒₃ : I → List I → Set}
           (𝓡^Env : {Γ Δ Θ : List I} → (Γ ─Env) 𝓥₁ Δ → (Δ ─Env) 𝓥₂ Θ → (Γ ─Env) 𝓥₃ Θ → Set)
@@ -289,7 +290,7 @@ module _ {I : Set} (d : Desc I) where
    lookup^R eq^R′ z     = refl
    lookup^R eq^R′ (s k) = begin
      sub (sub ρ u /0]) (ren σ (lookup ρ k))  ≡⟨ Fus.fus RenSub eq^R (lookup ρ k) ⟩
-     sub (base vl^Tm) (lookup ρ k)           ≡⟨ {!!} ⟩ -- need sub-id
+     sub (base vl^Tm) (lookup ρ k)           ≡⟨ sub-id (lookup ρ k) ⟩
      lookup ρ k                              ≡⟨ cong (sub ρ) (sym $ lookup-base^Tm k) ⟩
      sub ρ (lookup (base vl^Tm) k) ∎
 
