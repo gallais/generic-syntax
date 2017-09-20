@@ -256,24 +256,41 @@ module _ {I : Set} (d : Desc I) where
 
  renβ : ∀ {Γ Δ i j} (b : Tm d ∞ j (i ∷ Γ)) (u : Tm d ∞ i Γ) (ρ : Thinning Γ Δ) →
         ren ρ (b [ u /0]) ≡ ren (lift vl^Var (i ∷ []) ρ) b [ ren ρ u /0]
- renβ {Γ} {Δ} {i} b u ρ =
-   begin
+ renβ {i = i} b u ρ = begin
      ren ρ (b [ u /0])         ≡⟨ subren b (u /0]) ρ ⟩
      sub (ren ρ <$> (u /0])) b ≡⟨ sym (Fus.fus RenSub eq^R b) ⟩
-     ren ρ′ b [ ren ρ u /0]
-   ∎ where
+     ren ρ′ b [ ren ρ u /0]    ∎ where
 
-      ρ′ : Thinning (i ∷ Γ) (i ∷ Δ)
-      ρ′ = lift vl^Var (i ∷ []) ρ
+     ρ′ = lift vl^Var (i ∷ []) ρ
 
-      eq^R : ∀[ Eq^R ] (select ρ′ (ren ρ u /0])) (ren ρ <$> (u /0]))
-      eq^R = pack^R λ
-        { z      → refl
-        ; (s k) → begin
-          lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ k)) ≡⟨ lookup-base^Tm _ ⟩
-          `var (lookup (base vl^Var) (lookup ρ k))                ≡⟨ cong `var (lookup-base^Var _) ⟩
-          `var (lookup ρ k)                                       ≡⟨ sym (cong (ren ρ) (lookup-base^Tm k)) ⟩
-          ren ρ (lookup (base vl^Tm) k)                           ∎
-        }
+     eq^R : ∀[ Eq^R ] (select ρ′ (ren ρ u /0])) (ren ρ <$> (u /0]))
+     lookup^R eq^R z     = refl
+     lookup^R eq^R (s k) = begin
+       lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ k)) ≡⟨ lookup-base^Tm _ ⟩
+       `var (lookup (base vl^Var) (lookup ρ k))                ≡⟨ cong `var (lookup-base^Var _) ⟩
+       `var (lookup ρ k)                                       ≡⟨ sym (cong (ren ρ) (lookup-base^Tm k)) ⟩
+       ren ρ (lookup (base vl^Tm) k)                           ∎
+
+ subβ : ∀ {Γ Δ i j} (b : Tm d ∞ j (i ∷ Γ)) (u : Tm d ∞ i Γ) (ρ : (Γ ─Env) (Tm d ∞) Δ) →
+        sub ρ (b [ u /0]) ≡ sub (lift vl^Tm (i ∷ []) ρ) b [ sub ρ u /0]
+ subβ {i = i} b u ρ = begin
+   sub ρ (b [ u /0])                  ≡⟨ sub² b (u /0]) ρ ⟩
+   sub (sub ρ <$> (base vl^Tm ∙ u)) b ≡⟨ sym (Fus.fus Sub² eq^R′ b) ⟩
+   sub ρ′ b [ sub ρ u /0]             ∎ where
+
+   ρ′ = lift vl^Tm (i ∷ []) ρ
+   σ  = freshʳ vl^Var (i ∷ [])
+
+   eq^R : ∀[ Eq^R ] (select σ (sub ρ u /0])) (base vl^Tm)
+   lookup^R eq^R z     = refl
+   lookup^R eq^R (s k) = cong (ren extend ∘ lookup (base vl^Tm)) (lookup-base^Var k)
+
+   eq^R′ : ∀[ Eq^R ] (sub (sub ρ u /0]) <$> ρ′) (sub ρ <$> (base vl^Tm ∙ u))
+   lookup^R eq^R′ z     = refl
+   lookup^R eq^R′ (s k) = begin
+     sub (sub ρ u /0]) (ren σ (lookup ρ k))  ≡⟨ Fus.fus RenSub eq^R (lookup ρ k) ⟩
+     sub (base vl^Tm) (lookup ρ k)           ≡⟨ {!!} ⟩ -- need sub-id
+     lookup ρ k                              ≡⟨ cong (sub ρ) (sym $ lookup-base^Tm k) ⟩
+     sub ρ (lookup (base vl^Tm) k) ∎
 
 \end{code}
