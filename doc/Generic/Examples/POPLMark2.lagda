@@ -1,29 +1,14 @@
 \begin{code}
 module Generic.Examples.POPLMark2 where
 
-open import var hiding (_<$>_)
-open import rel
-open import varlike
-open import indexed
-open import environment
-open import Generic.Syntax
-open import Generic.Semantics
-open import Generic.Semantics.Unit
-open import Generic.Zip
-open import Generic.Simulation as Sim hiding (rensub ; RenSub)
-open import Generic.Identity using (ren-id)
-open import Generic.Fusion
+open import Generic hiding (_×_)
 
-open import Data.Star as S using (Star)
-open import Data.Empty
-open import Data.Unit
 open import Agda.Builtin.Bool
-open import Relation.Binary.PropositionalEquality hiding ([_])
-open ≡-Reasoning
-open import Data.Product hiding (,_)
 open import Agda.Builtin.List
-open import Size
+open import Data.Product hiding (,_)
+open import Data.Star as S using (Star)
 open import Function
+open import Relation.Binary.PropositionalEquality hiding ([_]); open ≡-Reasoning
 
 data Type : Set where
   α   : Type
@@ -38,11 +23,11 @@ infixl 10 _`∙_
 pattern `λ  b    = `con ((_ , _) , true , b , refl)
 pattern _`∙_ f t = `con ((_ , _) , false , f , t , refl)
 
-{-# DISPLAY `con (_ , true , b , refl)      = `λ b   #-}
-{-# DISPLAY `con (_ , false , f , t , refl) = f `∙ t #-}
+{-# DISPLAY syn.`con (_ , true , b , refl)      = `λ b   #-}
+{-# DISPLAY syn.`con (_ , false , f , t , refl) = f `∙ t #-}
 
 Term : Type ─Scoped
-Term = Tm TermD ∞
+Term = Tm TermD _
 
 infix 3 _↝_ _↝⋆_
 data _↝_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ] where
@@ -267,7 +252,7 @@ theorem2-6 t ρ rs = Sim.sim prf rs t where
         lookup^R ρ^R′ z     = refl
         lookup^R ρ^R′ (s k) = begin
           sub (select ρ′ (u /0])) (ren _ (lookup ρ₁ k)) ≡⟨ rensub TermD (lookup ρ₁ k) _ _ ⟩
-          sub _ (lookup ρ₁ k)                           ≡⟨ sym $ Sim.sim Sim.RenSub ρ^R (lookup ρ₁ k) ⟩
+          sub _ (lookup ρ₁ k)                           ≡⟨ sym $ Sim.sim sim.RenSub ρ^R (lookup ρ₁ k) ⟩
           ren ρ (lookup ρ₁ k) ∎
 
         eq : sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b ≡ ren ρ′ (sub ρ₁′ b) [ u /0]

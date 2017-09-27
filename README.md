@@ -1,5 +1,5 @@
 # generic-syntax
-A Scope Safe Universe of Syntaxes with Binding, Their Semantics and Proofs
+A Scope-and-Type Safe Universe of Syntaxes with Binding, Their Semantics and Proofs
 
 # typechecking
 To typecheck this development, you'll need:
