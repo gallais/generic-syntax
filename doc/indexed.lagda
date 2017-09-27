@@ -11,7 +11,7 @@
 -- {i : I} → S (f i) ⊎ T i → U i × V i
 -- (cf. test at the end of the file)
 
-module indexed {I : Set} where
+module indexed {i} {I : Set i} where
 
 open import Level using (Level ; _⊔_)
 open import Data.Sum using (_⊎_) public
@@ -44,7 +44,7 @@ _⟶_ :  {ℓ ℓ′ : Level} → (I → Set ℓ) → (I → Set ℓ′) → (I 
 %</constant>
 %<*forall>
 \begin{code}
-[_] :  {ℓ : Level} → (I → Set ℓ) → Set ℓ
+[_] :  {ℓ : Level} → (I → Set ℓ) → Set (i ⊔ ℓ)
 [ T ] = ∀ {i} → T i
 \end{code}
 %</forall>

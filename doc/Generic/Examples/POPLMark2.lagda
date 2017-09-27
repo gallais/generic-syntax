@@ -13,6 +13,9 @@ open import Generic.Zip
 open import Generic.Simulation as Sim hiding (rensub ; RenSub)
 open import Generic.Identity using (ren-id)
 open import Generic.Fusion
+
+open import Data.Star as S using (Star)
+open import Data.Empty
 open import Data.Unit
 open import Agda.Builtin.Bool
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -41,7 +44,7 @@ pattern _`∙_ f t = `con ((_ , _) , false , f , t , refl)
 Term : Type ─Scoped
 Term = Tm TermD ∞
 
-infix 3 _↝_
+infix 3 _↝_ _↝⋆_
 data _↝_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ] where
 -- computational
   β    : ∀ {Γ σ τ} (t : Term τ (σ ∷ Γ)) (u : Term σ Γ) → `λ t `∙ u ↝ t [ u /0]
@@ -50,11 +53,32 @@ data _↝_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ] where
   [∙]₁ : ∀ {Γ σ τ} (f : Term (σ ⇒ τ) Γ) {t u : Term σ Γ} → t ↝ u → f `∙ t ↝ f `∙ u
   [∙]₂ : ∀ {Γ σ τ} {f g : Term (σ ⇒ τ) Γ} → f ↝ g → (t : Term σ Γ) → f `∙ t ↝ g `∙ t
 
+_↝⋆_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]
+_↝⋆_ = Star _↝_
+
 th^↝ : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : Thinning Γ Δ) → t ↝ u → ren ρ t ↝ ren ρ u
 th^↝ ρ (β t u)    = subst (ren ρ (`λ t `∙ u) ↝_) (sym $ renβ TermD t u ρ) (β _ _)
 th^↝ ρ ([λ] r)    = [λ] (th^↝ _ r)
 th^↝ ρ ([∙]₁ f r) = [∙]₁ (ren ρ f) (th^↝ ρ r)
 th^↝ ρ ([∙]₂ r t) = [∙]₂ (th^↝ ρ r) (ren ρ t)
+
+sub^↝ : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : (Γ ─Env) Term Δ) → t ↝ u → sub ρ t ↝ sub ρ u
+sub^↝ ρ (β t u)    = subst (sub ρ (`λ t `∙ u) ↝_) (sym $ subβ TermD t u ρ) (β (sub _ t) (sub ρ u))
+sub^↝ ρ ([λ] r)    = [λ] (sub^↝ _ r)
+sub^↝ ρ ([∙]₁ f r) = [∙]₁ (sub ρ f) (sub^↝ ρ r)
+sub^↝ ρ ([∙]₂ r t) = [∙]₂ (sub^↝ ρ r) (sub ρ t)
+
+sub^↝⋆ : ∀ {σ Γ Δ} (t : Term σ Γ) {ρ ρ′ : (Γ ─Env) Term Δ} → ∀[ mkRel _↝⋆_ ] ρ ρ′ → sub ρ t ↝⋆ sub ρ′ t
+sub^↝⋆ (`var k)          ρ^R = lookup^R ρ^R k
+sub^↝⋆ (f `∙ t) {ρ} {ρ′} ρ^R = S.gmap (_`∙ sub ρ t) (λ f → [∙]₂ f (sub ρ t)) (sub^↝⋆ f ρ^R)
+                                  S.◅◅ S.gmap (sub ρ′ f `∙_) ([∙]₁ (sub ρ′ f)) (sub^↝⋆ t ρ^R)
+sub^↝⋆ {Γ = Γ} {Δ} (`con ((σ , τ) , true , b , refl)) {ρ} {ρ′} ρ^R = S.gmap `λ [λ] (sub^↝⋆ b (vs^R >>^R renρ^R))
+  where vs = freshˡ vl^Tm Δ {σ ∷ []}
+        re = freshʳ vl^Var (σ ∷ [])
+        vs^R : ∀[ mkRel _↝⋆_ ] vs vs
+        vs^R = pack^R (λ _ → S.ε)
+        renρ^R : ∀[ mkRel _↝⋆_ ] (th^Env th^Tm ρ re) (th^Env th^Tm ρ′ re)
+        renρ^R = pack^R (λ k → S.gmap (ren re) (th^↝ re) (lookup^R ρ^R k))
 
 ren-invert-∙ : ∀ {σ τ Γ Δ} (u : Term τ Γ) {f : Term (σ ⇒ τ) Δ} {t : Term σ Δ} (ρ : Thinning Γ Δ) →
                f `∙ t ≡ ren ρ u → ∃ λ f′ → ∃ λ t′ → f′ `∙ t′ ≡ u × f ≡ ren ρ f′ × t ≡ ren ρ t′
@@ -67,7 +91,7 @@ ren-invert-λ : ∀ {σ τ Γ Δ} (u : Term (σ ⇒ τ) Γ) {b : Term τ (σ ∷
 ren-invert-λ (`var _) ρ ()
 ren-invert-λ (_ `∙ _) ρ ()
 ren-invert-λ (`λ b′)  ρ refl = b′ , refl , refl
-                                
+
 ren-↝-invert :  ∀ {σ Γ Δ} (t′ : Term σ Γ) {t u : Term σ Δ} (ρ : Thinning Γ Δ) →
                 t ≡ ren ρ t′ → t ↝ u → ∃ λ u′ → u ≡ ren ρ u′ × t′ ↝ u′
 ren-↝-invert {Γ = Γ} {Δ} t ρ eq (β {σ = σ} b u) =
@@ -96,8 +120,17 @@ ren-↝-invert t ρ eq ([∙]₂ r u) =
       (g′ , eq , r′)              = ren-↝-invert f′ ρ eqf r
   in g′ `∙ t′ , cong₂ _`∙_ eq eqt , subst (_↝ g′ `∙ t′) eq∙ ([∙]₂ r′ t′)
 
+Closed : (∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]) → (∀ {σ Γ} → Term σ Γ → Set) → ∀ {σ Γ} → Term σ Γ → Set
+Closed red R t = ∀ {u} → red t u → R u
+
 data SN {σ Γ} (t : Term σ Γ) : Set where
-  sn : (∀ {u} → t ↝ u → SN u) → SN t
+  sn : Closed _↝_ SN t → SN t
+
+Closed-SN : ∀ {σ Γ} {t : Term σ Γ} → SN t → Closed _↝_ SN t
+Closed-SN (sn t^SN) = t^SN
+
+SN^sub⁻¹ : ∀ {σ Γ Δ} {t : Term σ Γ} (ρ : (Γ ─Env) Term Δ) → SN (sub ρ t) → SN t
+SN^sub⁻¹ ρ (sn tρ^SN) = sn (λ r → SN^sub⁻¹ ρ (tρ^SN (sub^↝ ρ r)))
 
 Red : Rel Term Unit -- predicate = binary relation with boring second component
 𝓡 : ∀ {σ} → [ Term σ ⟶ κ Set ]
@@ -131,52 +164,68 @@ lemma2-3 (σ ⇒ τ) ρ t T = λ ρ′ U → subst (λ t → 𝓡 (t `∙ _)) (s
 SN-η : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} → SN (ηexp t) → SN t
 SN-η (sn pr) = sn (λ r → SN-η (pr (ηexp^↝ r)))
 
-data NE : ∀ {σ Γ} → Term σ Γ → Set where
-  `var : ∀ {σ Γ} (k : Var σ Γ) → NE (`var k)
-  _`$_ : ∀ {σ τ Γ} {f : Term (σ ⇒ τ) Γ} → NE f → (t : Term σ Γ) → NE (f `∙ t)
+data NE {σ Γ} : Term σ Γ → Set where
+  [var] : (k : Var σ Γ) → NE (`var k)
+  _[∙]_ : ∀ {τ} (f : Term (τ ⇒ σ) Γ) (t : Term τ Γ) → NE (f `∙ t)
 
-NE-↝ : ∀ {σ Γ} {t u : Term σ Γ} → t ↝ u → NE t → NE u
-NE-↝ (β _ _)    (() `$ _)
-NE-↝ ([λ] r)    ()
-NE-↝ ([∙]₁ f r) (ne `$ _) = ne `$ _
-NE-↝ ([∙]₂ r t) (ne `$ _) = NE-↝ r ne `$ t
+th^NE : ∀ {σ Γ Δ} {t : Term σ Γ} → NE t → (ρ : Thinning Γ Δ) → NE (ren ρ t)
+th^NE ([var] k) ρ = [var] (lookup ρ k)
+th^NE (f [∙] t) ρ = ren ρ f [∙] ren ρ t
 
-th^NE : ∀ {σ Γ Δ} {t : Term σ Γ} (ρ : Thinning Γ Δ) → NE t → NE (ren ρ t)
-th^NE ρ (`var k)  = `var (lookup ρ k)
-th^NE ρ (ne `$ t) = th^NE ρ ne `$ ren ρ t
+Closed-𝓡 : ∀ σ {Γ} {t : Term σ Γ} → 𝓡 t → Closed _↝_ 𝓡 t
+Closed-𝓡 α       t^R = Closed-SN t^R
+Closed-𝓡 (σ ⇒ τ) t^R = λ r ρ u^R → Closed-𝓡 τ (t^R ρ u^R) ([∙]₂ (th^↝ ρ r) _)
 
-SN-`∙ : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} → NE t → SN t → {u : Term σ Γ} → SN u → SN (t `∙ u)
-SN-`∙ t^NE t^SN u^SN = sn (aux t^NE t^SN u^SN) where
+Closed⋆-𝓡 : ∀ {σ Γ} {t : Term σ Γ} → 𝓡 t → Closed _↝⋆_ 𝓡 t
+Closed⋆-𝓡 t^R Star.ε        = t^R
+Closed⋆-𝓡 t^R (r Star.◅ rs) = Closed⋆-𝓡 (Closed-𝓡 _ t^R r) rs
 
-  aux : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} {u : Term σ Γ} → NE t → SN t → SN u → ∀ {v} → t `∙ u ↝ v → SN v
-  aux ()   t^SN      u^SN      (β _ _)
-  aux t^NE t^SN      (sn u^SN) ([∙]₁ f r) = sn (aux t^NE t^SN (u^SN r))
-  aux t^NE (sn t^SN) u^SN      ([∙]₂ r t) = sn (aux (NE-↝ r t^NE) (t^SN r) u^SN)
-
-𝓡⇒SN : ∀ σ {Γ} (t : Term σ Γ) → 𝓡 t → SN t
-NE⇒𝓡 : ∀ σ {Γ} (t : Term σ Γ) → NE t → SN t → 𝓡 t
+𝓡⇒SN       : ∀ σ {Γ} (t : Term σ Γ) → 𝓡 t → SN t
+NE⇒𝓡       : ∀ σ {Γ} (t : Term σ Γ) → NE t → Closed _↝_ 𝓡 t → 𝓡 t
+Closed-𝓡-∙ : ∀ {σ τ Γ} {t : Term (σ ⇒ τ) Γ} → NE t → Closed _↝_ 𝓡 t →
+              ∀ {a} → 𝓡 a → SN a → Closed _↝_ 𝓡 (t `∙ a)
 
 𝓡⇒SN α       t t^R = t^R
 𝓡⇒SN (σ ⇒ τ) t t^R = SN-η ηt where
 
   𝓡[t∙z] : 𝓡 (ren extend t `∙ `var z)
-  𝓡[t∙z] = lemma2-1 (lemma2-3 (σ ⇒ τ) extend t t^R) (NE⇒𝓡 σ (`var z) (`var z) (sn λ ()))
+  𝓡[t∙z] = lemma2-1 (lemma2-3 (σ ⇒ τ) extend t t^R) (NE⇒𝓡 σ (`var z) ([var] z) (λ ()))
 
   ηt : SN (`λ (ren extend t `∙ `var z))
   ηt = SN-`λ (𝓡⇒SN τ (ren extend t `∙ `var z) 𝓡[t∙z])
 
-NE⇒𝓡 α       t t^NE t^SN = t^SN
-NE⇒𝓡 (σ ⇒ τ) t t^NE t^SN = λ ρ {u} u^SN →
-  let tρ^NE = th^NE ρ t^NE
-      tρ^SN = lemma2-2 ρ t^SN
-  in NE⇒𝓡 τ _ (tρ^NE `$ u) (SN-`∙ tρ^NE tρ^SN (𝓡⇒SN σ u u^SN))
+NE⇒𝓡 α       t t^NE t^R           = sn t^R
+NE⇒𝓡 (σ ⇒ τ) t t^NE t^R ρ {u} u^R = NE⇒𝓡 τ (ren ρ t `∙ u) (ren ρ t [∙] u) tρ∙u^R
+  where u^SN   = 𝓡⇒SN σ _ u^R
+        tρ^R   : Closed _↝_ 𝓡 (ren ρ t)
+        tρ^R r = let (u′ , eq , r′) = ren-↝-invert t ρ refl r
+                 in subst 𝓡 (sym eq) (lemma2-3 (σ ⇒ τ) ρ u′ (t^R r′))
+        tρ∙u^R : Closed _↝_ 𝓡 (ren ρ t `∙ u)
+        tρ∙u^R = Closed-𝓡-∙ (th^NE t^NE ρ) tρ^R u^R u^SN
+
+Closed-𝓡-∙ ()   t^R a^R a^SN      (β t u)
+Closed-𝓡-∙ t^NE t^R a^R (sn a^SN) ([∙]₁ t r) =
+  NE⇒𝓡 _ _ (t [∙] _) (Closed-𝓡-∙ t^NE t^R (Closed-𝓡 _ a^R r) (a^SN r))
+Closed-𝓡-∙ t^NE t^R a^R a^SN      ([∙]₂ r t) = rew $ t^R r (base vl^Var) a^R
+  where rew = subst (λ f → 𝓡 (f `∙ _)) (ren-id _)
 
 lemma2-4 : ∀ {Γ Δ Θ} (ρ : Thinning Δ Θ) (vs : (Γ ─Env) Term Δ) →
            ∀[ Red ] vs _ → ∀[ Red ] (th^Env th^Tm vs ρ) _
 lemma2-4 ρ vs rs = lemma2-3 _ ρ _ <$>^R rs
 
-lemma2-5 : ∀ τ {σ Γ} {t : Term τ (σ ∷ Γ)} {u : Term σ Γ} → SN u → 𝓡 (t [ u /0]) → 𝓡 (`λ t `∙ u)
-lemma2-5 = {!!}
+Closed-𝓡-β : ∀ {σ τ Γ} {t : Term τ (σ ∷ Γ)} → SN t → ∀ {u} → SN u → 𝓡 (t [ u /0]) → Closed _↝_ 𝓡 (`λ t `∙ u)
+𝓡-β        : ∀ {σ τ Γ} {t : Term τ (σ ∷ Γ)} → SN t → ∀ {u} → SN u → 𝓡 (t [ u /0]) → 𝓡 (`λ t `∙ u)
+
+Closed-𝓡-β         t^SN      u^SN      tu^R (β t u)          = tu^R
+Closed-𝓡-β {t = t} t^SN      (sn u^SN) tu^R ([∙]₁ f r)       =
+  𝓡-β t^SN (u^SN r) (Closed⋆-𝓡 tu^R (sub^↝⋆ t (pack^R (λ _ → S.ε) ∙^R S.return r)))
+Closed-𝓡-β         (sn t^SN) u^SN      tu^R ([∙]₂ ([λ] r) u) =
+  𝓡-β (t^SN r) u^SN (Closed-𝓡 _ tu^R (sub^↝ (u /0]) r))
+
+𝓡-β t^SN u^SN tu^R = NE⇒𝓡 _ _ (_ [∙] _) (Closed-𝓡-β t^SN u^SN tu^R)
+
+lemma2-5 : ∀ τ {σ Γ} {t : Term τ (σ ∷ Γ)} {u} → SN u → 𝓡 (t [ u /0]) → 𝓡 (`λ t `∙ u)
+lemma2-5 τ u^SN tu^R = 𝓡-β (SN^sub⁻¹ (_ /0]) (𝓡⇒SN _ _ tu^R)) u^SN tu^R
 
 theorem2-6 : ∀ {σ Γ Δ} (t : Term σ Γ) (ρ : (Γ ─Env) Term Δ) →
              ∀[ Red ] ρ _ → 𝓡 (sub ρ t)
@@ -217,7 +266,6 @@ theorem2-6 t ρ rs = Sim.sim prf rs t where
         ρ^R′ : ∀[ Eq^R ] (sub (select ρ′ (u /0])) <$> ρ₁′) ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ)
         lookup^R ρ^R′ z     = refl
         lookup^R ρ^R′ (s k) = begin
-          sub (select ρ′ (u /0])) (lookup ρ₁′ (s k))    ≡⟨⟩
           sub (select ρ′ (u /0])) (ren _ (lookup ρ₁ k)) ≡⟨ rensub TermD (lookup ρ₁ k) _ _ ⟩
           sub _ (lookup ρ₁ k)                           ≡⟨ sym $ Sim.sim Sim.RenSub ρ^R (lookup ρ₁ k) ⟩
           ren ρ (lookup ρ₁ k) ∎

@@ -10,7 +10,7 @@ open import Function hiding (case_of_)
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import var
-open import indexed 
+open import indexed
 open import environment as E hiding (traverse)
 
 -- Descriptions and their Interpretation

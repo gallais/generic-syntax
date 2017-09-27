@@ -9,6 +9,7 @@
 module var where
 
 open import indexed
+open import Data.Sum hiding (map)
 open import Data.List.Base hiding ([_])
 open import Data.List.All using (All ; _∷_)
 open import Function
@@ -33,6 +34,11 @@ module _ {I : Set} where
 %</var>
 
 \begin{code}
+ infixl 3 _─_
+ _─_ : {i : I} (Γ : List I) → Var i Γ → List I
+ _ ∷ Γ ─ z   = Γ
+ σ ∷ Γ ─ s v = σ ∷ (Γ ─ v)
+
  get : {B : I → Set} {i : I} → [ Var i ⟶ All B ⟶ κ (B i) ]
  get z     (b  ∷ _)  = b
  get (s v) (_  ∷ bs) = get v bs
@@ -42,8 +48,15 @@ f <$> z    = z
 f <$> s v  = s (f <$> v)
 
 record Injective {I J : Set} (f : I → J) : Set where
+  constructor mkInjective
   field inj : ∀ {i₁ i₂} → f i₁ ≡ f i₂ → i₁ ≡ i₂
 open Injective public
+
+Injective-inj₁ : ∀ {A B : Set} → Injective ((A → A ⊎ B) ∋ inj₁)
+inj Injective-inj₁ refl = refl
+
+Injective-inj₂ : ∀ {A B : Set} → Injective ((B → A ⊎ B) ∋ inj₂)
+inj Injective-inj₂ refl = refl
 
 _<$>⁻¹_ : {I J : Set} {f : I → J} → Injective f →
           {i : I} → [ Var (f i) ∘ map f ⟶ Var i ]
