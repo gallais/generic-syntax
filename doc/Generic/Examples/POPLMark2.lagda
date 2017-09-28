@@ -20,8 +20,10 @@ TermD =  `σ (Type × Type) λ { (σ , τ) →
          `+ `X [] (σ ⇒ τ) (`X [] σ (`∎ τ)) }
 
 infixl 10 _`∙_
-pattern `λ  b    = `con ((_ , _) , true , b , refl)
-pattern _`∙_ f t = `con ((_ , _) , false , f , t , refl)
+pattern `λ' b     = (_ , true , b , refl)
+pattern _`∙'_ f t = (_ , false , f , t , refl)
+pattern `λ  b     = `con (`λ' b)
+pattern _`∙_ f t  = `con (f `∙' t)
 
 {-# DISPLAY syn.`con (_ , true , b , refl)      = `λ b   #-}
 {-# DISPLAY syn.`con (_ , false , f , t , refl) = f `∙ t #-}
@@ -60,10 +62,9 @@ sub^↝⋆ t ρ^R = Sim.sim sim ρ^R t where
   Sim.th^R  sim = λ ρ → S.gmap _ (th^↝ ρ)
   Sim.var^R sim = id
   Sim.alg^R sim = λ
-    { ((σ , τ) , false , f , t , refl) {ρ₁} {ρ₂} ρ^R (refl , refl , f^R , t^R , _) →
-      S.gmap (_`∙ sub ρ₁ t) (λ f → [∙]₂ f (sub ρ₁ t)) f^R
-      S.◅◅ S.gmap (sub ρ₂ f `∙_) ([∙]₁ (sub ρ₂ f)) t^R
-    ; ((σ , τ) , true  , b     , refl) ρ^R (refl , refl , b^R , _) → S.gmap `λ [λ] (b^R _ (pack^R (λ _ → S.ε))) }
+    { (f `∙' t) {ρ₁} {ρ₂} ρ^R (refl , refl , f^R , t^R , _) → S.gmap (_`∙ sub ρ₁ t) (λ f → [∙]₂ f (sub ρ₁ t)) f^R
+                                                              S.◅◅ S.gmap (sub ρ₂ f `∙_) ([∙]₁ (sub ρ₂ f)) t^R
+    ; (`λ' b) ρ^R (refl , refl , b^R , _) → S.gmap `λ [λ] (b^R _ (pack^R (λ _ → S.ε))) }
 
 ren-invert-∙ : ∀ {σ τ Γ Δ} (u : Term τ Γ) {f : Term (σ ⇒ τ) Δ} {t : Term σ Δ} (ρ : Thinning Γ Δ) →
                f `∙ t ≡ ren ρ u → ∃ λ f′ → ∃ λ t′ → f′ `∙ t′ ≡ u × f ≡ ren ρ f′ × t ≡ ren ρ t′
@@ -219,20 +220,18 @@ theorem2-6 t ρ rs = Fdm.fdm prf rs t where
   prf : Fdm 𝓡' 𝓡' TermD Substitution
   Fdm.th^P  prf = λ ρ → lemma2-3 _ ρ _
   Fdm.var^P prf = id
-  Fdm.all^P prf = all^P where
+  Fdm.alg^P prf = alg^P where
 
-    all^P : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ : (Γ ─Env) Term Δ} →
+    alg^P : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ : (Γ ─Env) Term Δ} →
             let v = fmap TermD (Sem.body Substitution ρ) b in
             pred.∀[ 𝓡' ] ρ → All TermD (Kripke^P 𝓡' 𝓡') v → 𝓡 (Sem.alg Substitution v)
-    all^P ((σ , τ) , false , f , t , refl) ρ^P (f^P , t^P , _) = rew $ f^P (base vl^Var) t^P where
-      rew = subst (λ f → 𝓡 (f `∙ sub _ t)) (ren-id _)
-    all^P ((σ , τ) , true , b , refl) {ρ₁} ρ^P (b^P , _) ρ {u} u^P =
-      lemma2-5 τ (𝓡⇒SN σ u u^P) (subst 𝓡 eq (b^P ρ (ε^P ∙^P u^P))) where
+    alg^P (f `∙' t) ρ^P (f^P , t^P , _) = subst (𝓡 ∘ (_`∙ _)) (ren-id _) $ f^P (base vl^Var) t^P
+    alg^P (`λ' b) {ρ₁} ρ^P (b^P , _) ρ {u} u^P = lemma2-5 _ (𝓡⇒SN _ u u^P) (subst 𝓡 eq (b^P ρ (ε^P ∙^P u^P)))
+      where
+        ρ′  = lift vl^Var (_ ∷ []) ρ
+        ρ₁′ = lift vl^Tm (_ ∷ []) ρ₁
 
-        ρ′  = lift vl^Var (σ ∷ []) ρ
-        ρ₁′ = lift vl^Tm (σ ∷ []) ρ₁
-
-        ρ^R : rel.∀[ VarTm^R ] ρ (select (freshʳ vl^Var (σ ∷ [])) (select ρ′ (u /0])))
+        ρ^R : rel.∀[ VarTm^R ] ρ (select (freshʳ vl^Var (_ ∷ [])) (select ρ′ (u /0])))
         lookup^R ρ^R k = sym $ begin
           lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ (lookup (base vl^Var) k)))
             ≡⟨ lookup-base^Tm _ ⟩
