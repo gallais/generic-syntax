@@ -3,7 +3,6 @@ module Generic.Examples.POPLMark2 where
 
 open import Generic hiding (_×_)
 
-open import Agda.Builtin.Bool
 open import Agda.Builtin.List
 open import Data.Product hiding (,_)
 open import Data.Star as S using (Star)
@@ -14,19 +13,22 @@ data Type : Set where
   α   : Type
   _⇒_ : Type → Type → Type
 
+data TermC : Set where
+  Lam : Type → Type → TermC
+  App : Type → Type → TermC
+
 TermD : Desc Type
-TermD =  `σ (Type × Type) λ { (σ , τ) →
-         `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
-         `+ `X [] (σ ⇒ τ) (`X [] σ (`∎ τ)) }
+TermD =  `σ TermC λ { (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
+                    ; (App σ τ) → `X [] (σ ⇒ τ) (`X [] σ (`∎ τ)) }
 
 infixl 10 _`∙_
-pattern `λ' b     = (_ , true , b , refl)
-pattern _`∙'_ f t = (_ , false , f , t , refl)
+pattern `λ' b     = (Lam _ _ , b , refl)
+pattern _`∙'_ f t = (App _ _ , f , t , refl)
 pattern `λ  b     = `con (`λ' b)
 pattern _`∙_ f t  = `con (f `∙' t)
 
-{-# DISPLAY syn.`con (_ , true , b , refl)      = `λ b   #-}
-{-# DISPLAY syn.`con (_ , false , f , t , refl) = f `∙ t #-}
+{-# DISPLAY syn.`con (Lam _ _ , b , refl)      = `λ b   #-}
+{-# DISPLAY syn.`con (App _ _ , f , t , refl) = f `∙ t #-}
 
 Term : Type ─Scoped
 Term = Tm TermD _
@@ -62,9 +64,9 @@ sub^↝⋆ t ρ^R = Sim.sim sim ρ^R t where
   Sim.th^R  sim = λ ρ → S.gmap _ (th^↝ ρ)
   Sim.var^R sim = id
   Sim.alg^R sim = λ
-    { (f `∙' t) {ρ₁} {ρ₂} ρ^R (refl , refl , f^R , t^R , _) → S.gmap (_`∙ sub ρ₁ t) (λ f → [∙]₂ f (sub ρ₁ t)) f^R
-                                                              S.◅◅ S.gmap (sub ρ₂ f `∙_) ([∙]₁ (sub ρ₂ f)) t^R
-    ; (`λ' b) ρ^R (refl , refl , b^R , _) → S.gmap `λ [λ] (b^R _ (pack^R (λ _ → S.ε))) }
+    { (f `∙' t) {ρ₁} {ρ₂} ρ^R (refl , f^R , t^R , _) → S.gmap (_`∙ sub ρ₁ t) (λ f → [∙]₂ f (sub ρ₁ t)) f^R
+                                                  S.◅◅ S.gmap (sub ρ₂ f `∙_) ([∙]₁ (sub ρ₂ f)) t^R
+    ; (`λ' b) ρ^R (refl , b^R , _) → S.gmap `λ [λ] (b^R _ (pack^R (λ _ → S.ε))) }
 
 ren-invert-∙ : ∀ {σ τ Γ Δ} (u : Term τ Γ) {f : Term (σ ⇒ τ) Δ} {t : Term σ Δ} (ρ : Thinning Γ Δ) →
                f `∙ t ≡ ren ρ u → ∃ λ f′ → ∃ λ t′ → f′ `∙ t′ ≡ u × f ≡ ren ρ f′ × t ≡ ren ρ t′
