@@ -53,17 +53,17 @@ sub^↝ ρ ([λ] r)    = [λ] (sub^↝ _ r)
 sub^↝ ρ ([∙]₁ f r) = [∙]₁ (sub ρ f) (sub^↝ ρ r)
 sub^↝ ρ ([∙]₂ r t) = [∙]₂ (sub^↝ ρ r) (sub ρ t)
 
-sub^↝⋆ : ∀ {σ Γ Δ} (t : Term σ Γ) {ρ ρ′ : (Γ ─Env) Term Δ} → ∀[ mkRel _↝⋆_ ] ρ ρ′ → sub ρ t ↝⋆ sub ρ′ t
-sub^↝⋆ (`var k)          ρ^R = lookup^R ρ^R k
-sub^↝⋆ (f `∙ t) {ρ} {ρ′} ρ^R = S.gmap (_`∙ sub ρ t) (λ f → [∙]₂ f (sub ρ t)) (sub^↝⋆ f ρ^R)
-                                  S.◅◅ S.gmap (sub ρ′ f `∙_) ([∙]₁ (sub ρ′ f)) (sub^↝⋆ t ρ^R)
-sub^↝⋆ {Γ = Γ} {Δ} (`con ((σ , τ) , true , b , refl)) {ρ} {ρ′} ρ^R = S.gmap `λ [λ] (sub^↝⋆ b (vs^R >>^R renρ^R))
-  where vs = freshˡ vl^Tm Δ {σ ∷ []}
-        re = freshʳ vl^Var (σ ∷ [])
-        vs^R : ∀[ mkRel _↝⋆_ ] vs vs
-        vs^R = pack^R (λ _ → S.ε)
-        renρ^R : ∀[ mkRel _↝⋆_ ] (th^Env th^Tm ρ re) (th^Env th^Tm ρ′ re)
-        renρ^R = pack^R (λ k → S.gmap (ren re) (th^↝ re) (lookup^R ρ^R k))
+sub^↝⋆ : ∀ {σ Γ Δ} (t : Term σ Γ) {ρ ρ′ : (Γ ─Env) Term Δ} → rel.∀[ mkRel _↝⋆_ ] ρ ρ′ → sub ρ t ↝⋆ sub ρ′ t
+sub^↝⋆ t ρ^R = Sim.sim sim ρ^R t where
+
+  sim : Sim (mkRel _↝⋆_) (mkRel _↝⋆_) TermD Substitution Substitution
+  Sim.th^R  sim = λ ρ → S.gmap _ (th^↝ ρ)
+  Sim.var^R sim = id
+  Sim.alg^R sim = λ
+    { ((σ , τ) , false , f , t , refl) {ρ₁} {ρ₂} ρ^R (refl , refl , f^R , t^R , _) →
+      S.gmap (_`∙ sub ρ₁ t) (λ f → [∙]₂ f (sub ρ₁ t)) f^R
+      S.◅◅ S.gmap (sub ρ₂ f `∙_) ([∙]₁ (sub ρ₂ f)) t^R
+    ; ((σ , τ) , true  , b     , refl) ρ^R (refl , refl , b^R , _) → S.gmap `λ [λ] (b^R _ (pack^R (λ _ → S.ε))) }
 
 ren-invert-∙ : ∀ {σ τ Γ Δ} (u : Term τ Γ) {f : Term (σ ⇒ τ) Δ} {t : Term σ Δ} (ρ : Thinning Γ Δ) →
                f `∙ t ≡ ren ρ u → ∃ λ f′ → ∃ λ t′ → f′ `∙ t′ ≡ u × f ≡ ren ρ f′ × t ≡ ren ρ t′
@@ -117,13 +117,13 @@ Closed-SN (sn t^SN) = t^SN
 SN^sub⁻¹ : ∀ {σ Γ Δ} {t : Term σ Γ} (ρ : (Γ ─Env) Term Δ) → SN (sub ρ t) → SN t
 SN^sub⁻¹ ρ (sn tρ^SN) = sn (λ r → SN^sub⁻¹ ρ (tρ^SN (sub^↝ ρ r)))
 
-Red : Rel Term Unit -- predicate = binary relation with boring second component
-𝓡 : ∀ {σ} → [ Term σ ⟶ κ Set ]
+𝓡' : Pred Term
+𝓡  : ∀ {σ} → [ Term σ ⟶ κ Set ]
 
-rel Red {α}         t _ = SN t
-rel Red {σ ⇒ τ} {Γ} t _ = ∀ {Δ} (ρ : Thinning Γ Δ) {u} → 𝓡 u → 𝓡 (ren ρ t `∙ u)
+pred 𝓡' {α}         t = SN t
+pred 𝓡' {σ ⇒ τ} {Γ} t = ∀ {Δ} (ρ : Thinning Γ Δ) {u} → 𝓡 u → 𝓡 (ren ρ t `∙ u)
 
-𝓡 t = rel Red t _
+𝓡 = pred 𝓡'
 
 SN-`λ : ∀ {σ τ} {Γ} {t : Term τ (σ ∷ Γ)} → SN t → SN (`λ t)
 SN-`λ (sn t^R) = sn λ { ([λ] r) → SN-`λ (t^R r) }
@@ -195,8 +195,8 @@ Closed-𝓡-∙ t^NE t^R a^R a^SN      ([∙]₂ r t) = rew $ t^R r (base vl^Var
   where rew = subst (λ f → 𝓡 (f `∙ _)) (ren-id _)
 
 lemma2-4 : ∀ {Γ Δ Θ} (ρ : Thinning Δ Θ) (vs : (Γ ─Env) Term Δ) →
-           ∀[ Red ] vs _ → ∀[ Red ] (th^Env th^Tm vs ρ) _
-lemma2-4 ρ vs rs = lemma2-3 _ ρ _ <$>^R rs
+           pred.∀[ 𝓡' ] vs → pred.∀[ 𝓡' ] (th^Env th^Tm vs ρ)
+lemma2-4 ρ vs rs = lemma2-3 _ ρ _ <$>^P rs
 
 Closed-𝓡-β : ∀ {σ τ Γ} {t : Term τ (σ ∷ Γ)} → SN t → ∀ {u} → SN u → 𝓡 (t [ u /0]) → Closed _↝_ 𝓡 (`λ t `∙ u)
 𝓡-β        : ∀ {σ τ Γ} {t : Term τ (σ ∷ Γ)} → SN t → ∀ {u} → SN u → 𝓡 (t [ u /0]) → 𝓡 (`λ t `∙ u)
@@ -213,32 +213,26 @@ lemma2-5 : ∀ τ {σ Γ} {t : Term τ (σ ∷ Γ)} {u} → SN u → 𝓡 (t [ u
 lemma2-5 τ u^SN tu^R = 𝓡-β (SN^sub⁻¹ (_ /0]) (𝓡⇒SN _ _ tu^R)) u^SN tu^R
 
 theorem2-6 : ∀ {σ Γ Δ} (t : Term σ Γ) (ρ : (Γ ─Env) Term Δ) →
-             ∀[ Red ] ρ _ → 𝓡 (sub ρ t)
-theorem2-6 t ρ rs = Sim.sim prf rs t where
+             pred.∀[ 𝓡' ] ρ → 𝓡 (sub ρ t)
+theorem2-6 t ρ rs = Fdm.fdm prf rs t where
 
-  prf : Sim Red Red TermD Substitution _
-  Sim.th^R  prf = λ ρ → lemma2-3 _ ρ _
-  Sim.var^R prf = id
-  Sim.alg^R prf = alg^R where
+  prf : Fdm 𝓡' 𝓡' TermD Substitution
+  Fdm.th^P  prf = λ ρ → lemma2-3 _ ρ _
+  Fdm.var^P prf = id
+  Fdm.all^P prf = all^P where
 
-    alg^R : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ₁ : (Γ ─Env) Term Δ} {ρ₂} → ∀[ Red ] ρ₁ ρ₂ →
-            let v₁ = fmap TermD (Sem.body Substitution ρ₁) b
-                v₂ = fmap TermD (Sem.body SemUnit ρ₂) b
-            in Zip TermD (Kripke^R Red Red) v₁ v₂  → 𝓡 (Sem.alg Substitution v₁)
-    alg^R ((σ , τ) , false , f , t , refl) {ρ₁} ρ^R (refl , refl , f^R , t^R , _) =
-      subst (λ f → 𝓡 (f `∙ sub ρ₁ t)) (ren-id _) (f^R (base vl^Var) t^R)
-
-    alg^R t@((σ , τ) , true , b , refl)      {ρ₁} _ (refl , refl , b^R , _) ρ {u} u^R =
-       𝓡 (ren ρ (sub ρ₁ (`λ b)) `∙ u) ∋ lemma2-5 τ (𝓡⇒SN σ u u^R)
-      (𝓡 (ren ρ′ (sub ρ₁′ b) [ u /0]) ∋ subst 𝓡 eq bu) where
-
-        bu : 𝓡 (sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b)
-        bu = b^R ρ (ε^R ∙^R u^R)
+    all^P : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ : (Γ ─Env) Term Δ} →
+            let v = fmap TermD (Sem.body Substitution ρ) b in
+            pred.∀[ 𝓡' ] ρ → All TermD (Kripke^P 𝓡' 𝓡') v → 𝓡 (Sem.alg Substitution v)
+    all^P ((σ , τ) , false , f , t , refl) ρ^P (f^P , t^P , _) = rew $ f^P (base vl^Var) t^P where
+      rew = subst (λ f → 𝓡 (f `∙ sub _ t)) (ren-id _)
+    all^P ((σ , τ) , true , b , refl) {ρ₁} ρ^P (b^P , _) ρ {u} u^P =
+      lemma2-5 τ (𝓡⇒SN σ u u^P) (subst 𝓡 eq (b^P ρ (ε^P ∙^P u^P))) where
 
         ρ′  = lift vl^Var (σ ∷ []) ρ
         ρ₁′ = lift vl^Tm (σ ∷ []) ρ₁
 
-        ρ^R : ∀[ VarTm^R ] ρ (select (freshʳ vl^Var (σ ∷ [])) (select ρ′ (u /0])))
+        ρ^R : rel.∀[ VarTm^R ] ρ (select (freshʳ vl^Var (σ ∷ [])) (select ρ′ (u /0])))
         lookup^R ρ^R k = sym $ begin
           lookup (base vl^Tm) (lookup (base vl^Var) (lookup ρ (lookup (base vl^Var) k)))
             ≡⟨ lookup-base^Tm _ ⟩
@@ -248,7 +242,7 @@ theorem2-6 t ρ rs = Sim.sim prf rs t where
             ≡⟨ cong (`var ∘ lookup ρ) (lookup-base^Var k) ⟩
           `var (lookup ρ k) ∎
 
-        ρ^R′ : ∀[ Eq^R ] (sub (select ρ′ (u /0])) <$> ρ₁′) ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ)
+        ρ^R′ : rel.∀[ Eq^R ] (sub (select ρ′ (u /0])) <$> ρ₁′) ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ)
         lookup^R ρ^R′ z     = refl
         lookup^R ρ^R′ (s k) = begin
           sub (select ρ′ (u /0])) (ren _ (lookup ρ₁ k)) ≡⟨ rensub TermD (lookup ρ₁ k) _ _ ⟩

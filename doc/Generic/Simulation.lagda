@@ -45,7 +45,7 @@ module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I → List I → Set} (�
 \begin{code}
    sim ρ (`var k) = var^R (lookup^R ρ k)
    sim ρ (`con t) = alg^R t ρ (zip d (body ρ) t)
-  
+
    body ρ []       i t = sim ρ t
    body ρ (σ ∷ Δ)  i t = λ σ ρ′ → sim (ρ′ >>^R (th^R σ <$>^R ρ)) t
 
