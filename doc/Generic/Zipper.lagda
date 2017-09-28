@@ -15,6 +15,10 @@ open import var
 open import indexed
 open import Generic.Syntax
 
+data Hole (I : Set) : Set where
+  Here Skip : Hole I
+  Deep : I → (List I → List I) → Hole I
+
 module _ {I : Set} where
 
  hole : Desc I → I → (List I → List I) → Desc (I ⊎ (I × I × (List I → List I)))
@@ -22,13 +26,14 @@ module _ {I : Set} where
  hole (`X Δ j d) h δ = `X (List.map inj₁ Δ) (inj₁ j) (hole d h δ)
  hole (`∎ i)     h δ = `∎ (inj₂ (i , h , δ))
 
- ∂ : Desc I → Desc (I ⊎ (I × I × (List I → List I)))
+ ∂ : Desc I → Desc (I ⊎ (I × (I × (List I → List I))))
  ∂ (`σ A d)   = `σ A (λ a → ∂ (d a))
- ∂ (`X Δ j d) = `σ Bool λ holeHere → if holeHere
-                then hole d j (Δ ++_)
-                else `X (List.map inj₁ Δ) (inj₁ j) (∂ d)
+ ∂ (`X Δ j d) = `σ (Hole I) λ
+                   { Here       → hole d j (Δ ++_)
+                   ; (Deep i δ) → `X (List.map inj₁ Δ) (inj₂ (j , i , δ)) (hole d i (δ ∘ (Δ ++_)))
+                   ; Skip       → `X (List.map inj₁ Δ) (inj₁ j) (∂ d)
+                   }
  ∂ (`∎ i)     = `σ ⊥ ⊥-elim
-
 
  unHole₁ : ∀ (d : Desc I) X {h δ i Γ} →
           ⟦ hole d h δ ⟧ X (inj₁ i) (List.map inj₁ Γ) →
@@ -43,10 +48,11 @@ module _ {I : Set} where
  cast d (`var k) = `var (Injective-inj₁ <$>⁻¹ k)
  cast d (`con t) = `con (castD d t)
 
- castD (`σ A d)       (a     , v) = a , castD (d a) v
- castD (`∎ i)         (f     , _) = ⊥-elim f
- castD (`X Δ j d) {e} (true  , v) = ⊥-elim (unHole₁ d (Scope (Tm (∂ e) _)) v)
- castD (`X Δ j d) (false , t , v) = cast _ t′ , castD d v where
+ castD (`σ A d)       (a     , v)         = a , castD (d a) v
+ castD (`∎ i)         (f     , _)         = ⊥-elim f
+ castD (`X Δ j d) {e} (Here     , v)      = ⊥-elim (unHole₁ d (Scope (Tm (∂ e) _)) v)
+ castD (`X Δ j d) {e} (Deep i δ , t , v ) = ⊥-elim (unHole₁ d (Scope (Tm (∂ e) _)) v)
+ castD (`X Δ j d) {e} (Skip     , t , v)  = cast _ t′ , castD d v where
    t′ = subst (Tm _ _ _) (sym (map-++-commute inj₁ Δ _)) t
 
  unHole₂ : ∀ (d : Desc I) {s} e h δ {i j f Γ} →
@@ -57,12 +63,12 @@ module _ {I : Set} where
    where r′ = subst (Tm _ _ _) (sym (map-++-commute inj₁ Δ _)) r
  unHole₂ (`∎ i)     e h δ refl    = refl , refl , refl
 
- plug : ∀ (d : Desc I) {i j Γ f} →
-        Tm (∂ d) ∞ (inj₂ (i , j , f)) (List.map inj₁ Γ) →
+ plug : ∀ (d : Desc I) {i s j Γ f} →
+        Tm (∂ d) s (inj₂ (i , j , f)) (List.map inj₁ Γ) →
         Tm d ∞ j (f Γ) →
         Tm d ∞ i Γ
- plugD : ∀ (d : Desc I) e {i j Γ f} →
-         ⟦ ∂ d ⟧ (Scope (Tm (∂ e) ∞)) (inj₂ (i , j , f)) (List.map inj₁ Γ) →
+ plugD : ∀ (d : Desc I) e {i s j Γ f} →
+         ⟦ ∂ d ⟧ (Scope (Tm (∂ e) s)) (inj₂ (i , j , f)) (List.map inj₁ Γ) →
          Tm e ∞ j (f Γ) →
          ⟦ d ⟧ (Scope (Tm e ∞)) i Γ
 
@@ -77,11 +83,16 @@ module _ {I : Set} where
  plug d (`con v) t = `con (plugD d d v t)
 
  plugD (`σ A d)   e (a     , v)       t = a , plugD (d a) e v t
- plugD (`X Δ j d) e (false , (r , v)) t = cast _ r′ , plugD d e v t
+ plugD (`X Δ j d) e (Skip , (r , v)) t = cast _ r′ , plugD d e v t
    where r′ = subst (Tm _ _ _) (sym (map-++-commute inj₁ Δ _)) r
- plugD (`X Δ j d) e (true  , v)       t =
+ plugD (`X Δ j d) e (Here  , v)       t =
    let (b , eqi , eqf) = unHole₂ d e j (Δ ++_) v
        t′ = subst₂ (Tm _ _) eqi (cong (λ f → f _) eqf) t
    in t′ , b
+ plugD (`X Δ j d) e (Deep i δ , r , v) t =
+   let (b , eqi , eqf) = unHole₂ d e i (δ ∘ (Δ ++_)) v
+       t′ = subst₂ (Tm e _) eqi (cong (λ f → f _) eqf) t
+       r′ = subst (Tm _ _ _) (sym (map-++-commute inj₁ Δ _)) r
+   in plug e r′ t′ , b
  plugD (`∎ i)     e (v     , _)       t = ⊥-elim v
 \end{code}
