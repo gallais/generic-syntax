@@ -978,6 +978,10 @@ symmetric or transitive) so is \AF{Zip} \AB{d} \AB{R}.
 \caption{Zip: Characterising Structurally Equal Values with Related Substructures}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SIMULATION
+
+
 \subsection{Simulation Lemma}
 
 A \AF{Zip} constraint appears naturally when we want to say that a
@@ -1027,13 +1031,39 @@ simplest of the abstract proof frameworks Allais, Chapman, McBride
 and McKinna introduce for their specific language. They also explain
 how a similar framework can be defined for fusion lemmas and deploy
 it for the renaming-substitution interactions but also their respective
-interactions with normalisation by evaluation.
+interactions with normalisation by evaluation. Now that we are familiarised
+with the techniques at hand, we can tackle this more complex example.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% FUSION
+
+\subsection{Fusion Lemma}
+
+Results which can be reformulated as the ability to fuse two traversals
+obtained as \AF{Semantics} into one abound. When claiming that \AF{Tm} is
+a Functor, we have to prove that two successive renamings can be fused into
+a single renaming where the \AF{Thinning}s have been composed. Similarly,
+demonstrating that \AF{Tm} is a relative Monad~\cite{JFR4389} implies proving
+that two consecutive substitutions can be merged into a single one whose
+environment is the first one, where the second one has been applied in a
+pointwise manner. Last but not least, the \emph{Substitution Lemma} central
+to most model constructions (see for instance~\cite{mitchell1991kripke}) states
+that a syntactic substitution followed by the evaluation of the resulting term
+into the model is equivalent to the evaluation of the original term with an
+environment corresponding to the evaluated substitution.
+
+Because all of these statements have precisely the same structure, we can
+once more devise a framework which will, provided that its constraints are
+satisfied, prove a generic fusion lemma.
 
 
-
-
+A direct application of these results is our (to be published) entry to the
+POPLMark Challenge Reloaded~\cite{poplmarkreloaded}. By using a \AD{Desc}-based
+representation of intrisically well-typed and well-scoped terms we directly inherit
+not only renaming and substitution but also all four fusion lemmas as corollaries
+of our generic results. This allows us to shave off a lot of the usual boilerplate
+and go straight to the point.
 
 \subsection{Definition of Bisimilarity for co-finite objects}
 

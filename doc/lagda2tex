@@ -2,7 +2,7 @@
 set -e
 set -u
 
-AGDA=agda-2.5.3
+AGDA=agda-2.5.2
 DIRECTORY=$( dirname  "$1" )
 NAME=$( basename "$1" .lagda )
 TARGET=${DIRECTORY}/${NAME}
