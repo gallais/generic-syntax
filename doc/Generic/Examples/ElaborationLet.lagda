@@ -21,7 +21,7 @@ module _ {I : Set} where
 %<*letcode>
 \begin{code}
  Let : Desc I
- Let = `σ (List I) $ λ Δ → `σ I $ λ i → `Xs Δ i i
+ Let = `σ (List I) $ λ Δ → `σ I $ λ i → `Xs Δ (`X Δ i (`∎ i))
 \end{code}
 %</letcode>
 \begin{code}

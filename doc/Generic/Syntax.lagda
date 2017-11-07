@@ -90,28 +90,23 @@ module _ {I : Set} where
 \end{code}
 %<*paircomb>
 \begin{code}
- `Xs : List I → I → I → Desc I
- `Xs js j i = foldr (`X []) (`X js j (`∎ i)) js
+ `Xs : List I → Desc I → Desc I
+ `Xs js d = foldr (`X []) d js
 \end{code}
 %</paircomb>
 \begin{code}
-module _ {I : Set} {X : List I → I ─Scoped} {i j k : I} {Γ : List I} where
+module _ {I : Set} {d : Desc I} {X : List I → I ─Scoped} {i : I} {Γ : List I} where
 \end{code}
 %<*pairunpair>
 \begin{code}
- unXs :  (Δ : List I) → ⟦ `Xs Δ j i ⟧ X k Γ →
-         All (λ i → X [] i Γ) Δ × X Δ j Γ × k ≡ i
+ unXs :  (Δ : List I) → ⟦ `Xs Δ d ⟧ X i Γ →
+         All (λ i → X [] i Γ) Δ × ⟦ d ⟧ X i Γ
 \end{code}
 %</pairunpair>
 \begin{code}
- unXs = go id where
-
-  go : (f : List I → List I) → (Δ : List I) →
-       ⟦ foldr (`X []) (`X (f Δ) j (`∎ i)) Δ ⟧ X k Γ → All (λ i → X [] i Γ) Δ × X (f Δ) j Γ × k ≡ i
-  go f []       (v , eq) = [] , v , eq
-  go f (σ ∷ Δ)  (t , v)  = P.map (t ∷_) id $ go (f ∘ (σ ∷_)) Δ v
+ unXs []       v       = [] , v
+ unXs (σ ∷ Δ)  (r , v) = P.map (r ∷_) id (unXs Δ v)
 \end{code}
-
 
 \begin{code}
 -- Descriptions give rise to traversable functors
