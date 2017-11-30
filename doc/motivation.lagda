@@ -65,6 +65,44 @@ module _ where
  sub ρ (L b)    = L (sub (extend ρ) b)
 \end{code}
 %</sub>
+\begin{code}
+module _ where
+
+ private
+   Val : Type ─Scoped
+   Val α       = Lam α
+   Val (σ ⇒ τ) = □ (Val σ ⟶ Val τ)
+
+   th^Val : (σ : Type) → Thinnable (Val σ)
+   th^Val α       = λ ρ t → ren t ρ
+   th^Val (σ ⇒ τ) = th^□
+
+   reify   : (σ : Type) → [ Val σ ⟶ Lam σ ]
+   reflect : (σ : Type) → [ Lam σ ⟶ Val σ ]
+
+   reify   α = id
+   reify   (σ ⇒ τ) = λ b → L (reify τ (b E.extend (reflect σ (V z))))
+
+   reflect α = id
+   reflect (σ ⇒ τ) = λ b ρ v → reflect τ (A (ren ρ b) (reify σ v))
+
+   extend : {Γ Δ Θ : List Type} {σ : Type} → Thinning Δ Θ → (Γ ─Env) Val Δ → Val σ Θ → (σ ∷ Γ ─Env) Val Θ
+   extend r ρ v = (λ {σ} v → th^Val σ v r) <$> ρ ∙ v
+
+   ⟦V⟧ : ∀ {n Γ} → Var n Γ → [ Val n ⟶ Val n ]
+   ⟦V⟧ _ x = x
+
+   ⟦A⟧ : ∀ {σ τ Γ} → Lam (σ ⇒ τ) Γ → [ Val (σ ⇒ τ) ⟶ Val σ ⟶ Val τ ]
+   ⟦A⟧ _ f t = f (pack id) t
+\end{code}
+%<*nbe>
+\begin{code}
+ nbe : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Val Δ → Lam σ Γ → Val σ Δ
+ nbe ρ (V k)    = ⟦V⟧ k (lookup ρ k)
+ nbe ρ (A f t)  = ⟦A⟧ f (nbe ρ f) (nbe ρ t)
+ nbe ρ (L b)    = λ σ v → nbe (extend σ ρ v) b
+\end{code}
+%</nbe>
 
 \begin{code}
 open import environment hiding (extend ; _>>_)

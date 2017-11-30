@@ -1,0 +1,282 @@
+\documentclass{beamer}
+\usetheme{ru}
+\usepackage{agda}
+\usepackage{color}
+\usepackage{mathpartir}
+\usepackage{catchfilebetweentags}
+
+\let\\=\newline
+\renewcommand{\mathcal}[1]{#1}
+\input{lhs2tex-prelude}
+\title{A Scope-and-Type Safe Universe of Syntaxes with Binding, Their Semantics and Proofs}
+\author{Guillaume Allais$^1$, Robert Atkey$^2$, James Chapman$^2$, Conor McBride$^2$, James McKinna$^3$}
+\institute{$^1$ Radboud University \\ $^2$ University of Strathclyde \\ $^3$ University of Edinburgh}
+
+\begin{document}
+
+\maketitle
+
+\section{Primer: Scope-and-Type Safe Terms}
+
+  \begin{frame}{Well-Scoped Untyped Lambda Calculus}\Large
+    \ExecuteMetaData[lc.tex]{lc}
+  \end{frame}
+
+  \begin{frame}{Well-Scoped Untyped Lambda Calculus}\Large
+    \ExecuteMetaData[lc.tex]{lcnat}
+  \end{frame}
+
+  \begin{frame}{Well-Scoped-and-Typed Lambda Calculus}\Large
+    \ExecuteMetaData[lc.tex]{lcfull}
+  \end{frame}
+
+  \begin{frame}{Combinators for Indexed Sets}
+    \begin{minipage}{0.5\textwidth}
+      \ExecuteMetaData[var.tex]{scoped}
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+      \ExecuteMetaData[indexed.tex]{constant}
+    \end{minipage}
+
+    \ExecuteMetaData[indexed.tex]{arrow}
+    \ExecuteMetaData[indexed.tex]{product}
+    \ExecuteMetaData[indexed.tex]{forall}
+
+  \end{frame}
+
+  \begin{frame}{Well Scoped-and-Typed Variables and Terms}
+    \ExecuteMetaData[var.tex]{var}
+    \ExecuteMetaData[motivation.tex]{tm}
+  \end{frame}
+
+\section{Primer: Scope-and-Type Safe Programs}
+
+  \begin{frame}{Environments of Values}
+    \ExecuteMetaData[environment.tex]{env}
+  \end{frame}
+
+  \begin{frame}{Renaming}
+    \ExecuteMetaData[motivation.tex]{ren}
+  \end{frame}
+
+  \begin{frame}{Substitution}
+    \ExecuteMetaData[motivation.tex]{sub}
+  \end{frame}
+
+  \begin{frame}{Normalisation by Evaluation}
+    \ExecuteMetaData[motivation.tex]{nbe}
+  \end{frame}
+
+  \begin{frame}{Observing the Common Structure}
+    From
+    \begin{mathpar}\huge
+      \inferrule{\textit{Var} \longrightarrow \textit{Term}}
+                {\textit{Term} \longrightarrow \textit{Term}}
+    \end{mathpar}
+    To
+    \begin{mathpar}\huge
+      \inferrule{\textit{V} \longrightarrow \textit{C}}
+                {\textit{Env}_V \longrightarrow \textit{Sem}_C}
+    \end{mathpar}
+  \end{frame}
+
+  \begin{frame}{Extracting the essence of Binding}
+    \begin{mathpar}\Huge
+      \inferrule{\Box (\textit{V}~\sigma ~\longrightarrow~ \textit{C}~\tau)}
+                {\textit{C} (\sigma \Rightarrow \tau)}
+    \end{mathpar}
+  \end{frame}
+
+  \begin{frame}{Thinning}
+    \ExecuteMetaData[environment.tex]{thinning}
+    \ExecuteMetaData[environment.tex]{box}
+    \ExecuteMetaData[environment.tex]{comonad}
+    \ExecuteMetaData[environment.tex]{thinnable}
+    \ExecuteMetaData[environment.tex]{freeth}
+  \end{frame}
+
+  \begin{frame}{Type-and-Scope Safe Semantics}
+    \ExecuteMetaData[motivation.tex]{rsem}
+    \ExecuteMetaData[motivation.tex]{sem}
+  \end{frame}
+
+\section{Primer: Universe of Data Types}
+
+\begin{frame}{Data as the Fixpoint of a Functor}
+
+  {\huge $\textit{List}_A  = \mu{} X. 1 + A \times X$}\\
+
+  {\huge \begin{tabular}{lcl}
+    \textit{nil} & $=$ & $\textit{in} (\textit{inj}_1 ())$ \\
+    \textit{cons}$(a, as)$ & $=$ & $\textit{in} (\textit{inj}_2 (a, as))$
+  \end{tabular}}
+\end{frame}
+
+\begin{frame}{Indexed Data as the Fixpoint of a Functor}
+
+  {\huge \begin{tabular}{ll}
+      $\textit{Term}  = \mu{} T. \lambda{} n.$ & $\textit{Fin}(n) + T(1+n)$ \\
+      & $+ T(n) \times T(n)$
+  \end{tabular}}\bigskip
+
+  {\huge \begin{tabular}{lcl}
+    \textit{var}$(k)$    & $=$ & $\textit{in} (\textit{inj}_1 (k))$ \\
+    \textit{lam}$(b)$    & $=$ & $\textit{in} (\textit{inj}_2(\textit{inj}_1 (b)))$ \\
+    \textit{app}$(f, t)$ & $=$ & $\textit{in} (\textit{inj}_2(\textit{inj}_2 (f, t)))$
+  \end{tabular}}
+\end{frame}
+
+\begin{frame}{Descriptions of Strictly Positive Functors}
+  \ExecuteMetaData[Generic/Data.tex]{desc}
+  \ExecuteMetaData[Generic/Data.tex]{interp}
+\end{frame}
+
+\begin{frame}{Example: The list functor}
+  \ExecuteMetaData[Generic/Data.tex]{listD}
+\end{frame}
+
+\begin{frame}{Fixpoints and fold}
+  \ExecuteMetaData[Generic/Data.tex]{mu}
+  \ExecuteMetaData[Generic/Data.tex]{fmap}
+  \ExecuteMetaData[Generic/Data.tex]{fold}
+\end{frame}
+
+\section{A Universe of Type-and-Scope Safe Syntaxes}
+
+\begin{frame}{Descriptions of Syntaxes}
+  \ExecuteMetaData[Generic/Syntax.tex]{desc}
+  \ExecuteMetaData[Generic/Syntax.tex]{interp}
+\end{frame}
+
+
+\begin{frame}{Their Fixpoints: Free Relative Monads}
+  \ExecuteMetaData[Generic/Syntax.tex]{mu}
+  \ExecuteMetaData[Generic/Syntax.tex]{scope}
+\end{frame}
+
+\begin{frame}{Examples: Untyped and Simply-Typed LC}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCD}
+  \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
+\end{frame}
+
+\section{Generic Scope-and-Type Safe Programs}
+
+\begin{frame}{A Generic Notion of Semantics}
+  \ExecuteMetaData[environment.tex]{kripke}
+  \ExecuteMetaData[Generic/Semantics.tex]{semantics}
+\end{frame}
+
+\begin{frame}{Fundamental Lemma of Semantics}
+  \ExecuteMetaData[Generic/Semantics.tex]{comp}
+
+  \hspace{-50pt}\begin{minipage}{0.9\textwidth}
+    \ExecuteMetaData[Generic/Semantics.tex]{semtype}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}{Proof of the Fundamental Lemma}
+
+  \ExecuteMetaData[Generic/Semantics.tex]{semantics}
+
+  \ExecuteMetaData[Generic/Semantics.tex]{sem}
+  \ExecuteMetaData[Generic/Semantics.tex]{body}
+\end{frame}
+
+\begin{frame}{Generic Renaming}
+  \ExecuteMetaData[Generic/Semantics.tex]{renaming}
+\end{frame}
+\begin{frame}{Generic Substitution}
+  \ExecuteMetaData[Generic/Semantics.tex]{substitution}
+\end{frame}
+
+\begin{frame}{From Kripke to Scope: Varlike and Reify}
+  \ExecuteMetaData[varlike.tex]{varlike}
+  \ExecuteMetaData[Generic/Semantics.tex]{reify}
+\end{frame}
+
+\section{Examples of Generic Type-and-Scope Safe Programs}
+
+\begin{frame}{Let-elaboration}
+  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{letcode}
+  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unletcode}
+  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unlet}
+\end{frame}
+
+\begin{frame}{(Unsafe) Normalisation by Evaluation}
+  \ExecuteMetaData[Generic/Examples/NbyE.tex]{domain}
+  \hspace{-50pt}\begin{minipage}{0.9\textwidth}
+    \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbe-setup}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}{Example: NBE for Untyped LC}
+  Go check src/Generic/Examples/NbyE.agda
+\end{frame}
+
+\begin{frame}{Studying a particular syntax}
+  \begin{itemize}
+    \item Elaboration STLC+State to STLC
+    \item An Algebraic Approach to Typechecking (Atkey) (about 12 lines)
+    \item POPLMark Challenge Reloaded (SN of STLC via LR) (about 200 lines)
+    \item Well Kinded-and-Scoped System F
+  \end{itemize}
+\end{frame}
+
+\section{Non-Standard Semantics: Binding as Self-Reference}
+
+\begin{frame}{Representing Cyclic Structures}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistD}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistpat}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones}
+\end{frame}
+
+\begin{frame}{Unrolling the cycles}
+  \ExecuteMetaData[Generic/Cofinite.tex]{plug}
+  \ExecuteMetaData[Generic/Cofinite.tex]{unroll}
+\end{frame}
+
+\begin{frame}{Unfolding the whole structure}
+  \ExecuteMetaData[Generic/Cofinite.tex]{cotm}
+  \ExecuteMetaData[Generic/Cofinite.tex]{unfold}
+\end{frame}
+
+\section{Building Generic Proofs about Generic Programs}
+
+\begin{frame}{Zip: Structurally Equal Values}
+ \hspace{-50pt}\begin{minipage}{0.9\textwidth}
+   \ExecuteMetaData[Generic/Zip.tex]{ziptype}
+ \end{minipage}
+\end{frame}
+
+\begin{frame}{A Generic Notion of Simulation}
+  Go have a look at src/Generic/Simulation.agda
+\end{frame}
+
+\begin{frame}{Fundamental Lemma of Simulations and Corollary}
+ \hspace{-50pt}\begin{minipage}{0.9\textwidth}
+   \ExecuteMetaData[Generic/Simulation.tex]{simbody}
+   \ExecuteMetaData[Generic/Simulation.tex]{rensub}
+ \end{minipage}
+\end{frame}
+
+\begin{frame}{Fundamental Lemma of Fusion}
+  Go have a look at src/Generic/Fusion.agda
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}
+  \begin{itemize}
+    \item Well Scoped-and-Typed STLC
+    \item Well Scoped-and-Typed Programs on STLC
+    \item Well Scoped-and-Typed Generic Semantics on STLC
+    \item Universe of Datatypes and Generic Fold
+    \item Universe of Syntaxes and Generic Semantics
+    \item Renaming, Substitution, Normalisation by Evaluation
+    \item But also Printing, Let-elaboration, ...
+    \item Non-Standard Semantics: Binding as Self-Reference
+    \item Generic Proofs too!
+  \end{itemize}
+\end{frame}
+
+\end{document}
