@@ -52,6 +52,9 @@ data Tm {I : Set} (d : Desc I) : Size → I ─Scoped where
 %</mu>
 
 \begin{code}
+`con-inj : ∀ {I i Γ} {d : Desc I} {t u : ⟦ d ⟧ (Scope (Tm d ∞)) i Γ} → (Tm d ∞ i Γ ∋ `con t) ≡ `con u → t ≡ u
+`con-inj refl = refl
+
 -- Closed terms
 
 TM : {I : Set} → Desc I → I → Set
