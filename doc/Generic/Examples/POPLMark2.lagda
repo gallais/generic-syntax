@@ -263,4 +263,50 @@ data _⊢NE_∋_ Γ where
   `app : ∀ {σ τ} {f : Term (σ ⇒ τ) Γ} {t : Term σ Γ} →
          Γ ⊢NE σ ⇒ τ ∋ f → Γ ⊢SN σ ∋ t → Γ ⊢NE τ ∋ f `∙ t
 
+-- lemma 3.7
+
+th^↝SN : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : Thinning Γ Δ) → t ↝SN u → ren ρ t ↝SN ren ρ u
+th^↝SN ρ (β t u)    = subst (ren ρ (`λ t `∙ u) ↝SN_) (sym $ renβ TermD t u ρ) (β _ _)
+th^↝SN ρ ([∙]₂ r t) = [∙]₂ (th^↝SN ρ r) (ren ρ t)
+
+th^SN∋ : ∀ {σ Γ Δ t} (ρ : Thinning Γ Δ) → Γ ⊢SN σ ∋ t → Δ ⊢SN σ ∋ ren ρ t
+th^NE∋ : ∀ {σ Γ Δ t} (ρ : Thinning Γ Δ) → Γ ⊢NE σ ∋ t → Δ ⊢NE σ ∋ ren ρ t
+
+th^SN∋ ρ (`neu n)   = `neu (th^NE∋ ρ n)
+th^SN∋ ρ (`lam t)   = `lam (th^SN∋ _ t)
+th^SN∋ ρ (`red r t) = `red (th^↝SN ρ r) (th^SN∋ ρ t)
+th^NE∋ ρ (`var v)   = `var (lookup ρ v)
+th^NE∋ ρ (`app n t) = `app (th^NE∋ ρ n) (th^SN∋ ρ t)
+
+-- lemma 3.8
+
+th^↝SN∋-invert :  ∀ {σ Γ Δ} (t : Term σ Γ) {u : Term σ Δ} (ρ : Thinning Γ Δ) →
+                  ren ρ t ↝SN u → ∃ λ u′ → u ≡ ren ρ u′ × t ↝SN u′
+th^↝SN∋-invert (`var v) ρ ()
+th^↝SN∋-invert (`λ b)   ρ ()
+th^↝SN∋-invert (`λ b `∙ t) ρ (β ._ ._)   = b [ t /0] , sym (renβ TermD b t ρ) , β b t
+th^↝SN∋-invert (f `∙ t)    ρ ([∙]₂ r ._) =
+  let (g , eq , r′) = th^↝SN∋-invert f ρ r in g `∙ t , cong (_`∙ ren ρ t) eq , [∙]₂ r′ t
+
+th^SN∋-invert : ∀ {σ Γ Δ} (t : Term σ Γ) {t′ : Term σ Δ} (ρ : Thinning Γ Δ) →
+                t′ ≡ ren ρ t → Δ ⊢SN σ ∋ t′ → Γ ⊢SN σ ∋ t
+th^NE∋-invert : ∀ {σ Γ Δ} (t : Term σ Γ) {t′ : Term σ Δ} (ρ : Thinning Γ Δ) →
+                t′ ≡ ren ρ t → Δ ⊢NE σ ∋ t′ → Γ ⊢NE σ ∋ t
+th^SN∋-invert (`var v) ρ refl (`red r pr) =
+  let (v′ , eq , r′) = th^↝SN∋-invert (`var v) ρ r
+  in `red r′ (th^SN∋-invert v′ ρ eq pr)
+th^SN∋-invert (f `∙ t) ρ refl (`red r pr) =
+  let (ft′ , eq , r′) = th^↝SN∋-invert (f `∙ t) ρ r
+  in `red r′ (th^SN∋-invert ft′ ρ eq pr)
+th^SN∋-invert (`λ t)   ρ refl (`red r pr) =
+  let (λt′ , eq , r′) = th^↝SN∋-invert (`λ t) ρ r
+  in `red r′ (th^SN∋-invert λt′ ρ eq pr)
+th^SN∋-invert (`var v) ρ eq   (`neu pr) = `neu (th^NE∋-invert _ ρ eq pr)
+th^SN∋-invert (f `∙ t) ρ eq   (`neu pr) = `neu (th^NE∋-invert _ ρ eq pr)
+th^SN∋-invert (`λ t)   ρ refl (`lam pr) = `lam (th^SN∋-invert t _ refl pr)
+th^SN∋-invert (`λ t)   ρ refl (`neu ())
+
+th^NE∋-invert (`var v) ρ refl (`var _)     = `var v
+th^NE∋-invert (f `∙ t) ρ refl (`app rf rt) =
+ `app (th^NE∋-invert f ρ refl rf) (th^SN∋-invert t ρ refl rt)
 \end{code}
