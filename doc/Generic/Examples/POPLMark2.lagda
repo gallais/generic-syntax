@@ -81,33 +81,16 @@ ren-invert-λ (`var _) ρ ()
 ren-invert-λ (_ `∙ _) ρ ()
 ren-invert-λ (`λ b′)  ρ refl = b′ , refl , refl
 
-ren-↝-invert :  ∀ {σ Γ Δ} (t′ : Term σ Γ) {t u : Term σ Δ} (ρ : Thinning Γ Δ) →
-                t ≡ ren ρ t′ → t ↝ u → ∃ λ u′ → u ≡ ren ρ u′ × t′ ↝ u′
-ren-↝-invert {Γ = Γ} {Δ} t ρ eq (β {σ = σ} b u) =
-  let (f′ , t′ , eq∙ , eqf , eqt) = ren-invert-∙ t ρ eq
-      (b′ , eqλ , eqb)            = ren-invert-λ f′ ρ eqf
-      eqβ : `λ b′ `∙ t′ ≡ t
-      eqβ = trans (cong (_`∙ t′) eqλ) eq∙
-
-      eq : b [ u /0] ≡ ren ρ (b′ [ t′ /0])
-      eq = begin
-       b [ u /0]               ≡⟨ cong₂ (λ b u → b [ u /0]) eqb eqt ⟩
-       ren _ b′ [ ren ρ t′ /0] ≡⟨ sym (renβ TermD b′ t′ ρ) ⟩
-       ren ρ (b′ [ t′ /0])     ∎
-
-  in b′ [ t′ /0] , eq , subst (_↝ b′ [ t′ /0]) eqβ (β b′ t′)
-ren-↝-invert t ρ eq ([λ] r)  =
-  let (t′ , eqλ , eqt) = ren-invert-λ t ρ eq
-      (u′ , eq , r′)   = ren-↝-invert t′ _ eqt r
-  in `λ u′ , cong `λ eq , subst (_↝ `λ u′) eqλ ([λ] r′)
-ren-↝-invert t ρ eq ([∙]₁ f r) =
-  let (f′ , t′ , eq∙ , eqf , eqt) = ren-invert-∙ t ρ eq
-      (u′ , eq , r′)              = ren-↝-invert t′ ρ eqt r
-  in f′ `∙ u′ , cong₂ _`∙_ eqf eq , subst (_↝ f′ `∙ u′) eq∙ ([∙]₁ f′ r′)
-ren-↝-invert t ρ eq ([∙]₂ r u) =
-  let (f′ , t′ , eq∙ , eqf , eqt) = ren-invert-∙ t ρ eq
-      (g′ , eq , r′)              = ren-↝-invert f′ ρ eqf r
-  in g′ `∙ t′ , cong₂ _`∙_ eq eqt , subst (_↝ g′ `∙ t′) eq∙ ([∙]₂ r′ t′)
+th^↝-invert :  ∀ {σ Γ Δ} (t′ : Term σ Γ) {u : Term σ Δ} (ρ : Thinning Γ Δ) →
+                ren ρ t′ ↝ u → ∃ λ u′ → u ≡ ren ρ u′ × t′ ↝ u′
+th^↝-invert (`var v) ρ ()
+th^↝-invert (`λ b `∙ t) ρ (β _ _) = b [ t /0] , sym (renβ TermD b t ρ) , β b t
+th^↝-invert (`λ t)      ρ ([λ] r) =
+  let (t′ , eq , r′) = th^↝-invert t _ r in `λ t′ , cong `λ eq , [λ] r′
+th^↝-invert (f `∙ t) ρ ([∙]₁ ._ r) =
+  let (t′ , eq , r′) = th^↝-invert t ρ r in f `∙ t′ , cong (ren ρ f `∙_) eq , [∙]₁ _ r′
+th^↝-invert (f `∙ t) ρ ([∙]₂ r ._) =
+  let (f′ , eq , r′) = th^↝-invert f ρ r in f′ `∙ t , cong (_`∙ ren ρ t) eq , [∙]₂ r′ _
 
 Closed : (∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]) →
          (∀ {σ Γ} → Term σ Γ → Set) → ∀ {σ Γ} → Term σ Γ → Set
@@ -138,7 +121,7 @@ lemma2-1 {t = t} T U = subst (λ t → 𝓡 (t `∙ _)) (ren-id t) (T (base vl^V
 
 lemma2-2 : ∀ {σ Γ Δ} (ρ : Thinning Γ Δ) {t : Term σ Γ} → SN t → SN (ren ρ t)
 lemma2-2 ρ (sn u^SN) = sn $ λ r →
-  let (_ , eq , r′) = ren-↝-invert _ ρ refl r
+  let (_ , eq , r′) = th^↝-invert _ ρ r
   in subst SN (sym eq) $ lemma2-2 ρ (u^SN r′)
 
 lemma2-3 : ∀ σ {Γ Δ} (ρ : Thinning Γ Δ) (t : Term σ Γ) → 𝓡 t → 𝓡 (ren ρ t)
@@ -188,7 +171,7 @@ NE⇒𝓡 α       t t^NE t^R           = sn t^R
 NE⇒𝓡 (σ ⇒ τ) t t^NE t^R ρ {u} u^R = NE⇒𝓡 τ (ren ρ t `∙ u) (ren ρ t [∙] u) tρ∙u^R
   where u^SN   = 𝓡⇒SN σ _ u^R
         tρ^R   : Closed _↝_ 𝓡 (ren ρ t)
-        tρ^R r = let (u′ , eq , r′) = ren-↝-invert t ρ refl r
+        tρ^R r = let (u′ , eq , r′) = th^↝-invert t ρ r
                  in subst 𝓡 (sym eq) (lemma2-3 (σ ⇒ τ) ρ u′ (t^R r′))
         tρ∙u^R : Closed _↝_ 𝓡 (ren ρ t `∙ u)
         tρ∙u^R = Closed-𝓡-∙ (th^NE t^NE ρ) tρ^R u^R u^SN
