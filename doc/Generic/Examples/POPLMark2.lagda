@@ -263,6 +263,9 @@ data _⊢NE_∋_ Γ where
   `app : ∀ {σ τ} {f : Term (σ ⇒ τ) Γ} {t : Term σ Γ} →
          Γ ⊢NE σ ⇒ τ ∋ f → Γ ⊢SN σ ∋ t → Γ ⊢NE τ ∋ f `∙ t
 
+SN∋ : Pred Term
+pred SN∋ = _ ⊢SN _ ∋_
+
 -- lemma 3.7
 
 th^↝SN : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : Thinning Γ Δ) → t ↝SN u → ren ρ t ↝SN ren ρ u
@@ -309,4 +312,41 @@ th^SN∋-invert (`λ t)   ρ refl (`neu ())
 th^NE∋-invert (`var v) ρ refl (`var _)     = `var v
 th^NE∋-invert (f `∙ t) ρ refl (`app rf rt) =
  `app (th^NE∋-invert f ρ refl rf) (th^SN∋-invert t ρ refl rt)
+
+sub^↝SN : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : (Γ ─Env) Term Δ) → t ↝SN u → sub ρ t ↝SN sub ρ u
+sub^↝SN ρ (β t u)    = subst (sub ρ (`λ t `∙ u) ↝SN_) (sym $ subβ TermD t u ρ) (β (sub _ t) (sub ρ u))
+sub^↝SN ρ ([∙]₂ r t) = [∙]₂ (sub^↝SN ρ r) (sub ρ t)
+
+sub^SN∋ : ∀ {σ Γ Δ t ρ} → pred.∀[ SN∋ ] ρ → Γ ⊢SN σ ∋ t → Δ ⊢SN σ ∋ sub ρ t
+sub^NE∋ : ∀ {σ Γ Δ t ρ} → pred.∀[ SN∋ ] ρ → Γ ⊢NE σ ∋ t → Δ ⊢SN σ ∋ sub ρ t
+
+sub^SN∋ ρ^P (`neu n)   = sub^NE∋ ρ^P n
+sub^SN∋ ρ^P (`lam t)   = `lam (sub^SN∋ {!!} t)
+sub^SN∋ ρ^P (`red r t) = `red (sub^↝SN _ r) (sub^SN∋ ρ^P t)
+sub^NE∋ ρ^P (`var v)   = lookup^P ρ^P v
+sub^NE∋ ρ^P (`app n t) = {!!} -- `app (sub^NE∋ ρ^P n) (sub^SN∋ ρ^P t)
+
+-- lemma 3.10
+
+infixl 5 _∙SN_ _∙SNvar_
+_∙SN_ : ∀ {Γ σ τ} {f : Term (σ ⇒ τ) Γ} {t : Term σ Γ} →
+        Γ ⊢SN σ ⇒ τ ∋ f → Γ ⊢SN σ ∋ t → Γ ⊢SN τ ∋ f `∙ t
+`neu N   ∙SN T = `neu (`app N T)
+`lam B   ∙SN T = `red (β _ _) (sub^SN∋ (ρ^P ∙^P T) B) where
+  ρ^P = pack^P λ v → subst (_ ⊢SN _ ∋_) (sym $ lookup-base^Tm v) (`neu (`var v))
+`red r F ∙SN T = `red ([∙]₂ r _) (F ∙SN T)
+
+-- lemma 3.11
+
+_∙SNvar_ : ∀ {Γ σ τ f} → Γ ⊢SN σ ⇒ τ ∋ f → (v : Var σ Γ) → Γ ⊢SN τ ∋ f `∙ `var v
+F ∙SNvar v = F ∙SN `neu (`var v)
+
+-- lemma 3.12
+
+∙SNvar⁻¹ : ∀ {Γ σ τ f} (v : Var σ Γ) → Γ ⊢SN τ ∋ f `∙ `var v → Γ ⊢SN σ ⇒ τ ∋ f
+∙SNvar⁻¹ v (`neu (`app T _))   = `neu T
+∙SNvar⁻¹ v (`red (β t    _) F) = `lam (th^SN∋-invert t (base vl^Var ∙ v) eq F) where
+  eq = sym $ Sim.sim sim.RenSub (base^VarTm^R ∙^R refl) t
+∙SNvar⁻¹ v (`red ([∙]₂ r _) F) = `red r (∙SNvar⁻¹ v F)
+
 \end{code}
