@@ -14,12 +14,12 @@ data Type : Set where
   _⇒_ : Type → Type → Type
 
 data TermC : Set where
-  Lam : Type → Type → TermC
-  App : Type → Type → TermC
+  Lam App : Type → Type → TermC
 
 TermD : Desc Type
-TermD =  `σ TermC λ { (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
-                    ; (App σ τ) → `X [] (σ ⇒ τ) (`X [] σ (`∎ τ)) }
+TermD =  `σ TermC λ where
+  (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
+  (App σ τ) → `X [] (σ ⇒ τ) (`X [] σ (`∎ τ))
 
 infixl 10 _`∙_
 pattern `λ' b     = (Lam _ _ , b , refl)
@@ -57,7 +57,8 @@ sub^↝ ρ ([λ] r)    = [λ] (sub^↝ _ r)
 sub^↝ ρ ([∙]₁ f r) = [∙]₁ (sub ρ f) (sub^↝ ρ r)
 sub^↝ ρ ([∙]₂ r t) = [∙]₂ (sub^↝ ρ r) (sub ρ t)
 
-sub^↝⋆ : ∀ {σ Γ Δ} (t : Term σ Γ) {ρ ρ′ : (Γ ─Env) Term Δ} → rel.∀[ mkRel _↝⋆_ ] ρ ρ′ → sub ρ t ↝⋆ sub ρ′ t
+sub^↝⋆ : ∀ {σ Γ Δ} (t : Term σ Γ) {ρ ρ′ : (Γ ─Env) Term Δ} →
+         rel.∀[ mkRel _↝⋆_ ] ρ ρ′ → sub ρ t ↝⋆ sub ρ′ t
 sub^↝⋆ t ρ^R = Sim.sim sim ρ^R t where
 
   sim : Sim (mkRel _↝⋆_) (mkRel _↝⋆_) TermD Substitution Substitution
@@ -108,7 +109,8 @@ ren-↝-invert t ρ eq ([∙]₂ r u) =
       (g′ , eq , r′)              = ren-↝-invert f′ ρ eqf r
   in g′ `∙ t′ , cong₂ _`∙_ eq eqt , subst (_↝ g′ `∙ t′) eq∙ ([∙]₂ r′ t′)
 
-Closed : (∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]) → (∀ {σ Γ} → Term σ Γ → Set) → ∀ {σ Γ} → Term σ Γ → Set
+Closed : (∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]) →
+         (∀ {σ Γ} → Term σ Γ → Set) → ∀ {σ Γ} → Term σ Γ → Set
 Closed red R t = ∀ {u} → red t u → R u
 
 data SN {σ Γ} (t : Term σ Γ) : Set where
@@ -255,4 +257,27 @@ theorem2-6 t ρ rs = Fdm.fdm prf rs t where
               ren ρ′ (sub ρ₁′ b) [ u /0]           ≡⟨ rensub TermD (sub ρ₁′ b) ρ′ (u /0]) ⟩
               sub (select ρ′ (u /0])) (sub ρ₁′ b)  ≡⟨ Fus.fus (Sub² TermD) ρ^R′ b ⟩
               sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b ∎
+
+infix 1 _⊢SN_∋_ _⊢NE_∋_
+data _⊢SN_∋_ (Γ : List Type) : (σ : Type) → Term σ Γ → Set
+data _⊢NE_∋_ (Γ : List Type) : (σ : Type) → Term σ Γ → Set
+
+infix 3 _↝SN_
+data _↝SN_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ] where
+-- computational
+  β    : ∀ {Γ σ τ} (t : Term τ (σ ∷ Γ)) (u : Term σ Γ) → `λ t `∙ u ↝SN t [ u /0]
+-- structural
+  [∙]₂ : ∀ {Γ σ τ} {f g : Term (σ ⇒ τ) Γ} → f ↝SN g → (t : Term σ Γ) → f `∙ t ↝SN g `∙ t
+
+data _⊢SN_∋_ Γ where
+  `neu : ∀ {σ t} → Γ ⊢NE σ ∋ t → Γ ⊢SN σ ∋ t
+  `lam : ∀ {σ τ} {b : ((σ ∷_) ⊢ Term τ) Γ} →
+         (σ ∷ Γ) ⊢SN τ ∋ b → Γ ⊢SN σ ⇒ τ ∋ `λ b
+  `red : ∀ {σ} {t t′} → t ↝SN t′ → Γ ⊢SN σ ∋ t′ → Γ ⊢SN σ ∋ t
+
+data _⊢NE_∋_ Γ where
+  `var : ∀ {σ} (v : Var σ Γ) → Γ ⊢NE σ ∋ `var v
+  `app : ∀ {σ τ} {f : Term (σ ⇒ τ) Γ} {t : Term σ Γ} →
+         Γ ⊢NE σ ⇒ τ ∋ f → Γ ⊢SN σ ∋ t → Γ ⊢NE τ ∋ f `∙ t
+
 \end{code}
