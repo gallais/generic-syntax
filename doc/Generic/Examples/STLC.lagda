@@ -13,19 +13,20 @@ open import Function
 \end{code}
 %<*stlc>
 \begin{code}
+data `STLC : Set where
+  App Lam : Type → Type → `STLC
+
 STLC : Desc Type
-STLC =  `σ Bool $ λ isApp → if isApp
-        then  (`σ Type $ λ σ → `σ Type $ λ τ →
-              `X [] (σ ⇒ τ) (`X [] σ (`∎ τ)))
-        else  (`σ Type $ λ σ → `σ Type $ λ τ →
-              `X (σ ∷ []) τ (`∎ (σ ⇒ τ)))
+STLC =  `σ `STLC $ λ where
+  (App σ τ) → `X [] (σ ⇒ τ) (`X [] σ (`∎ τ))
+  (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
 \end{code}
 %</stlc>
 %<*patST>
 \begin{code}
 pattern `V x    = `var x
-pattern `A f t  = `con (true , _ , _ , f , t , refl)
-pattern `L b    = `con (false , _ , _ , b , refl)
+pattern `A f t  = `con (App _ _ , f , t , refl)
+pattern `L b    = `con (Lam _ _ , b , refl)
 \end{code}
 %</patST>
 \begin{code}

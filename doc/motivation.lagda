@@ -111,7 +111,7 @@ open import environment hiding (extend ; _>>_)
 %<*rsem>
 \begin{code}
 record Sem (𝓥 𝓒 : Type ─Scoped) : Set where
-  field  th^𝓥  : {σ : Type} →    Thinnable (𝓥 σ)
+  field  th^𝓥  : ∀ {σ} → Thinnable (𝓥 σ)
          ⟦V⟧   : {σ : Type} →    [ 𝓥 σ               ⟶ 𝓒 σ        ]
          ⟦A⟧   : {σ τ : Type} →  [ 𝓒 (σ ⇒ τ) ⟶ 𝓒 σ   ⟶ 𝓒 τ        ]
          ⟦L⟧   : {σ τ : Type} →  [ □ (𝓥 σ ⟶ 𝓒 τ)     ⟶ 𝓒 (σ ⇒ τ)  ]

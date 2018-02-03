@@ -14,7 +14,7 @@ open Pred public
 module _ {I : Set} {T : I ─Scoped} where
 
  record ∀[_] (𝓟 : Pred T) {Γ Δ : List I} (ρ : (Γ ─Env) T Δ) : Set where
-   constructor pack^R
+   constructor pack^P
    field lookup^P : ∀ {i} k → pred 𝓟 {i} (lookup ρ k)
  open ∀[_] public
 

@@ -4,7 +4,7 @@
 \usepackage{color}
 \usepackage{mathpartir}
 \usepackage{catchfilebetweentags}
-
+\setlength{\mathindent}{0cm}
 \let\\=\newline
 \renewcommand{\mathcal}[1]{#1}
 \input{lhs2tex-prelude}
@@ -39,7 +39,7 @@
     \end{minipage}
 
     \ExecuteMetaData[indexed.tex]{arrow}
-    \ExecuteMetaData[indexed.tex]{product}
+    \ExecuteMetaData[indexed.tex]{adjust}
     \ExecuteMetaData[indexed.tex]{forall}
 
   \end{frame}
@@ -97,7 +97,7 @@
 
   \begin{frame}{Type-and-Scope Safe Semantics}
     \ExecuteMetaData[motivation.tex]{rsem}
-    \ExecuteMetaData[motivation.tex]{sem}
+    \uncover<2->{\ExecuteMetaData[motivation.tex]{sem}}
   \end{frame}
 
 \section{Primer: Universe of Data Types}
@@ -168,10 +168,7 @@
 
 \begin{frame}{Fundamental Lemma of Semantics}
   \ExecuteMetaData[Generic/Semantics.tex]{comp}
-
-  \hspace{-50pt}\begin{minipage}{0.9\textwidth}
-    \ExecuteMetaData[Generic/Semantics.tex]{semtype}
-  \end{minipage}
+  \ExecuteMetaData[Generic/Semantics.tex]{semtype}
 \end{frame}
 
 \begin{frame}{Proof of the Fundamental Lemma}

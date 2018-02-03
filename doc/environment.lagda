@@ -15,7 +15,8 @@ infix 3 _─Env
 %<*env>
 \begin{code}
 record _─Env (Γ : List I) (𝓥 : I ─Scoped) (Δ : List I) : Set where
-  constructor pack; field lookup : {i : I} → Var i Γ → 𝓥 i Δ
+  constructor pack
+  field lookup : ∀ {i} → Var i Γ → 𝓥 i Δ
 \end{code}
 %</env>
 \begin{code}

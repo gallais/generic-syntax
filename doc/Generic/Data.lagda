@@ -67,8 +67,9 @@ fold d alg (`con t) = alg (fmap d (fold d alg) t)
 %<*listD>
 \begin{code}
 listD : Set → Desc ⊤ ⊤
-listD A =  `σ Bool $ λ isNil →
-           if isNil then `∎ tt else `σ A (λ _ → `X tt (`∎ tt))
+listD A =  `σ Bool $ λ isNil → if isNil
+           then `∎ tt
+           else `σ A (λ _ → `X tt (`∎ tt))
 \end{code}
 %</listD>
 
