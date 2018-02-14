@@ -14,8 +14,8 @@
 module indexed {ℓ^I} {I : Set ℓ^I} where
 
 open import Level using (Level ; _⊔_)
-open import Data.Sum using (_⊎_) public
-open import Data.Product using (_×_) public
+open import Data.Sum using (_⊎_)
+open import Data.Product using (_×_)
 \end{code}
 
 \AgdaHide{
