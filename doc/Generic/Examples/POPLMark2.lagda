@@ -271,7 +271,7 @@ data _⊢NE_∋_<_ (Γ : List Type) : (σ : Type) → Term σ Γ → Size → Se
 infix 3 _↝SN_<_ _↝SN_
 data _↝SN_<_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Size ⟶ κ Set ] where
 -- computational
-  β    : ∀ {Γ σ τ i} (t : Term τ (σ ∷ Γ)) u → `λ t `∙ u ↝SN t [ u /0] < i
+  β    : ∀ {Γ σ τ i} (t : Term τ (σ ∷ Γ)) u → Γ ⊢SN σ ∋ u < i → `λ t `∙ u ↝SN t [ u /0] < ↑ i
 -- structural
   [∙]₂ : ∀ {Γ σ τ i} {f g : Term (σ ⇒ τ) Γ} → f ↝SN g < i → ∀ t → f `∙ t ↝SN g `∙ t < ↑ i
 
@@ -289,7 +289,7 @@ wk^↝SN : ∀ {Γ σ i} {t u : Term σ Γ} → t ↝SN u < i → t ↝SN u < �
 wk^SN∋ : ∀ {Γ σ t i} → Γ ⊢SN σ ∋ t < i → Γ ⊢SN σ ∋ t < ↑ i
 wk^NE∋ : ∀ {Γ σ t i} → Γ ⊢NE σ ∋ t < i → Γ ⊢NE σ ∋ t < ↑ i
 
-wk^↝SN (β t u)         = β t u
+wk^↝SN (β t u u^SN)    = β t u (wk^SN∋ u^SN)
 wk^↝SN ([∙]₂ r t)      = [∙]₂ (wk^↝SN r) t
 wk^SN∋ (neu t^NE)      = neu (wk^NE∋ t^NE)
 wk^SN∋ (lam b^SN)      = lam (wk^SN∋ b^SN)
@@ -361,8 +361,9 @@ mutual
 
  -- 3.
  th^↝SN : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : Thinning Γ Δ) → t ↝SN u → ren ρ t ↝SN ren ρ u
- th^↝SN ρ (β t u)    = subst (ren ρ (`λ t `∙ u) ↝SN_) (sym $ renβ TermD t u ρ) (β _ _)
- th^↝SN ρ ([∙]₂ r t) = [∙]₂ (th^↝SN ρ r) (ren ρ t)
+ th^↝SN ρ (β t u u^SN) = subst (ren ρ (`λ t `∙ u) ↝SN_< _) (sym $ renβ TermD t u ρ)
+                       $ β _ (ren ρ u) (th^SN∋ ρ u^SN)
+ th^↝SN ρ ([∙]₂ r t)   = [∙]₂ (th^↝SN ρ r) (ren ρ t)
 
 -- Lemma 3.7: Neutral and Normal anti-Thinning
 mutual
@@ -396,8 +397,8 @@ mutual
              ren ρ t ↝SN u → ∃ λ u′ → u ≡ ren ρ u′ × t ↝SN u′
  th⁻¹^↝SN∋ (`var v) ρ ()
  th⁻¹^↝SN∋ (`λ b)   ρ ()
- th⁻¹^↝SN∋ (`λ b `∙ t) ρ (β ._ ._)   = b [ t /0] , sym (renβ TermD b t ρ) , β b t
- th⁻¹^↝SN∋ (f `∙ t)    ρ ([∙]₂ r ._) =
+ th⁻¹^↝SN∋ (`λ b `∙ t) ρ (β ._ ._ t^SN) = b [ t /0] , sym (renβ TermD b t ρ) , β b t (th⁻¹^SN∋ t ρ refl t^SN)
+ th⁻¹^↝SN∋ (f `∙ t)    ρ ([∙]₂ r ._)    =
    let (g , eq , r′) = th⁻¹^↝SN∋ f ρ r in g `∙ t , cong (_`∙ ren ρ t) eq , [∙]₂ r′ t
 
 -- Lemma 3.8: Stability under substitution of Strongly Neutrals
@@ -410,7 +411,7 @@ mutual
    ρ′^P = pack^P $ λ where
      z     → var z
      (s k) → th^NE∋ _ (lookup^P ρ^P k)
- sub^SN∋ ρ^P (red r t) = red (sub^↝SN _ r) (sub^SN∋ ρ^P t)
+ sub^SN∋ ρ^P (red r t) = red (sub^↝SN ρ^P r) (sub^SN∋ ρ^P t)
 
  -- 2.
  sub^NE∋ : ∀ {σ Γ Δ t ρ} → pred.∀[ NE∋ ] ρ → Γ ⊢NE σ ∋ t → Δ ⊢NE σ ∋ sub ρ t
@@ -418,15 +419,16 @@ mutual
  sub^NE∋ ρ^P (app n t) = app (sub^NE∋ ρ^P n) (sub^SN∋ ρ^P t)
 
  -- 3.
- sub^↝SN : ∀ {σ Γ Δ} {t u : Term σ Γ} (ρ : (Γ ─Env) Term Δ) → t ↝SN u → sub ρ t ↝SN sub ρ u
- sub^↝SN ρ (β t u)    = subst (sub ρ (`λ t `∙ u) ↝SN_) (sym $ subβ TermD t u ρ) (β (sub _ t) (sub ρ u))
- sub^↝SN ρ ([∙]₂ r t) = [∙]₂ (sub^↝SN ρ r) (sub ρ t)
+ sub^↝SN : ∀ {σ Γ Δ} {t u : Term σ Γ} {ρ : (Γ ─Env) Term Δ} → pred.∀[ NE∋ ] ρ → t ↝SN u → sub ρ t ↝SN sub ρ u
+ sub^↝SN ρ^P (β t u u^SN) = subst (sub _ (`λ t `∙ u) ↝SN_) (sym $ subβ TermD t u _)
+                        $ β (sub _ t) (sub _ u) (sub^SN∋ ρ^P u^SN)
+ sub^↝SN ρ^P ([∙]₂ r t)   = [∙]₂ (sub^↝SN ρ^P r) (sub _ t)
 
 -- Lemma 3.9: Stability under application to a strongly neutral
 infixl 5 _∙SN_
 _∙SN_ : ∀ {Γ σ τ f t} → Γ ⊢SN σ ⇒ τ ∋ f → Γ ⊢NE σ ∋ t → Γ ⊢SN τ ∋ f `∙ t
 neu f^NE   ∙SN t^NE = neu (app f^NE (neu t^NE))
-lam b^SN   ∙SN t^NE = red (β _ _) (sub^SN∋ ([v↦v]^NE ∙^P t^NE) b^SN)
+lam b^SN   ∙SN t^NE = red (β _ _ (neu t^NE)) (sub^SN∋ ([v↦v]^NE ∙^P t^NE) b^SN)
 red r f^SN ∙SN t^NE = red ([∙]₂ r _) (f^SN ∙SN t^NE)
 
 -- Lemma 3.10: Stability under application to a variable
@@ -440,27 +442,29 @@ NE∋-ext v (app f^NE v^SN) = f^NE
 
 SN∋-ext : ∀ {Γ σ τ f} v → Γ ⊢SN τ ∋ f `∙ `var v → Γ ⊢SN σ ⇒ τ ∋ f
 SN∋-ext v (neu fv^NE)   = neu (NE∋-ext v fv^NE)
-SN∋-ext v (red ([∙]₂ r .(`var v)) fv^SN) = red r (SN∋-ext v fv^SN)
-SN∋-ext v (red (β t .(`var v))    fv^SN) = lam (th⁻¹^SN∋ t (base vl^Var ∙ v) eq fv^SN) where
+SN∋-ext v (red ([∙]₂ r .(`var v))   fv^SN) = red r (SN∋-ext v fv^SN)
+SN∋-ext v (red (β t .(`var v) v^SN) fv^SN) = lam (th⁻¹^SN∋ t (base vl^Var ∙ v) eq fv^SN) where
   eq = sym $ Sim.sim sim.RenSub (base^VarTm^R ∙^R refl) t
 
 
-↜-↝^SN-confl : ∀ {Γ σ i} {t u u′ : Term σ Γ} → t ↝ u → t ↝SN u′ < i →
-               u ≡ u′ ⊎ ∃ λ t′ → u ↝SN t′ < i × u′ ↝⋆ t′
-↜-↝^SN-confl (β b t) (β .b .t) = inj₁ refl
-↜-↝^SN-confl ([∙]₂ ([λ] r) t) (β b .t) =
-  inj₂ (tgt r [ t /0] , β (tgt r) t , S.return (sub^↝ (t /0]) r))
-↜-↝^SN-confl ([∙]₁ f r) (β b t) =
-  inj₂ (b [ tgt r /0] , β b (tgt r) , sub^↝⋆ b ([v↦t↝⋆t] ∙^R S.return r))
-↜-↝^SN-confl (β b t) ([∙]₂ () .t)
-↜-↝^SN-confl ([∙]₁ f r) ([∙]₂ r^SN t) =
-  inj₂ (_ , [∙]₂ r^SN _ , S.return ([∙]₁ _ r))
-↜-↝^SN-confl ([∙]₂ r t) ([∙]₂ r^SN .t) with ↜-↝^SN-confl r r^SN
-... | inj₁ eq = inj₁ (cong (_`∙ t) eq)
-... | inj₂ (f , r′ , r′^SN) =
-  inj₂ (f `∙ t , [∙]₂ r′ t , S.gmap (_`∙ t) (λ r → [∙]₂ r t) r′^SN)
-
+-- Lemma [APLAS]: confluence of ↝SN and ↝ together with
+-- stability of SN∋ and NE∋ under ↝ reduction
 mutual
+
+ ↜-↝^SN-confl : ∀ {Γ σ i} {t u u′ : Term σ Γ} → t ↝ u → t ↝SN u′ < i →
+                u ≡ u′ ⊎ ∃ λ t′ → u ↝SN t′ < i × u′ ↝⋆ t′
+ ↜-↝^SN-confl (β b t) (β .b .t t^SN) = inj₁ refl
+ ↜-↝^SN-confl ([∙]₂ ([λ] r) t) (β b .t t^SN) =
+   inj₂ (tgt r [ t /0] , β (tgt r) t t^SN , S.return (sub^↝ (t /0]) r))
+ ↜-↝^SN-confl ([∙]₁ f r) (β b t t^SN) =
+   inj₂ (b [ tgt r /0] , β b (tgt r) (↝^SN∋ t^SN r) , sub^↝⋆ b ([v↦t↝⋆t] ∙^R S.return r))
+ ↜-↝^SN-confl (β b t) ([∙]₂ () .t)
+ ↜-↝^SN-confl ([∙]₁ f r) ([∙]₂ r^SN t) =
+   inj₂ (_ , [∙]₂ r^SN _ , S.return ([∙]₁ _ r))
+ ↜-↝^SN-confl ([∙]₂ r t) ([∙]₂ r^SN .t) with ↜-↝^SN-confl r r^SN
+ ... | inj₁ eq = inj₁ (cong (_`∙ t) eq)
+ ... | inj₂ (f , r′ , r′^SN) =
+   inj₂ (f `∙ t , [∙]₂ r′ t , S.gmap (_`∙ t) (λ r → [∙]₂ r t) r′^SN)
 
  ↝^SN∋ : ∀ {Γ σ t u i} → Γ ⊢SN σ ∋ t < i → t ↝ u → Γ ⊢SN σ ∋ u < i
  ↝^SN∋ (neu t^NE)    r       = neu (↝^NE∋ t^NE r)
@@ -498,9 +502,9 @@ mutual
   -- 3.
   sound^↝SN : ∀ {Γ α σ t u t′} (c : Γ ⊢ σ ∋C< α >) →
               t ↝SN u → Γ ⊢SN σ ∋ plug^∋ u c → SN (plug^∋ u c) → t ↝ t′ → SN (plug^∋ t′ c)
-  sound^↝SN c (β b u) ^SN∋ ^SN (β .b .u)        = ^SN
-  sound^↝SN c (β b u) ^SN∋ ^SN ([∙]₁ .(`λ b) r) = {!!}
-  sound^↝SN c (β b u) ^SN∋ ^SN ([∙]₂ r .u)      = {!!}
+  sound^↝SN c (β b u u^SN) ^SN∋ ^SN (β .b .u)        = ^SN
+  sound^↝SN c (β b u u^SN) ^SN∋ ^SN ([∙]₁ .(`λ b) r) = {!!}
+  sound^↝SN c (β b u u^SN) ^SN∋ ^SN ([∙]₂ r .u)      = {!!}
 
   sound^↝SN c ([∙]₂ () .u)  ^SN∋ ^SN (β b u)
   sound^↝SN c ([∙]₂ r^SN t) ^SN∋ (sn ^SN) ([∙]₁ f r) =
@@ -541,7 +545,7 @@ mutual
   complete^SN-RED : ∀ {Γ σ t} → RED t → SN t → Γ ⊢SN σ ∋ t
   complete^SN-RED (β b u)       λbu^SN =
     let (λb^SN , u^SN) = SN-`∙⁻¹ λbu^SN in
-    red (β b u) {!!}
+    red (β b u (complete^SN u u^SN)) {!!}
 --    red (β b u) (sub^SN∋ ([v↦v]^SN ∙^P complete^SN _ u^SN) (SN∋-`λ⁻¹ (complete^SN _ λb^SN)))
   complete^SN-RED (app f^RED t) ft^SN  =
     let (f^SN , t^SN) = SN-`∙⁻¹ ft^SN in
