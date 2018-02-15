@@ -133,21 +133,22 @@ th^↝-invert (f `∙ t) ρ ([∙]₂ r ._) =
 -- terms closed under reduction
 
 Closed : (∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]) →
-         (∀ {σ Γ} → Term σ Γ → Set) → ∀ {σ Γ} → Term σ Γ → Set
+         ∀ {σ Γ} → (Term σ Γ → Set) → Term σ Γ → Set
 Closed red R t = ∀ {u} → red t u → R u
 
 -- Definition 3.1
-data SN {σ Γ} (t : Term σ Γ) : Set where
-  sn : Closed _↝_ SN t → SN t
+infix 3 _⊢sn_∋_
+data _⊢sn_∋_ Γ σ (t : Term σ Γ) : Set where
+  sn : Closed _↝_ (Γ ⊢sn σ ∋_) t → Γ ⊢sn σ ∋ t
 
-Closed-SN : ∀ {σ Γ} {t : Term σ Γ} → SN t → Closed _↝_ SN t
+Closed-SN : ∀ {σ Γ t} → Γ ⊢sn σ ∋ t → Closed _↝_ (Γ ⊢sn σ ∋_) t
 Closed-SN (sn t^SN) = t^SN
 
 -- Lemma 3.1
-th^SN : ∀ {σ Γ Δ} (ρ : Thinning Γ Δ) {t : Term σ Γ} → SN t → SN (ren ρ t)
+th^SN : ∀ {σ Γ Δ} ρ {t} → Γ ⊢sn σ ∋ t → Δ ⊢sn σ ∋ (ren ρ t)
 th^SN ρ (sn u^SN) = sn $ λ r →
   let (_ , eq , r′) = th^↝-invert _ ρ r
-  in subst SN (sym eq) $ th^SN ρ (u^SN r′)
+  in subst (_ ⊢sn _ ∋_) (sym eq) $ th^SN ρ (u^SN r′)
 
 -- Lemma 3.2
 -- We start by an inductive definition of terms which are neutral
@@ -161,8 +162,8 @@ WHNE^↝ (app f^WHNE _)  ([∙]₂ r t) = app (WHNE^↝ f^WHNE r) t
 WHNE^↝ p               (β t u)    = case p of λ { (app () _) }
 
 -- 1.
-SN^WHNE∙ : ∀ {σ τ Γ} {f : Term (σ ⇒ τ) Γ} {t} → WHNE f → SN f → SN t → SN (f `∙ t)
-Closed-SN^WHNE∙ : ∀ {σ τ Γ} {f : Term (σ ⇒ τ) Γ} {t} → WHNE f → SN f → SN t → Closed _↝_ SN (f `∙ t)
+SN^WHNE∙ : ∀ {σ τ Γ f t} → WHNE f → Γ ⊢sn σ ⇒ τ ∋ f → Γ ⊢sn σ ∋ t → Γ ⊢sn τ ∋ f `∙ t
+Closed-SN^WHNE∙ : ∀ {σ τ Γ f t} → WHNE f → Γ ⊢sn σ ⇒ τ ∋ f → Γ ⊢sn σ ∋ t → Closed _↝_ (Γ ⊢sn τ ∋_) (f `∙ t)
 
 Closed-SN^WHNE∙ ()     f^SN      t^SN      (β t u)
 Closed-SN^WHNE∙ f^whne f^SN      (sn t^SN) ([∙]₁ f r) = SN^WHNE∙ f^whne f^SN (t^SN r)
@@ -171,23 +172,23 @@ Closed-SN^WHNE∙ f^whne (sn f^SN) t^SN      ([∙]₂ r t) = SN^WHNE∙ (WHNE^�
 SN^WHNE∙ f^whne f^SN t^SN = sn (Closed-SN^WHNE∙ f^whne f^SN t^SN)
 
 -- 2.
-SN^sub⁻¹ : ∀ {σ Γ Δ} (t : Term σ Γ) (ρ : (Γ ─Env) Term Δ) → SN (sub ρ t) → SN t
+SN^sub⁻¹ : ∀ {σ Γ Δ} t ρ → Δ ⊢sn σ ∋ (sub ρ t) → Γ ⊢sn σ ∋ t
 SN^sub⁻¹ t ρ (sn tρ^SN) = sn (λ r → SN^sub⁻¹ _ ρ (tρ^SN (sub^↝ ρ r)))
 
-SN^[/0]⁻¹ : ∀ {σ τ Γ} (t : Term τ (σ ∷ Γ)) u → SN (t [ u /0]) → SN t
+SN^[/0]⁻¹ : ∀ {σ τ Γ} t u → Γ ⊢sn τ ∋ (t [ u /0]) → (σ ∷ Γ) ⊢sn τ ∋ t
 SN^[/0]⁻¹ t u t[u]^SN = SN^sub⁻¹ t (base vl^Tm ∙ u) t[u]^SN
 
 -- 3.
-SN-`λ : ∀ {σ τ} {Γ} {t : Term τ (σ ∷ Γ)} → SN t → SN (`λ t)
+SN-`λ : ∀ {σ τ Γ t} → (σ ∷ Γ) ⊢sn τ ∋ t → Γ ⊢sn σ ⇒ τ ∋ `λ t
 SN-`λ (sn t^R) = sn λ { ([λ] r) → SN-`λ (t^R r) }
 
 -- 4.
-SN-`∙⁻¹ : ∀ {σ τ Γ} {f : Term (σ ⇒ τ) Γ} {t} → SN (f `∙ t) → SN f × SN t
+SN-`∙⁻¹ : ∀ {σ τ Γ f t} → Γ ⊢sn τ ∋ (f `∙ t) → Γ ⊢sn σ ⇒ τ ∋ f × Γ ⊢sn σ ∋ t
 SN-`∙⁻¹ (sn ft^SN) = sn (λ r → proj₁ (SN-`∙⁻¹ (ft^SN ([∙]₂ r _))))
                    , sn (λ r → proj₂ (SN-`∙⁻¹ (ft^SN ([∙]₁ _ r))))
 
 -- 5.
-SN-`λ⁻¹ : ∀ {σ τ} {Γ} {t : Term τ (σ ∷ Γ)} → SN (`λ t) → SN t
+SN-`λ⁻¹ : ∀ {σ τ Γ t} → Γ ⊢sn σ ⇒ τ ∋ `λ t → (σ ∷ Γ) ⊢sn τ ∋ t
 SN-`λ⁻¹ (sn λt^SN) = sn (λ r → SN-`λ⁻¹ (λt^SN ([λ] r)))
 
 -- Evaluation contexts indexed by the Scope, the type of the hole, and the
@@ -245,16 +246,16 @@ plugvar^↝⁻¹ <>                  ()
 
 -- Lemma 3.4
 -- 1.
-SN-`var : ∀ {σ Γ} → (v : Var σ Γ) → SN (`var v)
+SN-`var : ∀ {σ Γ} → (v : Var σ Γ) → Γ ⊢sn σ ∋ (`var v)
 SN-`var v = sn (λ ())
 
 -- 2. (By Lemma 3.2-1)
-SN-C[var]∙ : ∀ {Γ α σ τ v t} (c : Γ ⊢C< α >∈ σ ⇒ τ) → SN (plug^∈ (`var v) c) → SN t → SN (plug^∈ (`var v) (app c t))
+SN-C[var]∙ : ∀ {Γ α σ τ v t} (c : Γ ⊢C< α >∈ σ ⇒ τ) → Γ ⊢sn σ ⇒ τ ∋ plug^∈ (`var v) c → Γ ⊢sn σ ∋ t → Γ ⊢sn τ ∋ (plug^∈ (`var v) (app c t))
 SN-C[var]∙ c c[v]^SN t^SN = SN^WHNE∙ (C[v]^WHNE c) c[v]^SN t^SN
 
 -- 3.
 SN-C[var]∙^↝ : ∀ {Γ α σ τ v t u} (c : Γ ⊢C< α >∈ σ ⇒ τ) →
-  plug^∈ (`var v) (app c t) ↝ u → SN (plug^∈ (`var v) c) → SN t → SN u
+  plug^∈ (`var v) (app c t) ↝ u → Γ ⊢sn σ ⇒ τ ∋ plug^∈ (`var v) c → Γ ⊢sn σ ∋ t → Γ ⊢sn τ ∋ u
 SN-C[var]∙^↝ <>        ([∙]₁ _ r)  c[v]^SN t^SN = SN^WHNE∙ (var _) c[v]^SN (Closed-SN t^SN r)
 SN-C[var]∙^↝ <>        ([∙]₂ () t) c[v]^SN t^SN
 SN-C[var]∙^↝ (app c u) ([∙]₁ _ r)  c[v]^SN t^SN = SN^WHNE∙ (app (C[v]^WHNE c) _) c[v]^SN (Closed-SN t^SN r)
@@ -349,13 +350,13 @@ lookup^P [v↦v]^NE v rewrite lookup-base^Tm {d = TermD} v = var v
 mutual
 
  -- 1.
- th^SN∋ : ∀ {σ Γ Δ t} (ρ : Thinning Γ Δ) → Γ ⊢SN σ ∋ t → Δ ⊢SN σ ∋ ren ρ t
+ th^SN∋ : ∀ {σ Γ Δ t} ρ → Γ ⊢SN σ ∋ t → Δ ⊢SN σ ∋ ren ρ t
  th^SN∋ ρ (neu n)   = neu (th^NE∋ ρ n)
  th^SN∋ ρ (lam t)   = lam (th^SN∋ _ t)
  th^SN∋ ρ (red r t) = red (th^↝SN ρ r) (th^SN∋ ρ t)
 
  -- 2.
- th^NE∋ : ∀ {σ Γ Δ t} (ρ : Thinning Γ Δ) → Γ ⊢NE σ ∋ t → Δ ⊢NE σ ∋ ren ρ t
+ th^NE∋ : ∀ {σ Γ Δ t} ρ → Γ ⊢NE σ ∋ t → Δ ⊢NE σ ∋ ren ρ t
  th^NE∋ ρ (var v)   = var (lookup ρ v)
  th^NE∋ ρ (app n t) = app (th^NE∋ ρ n) (th^SN∋ ρ t)
 
@@ -369,8 +370,7 @@ mutual
 mutual
 
  -- 1.
- th⁻¹^SN∋ : ∀ {σ Γ Δ} (t : Term σ Γ) {t′ : Term σ Δ} (ρ : Thinning Γ Δ) →
-                 t′ ≡ ren ρ t → Δ ⊢SN σ ∋ t′ → Γ ⊢SN σ ∋ t
+ th⁻¹^SN∋ : ∀ {σ Γ Δ t′} t ρ → t′ ≡ ren ρ t → Δ ⊢SN σ ∋ t′ → Γ ⊢SN σ ∋ t
  th⁻¹^SN∋ (`var v) ρ refl (red r pr) =
    let (v′ , eq , r′) = th⁻¹^↝SN∋ (`var v) ρ r
    in red r′ (th⁻¹^SN∋ v′ ρ eq pr)
@@ -386,14 +386,13 @@ mutual
  th⁻¹^SN∋ (`λ t)   ρ refl (neu ())
 
  -- 2.
- th⁻¹^NE∋ : ∀ {σ Γ Δ} (t : Term σ Γ) {t′ : Term σ Δ} (ρ : Thinning Γ Δ) →
-                 t′ ≡ ren ρ t → Δ ⊢NE σ ∋ t′ → Γ ⊢NE σ ∋ t
+ th⁻¹^NE∋ : ∀ {σ Γ Δ t′} t ρ → t′ ≡ ren ρ t → Δ ⊢NE σ ∋ t′ → Γ ⊢NE σ ∋ t
  th⁻¹^NE∋ (`var v) ρ refl (var _)     = var v
  th⁻¹^NE∋ (f `∙ t) ρ refl (app rf rt) =
   app (th⁻¹^NE∋ f ρ refl rf) (th⁻¹^SN∋ t ρ refl rt)
 
  -- 3.
- th⁻¹^↝SN∋ : ∀ {σ Γ Δ} (t : Term σ Γ) {u : Term σ Δ} (ρ : Thinning Γ Δ) →
+ th⁻¹^↝SN∋ : ∀ {σ Γ Δ} (t : Term σ Γ) {u : Term σ Δ} ρ →
              ren ρ t ↝SN u → ∃ λ u′ → u ≡ ren ρ u′ × t ↝SN u′
  th⁻¹^↝SN∋ (`var v) ρ ()
  th⁻¹^↝SN∋ (`λ b)   ρ ()
@@ -489,19 +488,19 @@ mutual
 mutual
 
  -- 1.
-  sound^SN∋ : ∀ {Γ σ t} → Γ ⊢SN σ ∋ t → SN t
+  sound^SN∋ : ∀ {Γ σ t} → Γ ⊢SN σ ∋ t → Γ ⊢sn σ ∋ t
   sound^SN∋ (neu t^NE)   = sound^NE∋ t^NE
   sound^SN∋ (lam b^SN)   = SN-`λ (sound^SN∋ b^SN)
   sound^SN∋ (red r t^SN) = sn (sound^↝SN <> r t^SN (sound^SN∋ t^SN))
 
   -- 2.
-  sound^NE∋ : ∀ {Γ σ t} → Γ ⊢NE σ ∋ t → SN t
+  sound^NE∋ : ∀ {Γ σ t} → Γ ⊢NE σ ∋ t → Γ ⊢sn σ ∋ t
   sound^NE∋ (var v)         = SN-`var v
   sound^NE∋ (app f^NE t^SN) = SN^WHNE∙ (NE^WHNE f^NE) (sound^NE∋ f^NE) (sound^SN∋ t^SN)
 
   -- 3.
   sound^↝SN : ∀ {Γ α σ t u t′} (c : Γ ⊢ σ ∋C< α >) →
-              t ↝SN u → Γ ⊢SN σ ∋ plug^∋ u c → SN (plug^∋ u c) → t ↝ t′ → SN (plug^∋ t′ c)
+              t ↝SN u → Γ ⊢SN σ ∋ plug^∋ u c → Γ ⊢sn σ ∋ (plug^∋ u c) → t ↝ t′ → Γ ⊢sn σ ∋ (plug^∋ t′ c)
   sound^↝SN c (β b u u^SN) ^SN∋ ^SN (β .b .u)        = ^SN
   sound^↝SN c (β b u u^SN) ^SN∋ ^SN ([∙]₁ .(`λ b) r) = {!!}
   sound^↝SN c (β b u u^SN) ^SN∋ ^SN ([∙]₂ r .u)      = {!!}
@@ -535,14 +534,14 @@ C[β]^RED (app c t) = app (C[β]^RED c) t
 mutual
 
   -- 1.
-  complete^SN-WHNE : ∀ {Γ σ t} → WHNE t → SN t → Γ ⊢NE σ ∋ t
+  complete^SN-WHNE : ∀ {Γ σ t} → WHNE t → Γ ⊢sn σ ∋ t → Γ ⊢NE σ ∋ t
   complete^SN-WHNE (var v)        e^SN = var v
   complete^SN-WHNE (app f^WHNE t) e^SN =
     let (f^SN , t^SN) = SN-`∙⁻¹ e^SN in
     app (complete^SN-WHNE f^WHNE f^SN) (complete^SN t t^SN)
 
   -- 2.
-  complete^SN-RED : ∀ {Γ σ t} → RED t → SN t → Γ ⊢SN σ ∋ t
+  complete^SN-RED : ∀ {Γ σ t} → RED t → Γ ⊢sn σ ∋ t → Γ ⊢SN σ ∋ t
   complete^SN-RED (β b u)       λbu^SN =
     let (λb^SN , u^SN) = SN-`∙⁻¹ λbu^SN in
     red (β b u (complete^SN u u^SN)) {!!}
@@ -552,7 +551,7 @@ mutual
     {!!} -- complete^SN-RED f^RED f^SN ∙SN complete^SN t t^SN
 
   -- 3.
-  complete^SN : ∀ {Γ σ} t → SN t → Γ ⊢SN σ ∋ t
+  complete^SN : ∀ {Γ σ} t → Γ ⊢sn σ ∋ t → Γ ⊢SN σ ∋ t
   complete^SN (`var v) v^SN  = neu (var v)
   complete^SN (`λ b)   λb^SN = lam (complete^SN b (SN-`λ⁻¹ λb^SN))
   complete^SN (f `∙ t) ft^SN with WHNE+RED f t
@@ -560,10 +559,10 @@ mutual
   ... | inj₂ ft^RED  = complete^SN-RED ft^RED ft^SN
 
 
-complete^SN-C[v] : ∀ {Γ α σ v} (c : Γ ⊢C< α >∈ σ) → let t = plug^∈ (`var v) c in SN t → Γ ⊢NE σ ∋ t
+complete^SN-C[v] : ∀ {Γ α σ v} (c : Γ ⊢C< α >∈ σ) → let t = plug^∈ (`var v) c in Γ ⊢sn σ ∋ t → Γ ⊢NE σ ∋ t
 complete^SN-C[v] c = complete^SN-WHNE (C[v]^WHNE c)
 
-complete^SN-c[β] : ∀ {Γ α σ τ t} {b : Term τ (σ ∷ Γ)} c → SN (plug^∈ ((`λ b) `∙ t) c) →
+complete^SN-c[β] : ∀ {Γ α σ τ t} {b : Term τ (σ ∷ Γ)} c → Γ ⊢sn α ∋ plug^∈ ((`λ b) `∙ t) c →
                    Γ ⊢SN α ∋ plug^∈ (`λ b `∙ t) c
 complete^SN-c[β] c = complete^SN-RED (C[β]^RED c)
 
