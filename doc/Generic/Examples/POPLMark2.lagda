@@ -9,7 +9,7 @@ open import Data.Product as Prod
 open import Agda.Builtin.List
 open import Data.Product hiding (,_)
 open import Data.Star as S using (Star)
-open import Function
+open import Function hiding (_∋_)
 open import Relation.Binary.PropositionalEquality hiding ([_]); open ≡-Reasoning
 
 -- Definition of the language. We define an enumeration `TermC` as the
@@ -221,15 +221,6 @@ plug^∈ t (app c u) = plug^∈ t c `∙ u
 plug^∋ : ∀ {Γ α σ} → Term σ Γ → Γ ⊢ α ∋C< σ > → Term α Γ
 plug^∋ t <>        = t
 plug^∋ t (app c u) = plug^∋ (t `∙ u) c
-
-unzip : ∀ {Γ σ τ} (f : Term (σ ⇒ τ) Γ) t → ∃ λ α → ∃ λ (c : Γ ⊢C< α >∈ τ) →
-        (∃ λ v → f `∙ t ≡ plug^∈ (`var v) c)
-        ⊎ (∃ λ β → ∃ λ (b : Term α (β ∷ Γ)) → ∃ λ u → f `∙ t ≡ plug^∈ (`λ b `∙ u) c)
-unzip (`var v) t = _ , app <> t , inj₁ (v , refl)
-unzip (`λ b)   t = _ , <> , inj₂ (_ , b , t , refl)
-unzip (f `∙ u) t with unzip f u
-... | (_ , c , inj₁ (v , eq))          = _ , app c t , inj₁ (v , cong (_`∙ t) eq)
-... | (_ , c , inj₂ (_ , b , u′ , eq)) = _ , app c t , inj₂ (_ , b , u′ , cong (_`∙ t) eq)
 
 C[v]^WHNE : ∀ {Γ α σ v} (c : Γ ⊢C< α >∈ σ) → WHNE (plug^∈ (`var v) c)
 C[v]^WHNE <>        = var _
@@ -538,44 +529,56 @@ C[β]^RED : ∀ {Γ α σ τ b} {t : Term τ Γ} (c : Γ ⊢C< α >∈ σ) → R
 C[β]^RED <>        = β _ _
 C[β]^RED (app c t) = app (C[β]^RED c) t
 
+infix 4 _⊢SNC<_>∈_∋_
+data _⊢SNC<_>∈_∋_ Γ α : ∀ σ → Γ ⊢C< α >∈ σ → Set where
+  <>  : Γ ⊢SNC< α >∈ α ∋ <>
+  app : ∀ {σ τ c t} → Γ ⊢SNC< α >∈ σ ⇒ τ ∋ c → Γ ⊢SN σ ∋ t → Γ ⊢SNC< α >∈ τ ∋ app c t
 
 mutual
 
   -- 1.
-  complete^SNe : ∀ {Γ σ α i} v (c : Γ ⊢C< σ >∈ α) →
-                 let t = plug^∈ (`var v) c in Γ ⊢sn α ∋ t < i → Γ ⊢NE α ∋ t
-  complete^SNe v <>        c[v]^sn   = var v
-  complete^SNe v (app c t) c[v]∙t^sn =
+  complete^SNe : ∀ {Γ σ α i c} v → Γ ⊢SNC< σ >∈ α ∋ c →
+                 let t = plug^∈ (`var v) c in
+                 ∀ {t′} → t′ ≡ t → Γ ⊢sn α ∋ t′ < i → Γ ⊢NE α ∋ t′
+  complete^SNe v <>           refl c[v]^sn   = var v
+  complete^SNe v (app c t^SN) refl c[v]∙t^sn =
     let (c[v]^sn , t^sn) = SN-`∙⁻¹ c[v]∙t^sn in
-    app (complete^SNe v c c[v]^sn) {!complete^SN t t^sn!} -- todo: get this earlier on
+    app (complete^SNe v c refl c[v]^sn) t^SN
 
   -- 2.
   complete^SN-β : ∀ {Γ σ τ α i} (b : Term τ (σ ∷ Γ)) u (c : Γ ⊢C< τ >∈ α) →
-                  let t = plug^∈ (`λ b `∙ u) c in Γ ⊢sn α ∋ t < i → Γ ⊢SN α ∋ t
-  complete^SN-β b u c (sn c[λb∙u]^sn) =
-    red {!!} (complete^SN _ (c[λb∙u]^sn (C<>∈^↝ c (β b u))))
+                  let t = plug^∈ (`λ b `∙ u) c in t ↝SN plug^∈ (b [ u /0]) c →
+                  ∀ {t′} → t′ ≡ t → Γ ⊢sn α ∋ t′ < i → Γ ⊢SN α ∋ t′
+  complete^SN-β b u c r refl (sn c[λb∙u]^sn) = red r (complete^SN _ (c[λb∙u]^sn (C<>∈^↝ c (β b u))))
 
   -- 3.
   complete^SN : ∀ {Γ σ i} t → Γ ⊢sn σ ∋ t < i → Γ ⊢SN σ ∋ t
   complete^SN (`var v) v^sn  = neu (var v)
   complete^SN (`λ b)   λb^sn = lam (complete^SN b (SN-`λ⁻¹ λb^sn))
-  complete^SN (f `∙ t) ft^sn with unzip f t
-  ... | _ , c , inj₁ (v , eq)         rewrite eq = neu (complete^SNe v c ft^sn)
-  ... | _ , c , inj₂ (_ , b , u , eq) rewrite eq = complete^SN-β b u c ft^sn
+  complete^SN (f `∙ t) ft^sn =
+    let (f^sn , t^sn) = SN-`∙⁻¹ ft^sn in
+    let t^SN = complete^SN t t^sn in
+    case unzip f t f^sn t^SN of λ where
+       (_ , c , inj₁ (v , eq , sp))        → neu (complete^SNe v sp eq ft^sn)
+       (_ , c , inj₂ (_ , b , u , eq , r)) → complete^SN-β b u c r eq ft^sn
 
-{-
-with WHNE+RED f t
-  ... | inj₁ ft^WHNE = neu (complete^SN-WHNE ft^WHNE ft^SN)
-  ... | inj₂ ft^RED  = complete^SN-RED ft^RED ft^SN
-
-
-complete^SN-C[v] : ∀ {Γ α σ v} (c : Γ ⊢C< α >∈ σ) → let t = plug^∈ (`var v) c in Γ ⊢sn σ ∋ t → Γ ⊢NE σ ∋ t
-complete^SN-C[v] c = complete^SN-WHNE (C[v]^WHNE c)
-
-complete^SN-c[β] : ∀ {Γ α σ τ t} {b : Term τ (σ ∷ Γ)} c → Γ ⊢sn α ∋ plug^∈ ((`λ b) `∙ t) c →
-                   Γ ⊢SN α ∋ plug^∈ (`λ b `∙ t) c
-complete^SN-c[β] c = complete^SN-RED (C[β]^RED c)
-
+  -- ugly but it works
+  unzip : ∀ {Γ σ τ i} f t → Γ ⊢sn σ ⇒ τ ∋ f < i → Γ ⊢SN σ ∋ t →
+          ∃ λ α → ∃ λ (c : Γ ⊢C< α >∈ τ) →
+          (∃ λ v → f `∙ t ≡ plug^∈ (`var v) c × Γ ⊢SNC< α >∈ τ ∋ c)
+        ⊎ (∃ λ β → ∃ λ (b : Term α (β ∷ Γ)) → ∃ λ u →
+             f `∙ t ≡ plug^∈ (`λ b `∙ u) c
+             × plug^∈ (`λ b `∙ u) c ↝SN plug^∈ (b [ u /0]) c)
+  unzip (`var v) t v^sn  t^SN = _ , app <> t , inj₁ (v , refl , app <> t^SN)
+  unzip (`λ b)   t λb^sn t^SN = _ , <> , inj₂ (_ , b , t , refl , β b t t^SN)
+  unzip (f `∙ u) t fu^sn t^SN =
+    let (f^sn , u^sn) = SN-`∙⁻¹ fu^sn in
+    let u^SN = complete^SN u u^sn in
+    case unzip f u f^sn u^SN of λ where
+      (_ , c , inj₁ (v , eq , sp)) →
+        _ , app c t , inj₁ (v , cong (_`∙ t) eq , app sp t^SN)
+      (_ , c , inj₂ (_ , b , a , eq , r)) →
+        _ , app c t , inj₂ (_ , b , a , cong (_`∙ t) eq , [∙]₂ r t)
 
 -- Section 4 Reducibility Candidates
 -------------------------------------------------------------------
