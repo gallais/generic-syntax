@@ -3,7 +3,9 @@ module Generic.Examples.POPLMark2 where
 
 open import Generic
 
+open import Size
 open import Data.Sum as Sum
+open import Data.Product as Prod
 open import Agda.Builtin.List
 open import Data.Product hiding (,_)
 open import Data.Star as S using (Star)
@@ -58,6 +60,12 @@ data _↝_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ] where
   [∙]₁ : ∀ {Γ σ τ} (f : Term (σ ⇒ τ) Γ) {t u} → t ↝ u → f `∙ t ↝ f `∙ u
   [∙]₂ : ∀ {Γ σ τ} {f g : Term (σ ⇒ τ) Γ} → f ↝ g → ∀ t → f `∙ t ↝ g `∙ t
 
+src : ∀ {σ Γ} {s t : Term σ Γ} → s ↝ t → Term σ Γ
+src {s = src} _ = src
+
+tgt : ∀ {σ Γ} {s t : Term σ Γ} → s ↝ t → Term σ Γ
+tgt {t = tgt} _ = tgt
+
 _↝⋆_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]
 _↝⋆_ = Star _↝_
 
@@ -76,6 +84,9 @@ sub^↝ ρ ([λ] r)    = [λ] (sub^↝ _ r)
 sub^↝ ρ ([∙]₁ f r) = [∙]₁ (sub ρ f) (sub^↝ ρ r)
 sub^↝ ρ ([∙]₂ r t) = [∙]₂ (sub^↝ ρ r) (sub ρ t)
 
+[v↦t↝⋆t] : ∀ {Γ Δ} {ρ : (Γ ─Env) Term Δ} → rel.∀[ mkRel _↝⋆_ ] ρ ρ
+lookup^R [v↦t↝⋆t] k = S.ε
+
 sub^↝⋆ : ∀ {σ Γ Δ} (t : Term σ Γ) {ρ ρ′ : (Γ ─Env) Term Δ} →
          rel.∀[ mkRel _↝⋆_ ] ρ ρ′ → sub ρ t ↝⋆ sub ρ′ t
 sub^↝⋆ t ρ^R = Sim.sim sim ρ^R t where
@@ -86,7 +97,7 @@ sub^↝⋆ t ρ^R = Sim.sim sim ρ^R t where
   Sim.alg^R sim = λ where
     (f `∙' t) {ρ₁} {ρ₂} ρ^R (refl , f^R , t^R , _) → S.gmap _ (λ f → [∙]₂ f (sub ρ₁ t)) f^R
                                                 S.◅◅ S.gmap _ ([∙]₁ (sub ρ₂ f)) t^R
-    (`λ' b) ρ^R (refl , b^R , _) → S.gmap `λ [λ] (b^R _ (pack^R (λ _ → S.ε)))
+    (`λ' b) ρ^R (refl , b^R , _) → S.gmap `λ [λ] (b^R _ [v↦t↝⋆t])
 
 -- Inversion lemmas for the interaction between ren, ∙, λ and ↝
 
@@ -253,25 +264,43 @@ SN-C[var]∙^↝ (app c u) ([∙]₂ r t)  c[v]^SN t^SN =
 
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
 
-infix 5 _⊢SN_∋_ _⊢NE_∋_
-data _⊢SN_∋_ (Γ : List Type) : (σ : Type) → Term σ Γ → Set
-data _⊢NE_∋_ (Γ : List Type) : (σ : Type) → Term σ Γ → Set
+infix 5 _⊢SN_∋_<_ _⊢NE_∋_<_ _⊢SN_∋_ _⊢NE_∋_
+data _⊢SN_∋_<_ (Γ : List Type) : (σ : Type) → Term σ Γ → Size → Set
+data _⊢NE_∋_<_ (Γ : List Type) : (σ : Type) → Term σ Γ → Size → Set
 
-infix 3 _↝SN_
-data _↝SN_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ] where
+infix 3 _↝SN_<_ _↝SN_
+data _↝SN_<_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Size ⟶ κ Set ] where
 -- computational
-  β    : ∀ {Γ σ τ} (t : Term τ (σ ∷ Γ)) u → `λ t `∙ u ↝SN t [ u /0]
+  β    : ∀ {Γ σ τ i} (t : Term τ (σ ∷ Γ)) u → `λ t `∙ u ↝SN t [ u /0] < i
 -- structural
-  [∙]₂ : ∀ {Γ σ τ} {f g : Term (σ ⇒ τ) Γ} → f ↝SN g → ∀ t → f `∙ t ↝SN g `∙ t
+  [∙]₂ : ∀ {Γ σ τ i} {f g : Term (σ ⇒ τ) Γ} → f ↝SN g < i → ∀ t → f `∙ t ↝SN g `∙ t < ↑ i
 
-data _⊢SN_∋_ Γ where
-  neu : ∀ {σ t} → Γ ⊢NE σ ∋ t → Γ ⊢SN σ ∋ t
-  lam : ∀ {σ τ b} → (σ ∷ Γ) ⊢SN τ ∋ b → Γ ⊢SN σ ⇒ τ ∋ `λ b
-  red : ∀ {σ t t′} → t ↝SN t′ → Γ ⊢SN σ ∋ t′ → Γ ⊢SN σ ∋ t
+data _⊢SN_∋_<_ Γ where
+  neu : ∀ {σ t i} → Γ ⊢NE σ ∋ t < i → Γ ⊢SN σ ∋ t < ↑ i
+  lam : ∀ {σ τ b i} → (σ ∷ Γ) ⊢SN τ ∋ b < i → Γ ⊢SN σ ⇒ τ ∋ `λ b < ↑ i
+  red : ∀ {σ t t′ i} → t ↝SN t′ < i → Γ ⊢SN σ ∋ t′ < i → Γ ⊢SN σ ∋ t < ↑ i
 
-data _⊢NE_∋_ Γ where
-  var : ∀ {σ} v → Γ ⊢NE σ ∋ `var v
-  app : ∀ {σ τ f t} → Γ ⊢NE σ ⇒ τ ∋ f → Γ ⊢SN σ ∋ t → Γ ⊢NE τ ∋ f `∙ t
+data _⊢NE_∋_<_ Γ where
+  var : ∀ {σ i} v → Γ ⊢NE σ ∋ `var v < ↑ i
+  app : ∀ {σ τ f t i} → Γ ⊢NE σ ⇒ τ ∋ f < i → Γ ⊢SN σ ∋ t < i → Γ ⊢NE τ ∋ f `∙ t < ↑ i
+
+-- Why isn't this trivially true?
+wk^↝SN : ∀ {Γ σ i} {t u : Term σ Γ} → t ↝SN u < i → t ↝SN u < ↑ i
+wk^SN∋ : ∀ {Γ σ t i} → Γ ⊢SN σ ∋ t < i → Γ ⊢SN σ ∋ t < ↑ i
+wk^NE∋ : ∀ {Γ σ t i} → Γ ⊢NE σ ∋ t < i → Γ ⊢NE σ ∋ t < ↑ i
+
+wk^↝SN (β t u)         = β t u
+wk^↝SN ([∙]₂ r t)      = [∙]₂ (wk^↝SN r) t
+wk^SN∋ (neu t^NE)      = neu (wk^NE∋ t^NE)
+wk^SN∋ (lam b^SN)      = lam (wk^SN∋ b^SN)
+wk^SN∋ (red r t^SN)    = red (wk^↝SN r) (wk^SN∋ t^SN)
+wk^NE∋ (var v)         = var v
+wk^NE∋ (app f^NE t^SN) = app (wk^NE∋ f^NE) (wk^SN∋ t^SN)
+
+_↝SN_ : ∀ {σ} → [ Term σ ⟶ Term σ ⟶ κ Set ]
+_↝SN_   = _↝SN_< _
+_⊢SN_∋_ = _⊢SN_∋_< _
+_⊢NE_∋_ = _⊢NE_∋_< _
 
 SN^tm : ∀ {Γ σ t} → Γ ⊢SN σ ∋ t → Term σ Γ
 SN^tm {t = t} _ = t
@@ -416,18 +445,39 @@ SN∋-ext v (red (β t .(`var v))    fv^SN) = lam (th⁻¹^SN∋ t (base vl^Var 
   eq = sym $ Sim.sim sim.RenSub (base^VarTm^R ∙^R refl) t
 
 
+↜-↝^SN-confl : ∀ {Γ σ i} {t u u′ : Term σ Γ} → t ↝ u → t ↝SN u′ < i →
+               u ≡ u′ ⊎ ∃ λ t′ → u ↝SN t′ < i × u′ ↝⋆ t′
+↜-↝^SN-confl (β b t) (β .b .t) = inj₁ refl
+↜-↝^SN-confl ([∙]₂ ([λ] r) t) (β b .t) =
+  inj₂ (tgt r [ t /0] , β (tgt r) t , S.return (sub^↝ (t /0]) r))
+↜-↝^SN-confl ([∙]₁ f r) (β b t) =
+  inj₂ (b [ tgt r /0] , β b (tgt r) , sub^↝⋆ b ([v↦t↝⋆t] ∙^R S.return r))
+↜-↝^SN-confl (β b t) ([∙]₂ () .t)
+↜-↝^SN-confl ([∙]₁ f r) ([∙]₂ r^SN t) =
+  inj₂ (_ , [∙]₂ r^SN _ , S.return ([∙]₁ _ r))
+↜-↝^SN-confl ([∙]₂ r t) ([∙]₂ r^SN .t) with ↜-↝^SN-confl r r^SN
+... | inj₁ eq = inj₁ (cong (_`∙ t) eq)
+... | inj₂ (f , r′ , r′^SN) =
+  inj₂ (f `∙ t , [∙]₂ r′ t , S.gmap (_`∙ t) (λ r → [∙]₂ r t) r′^SN)
+
 mutual
 
- ↝^SN∋ : ∀ {Γ σ t u} → Γ ⊢SN σ ∋ t → t ↝ u → Γ ⊢SN σ ∋ u
+ ↝^SN∋ : ∀ {Γ σ t u i} → Γ ⊢SN σ ∋ t < i → t ↝ u → Γ ⊢SN σ ∋ u < i
  ↝^SN∋ (neu t^NE)    r       = neu (↝^NE∋ t^NE r)
  ↝^SN∋ (lam b^SN)    ([λ] r) = lam (↝^SN∋ b^SN r)
- ↝^SN∋ (red rt t^SN) r       = {!!} -- need confluence?!
+ ↝^SN∋ (red rt t^SN) r       with ↜-↝^SN-confl r rt
+ ... | inj₁ eq rewrite eq = wk^SN∋ t^SN
+ ... | inj₂ (t′ , rt′ , rs) = red rt′ (↝⋆^SN∋ t^SN rs)
 
- ↝^NE∋ : ∀ {Γ σ t u} → Γ ⊢NE σ ∋ t → t ↝ u → Γ ⊢NE σ ∋ u
+ ↝^NE∋ : ∀ {Γ σ t u i} → Γ ⊢NE σ ∋ t < i → t ↝ u → Γ ⊢NE σ ∋ u < i
  ↝^NE∋ (var v) ()
  ↝^NE∋ (app () t^SN) (β t u)
  ↝^NE∋ (app f^NE t^SN) ([∙]₁ f r) = app f^NE (↝^SN∋ t^SN r)
  ↝^NE∋ (app f^NE t^SN) ([∙]₂ r t) = app (↝^NE∋ f^NE r) t^SN
+
+ ↝⋆^SN∋ : ∀ {Γ σ t u i} → Γ ⊢SN σ ∋ t < i → t ↝⋆ u → Γ ⊢SN σ ∋ u < i
+ ↝⋆^SN∋ t^SN Star.ε        = t^SN
+ ↝⋆^SN∋ t^SN (r Star.◅ rs) = ↝⋆^SN∋ (↝^SN∋ t^SN r) rs
 
 -- Section 3.3 Soundness and Completeness
 
