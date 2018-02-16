@@ -220,31 +220,31 @@ f`∙⁻¹^sn (sn ft^sn) = sn (λ r → f`∙⁻¹^sn (ft^sn ([∙]₁ _ r)))
 -- type of the overall expression. Not sure whether they should be presented
 -- inside-out or outside-in so we define both for the moment.
 
-infix 3 _⊢C<_>∈_
-data _⊢C<_>∈_ Γ α : Type → Set where
-  <>  : Γ ⊢C< α >∈ α
-  app : ∀ {σ τ} → Γ ⊢C< α >∈ σ ⇒ τ → Term σ Γ → Γ ⊢C< α >∈ τ
+infix 3 _∣_⊢_
+data _∣_⊢_ Γ α : Type → Set where
+  <>  : Γ ∣ α ⊢ α
+  app : ∀ {σ τ} → Γ ∣ α ⊢ σ ⇒ τ → Term σ Γ → Γ ∣ α ⊢ τ
 
-plug^∈ : ∀ {Γ α σ} → Term α Γ → Γ ⊢C< α >∈ σ → Term σ Γ
-plug^∈ t <>        = t
-plug^∈ t (app c u) = plug^∈ t c `∙ u
+cut : ∀ {Γ α σ} → Term α Γ → Γ ∣ α ⊢ σ → Term σ Γ
+cut t <>        = t
+cut t (app c u) = cut t c `∙ u
 
 -- Lemma 4.5 Multi-step Reductions with Evaluation Contexts
-C<>∈^↝ : ∀ {Γ α σ t u} c → Γ ⊢ α ∋ t ↝ u → Γ ⊢ σ ∋ plug^∈ t c ↝ plug^∈ u c
-C<>∈^↝ <>        r = r
-C<>∈^↝ (app c t) r = [∙]₂ (C<>∈^↝ c r) t
+cut^↝ : ∀ {Γ α σ t u} c → Γ ⊢ α ∋ t ↝ u → Γ ⊢ σ ∋ cut t c ↝ cut u c
+cut^↝ <>        r = r
+cut^↝ (app c t) r = [∙]₂ (cut^↝ c r) t
 
-C<>∈^↝⋆ : ∀ {Γ α σ t u} c → Γ ⊢ α ∋ t ↝⋆ u → Γ ⊢ σ ∋ plug^∈ t c ↝⋆ plug^∈ u c
-C<>∈^↝⋆ c = S.gmap (flip plug^∈ c) (C<>∈^↝ c)
+cut^↝⋆ : ∀ {Γ α σ t u} c → Γ ⊢ α ∋ t ↝⋆ u → Γ ⊢ σ ∋ cut t c ↝⋆ cut u c
+cut^↝⋆ c = S.gmap (flip cut c) (cut^↝ c)
 
 -- Lemma 4.6 Evaluation Contexts
-plug^∈⁻¹^↝ : ∀ {Γ α σ u} c {v : Var α Γ} → Γ ⊢ σ ∋ plug^∈ (`var v) c ↝ u →
-             ∃ λ c′ → u ≡ plug^∈ (`var v) c′
-plug^∈⁻¹^↝ (app <> t) ([∙]₁ _ r)  = app <> _ , refl
-plug^∈⁻¹^↝ (app c t)  ([∙]₁ _ r)  = app c _ , refl
-plug^∈⁻¹^↝ (app c t)  ([∙]₂ r .t) =
-  let (c′ , r′) = plug^∈⁻¹^↝ c r in app c′ _ , cong (_`∙ _) r′
-plug^∈⁻¹^↝ <>                  ()
+cut⁻¹^↝ : ∀ {Γ α σ u} c {v : Var α Γ} → Γ ⊢ σ ∋ cut (`var v) c ↝ u →
+          ∃ λ c′ → u ≡ cut (`var v) c′
+cut⁻¹^↝ (app <> t) ([∙]₁ _ r)  = app <> _ , refl
+cut⁻¹^↝ (app c t)  ([∙]₁ _ r)  = app c _ , refl
+cut⁻¹^↝ (app c t)  ([∙]₂ r .t) =
+  let (c′ , r′) = cut⁻¹^↝ c r in app c′ _ , cong (_`∙ _) r′
+cut⁻¹^↝ <>                  ()
 
 -- Lemma 4.7 Closure properties of neutral terms
 -- 1.
@@ -252,41 +252,41 @@ plug^∈⁻¹^↝ <>                  ()
 `var^sne v = sn (λ ())
 
 -- 2.
-`∙^sne : ∀ {Γ α σ τ t} {v : Var α Γ} c → Γ ⊢sn σ ⇒ τ ∋ plug^∈ (`var v) c → Γ ⊢sn σ ∋ t →
-         Γ ⊢sn τ ∋ plug^∈ (`var v) (app c t)
+`∙^sne : ∀ {Γ α σ τ t} {v : Var α Γ} c → Γ ⊢sn σ ⇒ τ ∋ cut (`var v) c → Γ ⊢sn σ ∋ t →
+         Γ ⊢sn τ ∋ cut (`var v) (app c t)
 `∙^sne c f^sne t^sn = sn (go c f^sne t^sn) where
 
-  go : ∀ {Γ α σ τ t} {v : Var α Γ} c → Γ ⊢sn σ ⇒ τ ∋ plug^∈ (`var v) c → Γ ⊢sn σ ∋ t →
-       Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (plug^∈ (`var v) (app c t))
+  go : ∀ {Γ α σ τ t} {v : Var α Γ} c → Γ ⊢sn σ ⇒ τ ∋ cut (`var v) c → Γ ⊢sn σ ∋ t →
+       Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (cut (`var v) (app c t))
   go <>        f^sne      t^sn      ([∙]₂ () t)
   go c         f^sne      (sn t^sn) ([∙]₁ _ r) = sn (go c f^sne (t^sn r))
   go (app c u) (sn f^sne) t^sn      ([∙]₂ r t) =
-    let (c′ , eq) = plug^∈⁻¹^↝ (app c u) r in
+    let (c′ , eq) = cut⁻¹^↝ (app c u) r in
     let r′ = subst (_ ⊢ _ ∋ _ ↝_) eq r in
     subst (λ g → _ ⊢sn _ ∋ g `∙ t) (sym eq) (sn (go c′ (f^sne r′) t^sn))
 
 -- Lemma 4.8 Composition of evaluation contexts
-_∘C_ : ∀ {Γ α β σ} → Γ ⊢C< β >∈ σ → Γ ⊢C< α >∈ β → Γ ⊢C< α >∈ σ
+_∘C_ : ∀ {Γ α β σ} → Γ ∣ β ⊢ σ → Γ ∣ α ⊢ β → Γ ∣ α ⊢ σ
 <>      ∘C c′ = c′
 app c t ∘C c′ = app (c ∘C c′) t
 
-plug^∈-∘C : ∀ {Γ α β σ} x (c : Γ ⊢C< β >∈ σ) (c′ : Γ ⊢C< α >∈ β) →
-            plug^∈ (plug^∈ x c′) c ≡ plug^∈ x (c ∘C c′)
-plug^∈-∘C x <>        c′ = refl
-plug^∈-∘C x (app c t) c′ = cong (_`∙ t) (plug^∈-∘C x c c′)
+cut-∘C : ∀ {Γ α β σ} x (c : Γ ∣ β ⊢ σ) (c′ : Γ ∣ α ⊢ β) →
+            cut (cut x c′) c ≡ cut x (c ∘C c′)
+cut-∘C x <>        c′ = refl
+cut-∘C x (app c t) c′ = cong (_`∙ t) (cut-∘C x c c′)
 
-C<C<>>^sn : ∀ {Γ α β σ x y} (c : Γ ⊢C< β >∈ σ) (c′ : Γ ⊢C< α >∈ β) →
-            Γ ⊢sn σ ∋ plug^∈ (`var x) c → Γ ⊢sn β ∋ plug^∈ (`var y) c′ →
-            Γ ⊢sn σ ∋ plug^∈ (`var y) (c ∘C c′)
-C<C<>>^sn <>        c′ c^sn  c′^sn = c′^sn
-C<C<>>^sn (app c t) c′ ct^sn c′^sn =
+∘C^sn : ∀ {Γ α β σ x y} (c : Γ ∣ β ⊢ σ) (c′ : Γ ∣ α ⊢ β) →
+            Γ ⊢sn σ ∋ cut (`var x) c → Γ ⊢sn β ∋ cut (`var y) c′ →
+            Γ ⊢sn σ ∋ cut (`var y) (c ∘C c′)
+∘C^sn <>        c′ c^sn  c′^sn = c′^sn
+∘C^sn (app c t) c′ ct^sn c′^sn =
   let (c^sn , t^sn) = `∙⁻¹^sn ct^sn in
-  `∙^sne (c ∘C c′) (C<C<>>^sn c c′ c^sn c′^sn) t^sn
+  `∙^sne (c ∘C c′) (∘C^sn c c′ c^sn c′^sn) t^sn
 
 -- Lemma 4.9
 β⁻¹^Closed-sn : ∀ {Γ α σ τ u x} c b → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
-                Γ ⊢sn τ ∋ plug^∈ (b [ u /0]) c → Γ ⊢sn τ ∋ plug^∈ (`var x) c →
-                Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (plug^∈ (`λ b `∙ u) c)
+                Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ⊢sn τ ∋ cut (`var x) c →
+                Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (cut (`λ b `∙ u) c)
 β⁻¹^Closed-sn <> b b^sn u^sn c[b[u]]^sn c^sn (β t u) = c[b[u]]^sn
 β⁻¹^Closed-sn <> b b^sn (sn u^sn) c[b[u]]^sn c^sn ([∙]₁ _ r) =
   sn (β⁻¹^Closed-sn <> b b^sn (u^sn r) (Closed⋆-sn c[b[u]]^sn ([/0]^↝⋆ b r)) c^sn)
@@ -295,10 +295,9 @@ C<C<>>^sn (app c t) c′ ct^sn c′^sn =
 β⁻¹^Closed-sn (app c t) b b^sn u^sn c[b[u]]^sn c^sn r = {!!}
 
 β⁻¹^sn : ∀ {Γ α σ τ b u x} c → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
-         Γ ⊢sn τ ∋ plug^∈ (b [ u /0]) c → Γ ⊢sn τ ∋ plug^∈ (`var x) c →
-         Γ ⊢sn τ ∋ plug^∈ (`λ b `∙ u) c
+         Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ⊢sn τ ∋ cut (`var x) c →
+         Γ ⊢sn τ ∋ cut (`λ b `∙ u) c
 β⁻¹^sn c b^sn u^sn c[b[u]]^sn c^sn = sn (β⁻¹^Closed-sn c _ b^sn u^sn c[b[u]]^sn c^sn)
-
 
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
 
@@ -339,10 +338,10 @@ pred SNe = _ ⊢SNe _ ∋_
 [v↦v]^SNe : ∀ {Γ} → pred.∀[ SNe ] (base vl^Tm {Γ})
 lookup^P [v↦v]^SNe v rewrite lookup-base^Tm {d = TermD} v = var v
 
-plug⁻¹^SNe : ∀ {Γ σ t} → Γ ⊢SNe σ ∋ t → ∃ λ α → ∃ λ (v : Var α Γ) → ∃ λ c → t ≡ plug^∈ (`var v) c
-plug⁻¹^SNe (var v)          = _ , v , <> , refl
-plug⁻¹^SNe (app f^SNe t^SN) =
-  let (_ , v , c , eq) = plug⁻¹^SNe f^SNe in _ , v , app c (SN^tm t^SN) , cong (_`∙ _) eq
+cut⁻¹^SNe : ∀ {Γ σ t} → Γ ⊢SNe σ ∋ t → ∃ λ α → ∃ λ (v : Var α Γ) → ∃ λ c → t ≡ cut (`var v) c
+cut⁻¹^SNe (var v)          = _ , v , <> , refl
+cut⁻¹^SNe (app f^SNe t^SN) =
+  let (_ , v , c , eq) = cut⁻¹^SNe f^SNe in _ , v , app c (SN^tm t^SN) , cong (_`∙ _) eq
 
 -- Lemma 4.11 Thinning
 mutual
@@ -417,18 +416,18 @@ mutual
 
  -- 1.
   sound^SN : ∀ {Γ σ t} → Γ ⊢SN σ ∋ t → Γ ⊢sn σ ∋ t
-  sound^SN (neu t^SNe)  = let (_ , v , c , eq) = plug⁻¹^SNe t^SNe in sound^SNe v c eq t^SNe
+  sound^SN (neu t^SNe)  = let (_ , v , c , eq) = cut⁻¹^SNe t^SNe in sound^SNe v c eq t^SNe
   sound^SN (lam b^SN)   = `λ^sn (sound^SN b^SN)
   sound^SN (red r t^SN) = {!!} -- sn (sound^↝SN <> r t^SN {!!}) -- we may not even have a variable in scope?!
 
   -- 2.
-  sound^SNe : ∀ {Γ α σ} (v : Var α Γ) c → ∀ {t} → t ≡ plug^∈ (`var v) c → Γ ⊢SNe σ ∋ t → Γ ⊢sn σ ∋ t
+  sound^SNe : ∀ {Γ α σ} (v : Var α Γ) c → ∀ {t} → t ≡ cut (`var v) c → Γ ⊢SNe σ ∋ t → Γ ⊢sn σ ∋ t
   sound^SNe v <>        refl v^SNe               = `var^sne v
   sound^SNe v (app c t) refl (app c[v]^SNe t^SN) = `∙^sne c (sound^SNe v c refl c[v]^SNe) (sound^SN t^SN)
 
   -- 3.
-  sound^↝SN : ∀ {Γ σ τ t t′ q x} c → Γ ⊢ σ ∋ t ↝SN t′ → Γ ⊢SN τ ∋ plug^∈ t′ c →
-              Γ ⊢sn τ ∋ plug^∈ (`var x) c → Γ ⊢ τ ∋ plug^∈ t c ↝ q → Γ ⊢sn τ ∋ q
+  sound^↝SN : ∀ {Γ σ τ t t′ q x} c → Γ ⊢ σ ∋ t ↝SN t′ → Γ ⊢SN τ ∋ cut t′ c →
+              Γ ⊢sn τ ∋ cut (`var x) c → Γ ⊢ τ ∋ cut t c ↝ q → Γ ⊢sn τ ∋ q
   sound^↝SN = {!!}
 
 -- Theorem 4.16 Completeness of SN
@@ -438,26 +437,26 @@ data RED {Γ σ} : Term σ Γ → Set where
   β   : ∀ {τ} b (u : Term τ Γ) → RED (`λ b `∙ u)
   app : ∀ {τ f} → RED f → ∀ (t : Term τ Γ) → RED (f `∙ t)
 
-infix 4 _⊢SNC<_>∈_∋_
-data _⊢SNC<_>∈_∋_ Γ α : ∀ σ → Γ ⊢C< α >∈ σ → Set where
-  <>  : Γ ⊢SNC< α >∈ α ∋ <>
-  app : ∀ {σ τ c t} → Γ ⊢SNC< α >∈ σ ⇒ τ ∋ c → Γ ⊢SN σ ∋ t → Γ ⊢SNC< α >∈ τ ∋ app c t
+infix 4 _∣_⊢SN_∋_
+data _∣_⊢SN_∋_ Γ α : ∀ σ → Γ ∣ α ⊢ σ → Set where
+  <>  : Γ ∣ α ⊢SN α ∋ <>
+  app : ∀ {σ τ c t} → Γ ∣ α ⊢SN σ ⇒ τ ∋ c → Γ ⊢SN σ ∋ t → Γ ∣ α ⊢SN τ ∋ app c t
 
 mutual
   -- 1.
-  complete^SNe : ∀ {Γ σ α i c} v → Γ ⊢SNC< σ >∈ α ∋ c →
-                 let t = plug^∈ (`var v) c in
-                 ∀ {t′} → t′ ≡ t → Γ ⊢sn α ∋ t′ < i → Γ ⊢SNe α ∋ t′
+  complete^SNe : ∀ {Γ σ α i c} v → Γ ∣ α ⊢SN σ ∋ c →
+                 let t = cut (`var v) c in
+                 ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SNe σ ∋ t′
   complete^SNe v <>           refl c[v]^sn   = var v
   complete^SNe v (app c t^SN) refl c[v]∙t^sn =
     let (c[v]^sn , t^sn) = `∙⁻¹^sn c[v]∙t^sn in
     app (complete^SNe v c refl c[v]^sn) t^SN
 
   -- 2.
-  complete^SN-β : ∀ {Γ σ τ α i} (b : Term τ (σ ∷ Γ)) u (c : Γ ⊢C< τ >∈ α) →
-                  let t = plug^∈ (`λ b `∙ u) c in Γ ⊢ α ∋ t ↝SN plug^∈ (b [ u /0]) c →
-                  ∀ {t′} → t′ ≡ t → Γ ⊢sn α ∋ t′ < i → Γ ⊢SN α ∋ t′
-  complete^SN-β b u c r refl (sn c[λb∙u]^sn) = red r (complete^SN _ (c[λb∙u]^sn (C<>∈^↝ c (β b u))))
+  complete^SN-β : ∀ {Γ σ τ α i} (b : Term α (σ ∷ Γ)) u (c : Γ ∣ α ⊢ τ) →
+                  let t = cut (`λ b `∙ u) c in Γ ⊢ τ ∋ t ↝SN cut (b [ u /0]) c →
+                  ∀ {t′} → t′ ≡ t → Γ ⊢sn τ ∋ t′ < i → Γ ⊢SN τ ∋ t′
+  complete^SN-β b u c r refl (sn c[λb∙u]^sn) = red r (complete^SN _ (c[λb∙u]^sn (cut^↝ c (β b u))))
 
   -- 3.
   complete^SN : ∀ {Γ σ i} t → Γ ⊢sn σ ∋ t < i → Γ ⊢SN σ ∋ t
@@ -472,11 +471,11 @@ mutual
 
   -- ugly but it works
   unzip : ∀ {Γ σ τ i} f t → Γ ⊢sn σ ⇒ τ ∋ f < i → Γ ⊢SN σ ∋ t →
-          ∃ λ α → ∃ λ (c : Γ ⊢C< α >∈ τ) →
-          (∃ λ v → f `∙ t ≡ plug^∈ (`var v) c × Γ ⊢SNC< α >∈ τ ∋ c)
+          ∃ λ α → ∃ λ (c : Γ ∣ α ⊢ τ) →
+          (∃ λ v → f `∙ t ≡ cut (`var v) c × Γ ∣ α ⊢SN τ ∋ c)
         ⊎ (∃ λ β → ∃ λ (b : Term α (β ∷ Γ)) → ∃ λ u →
-             f `∙ t ≡ plug^∈ (`λ b `∙ u) c
-             × Γ ⊢ τ ∋ plug^∈ (`λ b `∙ u) c ↝SN plug^∈ (b [ u /0]) c)
+             f `∙ t ≡ cut (`λ b `∙ u) c
+             × Γ ⊢ τ ∋ cut (`λ b `∙ u) c ↝SN cut (b [ u /0]) c)
   unzip (`var v) t v^sn  t^SN = _ , app <> t , inj₁ (v , refl , app <> t^SN)
   unzip (`λ b)   t λb^sn t^SN = _ , <> , inj₂ (_ , b , t , refl , β b t t^SN)
   unzip (f `∙ u) t fu^sn t^SN =
