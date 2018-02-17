@@ -217,13 +217,16 @@ f`∙⁻¹^sn (sn ft^sn) = sn (λ r → f`∙⁻¹^sn (ft^sn ([∙]₁ _ r)))
 `λ⁻¹^sn (sn λt^sn) = sn (λ r → `λ⁻¹^sn (λt^sn ([λ] r)))
 
 -- Evaluation contexts indexed by the Scope, the type of the hole, and the
--- type of the overall expression. Not sure whether they should be presented
--- inside-out or outside-in so we define both for the moment.
+-- type of the overall expression.
 
-infix 3 _∣_⊢_
+infix 3 _∣_⊢_ _∣_⊢sn_∋_
 data _∣_⊢_ Γ α : Type → Set where
   <>  : Γ ∣ α ⊢ α
   app : ∀ {σ τ} → Γ ∣ α ⊢ σ ⇒ τ → Term σ Γ → Γ ∣ α ⊢ τ
+
+data _∣_⊢sn_∋_ Γ α : ∀ τ (c : Γ ∣ α ⊢ τ) → Set where
+  <>  : Γ ∣ α ⊢sn α ∋ <>
+  app : ∀ {σ τ c t} → Γ ∣ α ⊢sn σ ⇒ τ ∋ c → Γ ⊢sn σ ∋ t → Γ ∣ α ⊢sn τ ∋ app c t
 
 cut : ∀ {Γ α σ} → Term α Γ → Γ ∣ α ⊢ σ → Term σ Γ
 cut t <>        = t
@@ -244,7 +247,12 @@ cut⁻¹^↝ (app <> t) ([∙]₁ _ r)  = app <> _ , refl
 cut⁻¹^↝ (app c t)  ([∙]₁ _ r)  = app c _ , refl
 cut⁻¹^↝ (app c t)  ([∙]₂ r .t) =
   let (c′ , r′) = cut⁻¹^↝ c r in app c′ _ , cong (_`∙ _) r′
-cut⁻¹^↝ <>                  ()
+cut⁻¹^↝ <>         ()
+
+cut⁻¹^sn : ∀ {Γ α σ} t c → Γ ⊢sn σ ∋ cut t c → Γ ∣ α ⊢sn σ ∋ c
+cut⁻¹^sn t <>        t^sn     = <>
+cut⁻¹^sn t (app c u) c[t]u^sn =
+  let (c[t]^sn , u^sn) = `∙⁻¹^sn c[t]u^sn in app (cut⁻¹^sn t c c[t]^sn) u^sn
 
 -- Lemma 4.7 Closure properties of neutral terms
 -- 1.
@@ -265,6 +273,11 @@ cut⁻¹^↝ <>                  ()
     let r′ = subst (_ ⊢ _ ∋ _ ↝_) eq r in
     subst (λ g → _ ⊢sn _ ∋ g `∙ t) (sym eq) (sn (go c′ (f^sne r′) t^sn))
 
+cut^sn : ∀ {Γ α σ} v {c} → Γ ∣ α ⊢sn σ ∋ c → Γ ⊢sn σ ∋ cut (`var v) c
+cut^sn v           <>              = `var^sne v
+cut^sn v {app c t} (app c^sn t^sn) = `∙^sne c (cut^sn v c^sn) t^sn
+
+
 -- Lemma 4.8 Composition of evaluation contexts
 _∘C_ : ∀ {Γ α β σ} → Γ ∣ β ⊢ σ → Γ ∣ α ⊢ β → Γ ∣ α ⊢ σ
 <>      ∘C c′ = c′
@@ -275,29 +288,20 @@ cut-∘C : ∀ {Γ α β σ} x (c : Γ ∣ β ⊢ σ) (c′ : Γ ∣ α ⊢ β) 
 cut-∘C x <>        c′ = refl
 cut-∘C x (app c t) c′ = cong (_`∙ t) (cut-∘C x c c′)
 
-∘C^sn : ∀ {Γ α β σ x y} (c : Γ ∣ β ⊢ σ) (c′ : Γ ∣ α ⊢ β) →
-            Γ ⊢sn σ ∋ cut (`var x) c → Γ ⊢sn β ∋ cut (`var y) c′ →
-            Γ ⊢sn σ ∋ cut (`var y) (c ∘C c′)
-∘C^sn <>        c′ c^sn  c′^sn = c′^sn
-∘C^sn (app c t) c′ ct^sn c′^sn =
-  let (c^sn , t^sn) = `∙⁻¹^sn ct^sn in
-  `∙^sne (c ∘C c′) (∘C^sn c c′ c^sn c′^sn) t^sn
+∘C^sn : ∀ {Γ α β σ c c′} → Γ ∣ β ⊢sn σ ∋ c → Γ ∣ α ⊢sn β ∋ c′ → Γ ∣ α ⊢sn σ ∋ c ∘C c′
+∘C^sn <>              c′^sn = c′^sn
+∘C^sn (app c^sn t^sn) c′^sn = app (∘C^sn c^sn c′^sn) t^sn
 
 -- Lemma 4.9
-β⁻¹^Closed-sn : ∀ {Γ α σ τ u x} c b → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
-                Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ⊢sn τ ∋ cut (`var x) c →
+β⁻¹^Closed-sn : ∀ {Γ α σ τ u c} b → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
+                Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ∣ α ⊢sn τ ∋ c →
                 Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (cut (`λ b `∙ u) c)
-β⁻¹^Closed-sn <> b b^sn u^sn c[b[u]]^sn c^sn (β t u) = c[b[u]]^sn
-β⁻¹^Closed-sn <> b b^sn (sn u^sn) c[b[u]]^sn c^sn ([∙]₁ _ r) =
-  sn (β⁻¹^Closed-sn <> b b^sn (u^sn r) (Closed⋆-sn c[b[u]]^sn ([/0]^↝⋆ b r)) c^sn)
-β⁻¹^Closed-sn <> b (sn b^sn) u^sn c[b[u]]^sn c^sn ([∙]₂ ([λ] r) t) =
-  sn (β⁻¹^Closed-sn <> _ (b^sn r) u^sn (Closed-sn c[b[u]]^sn ([/0]^↝ r _)) c^sn)
-β⁻¹^Closed-sn (app c t) b b^sn u^sn c[b[u]]^sn c^sn r = {!!}
+β⁻¹^Closed-sn b b^sn u^sn c[b[u]]^sn c^sn r = {!!}
 
-β⁻¹^sn : ∀ {Γ α σ τ b u x} c → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
-         Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ⊢sn τ ∋ cut (`var x) c →
+β⁻¹^sn : ∀ {Γ α σ τ b u c} → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
+         Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ∣ α ⊢sn τ ∋ c →
          Γ ⊢sn τ ∋ cut (`λ b `∙ u) c
-β⁻¹^sn c b^sn u^sn c[b[u]]^sn c^sn = sn (β⁻¹^Closed-sn c _ b^sn u^sn c[b[u]]^sn c^sn)
+β⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn = sn (β⁻¹^Closed-sn _ b^sn u^sn c[b[u]]^sn c^sn)
 
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
 
@@ -326,9 +330,6 @@ _⊢_∋_↝SN_ = _⊢_∋_↝SN_< _
 _⊢SN_∋_ = _⊢SN_∋_< _
 _⊢SNe_∋_ = _⊢SNe_∋_< _
 
-SN^tm : ∀ {Γ σ t} → Γ ⊢SN σ ∋ t → Term σ Γ
-SN^tm {t = t} _ = t
-
 SN∋ : Pred Term
 pred SN∋ = _ ⊢SN _ ∋_
 
@@ -338,10 +339,19 @@ pred SNe = _ ⊢SNe _ ∋_
 [v↦v]^SNe : ∀ {Γ} → pred.∀[ SNe ] (base vl^Tm {Γ})
 lookup^P [v↦v]^SNe v rewrite lookup-base^Tm {d = TermD} v = var v
 
-cut⁻¹^SNe : ∀ {Γ σ t} → Γ ⊢SNe σ ∋ t → ∃ λ α → ∃ λ (v : Var α Γ) → ∃ λ c → t ≡ cut (`var v) c
-cut⁻¹^SNe (var v)          = _ , v , <> , refl
+infix 4 _∣_⊢SN_∋_<_ _∣_⊢SN_∋_
+data _∣_⊢SN_∋_<_ Γ α : ∀ σ → Γ ∣ α ⊢ σ → Size → Set where
+  <>  : ∀ {i} → Γ ∣ α ⊢SN α ∋ <> < ↑ i
+  app : ∀ {i σ τ c t} → Γ ∣ α ⊢SN σ ⇒ τ ∋ c < i → Γ ⊢SN σ ∋ t < i → Γ ∣ α ⊢SN τ ∋ app c t < ↑ i
+
+_∣_⊢SN_∋_ = _∣_⊢SN_∋_< _
+
+cut⁻¹^SNe : ∀ {Γ τ t i} → Γ ⊢SNe τ ∋ t < i → ∃ λ ctx → let (σ , c) = ctx in
+            ∃ λ v → t ≡ cut (`var v) c × Γ ∣ σ ⊢SN τ ∋ c < i
+cut⁻¹^SNe (var v)          = _ , v , refl , <>
 cut⁻¹^SNe (app f^SNe t^SN) =
-  let (_ , v , c , eq) = cut⁻¹^SNe f^SNe in _ , v , app c (SN^tm t^SN) , cong (_`∙ _) eq
+  let (_ , v , eq , c^SN) = cut⁻¹^SNe f^SNe
+  in _ , v , cong (_`∙ _) eq , app c^SN t^SN
 
 -- Lemma 4.11 Thinning
 mutual
@@ -415,20 +425,21 @@ SN-ext v (red (β t .(`var v) v^SN) fv^SN) = lam (th⁻¹^SN t (base vl^Var ∙ 
 mutual
 
  -- 1.
-  sound^SN : ∀ {Γ σ t} → Γ ⊢SN σ ∋ t → Γ ⊢sn σ ∋ t
-  sound^SN (neu t^SNe)  = let (_ , v , c , eq) = cut⁻¹^SNe t^SNe in sound^SNe v c eq t^SNe
+  sound^SN : ∀ {Γ σ t i} → Γ ⊢SN σ ∋ t < i → Γ ⊢sn σ ∋ t
+  sound^SN (neu t^SNe)  = let (_ , v , eq , c^SN) = cut⁻¹^SNe t^SNe in
+                          subst (_ ⊢sn _ ∋_) (sym eq) (cut^sn _ (sound^∣SN c^SN))
   sound^SN (lam b^SN)   = `λ^sn (sound^SN b^SN)
-  sound^SN (red r t^SN) = {!!} -- sn (sound^↝SN <> r t^SN {!!}) -- we may not even have a variable in scope?!
+  sound^SN (red r t^SN) = sn (sound^↝SN <> t^SN r)
 
   -- 2.
-  sound^SNe : ∀ {Γ α σ} (v : Var α Γ) c → ∀ {t} → t ≡ cut (`var v) c → Γ ⊢SNe σ ∋ t → Γ ⊢sn σ ∋ t
-  sound^SNe v <>        refl v^SNe               = `var^sne v
-  sound^SNe v (app c t) refl (app c[v]^SNe t^SN) = `∙^sne c (sound^SNe v c refl c[v]^SNe) (sound^SN t^SN)
+  sound^∣SN : ∀ {Γ α σ c i} → Γ ∣ α ⊢SN σ ∋ c < i → Γ ∣ α ⊢sn σ ∋ c
+  sound^∣SN <>              = <>
+  sound^∣SN (app c^SN t^SN) = app (sound^∣SN c^SN) (sound^SN t^SN)
 
   -- 3.
-  sound^↝SN : ∀ {Γ σ τ t t′ q x} c → Γ ⊢ σ ∋ t ↝SN t′ → Γ ⊢SN τ ∋ cut t′ c →
-              Γ ⊢sn τ ∋ cut (`var x) c → Γ ⊢ τ ∋ cut t c ↝ q → Γ ⊢sn τ ∋ q
-  sound^↝SN = {!!}
+  sound^↝SN : ∀ {Γ σ τ t u q i c} → Γ ∣ σ ⊢sn τ ∋ c → Γ ⊢SN τ ∋ cut u c < i →
+              Γ ⊢ σ ∋ t ↝SN u < i → Γ ⊢ τ ∋ cut t c ↝ q → Γ ⊢sn τ ∋ q
+  sound^↝SN c^sn c[u]^SN t↝SNu c[t]↝q = {!!}
 
 -- Theorem 4.16 Completeness of SN
 -- We start with a definition of deeply nested β-redexes
@@ -436,11 +447,6 @@ mutual
 data RED {Γ σ} : Term σ Γ → Set where
   β   : ∀ {τ} b (u : Term τ Γ) → RED (`λ b `∙ u)
   app : ∀ {τ f} → RED f → ∀ (t : Term τ Γ) → RED (f `∙ t)
-
-infix 4 _∣_⊢SN_∋_
-data _∣_⊢SN_∋_ Γ α : ∀ σ → Γ ∣ α ⊢ σ → Set where
-  <>  : Γ ∣ α ⊢SN α ∋ <>
-  app : ∀ {σ τ c t} → Γ ∣ α ⊢SN σ ⇒ τ ∋ c → Γ ⊢SN σ ∋ t → Γ ∣ α ⊢SN τ ∋ app c t
 
 mutual
   -- 1.
