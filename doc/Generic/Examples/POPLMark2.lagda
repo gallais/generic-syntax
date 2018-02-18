@@ -460,22 +460,6 @@ data _⊢_∋_↝sn_<_ Γ τ : (t u : Term τ Γ) → Size → Set where
 
 _⊢_∋_↝sn_ = _⊢_∋_↝sn_< _
 
-
--- Lemma 4.16 Confluence of ↝sn
-confl^↝sn-↝ : ∀ {Γ σ t t₁ t₂ i} → Γ ⊢ σ ∋ t ↝sn t₁ < i → Γ ⊢ σ ∋ t ↝ t₂ →
-              (t₁ ≡ t₂) ⊎ ∃ λ t₁⊓t₂ → Γ ⊢ σ ∋ t₂ ↝sn t₁⊓t₂ < i × Γ ⊢ σ ∋ t₁ ↝⋆ t₁⊓t₂
-confl^↝sn-↝ (β b u _)     (β .b .u)         = inj₁ refl
-confl^↝sn-↝ (β b u u^sn)  ([∙]₁ .(`λ b) r)  =
-  inj₂ (_ , β b _ (Closed-sn u^sn r) , [/0]^↝⋆ b r)
-confl^↝sn-↝ (β b u u^sn)  ([∙]₂ ([λ] r) .u) =
-  inj₂ (_ , β _ u u^sn , S.return ([/0]^↝ r u))
-confl^↝sn-↝ ([∙]₂ () t)   (β b .t)
-confl^↝sn-↝ ([∙]₂ r^sn t) ([∙]₁ f r)        =
-  inj₂ (_ , [∙]₂ r^sn _ , S.return ([∙]₁ _ r))
-confl^↝sn-↝ ([∙]₂ r^sn t) ([∙]₂ r .t) with confl^↝sn-↝ r^sn r
-... | inj₁ eq               = inj₁ (cong (_`∙ t) eq)
-... | inj₂ (f , rf , rf^sn) = inj₂ (f `∙ t , [∙]₂ rf t , S.gmap _ (λ f → [∙]₂ f t) rf^sn)
-
 -- Lemma 4.17 Backwards closure of sn
 ↝sn⁻¹^sn : ∀ {Γ σ τ t′ t i} c → Γ ⊢ σ ∋ t′ ↝sn t < i →
            Γ ⊢sn τ ∋ cut t c → Γ ⊢sn τ ∋ cut t′ c
@@ -489,36 +473,14 @@ confl^↝sn-↝ ([∙]₂ r^sn t) ([∙]₂ r .t) with confl^↝sn-↝ r^sn r
   let ih     = ↝sn⁻¹^sn (c ∘C app <> u) r^sn ft^sn′ in
   subst (_ ⊢sn _ ∋_) (sym (eq _)) ih
 
-module quick where
  -- Theorem 4.18 Soundness of SN
- mutual
-   -- 1.
-   sound^SN : ∀ {Γ σ t i} → Γ ⊢SN σ ∋ t < i → Γ ⊢sn σ ∋ t
-   sound^SN (neu t^SNe)  = let (_ , v , eq , c^SN) = cut⁻¹^SNe t^SNe in
-                           subst (_ ⊢sn _ ∋_) (sym eq) (cut^sn _ (sound^∣SN c^SN))
-   sound^SN (lam b^SN)   = `λ^sn (sound^SN b^SN)
-   sound^SN (red r t^SN) = ↝sn⁻¹^sn (sound^↝SN r) (sound^SN t^SN)
-
-   -- 2.
-   sound^∣SN : ∀ {Γ α σ c i} → Γ ∣ α ⊢SN σ ∋ c < i → Γ ∣ α ⊢sn σ ∋ c
-   sound^∣SN <>              = <>
-   sound^∣SN (app c^SN t^SN) = app (sound^∣SN c^SN) (sound^SN t^SN)
-
-   -- 3.
-   sound^↝SN : ∀ {Γ σ t u i} → Γ ⊢ σ ∋ t ↝SN u < i → Γ ⊢ σ ∋ t ↝sn u
-   sound^↝SN (β t u u^SN) = β t u (sound^SN u^SN)
-   sound^↝SN ([∙]₂ r t)   = [∙]₂ (sound^↝SN r) t
-
--- Section 4.4 Soundness and Completeness
--- Theorem 4.15 Soundness of SN
 mutual
-
- -- 1.
+  -- 1.
   sound^SN : ∀ {Γ σ t i} → Γ ⊢SN σ ∋ t < i → Γ ⊢sn σ ∋ t
   sound^SN (neu t^SNe)  = let (_ , v , eq , c^SN) = cut⁻¹^SNe t^SNe in
                           subst (_ ⊢sn _ ∋_) (sym eq) (cut^sn _ (sound^∣SN c^SN))
   sound^SN (lam b^SN)   = `λ^sn (sound^SN b^SN)
-  sound^SN (red r t^SN) = sn (sound^↝SN <> t^SN r)
+  sound^SN (red r t^SN) = ↝sn⁻¹^sn <> (sound^↝SN r) (sound^SN t^SN)
 
   -- 2.
   sound^∣SN : ∀ {Γ α σ c i} → Γ ∣ α ⊢SN σ ∋ c < i → Γ ∣ α ⊢sn σ ∋ c
@@ -526,9 +488,11 @@ mutual
   sound^∣SN (app c^SN t^SN) = app (sound^∣SN c^SN) (sound^SN t^SN)
 
   -- 3.
-  sound^↝SN : ∀ {Γ σ τ t u q i c} → Γ ∣ σ ⊢sn τ ∋ c → Γ ⊢SN τ ∋ cut u c < i →
-              Γ ⊢ σ ∋ t ↝SN u < i → Γ ⊢ τ ∋ cut t c ↝ q → Γ ⊢sn τ ∋ q
-  sound^↝SN c^sn c[u]^SN t↝SNu c[t]↝q = {!!}
+  sound^↝SN : ∀ {Γ σ t u i} → Γ ⊢ σ ∋ t ↝SN u < i → Γ ⊢ σ ∋ t ↝sn u
+  sound^↝SN (β t u u^SN) = β t u (sound^SN u^SN)
+  sound^↝SN ([∙]₂ r t)   = [∙]₂ (sound^↝SN r) t
+
+-- Section 4.4 Soundness and Completeness
 
 -- Theorem 4.16 Completeness of SN
 -- We start with a definition of deeply nested β-redexes
