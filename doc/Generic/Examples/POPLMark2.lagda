@@ -269,10 +269,12 @@ cut⁻¹^↝ (app c t)  ([∙]₂ r .t) =
   let (c′ , r′) = cut⁻¹^↝ c r in app c′ _ , cong (_`∙ _) r′
 cut⁻¹^↝ <>         ()
 
-cut⁻¹^sn : ∀ {Γ α σ} t c → Γ ⊢sn σ ∋ cut t c → Γ ∣ α ⊢sn σ ∋ c
-cut⁻¹^sn t <>        t^sn     = <>
+cut⁻¹^sn : ∀ {Γ α σ} t c → Γ ⊢sn σ ∋ cut t c → (Γ ∣ α ⊢sn σ ∋ c) × (Γ ⊢sn α ∋ t)
+cut⁻¹^sn t <>        t^sn     = <> , t^sn
 cut⁻¹^sn t (app c u) c[t]u^sn =
-  let (c[t]^sn , u^sn) = `∙⁻¹^sn c[t]u^sn in app (cut⁻¹^sn t c c[t]^sn) u^sn
+  let (c[t]^sn , u^sn) = `∙⁻¹^sn c[t]u^sn in
+  let (c^sn , t^sn) = cut⁻¹^sn t c c[t]^sn in
+  app c^sn u^sn , t^sn
 
 -- Lemma 4.7 Closure properties of neutral terms
 -- 1.
@@ -303,10 +305,10 @@ _∘C_ : ∀ {Γ α β σ} → Γ ∣ β ⊢ σ → Γ ∣ α ⊢ β → Γ ∣ 
 <>      ∘C c′ = c′
 app c t ∘C c′ = app (c ∘C c′) t
 
-cut-∘C : ∀ {Γ α β σ} x (c : Γ ∣ β ⊢ σ) (c′ : Γ ∣ α ⊢ β) →
-            cut (cut x c′) c ≡ cut x (c ∘C c′)
-cut-∘C x <>        c′ = refl
-cut-∘C x (app c t) c′ = cong (_`∙ t) (cut-∘C x c c′)
+cut-∘C : ∀ {Γ α β σ} t (c : Γ ∣ β ⊢ σ) (c′ : Γ ∣ α ⊢ β) →
+         cut (cut t c′) c ≡ cut t (c ∘C c′)
+cut-∘C t <>        c′ = refl
+cut-∘C t (app c u) c′ = cong (_`∙ u) (cut-∘C t c c′)
 
 ∘C^sn : ∀ {Γ α β σ c c′} → Γ ∣ β ⊢sn σ ∋ c → Γ ∣ α ⊢sn β ∋ c′ → Γ ∣ α ⊢sn σ ∋ c ∘C c′
 ∘C^sn <>              c′^sn = c′^sn
@@ -451,13 +453,13 @@ SN-ext v (red (β t .(`var v) v^SN) fv^SN) = lam (th⁻¹^SN t (base vl^Var ∙ 
   eq = sym $ Sim.sim sim.RenSub (base^VarTm^R ∙^R refl) t
 
 -- Section 4.3 Soundness (Short alternative proof)
-
 infix 4 _⊢_∋_↝sn_<_ _⊢_∋_↝sn_
 data _⊢_∋_↝sn_<_ Γ τ : (t u : Term τ Γ) → Size → Set where
   β    : ∀ {σ i} b u → Γ ⊢sn σ ∋ u → Γ ⊢ τ ∋ `λ b `∙ u ↝sn b [ u /0] < ↑ i
   [∙]₂ : ∀ {σ f g i} → Γ ⊢ σ ⇒ τ ∋ f ↝sn g < i → ∀ t → Γ ⊢ τ ∋ f `∙ t ↝sn g `∙ t < ↑ i
 
 _⊢_∋_↝sn_ = _⊢_∋_↝sn_< _
+
 
 -- Lemma 4.16 Confluence of ↝sn
 confl^↝sn-↝ : ∀ {Γ σ t t₁ t₂ i} → Γ ⊢ σ ∋ t ↝sn t₁ < i → Γ ⊢ σ ∋ t ↝ t₂ →
@@ -475,9 +477,17 @@ confl^↝sn-↝ ([∙]₂ r^sn t) ([∙]₂ r .t) with confl^↝sn-↝ r^sn r
 ... | inj₂ (f , rf , rf^sn) = inj₂ (f `∙ t , [∙]₂ rf t , S.gmap _ (λ f → [∙]₂ f t) rf^sn)
 
 -- Lemma 4.17 Backwards closure of sn
-↝sn⁻¹^sn : ∀ {Γ σ t′ t i} → Γ ⊢ σ ∋ t′ ↝sn t < i → Γ ⊢sn σ ∋ t → Γ ⊢sn σ ∋ t′
-↝sn⁻¹^sn (β b u u^sn)  b[u]^sn = {!!} -- β⁻¹^sn b b[u]^sn u^sn
-↝sn⁻¹^sn ([∙]₂ r^sn u) ft^sn   = {!!} -- ?!
+↝sn⁻¹^sn : ∀ {Γ σ τ t′ t i} c → Γ ⊢ σ ∋ t′ ↝sn t < i →
+           Γ ⊢sn τ ∋ cut t c → Γ ⊢sn τ ∋ cut t′ c
+↝sn⁻¹^sn c (β b u u^sn)  c[b[u]]^sn =
+  let (c^sn , b[u]^sn) = cut⁻¹^sn (b [ u /0]) c c[b[u]]^sn in
+  let b^sn = [/0]⁻¹^sn b u b[u]^sn in
+  β⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn
+↝sn⁻¹^sn c ([∙]₂ r^sn u) c[ft]^sn   =
+  let eq t   = cut-∘C t c (app <> u) in
+  let ft^sn′ = subst (_ ⊢sn _ ∋_) (eq _) c[ft]^sn in
+  let ih     = ↝sn⁻¹^sn (c ∘C app <> u) r^sn ft^sn′ in
+  subst (_ ⊢sn _ ∋_) (sym (eq _)) ih
 
 module quick where
  -- Theorem 4.18 Soundness of SN
