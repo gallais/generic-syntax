@@ -241,6 +241,26 @@ cut^↝⋆ : ∀ {Γ α σ t u} c → Γ ⊢ α ∋ t ↝⋆ u → Γ ⊢ σ ∋
 cut^↝⋆ c = S.gmap (flip cut c) (cut^↝ c)
 
 -- Lemma 4.6 Evaluation Contexts
+data ¬λ {Γ σ} : Term σ Γ → Set where
+  var : ∀ v → ¬λ (`var v)
+  app : ∀ {τ} f (t : Term τ Γ) → ¬λ (f `∙ t)
+
+cut⁻¹‿sn^↝ : ∀ {Γ α σ u c t} → Γ ∣ α ⊢sn σ ∋ c → ¬λ t → Γ ⊢ σ ∋ cut t c ↝ u →
+               (∃ λ t′ → u ≡ cut t′ c × Γ ⊢ α ∋ t ↝ t′)
+             ⊎ (∃ λ c′ → u ≡ cut t c′ × Γ ∣ α ⊢sn σ ∋ c′
+               × ∀ t′ → Γ ⊢ σ ∋ cut t′ c ↝ cut t′ c′)
+cut⁻¹‿sn^↝ <>                        ¬λ r          = inj₁ (_ , refl , r)
+cut⁻¹‿sn^↝ (app <> t^sn)             () (β b t)
+cut⁻¹‿sn^↝ (app <> t^sn)             ¬λ ([∙]₁ f r) =
+  inj₂ (app <> _ , refl , app <> (Closed-sn t^sn r) , λ u → [∙]₁ _ r)
+cut⁻¹‿sn^↝ (app <> t^sn)             ¬λ ([∙]₂ r t) = inj₁ (_ , refl , r)
+cut⁻¹‿sn^↝ (app c^sn@(app _ _) t^sn) ¬λ ([∙]₁ _ r) =
+  inj₂ (_ , refl , app c^sn (Closed-sn t^sn r) , λ u → [∙]₁ _ r)
+cut⁻¹‿sn^↝ (app c^sn t^sn)           ¬λ ([∙]₂ r t) with cut⁻¹‿sn^↝ c^sn ¬λ r
+... | inj₁ (t′ , eq , r′)         = inj₁ (t′ , cong (_`∙ t) eq , r′)
+... | inj₂ (c′ , eq , c′^sn , r′) =
+  inj₂ (app c′ t , cong (_`∙ t) eq , app c′^sn t^sn , λ u → [∙]₂ (r′ u) t)
+
 cut⁻¹^↝ : ∀ {Γ α σ u} c {v : Var α Γ} → Γ ⊢ σ ∋ cut (`var v) c ↝ u →
           ∃ λ c′ → u ≡ cut (`var v) c′
 cut⁻¹^↝ (app <> t) ([∙]₁ _ r)  = app <> _ , refl
@@ -293,15 +313,25 @@ cut-∘C x (app c t) c′ = cong (_`∙ t) (cut-∘C x c c′)
 ∘C^sn (app c^sn t^sn) c′^sn = app (∘C^sn c^sn c′^sn) t^sn
 
 -- Lemma 4.9
-cβ⁻¹^Closed-sn : ∀ {Γ α σ τ u c} b → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
+β⁻¹^Closed-sn : ∀ {Γ α σ τ} c b u → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
                 Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ∣ α ⊢sn τ ∋ c →
                 Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (cut (`λ b `∙ u) c)
-cβ⁻¹^Closed-sn b b^sn u^sn c[b[u]]^sn c^sn r = {!!}
+β⁻¹^Closed-sn c b u b^sn@(sn b^sn′) u^sn@(sn u^sn′) c[b[u]]^sn@(sn c[b[u]]^sn′) c^sn r
+  with cut⁻¹‿sn^↝ c^sn (app (`λ b) u) r
+... | inj₁ (._ , refl , β .b .u)          = c[b[u]]^sn
+... | inj₁ (._ , refl , [∙]₁ .(`λ b) r′)  =
+  let c[b[u]]^sn′ = Closed⋆-sn c[b[u]]^sn (cut^↝⋆ c ([/0]^↝⋆ b r′)) in
+  sn (β⁻¹^Closed-sn c b _ b^sn (u^sn′ r′) c[b[u]]^sn′ c^sn)
+... | inj₁ (._ , refl , [∙]₂ ([λ] r′) .u) =
+  let c[b[u]]^sn′ = Closed-sn c[b[u]]^sn (cut^↝ c ([/0]^↝ r′ u)) in
+  sn (β⁻¹^Closed-sn c _ u (b^sn′ r′) u^sn c[b[u]]^sn′ c^sn)
+... | inj₂ (c′ , refl , c′^sn , r′) =
+  sn (β⁻¹^Closed-sn c′ b u b^sn u^sn (c[b[u]]^sn′ (r′ (b [ u /0]))) c′^sn)
 
-cβ⁻¹^sn : ∀ {Γ α σ τ b u c} → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
+β⁻¹^sn : ∀ {Γ α σ τ b u c} → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
          Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ∣ α ⊢sn τ ∋ c →
          Γ ⊢sn τ ∋ cut (`λ b `∙ u) c
-cβ⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn = sn (cβ⁻¹^Closed-sn _ b^sn u^sn c[b[u]]^sn c^sn)
+β⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn = sn (β⁻¹^Closed-sn _ _ _ b^sn u^sn c[b[u]]^sn c^sn)
 
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
 
@@ -429,19 +459,6 @@ data _⊢_∋_↝sn_<_ Γ τ : (t u : Term τ Γ) → Size → Set where
 
 _⊢_∋_↝sn_ = _⊢_∋_↝sn_< _
 
--- Lemma 4.15
-
-β⁻¹^Closed-sn : ∀ {Γ σ τ u} b → Γ ⊢sn τ ∋ b [ u /0] → Γ ⊢sn σ ∋ u →
-                Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (`λ b `∙ u)
-β⁻¹^Closed-sn b b[u]^sn      u^sn      (β t u)          = b[u]^sn
-β⁻¹^Closed-sn b b[u]^sn      (sn u^sn) ([∙]₁ .(`λ _) r) =
-  sn (β⁻¹^Closed-sn b (Closed⋆-sn b[u]^sn ([/0]^↝⋆ b r)) (u^sn r))
-β⁻¹^Closed-sn b (sn b[u]^sn) u^sn      ([∙]₂ ([λ] r) t) =
-  sn (β⁻¹^Closed-sn _ (b[u]^sn ([/0]^↝ r _)) u^sn)
-
-β⁻¹^sn : ∀ {Γ σ τ u} b → Γ ⊢sn τ ∋ b [ u /0] → Γ ⊢sn σ ∋ u → Γ ⊢sn τ ∋ `λ b `∙ u
-β⁻¹^sn b b[u]^sn u^sn = sn (β⁻¹^Closed-sn b b[u]^sn u^sn)
-
 -- Lemma 4.16 Confluence of ↝sn
 confl^↝sn-↝ : ∀ {Γ σ t t₁ t₂ i} → Γ ⊢ σ ∋ t ↝sn t₁ < i → Γ ⊢ σ ∋ t ↝ t₂ →
               (t₁ ≡ t₂) ⊎ ∃ λ t₁⊓t₂ → Γ ⊢ σ ∋ t₂ ↝sn t₁⊓t₂ < i × Γ ⊢ σ ∋ t₁ ↝⋆ t₁⊓t₂
@@ -459,8 +476,8 @@ confl^↝sn-↝ ([∙]₂ r^sn t) ([∙]₂ r .t) with confl^↝sn-↝ r^sn r
 
 -- Lemma 4.17 Backwards closure of sn
 ↝sn⁻¹^sn : ∀ {Γ σ t′ t i} → Γ ⊢ σ ∋ t′ ↝sn t < i → Γ ⊢sn σ ∋ t → Γ ⊢sn σ ∋ t′
-↝sn⁻¹^sn (β b u u^sn)  b[u]^sn = β⁻¹^sn b b[u]^sn u^sn
-↝sn⁻¹^sn ([∙]₂ r^sn u) ft^sn@(sn ft′^sn)   = {!!} -- ?!
+↝sn⁻¹^sn (β b u u^sn)  b[u]^sn = {!!} -- β⁻¹^sn b b[u]^sn u^sn
+↝sn⁻¹^sn ([∙]₂ r^sn u) ft^sn   = {!!} -- ?!
 
 module quick where
  -- Theorem 4.18 Soundness of SN
