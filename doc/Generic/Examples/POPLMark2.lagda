@@ -293,15 +293,15 @@ cut-∘C x (app c t) c′ = cong (_`∙ t) (cut-∘C x c c′)
 ∘C^sn (app c^sn t^sn) c′^sn = app (∘C^sn c^sn c′^sn) t^sn
 
 -- Lemma 4.9
-β⁻¹^Closed-sn : ∀ {Γ α σ τ u c} b → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
+cβ⁻¹^Closed-sn : ∀ {Γ α σ τ u c} b → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
                 Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ∣ α ⊢sn τ ∋ c →
                 Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (cut (`λ b `∙ u) c)
-β⁻¹^Closed-sn b b^sn u^sn c[b[u]]^sn c^sn r = {!!}
+cβ⁻¹^Closed-sn b b^sn u^sn c[b[u]]^sn c^sn r = {!!}
 
-β⁻¹^sn : ∀ {Γ α σ τ b u c} → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
+cβ⁻¹^sn : ∀ {Γ α σ τ b u c} → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
          Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ∣ α ⊢sn τ ∋ c →
          Γ ⊢sn τ ∋ cut (`λ b `∙ u) c
-β⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn = sn (β⁻¹^Closed-sn _ b^sn u^sn c[b[u]]^sn c^sn)
+cβ⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn = sn (cβ⁻¹^Closed-sn _ b^sn u^sn c[b[u]]^sn c^sn)
 
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
 
@@ -420,7 +420,69 @@ SN-ext v (red ([∙]₂ r .(`var v))   fv^SN) = red r (SN-ext v fv^SN)
 SN-ext v (red (β t .(`var v) v^SN) fv^SN) = lam (th⁻¹^SN t (base vl^Var ∙ v) eq fv^SN) where
   eq = sym $ Sim.sim sim.RenSub (base^VarTm^R ∙^R refl) t
 
--- Section 4.3 Soundness and Completeness
+-- Section 4.3 Soundness (Short alternative proof)
+
+infix 4 _⊢_∋_↝sn_<_ _⊢_∋_↝sn_
+data _⊢_∋_↝sn_<_ Γ τ : (t u : Term τ Γ) → Size → Set where
+  β    : ∀ {σ i} b u → Γ ⊢sn σ ∋ u → Γ ⊢ τ ∋ `λ b `∙ u ↝sn b [ u /0] < ↑ i
+  [∙]₂ : ∀ {σ f g i} → Γ ⊢ σ ⇒ τ ∋ f ↝sn g < i → ∀ t → Γ ⊢ τ ∋ f `∙ t ↝sn g `∙ t < ↑ i
+
+_⊢_∋_↝sn_ = _⊢_∋_↝sn_< _
+
+-- Lemma 4.15
+
+β⁻¹^Closed-sn : ∀ {Γ σ τ u} b → Γ ⊢sn τ ∋ b [ u /0] → Γ ⊢sn σ ∋ u →
+                Closed (Γ ⊢ τ ∋_↝_) (Γ ⊢sn τ ∋_) (`λ b `∙ u)
+β⁻¹^Closed-sn b b[u]^sn      u^sn      (β t u)          = b[u]^sn
+β⁻¹^Closed-sn b b[u]^sn      (sn u^sn) ([∙]₁ .(`λ _) r) =
+  sn (β⁻¹^Closed-sn b (Closed⋆-sn b[u]^sn ([/0]^↝⋆ b r)) (u^sn r))
+β⁻¹^Closed-sn b (sn b[u]^sn) u^sn      ([∙]₂ ([λ] r) t) =
+  sn (β⁻¹^Closed-sn _ (b[u]^sn ([/0]^↝ r _)) u^sn)
+
+β⁻¹^sn : ∀ {Γ σ τ u} b → Γ ⊢sn τ ∋ b [ u /0] → Γ ⊢sn σ ∋ u → Γ ⊢sn τ ∋ `λ b `∙ u
+β⁻¹^sn b b[u]^sn u^sn = sn (β⁻¹^Closed-sn b b[u]^sn u^sn)
+
+-- Lemma 4.16 Confluence of ↝sn
+confl^↝sn-↝ : ∀ {Γ σ t t₁ t₂ i} → Γ ⊢ σ ∋ t ↝sn t₁ < i → Γ ⊢ σ ∋ t ↝ t₂ →
+              (t₁ ≡ t₂) ⊎ ∃ λ t₁⊓t₂ → Γ ⊢ σ ∋ t₂ ↝sn t₁⊓t₂ < i × Γ ⊢ σ ∋ t₁ ↝⋆ t₁⊓t₂
+confl^↝sn-↝ (β b u _)     (β .b .u)         = inj₁ refl
+confl^↝sn-↝ (β b u u^sn)  ([∙]₁ .(`λ b) r)  =
+  inj₂ (_ , β b _ (Closed-sn u^sn r) , [/0]^↝⋆ b r)
+confl^↝sn-↝ (β b u u^sn)  ([∙]₂ ([λ] r) .u) =
+  inj₂ (_ , β _ u u^sn , S.return ([/0]^↝ r u))
+confl^↝sn-↝ ([∙]₂ () t)   (β b .t)
+confl^↝sn-↝ ([∙]₂ r^sn t) ([∙]₁ f r)        =
+  inj₂ (_ , [∙]₂ r^sn _ , S.return ([∙]₁ _ r))
+confl^↝sn-↝ ([∙]₂ r^sn t) ([∙]₂ r .t) with confl^↝sn-↝ r^sn r
+... | inj₁ eq               = inj₁ (cong (_`∙ t) eq)
+... | inj₂ (f , rf , rf^sn) = inj₂ (f `∙ t , [∙]₂ rf t , S.gmap _ (λ f → [∙]₂ f t) rf^sn)
+
+-- Lemma 4.17 Backwards closure of sn
+↝sn⁻¹^sn : ∀ {Γ σ t′ t i} → Γ ⊢ σ ∋ t′ ↝sn t < i → Γ ⊢sn σ ∋ t → Γ ⊢sn σ ∋ t′
+↝sn⁻¹^sn (β b u u^sn)  b[u]^sn = β⁻¹^sn b b[u]^sn u^sn
+↝sn⁻¹^sn ([∙]₂ r^sn u) ft^sn@(sn ft′^sn)   = {!!} -- ?!
+
+module quick where
+ -- Theorem 4.18 Soundness of SN
+ mutual
+   -- 1.
+   sound^SN : ∀ {Γ σ t i} → Γ ⊢SN σ ∋ t < i → Γ ⊢sn σ ∋ t
+   sound^SN (neu t^SNe)  = let (_ , v , eq , c^SN) = cut⁻¹^SNe t^SNe in
+                           subst (_ ⊢sn _ ∋_) (sym eq) (cut^sn _ (sound^∣SN c^SN))
+   sound^SN (lam b^SN)   = `λ^sn (sound^SN b^SN)
+   sound^SN (red r t^SN) = ↝sn⁻¹^sn (sound^↝SN r) (sound^SN t^SN)
+
+   -- 2.
+   sound^∣SN : ∀ {Γ α σ c i} → Γ ∣ α ⊢SN σ ∋ c < i → Γ ∣ α ⊢sn σ ∋ c
+   sound^∣SN <>              = <>
+   sound^∣SN (app c^SN t^SN) = app (sound^∣SN c^SN) (sound^SN t^SN)
+
+   -- 3.
+   sound^↝SN : ∀ {Γ σ t u i} → Γ ⊢ σ ∋ t ↝SN u < i → Γ ⊢ σ ∋ t ↝sn u
+   sound^↝SN (β t u u^SN) = β t u (sound^SN u^SN)
+   sound^↝SN ([∙]₂ r t)   = [∙]₂ (sound^↝SN r) t
+
+-- Section 4.4 Soundness and Completeness
 -- Theorem 4.15 Soundness of SN
 mutual
 
