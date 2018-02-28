@@ -1087,8 +1087,6 @@ rise to an equivalence relation.
 
 
 
-
-
 We have also seen how this setup
 could be applied to a different domain: the representation of potentially
 cyclic structures by finite artefacts.
@@ -1101,9 +1099,69 @@ but also across from them in the cyclic tree. This yields a much more
 involved binding structure which would be interesting in its own right.
 
 
-\section{Use cases}
+\section{Fully Worked-out Example}
 
 \todo{system F, etc.}
+
+\section{Related Work}
+
+\paragraph{Variable Binding} The representation of variable binding
+in formal systems has been a hot topic for decades. Part of the purpose
+of the first POPLMark challenge~\cite{poplmark} was to explore and
+compare various methods. Our generic universe of syntax is based on
+scope-and-typed de Bruijn indices~\cite{de1972lambda} but it is not
+a vital necessity. It is for instance possible to give an interpretation
+of \AD{Desc}ripton corresponding to Chlipala's Parametric Higher-Order
+Abstract Syntax~\cite{chlipala2008parametric} and we would be interested
+to see what the appropriate notion of Semantics is for this representation.
+
+The practice of enforcing strong invariants in the deeply-embedded syntax
+of the programming language to be studied has recently been extended to
+imperative languages~\cite{BachPoulsen}.
+
+\paragraph{Meta-Theory Automation via Tactics} The tediousness of repeatedly
+proving similar statements has unsurprisingly led to various attempts at
+automating the pain away via either code generation or the definition of
+tactics. These solutions can be seen as untrusted oracle driving the
+interactive theorem prover.
+
+Kaiser, Schäfer, and Stark~\cite{Kaiser-wsdebr} build on our previous
+paper to give theoretical foundations to the so far untrusted set of tactics
+that defines Autosubst.
+
+Keuchel, Weirich, and Schrijvers' Needle \& Knot~\cite{needleandknot}
+
+
+\paragraph{Universes of Syntaxes with Binding} Keeping in mind Altenkirch
+and McBride's observation that generic programming is everyday programming
+in dependently-typed languages~\cite{genericprogramming-dtp}, we can naturally
+expect generic treatments of these notions in tools such as Agda or Coq
+which are provably sound.
+
+The GMeta generic framework~\cite{gmeta} does provide a universe of syntaxes
+and offers various binding conventions (locally nameless~\cite{Charguéraud2012}
+or de Bruijn indices). It also generically implements common traversals (computing
+the sets of free / bound variables, measuring the size of a term, shifting
+de Bruijn indices or substituting terms for parameters) as well as common
+predicates (e.g. being a closed term) and provide generic lemmas proving that
+all of these are well-behaved. It does not however offer a generic framework
+for defining new well-scoped-and-typed semantics and proving that they are
+well-behaved.
+
+Érdi~\cite{gergodraft} defines a universe inspired by ours and gives three
+different interpretations corresponding to raw, scoped and typed syntax
+which are related via erasure. He provides scope-and-type preserving renaming
+and substitution as well as various generic proofs that they are well-behaved.
+
+Copello~\cite{copello2017} sets out to work with \emph{named} binders and
+defines nominal techniques (such as name swapping) and ultimately $\alpha$-equivalence
+over a generic universe of Regular Trees with Binders inspired by Morris'~\cite{morris-regulartt}.
+
+
+
+
+
+
 
 \section{Conclusion}
 
@@ -1135,3 +1193,5 @@ many such common compilation passes can be implemented generically.
 An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
 could provide an appropriate framework to highlight the connection
 between various languages, some being seen as the extension of others.
+
+\newpage

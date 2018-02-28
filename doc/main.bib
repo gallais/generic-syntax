@@ -1,3 +1,67 @@
+@InProceedings{gmeta,
+author="Lee, Gyesik
+and Oliveira, Bruno C. D. S.
+and Cho, Sungkeun
+and Yi, Kwangkeun",
+editor="Seidl, Helmut",
+title="GMeta: A Generic Formal Metatheory Framework for First-Order Representations",
+booktitle="Programming Languages and Systems",
+year="2012",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="436--455",
+isbn="978-3-642-28869-2"
+}
+@Article{Charguéraud2012,
+author="Chargu{\'e}raud, Arthur",
+title="The Locally Nameless Representation",
+journal="Journal of Automated Reasoning",
+year="2012",
+month="Oct",
+day="01",
+volume="49",
+number="3",
+pages="363--408",
+issn="1573-0670",
+doi="10.1007/s10817-011-9225-2",
+url="https://doi.org/10.1007/s10817-011-9225-2"
+}
+@InProceedings{poplmark,
+author="Aydemir, Brian E.
+and Bohannon, Aaron
+and Fairbairn, Matthew
+and Foster, J. Nathan
+and Pierce, Benjamin C.
+and Sewell, Peter
+and Vytiniotis, Dimitrios
+and Washburn, Geoffrey
+and Weirich, Stephanie
+and Zdancewic, Steve",
+editor="Hurd, Joe
+and Melham, Tom",
+title="Mechanized Metatheory for the Masses: The PoplMark Challenge",
+booktitle="Theorem Proving in Higher Order Logics",
+year="2005",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="50--65",
+isbn="978-3-540-31820-0"
+}
+@InProceedings{morris-regulartt,
+author="Morris, Peter
+and Altenkirch, Thorsten
+and McBride, Conor",
+editor="Filli{\^a}tre, Jean-Christophe
+and Paulin-Mohring, Christine
+and Werner, Benjamin",
+title="Exploring the Regular Tree Types",
+booktitle="Types for Proofs and Programs",
+year="2006",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="252--267",
+isbn="978-3-540-31429-5",
+}
 @article{poplmarkreloaded,
   title={POPLMark Reloaded},
   author={Abel, Andreas and Momigliano, Alberto and Pientka, Brigitte},
@@ -171,7 +235,7 @@ doi="10.1007/978-3-642-12032-9_21",
  publisher = {ACM},
  address = {New York, NY, USA},
  keywords = {Agda, Generic Programming, Lambda-calculus, Mechanized Meta-Theory, Normalisation by Evaluation, Semantics},
-} 
+}
 @article{mcbride2010ornamental,
   title={Ornamental algebras, algebraic ornaments},
   author={McBride, Conor},
@@ -243,11 +307,18 @@ doi="10.1007/978-3-642-12032-9_21",
   year={1995},
   publisher={Springer}
 }
+@phdthesis{copello2017,
+  title={On the Formalisation of the Metatheory of the Lambda Calculus and Languages with Binders},
+  author={Copello, Ernesto},
+  year={2017},
+  issn={0797 6410},
+  school={Universidad de la República (Uruguay)}
+}
 @phdthesis{chapman2009type,
   title={Type checking and normalisation},
   author={Chapman, James Maitland},
   year={2009},
-  school={University of Nottingham}
+  school={University of Nottingham (United Kingdom)}
 }
 @article{girard1972interpretation,
   title={Interpr{\'e}tation fonctionelle et {\'e}limination des coupures de l’arithm{\'e}tique d’ordre sup{\'e}rieur},
@@ -382,6 +453,25 @@ doi="10.1007/978-3-642-12032-9_21",
 	issn = {1972-5787},
 	pages = {1--43},
 }
+@inproceedings{genericprogramming-dtp,
+ author = {Altenkirch, Thorsten and McBride, Conor},
+ title = {Generic Programming Within Dependently Typed Programming},
+ booktitle = {Proceedings of the IFIP TC2/WG2.1 Working Conference on Generic Programming},
+ year = {2003},
+ isbn = {1-4020-7374-7},
+ pages = {1--20},
+ numpages = {20},
+ url = {http://dl.acm.org/citation.cfm?id=647100.717294},
+ acmid = {717294},
+ publisher = {Kluwer, B.V.},
+ address = {Deventer, The Netherlands, The Netherlands},
+}
+@unpublished{gergodraft,
+ title="Generic description of well-scoped, well-typed syntaxes",
+ author="Érdi, Gergő",
+ year="2018",
+ url={https://github.com/gergoerdi/universe-of-syntax}
+}
 @inproceedings{de1972lambda,
   title={Lambda {C}alculus Notation with Nameless Dummies},
   author={de Bruijn, Nicolaas Govert},
@@ -400,6 +490,57 @@ doi="10.1007/978-3-642-12032-9_21",
   year={1995},
   volume={530},
   organization={Springer}
+}
+@article{BachPoulsen,
+ author = {Bach Poulsen, Casper and Rouvoet, Arjen and Tolmach, Andrew and Krebbers, Robbert and Visser, Eelco},
+ title = {Intrinsically-typed Definitional Interpreters for Imperative Languages},
+ journal = {Proc. ACM Program. Lang.},
+ issue_date = {January 2018},
+ volume = {2},
+ number = {POPL},
+ month = dec,
+ year = {2017},
+ issn = {2475-1421},
+ pages = {16:1--16:34},
+ articleno = {16},
+ numpages = {34},
+ url = {http://doi.acm.org/10.1145/3158104},
+ doi = {10.1145/3158104},
+ acmid = {3158104},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Agda, Java, definitional interpreters, dependent types, mechanized semantics, scope graphs, type safety},
+}
+@inproceedings{needleandknot,
+ author = {Keuchel, Steven and Weirich, Stephanie and Schrijvers, Tom},
+ title = {Needle \& Knot: Binder Boilerplate Tied Up},
+ booktitle = {Proceedings of the 25th European Symposium on Programming Languages and Systems - Volume 9632},
+ year = {2016},
+ isbn = {978-3-662-49497-4},
+ pages = {419--445},
+ numpages = {27},
+ url = {http://dx.doi.org/10.1007/978-3-662-49498-1_17},
+ doi = {10.1007/978-3-662-49498-1_17},
+ acmid = {2958897},
+ publisher = {Springer-Verlag New York, Inc.},
+ address = {New York, NY, USA},
+}
+@inproceedings{Kaiser-wsdebr,
+ author = {Kaiser, Jonas and Sch\"{a}fer, Steven and Stark, Kathrin},
+ title = {Binder Aware Recursion over Well-scoped De Bruijn Syntax},
+ booktitle = {Proceedings of the 7th ACM SIGPLAN International Conference on Certified Programs and Proofs},
+ series = {CPP 2018},
+ year = {2018},
+ isbn = {978-1-4503-5586-5},
+ location = {Los Angeles, CA, USA},
+ pages = {293--306},
+ numpages = {14},
+ url = {http://doi.acm.org/10.1145/3167098},
+ doi = {10.1145/3167098},
+ acmid = {3167098},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {System F, parallel substitutions, recursion principle, well-scoped de Bruijn representation},
 }
 @article{bird_paterson_1999,
    title={de {B}ruijn notation as a nested datatype},
