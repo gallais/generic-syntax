@@ -16,16 +16,30 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 open import Relation.Nullary
 
 open import var hiding (_<$>_)
+open import varlike
 open import indexed
 open import environment as E hiding (traverse ; _<$>_)
 open import Generic.Syntax
+open import Generic.Semantics
 
 LAMBS : {I : Set} → (I → Set) → (I → Set) → List I → I ─Scoped
-LAMBS V T Δ j Γ = All V Δ → T j
+LAMBS V T [] j Γ = T j
+LAMBS V T Δ  j Γ = (Δ ─Env) (κ ∘′ V) [] → T j
 
 data PHOAS {I : Set} (d : Desc I) (V : I → Set) : Size → I → Set where
   V[_] : ∀ {s σ} → V σ → PHOAS d V (↑ s) σ
   T[_] : ∀ {s σ} → ⟦ d ⟧ (LAMBS V (PHOAS d V s)) σ [] → PHOAS d V (↑ s) σ
+
+module ToPHOAS {I : Set} {V : I → Set} where
+
+  toPHOAS : ∀ d → Sem d (κ ∘′ V) (κ ∘′ PHOAS d V ∞)
+  Sem.th^𝓥  (toPHOAS d) = λ v _ → v
+  Sem.var    (toPHOAS d) = V[_]
+  Sem.alg    (toPHOAS d) = T[_] ∘′ fmap d (λ Δ → binders Δ) where
+
+    binders : ∀ {Γ} Δ i → Kripke (κ ∘′ V) (κ ∘′ PHOAS d V ∞) Δ i Γ → LAMBS V (PHOAS d V ∞) Δ i []
+    binders []        i kr = kr
+    binders Δ@(_ ∷ _) i kr = λ vs → kr (base vl^Var) ((λ v → v) E.<$> vs)
 
 open import Data.String as String
 
