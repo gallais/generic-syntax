@@ -1106,9 +1106,13 @@ involved binding structure which would be interesting in its own right.
 
 \todo{system F, etc.}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% RELATED WORK
+
 \section{Related Work}
 
-\paragraph{Variable Binding} The representation of variable binding
+\subsection{Variable Binding} The representation of variable binding
 in formal systems has been a hot topic for decades. Part of the purpose
 of the first POPLMark challenge~\cite{poplmark} was to explore and
 compare various methods. Our generic universe of syntax is based on
@@ -1122,24 +1126,43 @@ The practice of enforcing strong invariants in the deeply-embedded syntax
 of the programming language to be studied has recently been extended to
 imperative languages~\cite{BachPoulsen}.
 
-\paragraph{Meta-Theory Automation via Tactics} The tediousness of repeatedly
+\subsection{Meta-Theory Automation via Tactics} The tediousness of repeatedly
 proving similar statements has unsurprisingly led to various attempts at
 automating the pain away via either code generation or the definition of
 tactics. These solutions can be seen as untrusted oracle driving the
 interactive theorem prover.
 
-Kaiser, Schäfer, and Stark~\cite{Kaiser-wsdebr} build on our previous
-paper to give theoretical foundations to the so far untrusted set of tactics
-that defines Autosubst.
+Polonowski's DBGen~\cite{polonowski:db} takes as input a raw syntax with
+comments annotating binding sites. It generates a module defining lifting,
+substitution as well as a raw syntax using names and a validation function
+transforming named terms into de Bruijn ones; we refrain from calling it a
+scopechecker as terms are not statically proven to be well-scoped.
 
-Keuchel, Weirich, and Schrijvers' Needle \& Knot~\cite{needleandknot}
+Kaiser, Schäfer, and Stark~\cite{Kaiser-wsdebr} build on our previous paper
+to draft possible theoretical foundations for Autosubst, a so far untrusted
+set of tactics. The whole paper is based on a specific syntax: well-scoped
+call by value System F. In contrast, our effort has been here to carve out
+a precise universe of syntaxes with binding and give a systematic account
+of their semantics and proofs.
 
+Keuchel, Weirich, and Schrijvers' Needle~\cite{needleandknot} is a code
+generator written in Haskell producing syntax-specific Coq modules
+implementing common traversals and lemmas about them.
 
-\paragraph{Universes of Syntaxes with Binding} Keeping in mind Altenkirch
+\subsection{Universes of Syntaxes with Binding} Keeping in mind Altenkirch
 and McBride's observation that generic programming is everyday programming
 in dependently-typed languages~\cite{genericprogramming-dtp}, we can naturally
-expect generic treatments of these notions in tools such as Agda or Coq
-which are provably sound.
+expect generic, provably sound, treatments of these notions in tools such as
+Agda or Coq.
+
+Keuchel, Weirich, and Schrijvers' Knot presented in the same paper as
+Needle~\cite{needleandknot} implements the traversals and lemmas generated
+in specialised forms by Needle once and for all as a set of generic programs.
+They see the existence of Needle as a pragmatic choice: working directly with
+the free monadic terms over finitary containers would be too cumbersome. In
+our experience solving the POPLMark reloaded challenge, Agda's pattern
+synonym~\cite{Pickering:patsyn} make working with an encoded definition almost
+seamless.
 
 The GMeta generic framework~\cite{gmeta} does provide a universe of syntaxes
 and offers various binding conventions (locally nameless~\cite{Charguéraud2012}
@@ -1158,7 +1181,7 @@ and substitution as well as various generic proofs that they are well-behaved.
 
 Copello~\cite{copello2017} sets out to work with \emph{named} binders and
 defines nominal techniques (such as name swapping) and ultimately $\alpha$-equivalence
-over a generic universe of Regular Trees with Binders inspired by Morris'~\cite{morris-regulartt}.
+over a generic universe of regular trees with binders inspired by Morris'~\cite{morris-regulartt}.
 
 
 
