@@ -382,11 +382,16 @@ not need the extra expressivity. For instance, the functor corresponding
 to lists of elements in $A$ stores one bit of data: whether the current
 node is the empty list or not. Depending on that bit, the rest of the
 description is either the ``stop'' token or a pair of an element in $A$
-and a recursive substructure (i.e. the tail of the list).
+and a recursive substructure (i.e. the tail of the list).\todo{fin}
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Data.tex]{listD}
-\caption{The Description corresponding to Lists}\label{figure:listD}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Data.tex]{listD}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Data.tex]{finD}
+\end{minipage}
+\caption{Descriptions corresponding to List and Fin respectively}\label{figure:listD}
 \end{figure}
 
 Together with \AF{⟦\_⟧} which acts on $\Set{}^J$, we can define the

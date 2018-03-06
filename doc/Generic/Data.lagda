@@ -3,7 +3,9 @@ module Generic.Data where
 
 open import indexed
 open import Size
+open import Data.Empty
 open import Data.Bool
+open import Data.Nat using (ℕ ; suc)
 open import Data.Unit
 open import Data.Product as Prod
 open import Function
@@ -63,6 +65,46 @@ fold : {I : Set} {X : I → Set} {s : Size} → (d : Desc I I) → [ ⟦ d ⟧ X
 fold d alg (`con t) = alg (fmap d (fold d alg) t)
 \end{code}
 %</fold>
+
+
+%<*finD>
+\begin{code}
+finD : Desc ℕ ℕ
+finD =  `σ ℕ $ λ index →
+        `σ Bool $ λ isZero → if isZero
+        then `∎ (suc index)
+        else `X index (`∎ (suc index))
+\end{code}
+%</finD>
+
+%<*fin>
+\begin{code}
+fin : ℕ → Set
+fin = μ finD ∞
+\end{code}
+%</fin>
+
+%<*finz-elim>
+\begin{code}
+fin0-elim : fin 0 → ⊥
+fin0-elim (`con (_ , true , ()))
+fin0-elim (`con (_ , false , _ , ()))
+\end{code}
+%</finz-elim>
+
+%<*fz>
+\begin{code}
+fz : ∀ n → fin (suc n)
+fz n = `con (n , true , refl)
+\end{code}
+%</fz>
+
+%<*fs>
+\begin{code}
+fs : ∀ n → fin n → fin (suc n)
+fs n k = `con (n , false , k , refl)
+\end{code}
+%</fs>
 
 %<*listD>
 \begin{code}
