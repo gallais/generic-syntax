@@ -287,24 +287,47 @@ bound variable. This is concisely expressed by the type
 \caption{Semantics for \AD{Lam} and their Fundamental Lemma}
 \end{figure}
 
-Coming back to renaming and substitution, we can see that they do fit
-in the \AR{Sem} framework. We also include the definition of a very
-basic printer relying on a name supply to highlight the fact that
-computations can very well be effectful. Both Printing and Renaming
-highlight the importance of having a distinct notion of values and
-computations: the type of values in their respective environments
-are distinct from their type of computations.
+Coming back to renaming and substitution, we can see that they both fit
+in the \AR{Sem} framework. We can notice that the definition of Substitution
+depends on the Renaming one: to be able to push terms under binder, we
+need to have already proven that they are thinnable.
 
 \begin{figure}[h]
-\begin{minipage}{0.40\textwidth}
+\begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[motivation.tex]{semren}
-\ExecuteMetaData[motivation.tex]{semsub}
-\end{minipage}\hspace{1em}
-\begin{minipage}{0.50\textwidth}
-\ExecuteMetaData[motivation.tex]{semprint}
 \end{minipage}
-\caption{Renaming, Substitution and Printing as Instances of \AR{Sem}}
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{semsub}
+\end{minipage}
+\caption{Renaming and Substitution as Instances of \AR{Sem}}
 \end{figure}
+
+We also include the definition of a very basic printer relying on a
+name supply to highlight the fact that computations can very well be
+effectful. The \AF{Printing} semantics is defined by using \AD{String}s
+as values and \AD{State \mathbb{N} String} as computations. We use a
+\AR{Wrap}per with a type and a context as phantom types in order to
+help Agda's inference mechanism propagate the appropriate constraints.
+One of the main driving force is the definition of \AF{fresh} which
+generates a fresh name for a newly-bound variable.
+
+\begin{figure}[h]
+\ExecuteMetaData[motivation.tex]{valprint}
+\ExecuteMetaData[motivation.tex]{freshprint}
+\caption{Wrapper and fresh name generation}
+\end{figure}
+
+The wrapper \AR{Wrap} is trivially a thinnable functor so we omit here
+the definitions of \AF{th^{Wrap}} and \AF{map^{Wrap}}.
+
+\begin{figure}[h]
+\ExecuteMetaData[motivation.tex]{semprint}
+\caption{Printing as an instance of \AR{Sem}}
+\end{figure}
+
+Both Printing and Renaming highlight the importance of having a distinct
+notion of values and computations: the type of values in their respective
+environments are distinct from their type of computations.
 
 All of these examples are already described at length by Allais, Chapman,
 McBride and McKinna~\citeyear{allais2017type} so we will not spend any

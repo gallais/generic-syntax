@@ -50,7 +50,7 @@ module _ where
 module _ where
 
  private
-   
+
    extend : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
    extend ρ = ren E.extend <$> ρ ∙ V z
 
@@ -104,17 +104,13 @@ module _ where
 \end{code}
 %</nbe>
 
-\begin{code}
-open import environment hiding (extend ; _>>_)
-\end{code}
-
 %<*rsem>
 \begin{code}
 record Sem (𝓥 𝓒 : Type ─Scoped) : Set where
   field  th^𝓥  : ∀ {σ} → Thinnable (𝓥 σ)
          ⟦V⟧   : {σ : Type} →    [ 𝓥 σ               ⟶ 𝓒 σ        ]
          ⟦A⟧   : {σ τ : Type} →  [ 𝓒 (σ ⇒ τ) ⟶ 𝓒 σ   ⟶ 𝓒 τ        ]
-         ⟦L⟧   : {σ τ : Type} →  [ □ (𝓥 σ ⟶ 𝓒 τ)     ⟶ 𝓒 (σ ⇒ τ)  ]
+         ⟦L⟧   : (σ : Type) {τ : Type} →  [ □ (𝓥 σ ⟶ 𝓒 τ)     ⟶ 𝓒 (σ ⇒ τ)  ]
 \end{code}
 %</rsem>
 
@@ -128,7 +124,7 @@ module _ {𝓥 𝓒} (𝓢 : Sem 𝓥 𝓒) where
  sem : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
  sem ρ (V k)    = ⟦V⟧ (lookup ρ k)
  sem ρ (A f t)  = ⟦A⟧ (sem ρ f) (sem ρ t)
- sem ρ (L b)    = ⟦L⟧ (λ σ v → sem (extend σ ρ v) b)
+ sem ρ (L b)    = ⟦L⟧ _ (λ σ v → sem (extend σ ρ v) b)
 \end{code}
 %</sem>
 \begin{code}
@@ -146,7 +142,7 @@ Renaming = record
   { th^𝓥  = th^Var
   ; ⟦V⟧    = V
   ; ⟦A⟧    = A
-  ; ⟦L⟧    = λ b → L (b (pack s) z) }
+  ; ⟦L⟧    = λ σ b → L (b (pack s) z) }
 \end{code}
 %</semren>
 %<*semsub>
@@ -156,7 +152,7 @@ Substitution = record
    { th^𝓥  = λ t ρ → sem Renaming ρ t
    ; ⟦V⟧    = id
    ; ⟦A⟧    = A
-   ; ⟦L⟧    = λ b → L (b (pack s) (V z)) }
+   ; ⟦L⟧    = λ σ b → L (b (pack s) (V z)) }
 \end{code}
 %</semsub>
 
@@ -166,30 +162,57 @@ open import Category.Applicative
 open import Data.String hiding (show)
 open import Data.Nat.Show
 open import Data.Product
-open import Relation.Binary.PropositionalEquality
+open import Relation.Binary.PropositionalEquality hiding ([_])
+
+module Printer where
+ open RawMonadState (StateMonadState ℕ)
+
 \end{code}
 
+%<*valprint>
+\begin{code}
+ record Wrap (A : Set) (σ : Type) (Γ : List Type) : Set where
+   constructor MkW; field getW : A
+\end{code}
+%</valprint>
+\begin{code}
+ open Wrap public
+
+ th^Wrap : {A : Set} → ∀ {σ} → Thinnable (Wrap A σ)
+ th^Wrap w ρ = MkW (getW w)
+
+ map^Wrap : {A B : Set} → ∀ {σ} → (A → B) → [ Wrap A σ ⟶ Wrap B σ ]
+ map^Wrap f (MkW a) = MkW (f a)
+
+ open E
+\end{code}
+%<*freshprint>
+\begin{code}
+ fresh : {Γ : List Type} → ∀ σ → State ℕ (Wrap String σ (σ ∷ Γ))
+ fresh σ = get >>= λ x → MkW (show x) <$ put (suc x)
+\end{code}
+%</freshprint>
 %<*semprint>
 \begin{code}
-Printing : Sem (λ _ _ → String) (λ _ _ → State ℕ String)
-Printing = record
-   { th^𝓥  = λ t _ → t
-   ; ⟦V⟧    = return
-   ; ⟦A⟧    =  λ mf mt → mf >>= λ f → mt >>= λ t →
+ Printing : Sem (Wrap String) (Wrap (State ℕ String))
+ Printing = record
+   { th^𝓥  =  th^Wrap
+   ; ⟦V⟧    =  map^Wrap return
+   ; ⟦A⟧    =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
                return $ f ++ "(" ++ t ++ ")"
-   ; ⟦L⟧    =  λ {σ} mb → get >>= λ x → put (suc x) >>
-               let x' = show x in mb (pack (s {j = σ})) x' >>= λ b →
-               return $ "λ" ++ x' ++ "." ++ b }
+   ; ⟦L⟧    =  λ σ mb → MkW $ fresh σ >>= λ x →
+               getW (mb extend x) >>= λ b →
+               return $ "λ" ++ getW x ++ "." ++ b }
 \end{code}
 %</semprint>
 \begin{code}
-  where open RawMonadState (StateMonadState ℕ)
+open Printer using (Printing)
 \end{code}
 
 
 \begin{code}
 print : (σ : Type) → Lam σ [] → String
-print _ t = proj₁ $ sem Printing {Δ = []} (pack λ ()) t 0
+print _ t = proj₁ $ Printer.getW (sem Printing {Δ = []} (pack λ ()) t) 0
 
 _ : print (α ⇒ α) (L (V z)) ≡ "λ0.0"
 _ = refl
