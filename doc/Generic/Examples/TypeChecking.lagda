@@ -38,23 +38,35 @@ isArrow : (σ⇒τ : Type) → Maybe (Type × Type)
 isArrow (σ ⇒ τ) = just (σ , τ)
 isArrow _       = nothing
 \end{code}
+%<*constructors>
+\begin{code}
+data LangC : Set where
+  App Lam Emb : LangC
+  Cut : Type → LangC
+\end{code}
+%</constructors>
+%<*phase>
+\begin{code}
+data Phase : Set where
+  Check Infer : Phase
+\end{code}
+%</phase>
 %<*bidirectional>
 \begin{code}
-data Phase : Set where Check Infer : Phase
-
 Lang : Desc Phase
-Lang  =   `X [] Infer (`X [] Check (`∎ Infer))    -- apply
-      `+  `X (Infer ∷ []) Check (`∎ Check)        -- lamda
-      `+  `σ Type (λ _ → `X [] Check (`∎ Infer))  -- cut
-      `+  `X [] Infer (`∎ Check)                  -- embed
+Lang  =  `σ LangC $ λ where
+  App      → `X [] Infer (`X [] Check (`∎ Infer))
+  Lam      → `X (Infer ∷ []) Check (`∎ Check)
+  (Cut σ)  → `X [] Check (`∎ Infer)
+  Emb      → `X [] Infer (`∎ Check)
 \end{code}
 %</bidirectional>
 %<*langsyntax>
 \begin{code}
-pattern `app f t  = `con (true , f , t , refl)
-pattern `lam b    = `con (false , true , b , refl)
-pattern `cut σ t  = `con (false , false , true , σ , t , refl)
-pattern `emb t    = `con (false , false , false , t , refl)
+pattern `app f t  = `con (App , f , t , refl)
+pattern `lam b    = `con (Lam , b , refl)
+pattern `cut σ t  = `con (Cut σ , t , refl)
+pattern `emb t    = `con (Emb , t , refl)
 \end{code}
 %</langsyntax>
 %<*typemode>
@@ -73,36 +85,25 @@ Var- _ = Type
 %<*typecheck>
 \begin{code}
 Typecheck : Sem Lang (const ∘ Var-) (const ∘ Type-)
-\end{code}
-%</typecheck>
-\begin{code}
 Typecheck = record
   { th^𝓥  = λ v ρ → v
-  ; var    = var
-  ; alg    = case app $ case lam $ case cut emb }
+  ; var    = var _
+  ; alg    = alg } where
 
-  where
+   var : (i : Phase) → Var- i → Type- i
+   var Infer = just
+   var Check = _==_
 
-   var : {i : Phase} → Var- i → Type- i
-   var {Infer} = just
-   var {Check} = _==_
-
-   app : {i : Phase} → Type- Infer × Type- Check × i ≡ Infer → Type- i
-   app (f , t , refl) =  f            >>= λ σ⇒τ →
-                         isArrow σ⇒τ  >>= uncurry λ σ τ →
-                         τ <$ t σ
-
-   lam : {i : Phase} → [ □ ((Infer ∷ [] ─Env) _ ⟶ κ (Type- Check)) ∙× κ (i ≡ Check) ⟶ κ (Type- i) ]
-   lam (b , refl) σ⇒τ =  isArrow σ⇒τ >>= uncurry λ σ τ →
-                         b (extend {σ = Infer}) (ε ∙ σ) τ
-
-   cut : {i : Phase} → Type × Type- Check × i ≡ Infer → Type- i
-   cut (σ , t , refl) = σ <$ t σ
-
-   emb : {i : Phase} → Type- Infer × i ≡ Check → Type- i
-   emb (t , refl) σ =  t >>= λ τ  →
-                       σ == τ
+   alg : ∀ {i Γ} → ⟦ Lang ⟧ (Kripke (κ ∘ Var-) (κ ∘ Type-)) i Γ → Type- i
+   alg (App , f , t , refl) =  f            >>= λ σ⇒τ →
+                               isArrow σ⇒τ  >>= uncurry λ σ τ →
+                               τ <$ t σ
+   alg (Lam , b , refl)     =  λ σ⇒τ → isArrow σ⇒τ >>= uncurry λ σ τ →
+                               b (extend {σ = Infer}) (ε ∙ σ) τ
+   alg (Cut σ , t , refl)   =  σ <$ t σ
+   alg (Emb , t , refl)     =  λ σ → t >>= λ τ → σ == τ
 \end{code}
+%</typecheck>
 \begin{code}
 type- : (p : Phase) → Tm Lang ∞ p [] → Type- p
 type- p t = Sem.sem Typecheck {Δ = []} ε t
