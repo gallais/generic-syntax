@@ -493,25 +493,26 @@ which make our types much more readable.
 \caption{Decsription's Meanings as ``Functors''}
 \end{figure}
 
-If we pre-compose the meaning function \AF{⟦\_⟧} with a notion
-of `scope' (denoted \AF{Scope} here) which turns any \AB{I} \AF{─Scoped}
-family into a function of type \AD{List} \AB{I} \AS{→} \AB{I} \AF{─Scoped}
-by simply appending the two \AD{List} indices, we recover an endofunctor on
-\AB{I} \AF{─Scoped} and we can take its fixpoint. Because we want to define
-the terms of a language with variables, instead of considering the initial
-algebra, this time we opt for the free relative
+If we pre-compose the meaning function \AF{⟦\_⟧} with a notion of `de Bruijn scopes'
+(denoted \AF{Scope} here) which turns any \AB{I} \AF{─Scoped} family into a function
+of type \AD{List} \AB{I} \AS{→} \AB{I} \AF{─Scoped} by simply appending the two
+\AD{List} indices, we recover a meaning function producing an endofunctor on \AB{I} \AF{─Scoped}.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Syntax.tex]{scope}
+\caption{De Bruijn Scopes}
+\end{figure}
+
+The endofunctors thus defined are strictly positive and we can take their fixpoints.
+Because we want to define the terms of a language with variables, instead of
+considering the initial algebra, this time we opt for the free relative
 monad~\cite{JFR4389} (with respect to the functor \AF{Var}): the \AIC{`var}
 constructor corresponds to return, and we will define bind (also known as
 the parallel substitution \AF{sub}) in the next section. We have once more
 a \AD{Size} index to get all the benefits of type based termination checking.
 
 \begin{figure}[h]
-\begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Generic/Syntax.tex]{mu}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.35\textwidth}
-\ExecuteMetaData[Generic/Syntax.tex]{scope}
-\end{minipage}
 \caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}
 \end{figure}
 
@@ -527,10 +528,10 @@ the substructures and make sure that e.g. the application's functional
 argument's kind is a function type.
 
 \begin{figure}[h]
-\begin{minipage}{0.40\textwidth}
+\begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCD}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.50\textwidth}
+\begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
 \end{minipage}
 \caption{Examples: The Untyped and Simply Typed Lambda Calculi}
@@ -540,9 +541,9 @@ We can then define constructors corresponding
 to the original ones in Figure~\ref{scoped-untyped}: \AIC{`V}
 for \AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the
 application one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.
-In Agda, we can use pattern synonyms to define these. This means that
-the end user can seemlessly write pattern-matching programs on encoded
-terms without dealing with the gnarly details of the encoding.
+In Agda, we can use pattern synonyms~\cite{Pickering:patsyn} to define these.
+This means that the end user can seemlessly write pattern-matching programs on
+encoded terms without dealing with the gnarly details of the encoding.
 These pattern definitions can omit some arguments by using ``\AS{\_}'',
 in which case they will be filled in by unification just like any other
 implicit argument: there is no extra cost to using an encoding!
@@ -623,7 +624,7 @@ have to abide by three constraints
 \item Values should be thinnable so that we can push the
       evaluation environment under binders;
 \item Values should embed into Computations for us to be able
-      to the return the value associated to a variable as the
+      to return the value associated to a variable as the
       result of its evaluation;
 \item Last but not least, we should have an algebra turning
       a term where substructures have been replaced with
