@@ -429,10 +429,10 @@ non-empty one in which case we store a natural number \AB{n}, the head of type
 \caption{The Description of the base functor for \AD{Vec} \AB{A} \AB{n}}\label{figure:vecD}
 \end{figure}
 
-Together with \AF{⟦\_⟧} which acts on $\Set{}^J$, we can define the
-function \AF{fmap} by recursion over a code \AB{d}. It describes the
-action of the functor corresponding to \AB{d} over functions. This is
-the first example of generic programming over all the functors one can
+After implementing \AF{⟦\_⟧}, which acts on the objects of $\Set{}^J$, we can
+define the function \AF{fmap} by recursion over a code \AB{d}. It describes
+the action of the functor corresponding to \AB{d} over morphisms in $\Set{}^J$.
+This is the first example of generic programming over all the functors one can
 obtain as the meaning of a description.
 
 \begin{figure}[h]
@@ -462,7 +462,7 @@ based approach to termination checking the definition of \AF{fold} would
 be rejected and our only recourse would be to manually inline \AF{fmap}.
 However, in most definitions the \AD{Size} does not matter in which case
 we will simply use the primitive limit \AD{Size} \AF{∞} which is
-characterised by \AF{∞} = \AF{↑} \AF{∞}. \todo{More pointers}
+characterised by \AF{∞} = \AF{↑} \AF{∞}.
 
 This demonstrates that this approach allows us to define generically
 the iteration principle associated to all the datatypes which arise
@@ -543,9 +543,9 @@ The variable case will be added by the free monad construction so we
 only have to describe two constructors: application where we have two
 substructures which do not bind any extra argument and $\lambda$-abstraction
 which has exactly one substructure with precisely one extra bound variable.
-In the typed case, we use \AIC{‵σ} to store crucial type information about
-the substructures and make sure that e.g. the application's functional
-argument's kind is a function type.
+In the untyped case a single bit is enough to distinguish the two constructors
+whilst in the typed case, we need our tags to carry extra information about the
+types involved so we use the ad-hoc \AD{`STLC} type.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -626,6 +626,10 @@ and extracts its constituents.
 \caption{Descriptions are closed under Finite Products of Recursive Positions}
 \end{figure}
 
+A concrete use case for both of these results will be given in section~\ref{section:letbinding}
+where we explain how to seamlessly enrich an existing syntax with let-bindings
+and how to use the \AR{Sem} framework to elaborate them away.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GENERIC SEMANTICS
@@ -652,7 +656,13 @@ have to abide by three constraints
       on whether extra bound variables have been introduced)
       into Computations
 \end{itemize}
-We crucially use the fact that the meaning of a description is
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics.tex]{semantics}
+\caption{A Generic Notion of Semantics}
+\end{figure}
+
+Here we crucially use the fact that the meaning of a description is
 defined in terms of a function interpreting substructures which has
 the type \AF{List} \AB{I} \AS{→} \AB{I}\AF{─Scoped}, i.e. that gets access
 to the current scope but also the exact list of the newly bound variables' kinds.
@@ -660,22 +670,18 @@ We define such a function, \AF{Kripke}, by case analysis on the number
 of newly bound variables: if it's $0$ we expect the substructure
 to be a computation (the result of the evaluation function's
 recursive call) but if there are newly bound variables then we expect
-a function which takes one value for each one of these extra variables
-and delivers a computation corresponding to the evaluation of the body
-of the binder in the extended environment.
+that in any context extension, we will have a function which, provided
+a value for each one of these extra variables, will deliver a computation
+corresponding to the evaluation of the body of the binder in the extended
+environment.
 
 \begin{figure}[h]
-\begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[environment.tex]{kripke}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[Generic/Semantics.tex]{semantics}
-\end{minipage}
-\caption{A Generic Notion of Semantics}
+\ExecuteMetaData[environment.tex]{kripke}
+\caption{Substructures as either Computations or Kripke Function Spaces}
 \end{figure}
 
 It is once more the case that the abstract notion of Semantics comes
-with a fundamental lemma: all \AB{I}\AF{─Scoped} families \AB{𝓥} and
+with a fundamental lemma: all \AB{I} \AF{─Scoped} families \AB{𝓥} and
 \AB{𝓒} satisfying the three criteria we have put forward give rise
 to an evaluation function. We introduce a notion of computation
 \AF{\_─Comp} analogous to that of environments: instead of associating
@@ -688,11 +694,11 @@ values to variables, it associates computations to terms.
 
 We can then define the type of the fundamental lemma (called \AF{sem}) as
 a function from environments to computations. It is defined mutually with a
-function \AF{body} turning a \AF{Scope} (i.e. a substructure in a
+function \AF{body} turning a de Bruijn \AF{Scope} (i.e. a substructure in a
 potentially extended context) into a \AF{Kripke} (i.e. a subcomputation
 expecting a value for each newly bound variable).
 
-\begin{figure}
+\begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{semtype}
 \caption{Statement of the Fundamental Lemma of \AR{Sem}antics}
 \end{figure}
@@ -704,27 +710,28 @@ we simply lookup the associated value in the evaluation environment
 and turn it into a computation using \ARF{var}. If it is a proper
 node then we call \AF{fmap} to evaluate the substructures using
 \AF{body} and then call the \ARF{alg}ebra to combine these results.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics.tex]{sem}
+\caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{sem}}
+\end{figure}
+
 The auxiliary lemma \AF{body} distinguishes two cases: if no new
 variable has been bound in the recursive substructure, it is simply
 a matter of calling \AF{sem} recursively, otherwise we are provided
 with a \AF{Thinning}, some additional values and evaluate the
 substructure in the thinned and extended evaluation environment.
 
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics.tex]{body}
+\caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}
+\end{figure}
+
 Because \AF{fmap} introduces one level of indirection between the
 recursive calls and the subterms they are acting upon, the fact
-that our terms are indexed by a \AF{Size} is crucial in getting the
-termination checker to see that our proof is indeed trivially
-well-founded.
-
-\begin{figure}[h]
-\begin{minipage}{0.35\textwidth}
-\hspace{-2em}\ExecuteMetaData[Generic/Semantics.tex]{sem}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.55\textwidth}
-\ExecuteMetaData[Generic/Semantics.tex]{body}
-\end{minipage}
-\caption{Proof of the Fundamental Lemma of \AR{Sem}antics}
-\end{figure}
+that our terms are indexed by a \AF{Size} is once more crucial in
+getting the termination checker to see that our proof is indeed
+trivially well-founded.
 
 Renaming can be defined generically for all syntax descriptions as a
 semantics with \AF{Var} as values and \AD{Tm} as computations. The
@@ -787,7 +794,7 @@ in Section~\ref{desccomb}.
 An example of such an extension is the addition of let-bindings to
 an existing language.
 
-\subsection{Sugar and Desugaring as a Semantics}
+\subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}
 
 Let bindings allow the user to avoid repeating herself by naming
 sub-expressions and then using these names to refer to the associated

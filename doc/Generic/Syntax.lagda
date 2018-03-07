@@ -38,8 +38,7 @@ data Desc (I : Set) : Set₁ where
 \end{code}
 %<*scope>
 \begin{code}
-Scope :  {I : Set} (T : I ─Scoped) →
-         (List I → I ─Scoped)
+Scope : {I : Set} → I ─Scoped → List I → I ─Scoped
 Scope T Δ i = (Δ ++_) ⊢ T i
 \end{code}
 %</scope>

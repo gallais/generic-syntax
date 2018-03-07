@@ -39,8 +39,7 @@ record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
 %<*semtype>
 \begin{code}
  sem   :  {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
- body  :  {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ → ∀ Θ i →
-          Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
+ body  :  {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
 \end{code}
 %</semtype>
 %<*sem>

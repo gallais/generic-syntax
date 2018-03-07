@@ -134,8 +134,7 @@ th^□ = duplicate
 %</freeth>
 %<*kripke>
 \begin{code}
-Kripke :  (𝓥 𝓒 : I ─Scoped) →
-          (List I → I ─Scoped)
+Kripke :  (𝓥 𝓒 : I ─Scoped) → (List I → I ─Scoped)
 Kripke 𝓥 𝓒 []  i = 𝓒 i
 Kripke 𝓥 𝓒 Γ   i = □ ((Γ ─Env) 𝓥 ⟶ 𝓒 i)
 \end{code}
