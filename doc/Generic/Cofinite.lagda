@@ -21,6 +21,8 @@ module _ {I : Set} where
 \end{code}
 %</cotm>
 \begin{code}
+ open ∞Tm public
+
 module _ {d : Desc ⊤} where
 \end{code}
 %<*plug>
@@ -41,6 +43,6 @@ module _ {d : Desc ⊤} where
 %<*unfold>
 \begin{code}
  unfold : {s : Size} → TM d tt → ∞Tm d s tt
- ∞Tm.force (unfold t) = fmap d (λ _ _ → unfold) (unroll t)
+ unfold t .force = fmap d (λ _ _ → unfold) (unroll t)
 \end{code}
 %</unfold>

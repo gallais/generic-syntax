@@ -49,8 +49,8 @@ pattern ↶_ k      = `var k
 \begin{code}
 01⋯ : ∞Tm (CListD ℕ) ∞ tt
 10⋯ : ∞Tm (CListD ℕ) ∞ tt
-∞Tm.force 01⋯ = false , 0 , 10⋯ , refl
-∞Tm.force 10⋯ = false , 1 , 01⋯ , refl
+01⋯ .force = false , 0 , 10⋯ , refl
+10⋯ .force = false , 1 , 01⋯ , refl
 \end{code}
 %</zeroones2>
 
