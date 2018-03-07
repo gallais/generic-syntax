@@ -692,6 +692,8 @@ values to variables, it associates computations to terms.
 \caption{\AF{\_─Comp}: Associating Computations to Terms}
 \end{figure}
 
+\subsection{Fundamental Lemma of Semantics}
+
 We can then define the type of the fundamental lemma (called \AF{sem}) as
 a function from environments to computations. It is defined mutually with a
 function \AF{body} turning a de Bruijn \AF{Scope} (i.e. a substructure in a
@@ -733,6 +735,8 @@ that our terms are indexed by a \AF{Size} is once more crucial in
 getting the termination checker to see that our proof is indeed
 trivially well-founded.
 
+\subsection{Our First Generic Programs: Renaming and Substitution}
+
 Renaming can be defined generically for all syntax descriptions as a
 semantics with \AF{Var} as values and \AD{Tm} as computations. The
 two first constraints on \AF{Var} described earlier are trivially
@@ -768,12 +772,18 @@ families which have \AR{VarLike} values i.e. values that are thinnable
 and such that we can craft dummy ones in non-empty contexts.
 
 \begin{figure}[h]
-\begin{minipage}{0.40\textwidth}
-  \ExecuteMetaData[varlike.tex]{varlike}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.50\textwidth}
-  \ExecuteMetaData[Generic/Semantics.tex]{reify}
-\end{minipage}
+\ExecuteMetaData[varlike.tex]{varlike}
+\caption{\AR{VarLike}: \AF{Thinnable} and with dummy values}
+\end{figure}
+
+Because for any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh^{r}} of
+type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})} and \AF{fresh^{l}} of
+type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Γ} \AF{++} \AB{Δ})} by combining the use
+of dummy variables and thinnings, and we can very easily prove that variables
+are \AR{VarLike} we can then write \AF{reify} like so:
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics.tex]{reify}
 \caption{Generic Reification thanks to \AR{VarLike} Values}
 \end{figure}
 
@@ -842,19 +852,25 @@ dummy environment associating each variable to itself.
 In about 20 lines of code we have defined a generic extension of
 syntaxes with binding together with a semantics which corresponds
 to an elaborator translating away this new constructor. In their
-own setting working on a given language, Allais, Chapman, McBride
+own setting working on STLC, Allais, Chapman, McBride
 and McKinna~\citeyear{allais2017type} have shown that it is similarly
 possible to implement a Continuation Passing Style transformation as
 a semantics.
-The ease with which one can define such generic transformations
-suggests that this setup could be a good candidate to implement
-generic compilation passes.
+
+We have demonstrated how easily one can define extensions and combine
+them on top of a base language without having to reimplement common
+traversals for each one of the intermediate representations. Moreover,
+it is possible to define \emph{generic} transformations elaborating
+these added features in terms of lower-level ones. This suggests that
+this setup could be a good candidate to implement generic compilation
+passes and could deal with a framework using a wealth of slightly
+different intermediate languages à la nanopass~\cite{Keep:2013:NFC:2544174.2500618}.
 
 \subsection{(Unsafe) Normalisation by Evaluation}
 
 A key type of traversal we have not studied yet is a language's
 evaluator. Our universe of syntaxes with binding does not impose
-any typing discipline on the user defined languages and as such
+any typing discipline on the user-defined languages and as such
 cannot guarantee their totality. This is embodied by one of our running
 examples: the untyped $\lambda$-calculus. As a consequence there
 is no hope for a safe generic framework to define normalisation
@@ -873,18 +889,23 @@ an error token because the evaluation of untyped programs may
 (and usually does!) go wrong.
 
 \begin{figure}[h]
-{\center \ExecuteMetaData[Generic/Examples/NbyE.tex]{domain}}
+\ExecuteMetaData[Generic/Examples/NbyE.tex]{domain}
 \caption{Generic Reflexive Domain}
 \end{figure}
 
 This datatype definition is utterly unsafe. The more conservative
 user will happily restrict herself to typed settings where the
 domain can be defined as a logical predicate or opt instead for
-a step-indexed approach. But this domain does make it possible
-to define a generic \AF{nbe} semantics as well as a reification
-function turning elements of the reflexive domain into terms.
-By composing them, we obtain the normalisation function which
-gives its name to normalisation by evaluation.
+a step-indexed approach.
+
+But this domain does make it possible to define a generic \AF{nbe}
+semantics which, given a term, produces a value in the reflexive
+domain. Because we have picked a universe of finitary syntaxes, we
+can \emph{traverse}~\cite{mcbride_paterson_2008} the functor to define
+a (potentially failing) reification function turning elements of the
+reflexive domain into terms. By composing them, we obtain the
+normalisation function which gives its name to normalisation by
+evaluation.
 
 The user still has to explicitly pass an interpretation of
 the various constructors because there is no way for us to
@@ -914,23 +935,33 @@ applications.
 \caption{Normalisation by Evaluation for the Untyped $\lambda$-Calculus}
 \end{figure}
 
+We haven't used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
+(by disabling totality checking we have lost all guarantees with respect to
+termination) we know we will get a term in normal form.
+
 \subsection{An Algebraic Approach to Typechecking}
 
 Following Bob Atkey~\citeyear{atkey2015algebraic}, we can consider type checking
-and type inference as the semantics of a bi-directional~\cite{pierce2000local}
-language. We represent it as a bi-sorted language using a notion of \AD{Phase} to
-distinguish between terms for which we will be able to \AIC{Infer} the type and
-the ones for which we will have to \AIC{Check} a type candidate.
+and type inference as a possible semantics for a bi-directional~\cite{pierce2000local}
+language. We represent the raw syntax of a simply-typed bi-directional calculus
+as a bi-sorted language using a notion of \AD{Phase} to distinguish between terms
+for which we will be able to \AIC{Infer} the type and the ones for which we will
+have to \AIC{Check} a type candidate.
+
+Following traditional presentations, eliminators give rise to \AIC{Infer}rable
+terms under the condition that the term they are eliminating is also \AIC{Infer}rable
+and the other arguments are \AIC{Check}able whilst constructors are always \AIC{Check}able.
+Two extra constructors allow changes of direction: \AIC{Cut} annotates a \AIC{Check}able
+term with its type thus making it \AIC{Infer}rable whilst \AIC{Emb} embeds \AIC{Infer}rables
+into \AIC{Check}ables.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.35\textwidth}
   \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{constructors}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{phase}
+\begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{bidirectional}
 \end{minipage}
-
-\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{bidirectional}
 \caption{A Bidirectional Simply-Typed Language}
 \end{figure}
 

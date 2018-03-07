@@ -20,7 +20,7 @@ open import Generic.Semantics
 %<*domain>
 \begin{code}
 {-# NO_POSITIVITY_CHECK #-}
-data Dm {I : Set} (d : Desc I) : Size → I →  List I → Set where 
+data Dm {I : Set} (d : Desc I) : Size → I ─Scoped where
   V : {s : Size} {i : I} → [ Var i                               ⟶  Dm d s      i  ]
   C : {s : Size} {i : I} → [ ⟦ d ⟧ (Kripke (Dm d s) (Dm d s)) i  ⟶  Dm d (↑ s)  i  ]
   ⊥ : {s : Size} {i : I} → [                                        Dm d (↑ s)   i  ]

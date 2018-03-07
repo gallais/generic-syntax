@@ -66,8 +66,7 @@ module _ {I : Set} where
 \end{code}
 %<*reify>
 \begin{code}
- reify : {𝓥 𝓒 : I ─Scoped} → VarLike 𝓥 →
-         {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
+ reify : {𝓥 𝓒 : I ─Scoped} → VarLike 𝓥 → {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
  reify vl^𝓥 []         i b = b
  reify vl^𝓥 Δ@(_ ∷ _)  i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
 \end{code}
