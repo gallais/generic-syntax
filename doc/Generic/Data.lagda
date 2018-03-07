@@ -109,18 +109,18 @@ fs n k = `con (n , false , k , refl)
 %<*listD>
 \begin{code}
 listD : Set → Desc ⊤ ⊤
-listD A =  `σ Bool $ λ isNil → if isNil
-           then `∎ tt
+listD A =  `σ Bool $ λ isNil →
+           if isNil then `∎ tt
            else `σ A (λ _ → `X tt (`∎ tt))
 \end{code}
 %</listD>
 
-%<*listD>
+%<*list>
 \begin{code}
 List : Set → Set
 List A = μ (listD A) ∞ tt
 \end{code}
-%</listD>
+%</list>
 
 %<*nil>
 \begin{code}
@@ -146,6 +146,22 @@ example : List (List Bool)
 example  = (false ∷ []) ∷ (true ∷ []) ∷ []
 \end{code}
 %</example>
+
+%<*vecD>
+\begin{code}
+vecD : Set → Desc ℕ ℕ
+vecD A =  `σ Bool $ λ isNil →
+          if isNil then `∎ 0
+          else `σ ℕ (λ n → `σ A (λ _ → `X n (`∎ (suc n))))
+\end{code}
+%</vecD>
+
+%<*vec>
+\begin{code}
+Vec : Set → ℕ → Set
+Vec A = μ (vecD A) ∞
+\end{code}
+%</vec>
 
 %<*foldr>
 \begin{code}

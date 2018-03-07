@@ -75,7 +75,7 @@ endowed with similar operations by using what Altenkirch, Chapman and
 Uustalu~\citeyear{Altenkirch2010, JFR4389} refer to as relative monads.
 
 In this paper, we pick $J = \mathit{List} I$ which is straightforwardly the list
-of the sort (/ kind / types depending of the application) of the de Bruijn variables
+of the sort (/ kind / types depending on the application) of the de Bruijn variables
 in scope. We can recover an untyped approach by picking $I$ to be the unit type.
 Because of this typed setting, our functors will actually take an extra $I$ argument
 corresponding to the type of the expression being built. This is summed up by
@@ -134,7 +134,7 @@ turning a family into a Set.
 These combinators lead to more readable type declarations. For instance,
 the compact expression
 \AF{[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⟶} \AB{R} \AF{]}
-corresponds to the more verbose type
+desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
 Because the context comes second in the definition of \AF{\_─Scoped}, we
@@ -142,10 +142,10 @@ can readily use these combinators to thread, modify or quantify over the
 scope when defining such families:
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.40\textwidth}
 \ExecuteMetaData[var.tex]{var}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \ExecuteMetaData[motivation.tex]{tm}
 \end{minipage}
 \caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
@@ -271,10 +271,9 @@ embedding. A semantics with values in $\mathcal{V}$ and
 computations in $\mathcal{C}$ is meant to give rise to a
 traversal which, provided a term and an environment of values
 for each one of the variables in scope, delivers a computation.
-The traversal \AF{sem} realises this specification generically
-for all Semantics.
 
-A Semantics is characterised by a set of constraints. First of all,
+A Semantics is characterised by a set of constraints on the notions of
+values $\mathcal{V}$ and computations $\mathcal{C}$ at hand. First of all,
 values should be thinnable so that \AF{sem} may push the environment
 under binders. Second, the set of computations needs to be closed
 under various combinators which are the semantical counterparts of
@@ -288,13 +287,18 @@ bound variable. This is concisely expressed by the type
 (\AF{□} (\AB{\mathcal{V}} \AF{→} \AB{\mathcal{C}})).
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[motivation.tex]{rsem}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\caption{Semantics for \AD{Lam}}
+\end{figure}
+
+The traversal \AF{sem} realises the promise made earlier that any given
+{\AR{Sem} \AB{\mathcal{V}} \AB{\mathcal{C}}} will induce a function which,
+given a value in $\mathcal{V}$ for each variable in scope, turns a term
+into a computation $\mathcal{C}$.
+
+\begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{sem}
-\end{minipage}
-\caption{Semantics for \AD{Lam} and their Fundamental Lemma}
+\caption{Fundamental Lemma of Semantics for \AD{Lam}}
 \end{figure}
 
 Coming back to renaming and substitution, we can see that they both fit
@@ -312,12 +316,12 @@ need to have already proven that they are thinnable.
 \caption{Renaming and Substitution as Instances of \AR{Sem}}
 \end{figure}
 
-We also include the definition of a very basic printer relying on a
+We also include the definition of a basic printer relying on a
 name supply to highlight the fact that computations can very well be
 effectful. The \AF{Printing} semantics is defined by using \AD{String}s
-as values and \AD{State \mathbb{N} String} as computations. We use a
+as values and {\AD{State} \AD{\mathbb{N}} \AD{String}} as computations. We use a
 \AR{Wrap}per with a type and a context as phantom types in order to
-help Agda's inference mechanism propagate the appropriate constraints.
+help Agda's inference propagate the appropriate constraints.
 One of the main driving force is the definition of \AF{fresh} which
 generates a fresh name for a newly-bound variable.
 
@@ -328,7 +332,13 @@ generates a fresh name for a newly-bound variable.
 \end{figure}
 
 The wrapper \AR{Wrap} is trivially a thinnable functor so we omit here
-the definitions of \AF{th^{Wrap}} and \AF{map^{Wrap}}.
+the definitions of \AF{th^{Wrap}} and \AF{map^{Wrap}} and jump straight
+to the definition of the printer. To print an application node, we produce
+a string representation of the function, then of its argument and combine
+them by putting the argument between parentheses. To print a $\lambda$-abstraction,
+we start by generating a fresh name for the newly-bound variable, use that
+name to generate a string representing the body of the function to which we
+prepend a ``$\lambda$'' binding the fresh name.
 
 \begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{semprint}
@@ -363,7 +373,8 @@ to compute the definition of \AF{Sem} from the datatype's.
 
 Chapman, Dagand, McBride and Morris~\citeyear{Chapman:2010:GAL:1863543.1863547}
 defined a universe of data types inspired by Dybjer and Setzer's
-finite axiomatisation of Inductive-Recursive definitions~\citeyear{Dybjer1999}.
+finite axiomatisation of Inductive-Recursive definitions~\citeyear{Dybjer1999}
+and Benke, Dybjer and Jansson's universes for generic programs and proofs~\citeyear{benke-ugpp}.
 This explicit definition of \emph{codes} for data types empowers the
 user to write generic programs tackling \emph{all} of the data types
 one can obtain this way. In this section we recall the main aspects
@@ -397,16 +408,25 @@ not need the extra expressivity. For instance, the functor corresponding
 to lists of elements in $A$ stores one bit of data: whether the current
 node is the empty list or not. Depending on that bit, the rest of the
 description is either the ``stop'' token or a pair of an element in $A$
-and a recursive substructure (i.e. the tail of the list).\todo{fin}
+and a recursive substructure i.e. the tail of the list.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Data.tex]{listD}
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Data.tex]{finD}
-\end{minipage}
-\caption{Descriptions corresponding to List and Fin respectively}\label{figure:listD}
+\ExecuteMetaData[Generic/Data.tex]{listD}
+\caption{The Description of the base functor for \AD{List} \AB{A}}\label{figure:listD}
+\end{figure}
+
+But she can also use the index to enforce invariants as in the definition
+of the base functor for the \AD{Vec} \AB{A} \AB{n} inductive family of
+length-indexed lists. It has the same structure as the definition of \AF{listD}.
+We start with a bit of data distinguishing the two constructors: either
+the empty list (in which case the branch's index is enforced to be $0$) or a
+non-empty one in which case we store a natural number \AB{n}, the head of type
+\AB{A} and a tail of size \AB{n} (and the branch's index is enforced to be
+\AIC{suc} \AB{n}).
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Data.tex]{vecD}
+\caption{The Description of the base functor for \AD{Vec} \AB{A} \AB{n}}\label{figure:vecD}
 \end{figure}
 
 Together with \AF{⟦\_⟧} which acts on $\Set{}^J$, we can define the
@@ -952,9 +972,9 @@ also a well scoped and well typed term of that type.
 
 \subsection{Binding as Self-Reference: Representing Cyclic Structures}
 
-Ghani, Hamana, Uustalu and Vene~\cite{ghani2006representing} have
+Ghani, Hamana, Uustalu and Vene~\citeyear{ghani2006representing} have
 demonstrated how Altenkirch and Reus' type-level de Bruijn
-indices~\cite{altenkirch1999monadic} can be used to represent
+indices~\citeyear{altenkirch1999monadic} can be used to represent
 potentially cyclic structures by a finite object. In their
 representation each bound variable is a pointer to the node
 that introduced it. Because we are, at the top-level, only
@@ -1155,7 +1175,7 @@ satisfied, prove a generic fusion lemma.
 \end{figure}
 
 A direct application of these results is our (to be published) entry to the
-POPLMark Challenge Reloaded~\cite{poplmarkreloaded}. By using a \AD{Desc}-based
+POPLMark Challenge Reloaded~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
 representation of intrisically well-typed and well-scoped terms we directly inherit
 not only renaming and substitution but also all four fusion lemmas as corollaries
 of our generic results. This allows us to shave off a lot of the usual boilerplate
@@ -1212,17 +1232,17 @@ involved binding structure which would be interesting in its own right.
 
 \subsection{Variable Binding} The representation of variable binding
 in formal systems has been a hot topic for decades. Part of the purpose
-of the first POPLMark challenge~\cite{poplmark} was to explore and
+of the first POPLMark challenge~\citeyear{poplmark} was to explore and
 compare various methods. Our generic universe of syntax is based on
 scope-and-typed de Bruijn indices~\cite{de1972lambda} but it is not
 a vital necessity. It is for instance possible to give an interpretation
 of \AD{Desc}ripton corresponding to Chlipala's Parametric Higher-Order
-Abstract Syntax~\cite{chlipala2008parametric} and we would be interested
+Abstract Syntax~\citeyear{chlipala2008parametric} and we would be interested
 to see what the appropriate notion of Semantics is for this representation.
 
 The practice of enforcing strong invariants in the deeply-embedded syntax
 of the programming language to be studied has recently been extended to
-imperative languages~\cite{BachPoulsen}.
+imperative languages~\citeyear{BachPoulsen}.
 
 \subsection{Meta-Theory Automation via Tactics} The tediousness of repeatedly
 proving similar statements has unsurprisingly led to various attempts at
@@ -1230,31 +1250,31 @@ automating the pain away via either code generation or the definition of
 tactics. These solutions can be seen as untrusted oracle driving the
 interactive theorem prover.
 
-Polonowski's DBGen~\cite{polonowski:db} takes as input a raw syntax with
+Polonowski's DBGen~\citeyear{polonowski:db} takes as input a raw syntax with
 comments annotating binding sites. It generates a module defining lifting,
 substitution as well as a raw syntax using names and a validation function
 transforming named terms into de Bruijn ones; we refrain from calling it a
 scopechecker as terms are not statically proven to be well-scoped.
 
-Kaiser, Schäfer, and Stark~\cite{Kaiser-wsdebr} build on our previous paper
+Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} build on our previous paper
 to draft possible theoretical foundations for Autosubst, a so far untrusted
 set of tactics. The whole paper is based on a specific syntax: well-scoped
 call by value System F. In contrast, our effort has been here to carve out
 a precise universe of syntaxes with binding and give a systematic account
 of their semantics and proofs.
 
-Keuchel, Weirich, and Schrijvers' Needle~\cite{needleandknot} is a code
+Keuchel, Weirich, and Schrijvers' Needle~\citeyear{needleandknot} is a code
 generator written in Haskell producing syntax-specific Coq modules
 implementing common traversals and lemmas about them.
 
 \subsection{Universes of Syntaxes with Binding} Keeping in mind Altenkirch
 and McBride's observation that generic programming is everyday programming
-in dependently-typed languages~\cite{genericprogramming-dtp}, we can naturally
+in dependently-typed languages~\citeyear{genericprogramming-dtp}, we can naturally
 expect generic, provably sound, treatments of these notions in tools such as
 Agda or Coq.
 
 Keuchel, Weirich, and Schrijvers' Knot presented in the same paper as
-Needle~\cite{needleandknot} implements the traversals and lemmas generated
+Needle~\citeyear{needleandknot} implements the traversals and lemmas generated
 in specialised forms by Needle once and for all as a set of generic programs.
 They see the existence of Needle as a pragmatic choice: working directly with
 the free monadic terms over finitary containers would be too cumbersome. In
@@ -1262,7 +1282,7 @@ our experience solving the POPLMark reloaded challenge, Agda's pattern
 synonym~\cite{Pickering:patsyn} make working with an encoded definition almost
 seamless.
 
-The GMeta generic framework~\cite{gmeta} does provide a universe of syntaxes
+The GMeta generic framework~\citeyear{gmeta} does provide a universe of syntaxes
 and offers various binding conventions (locally nameless~\cite{Charguéraud2012}
 or de Bruijn indices). It also generically implements common traversals (computing
 the sets of free / bound variables, measuring the size of a term, shifting
@@ -1272,14 +1292,14 @@ all of these are well-behaved. It does not however offer a generic framework
 for defining new well-scoped-and-typed semantics and proving that they are
 well-behaved.
 
-Érdi~\cite{gergodraft} defines a universe inspired by ours and gives three
+Érdi~\citeyear{gergodraft} defines a universe inspired by ours and gives three
 different interpretations corresponding to raw, scoped and typed syntax
 which are related via erasure. He provides scope-and-type preserving renaming
 and substitution as well as various generic proofs that they are well-behaved.
 
-Copello~\cite{copello2017} sets out to work with \emph{named} binders and
+Copello~\citeyear{copello2017} sets out to work with \emph{named} binders and
 defines nominal techniques (such as name swapping) and ultimately $\alpha$-equivalence
-over a generic universe of regular trees with binders inspired by Morris'~\cite{morris-regulartt}.
+over a generic universe of regular trees with binders inspired by Morris'~\citeyear{morris-regulartt}.
 
 
 
