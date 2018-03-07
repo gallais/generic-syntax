@@ -1146,7 +1146,7 @@ to one on environments.
 \caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
 \end{figure}
 
-We can then use \AF{Zip} together with \AF{Kripke^R} to express the idea
+We can then combine \AF{Zip} and \AF{Kripke^R} to express the idea
 that two semantic objects of respective types
 \AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥_1} \AB{𝓒_1}) and
 \AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥_2} \AB{𝓒_2}) are
@@ -1161,23 +1161,31 @@ constraint:
 \caption{A Generic Notion of Simulation}
 \end{figure}
 
-We can prove a generic theorem showing that for each pair of \AR{Sem}antics
-respecting the \AR{Sim}ulation constraint, we get related computations given
-environments of related input values. This theorem is once more mutually
-proven with a statement about \AF{Scope}s, and \AD{Size}s play a crucial
-role in ensuring that the function is indeed total.
+The fundamental lemma of simulations is a generic theorem showing that for
+each pair of \AR{Sem}antics respecting the \AR{Sim}ulation constraint, we
+get related computations given environments of related input values. This
+theorem is once more mutually proven with a statement about \AF{Scope}s,
+and \AD{Size}s play a crucial role in ensuring that the function is indeed total.
 
 \begin{figure}[h]
- \ExecuteMetaData[Generic/Simulation.tex]{simbody}
- \ExecuteMetaData[Generic/Simulation.tex]{rensub}
-\caption{Fundamental Lemma of \AF{Sim}ulations and Renaming as a Substitution as its Corollary}
+\ExecuteMetaData[Generic/Simulation.tex]{simbody}
+\caption{Fundamental Lemma of \AF{Sim}ulations}
 \end{figure}
 
 Instantiating this generic simulation lemma, we can for instance get
-that Renaming and Substitution are extensional or that Renaming is a
-special case of Substitution.
+that Renaming and Substitution are extensional (given extensionally
+equal environments they produce syntactically equal terms) or that
+Renaming is a special case of Substitution. Of course these results
+are not new but having them generically over all syntaxes with binding
+is convenient; which we have experienced first hand when tackling the
+POPLMark reloaded challenge where \AF{rensub} was actually needed.
 
-This Simulation proof framework is the simplest examples of the abstract
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Simulation.tex]{rensub}
+\caption{Renaming as a Substitution via Simulation}
+\end{figure}
+
+This Simulation proof framework is the simplest examples of the kind of abstract
 proof frameworks Allais, Chapman, McBride and McKinna introduce for their
 specific language. They also explain how a similar framework can be defined
 for fusion lemmas and deploy it for the renaming-substitution interactions

@@ -103,14 +103,14 @@ module _ {I : Set} {𝓥 𝓒 : I ─Scoped} (𝓥^P  : Pred 𝓥) (𝓒^P : Pre
 %</kripkeP>
 \begin{code}
 
-module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I ─Scoped} (𝓥^R  : Rel 𝓥₁ 𝓥₂) (𝓒^R  : Rel 𝓒₁ 𝓒₂) where
+module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) (𝓡^𝓒  : Rel 𝓒₁ 𝓒₂) where
 
 \end{code}
 %<*kripkeR>
 \begin{code}
  Kripke^R : (Δ : List I) (τ : I) → [ Kripke 𝓥₁ 𝓒₁ Δ τ ⟶ Kripke 𝓥₂ 𝓒₂ Δ τ ⟶ κ Set ]
- Kripke^R []       σ k₁ k₂ = rel 𝓒^R k₁ k₂
- Kripke^R (τ ∷ Δ)  σ k₁ k₂ = {Θ : List I} → ∀ th {ρ₁} {ρ₂} → ∀[ 𝓥^R ] ρ₁ ρ₂ → rel 𝓒^R {σ} {Θ} (k₁ th ρ₁) (k₂ th ρ₂)
+ Kripke^R []         σ k₁ k₂ = rel 𝓡^𝓒 k₁ k₂
+ Kripke^R Δ@(_ ∷ _)  σ k₁ k₂ = {Θ : List I} {ρ₁ : (Δ ─Env) 𝓥₁ Θ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} → ∀ th → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → rel 𝓡^𝓒 (k₁ th ρ₁) (k₂ th ρ₂)
 \end{code}
 %</kripkeR>
 \begin{code}
