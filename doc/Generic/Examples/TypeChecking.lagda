@@ -85,23 +85,20 @@ Var- _ = Type
 %<*typecheck>
 \begin{code}
 Typecheck : Sem Lang (const ∘ Var-) (const ∘ Type-)
-Typecheck = record
-  { th^𝓥  = λ v ρ → v
-  ; var    = var _
-  ; alg    = alg } where
+Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
 
    var : (i : Phase) → Var- i → Type- i
-   var Infer = just
-   var Check = _==_
+   var Infer  = just
+   var Check  = _==_
 
-   alg : ∀ {i Γ} → ⟦ Lang ⟧ (Kripke (κ ∘ Var-) (κ ∘ Type-)) i Γ → Type- i
-   alg (App , f , t , refl) =  f            >>= λ σ⇒τ →
-                               isArrow σ⇒τ  >>= uncurry λ σ τ →
-                               τ <$ t σ
-   alg (Lam , b , refl)     =  λ σ⇒τ → isArrow σ⇒τ >>= uncurry λ σ τ →
-                               b (extend {σ = Infer}) (ε ∙ σ) τ
-   alg (Cut σ , t , refl)   =  σ <$ t σ
-   alg (Emb , t , refl)     =  λ σ → t >>= λ τ → σ == τ
+   alg : {i : Phase} {Γ : List Phase} → ⟦ Lang ⟧ (Kripke (κ ∘ Var-) (κ ∘ Type-)) i Γ → Type- i
+   alg (App , f , t , refl)  =  f            >>= λ σ⇒τ →
+                                isArrow σ⇒τ  >>= uncurry λ σ τ →
+                                τ <$ t σ
+   alg (Lam , b , refl)      =  λ σ⇒τ → isArrow σ⇒τ >>= uncurry λ σ τ →
+                                b (extend {σ = Infer}) (ε ∙ σ) τ
+   alg (Cut σ , t , refl)    =  σ <$ t σ
+   alg (Emb , t , refl)      =  λ σ → t >>= λ τ → σ == τ
 \end{code}
 %</typecheck>
 \begin{code}
