@@ -1116,15 +1116,31 @@ presentation of semantics for all syntaxes.
 The most important concept in this section is (\AF{Zip} \AB{d}), a relation
 transformer which characterises structurally equal layers such that their
 substructures are themselves related by the relation it is passed as an
-argument. It is defined by induction on the description and case analysis
-on the two layers which are meant to be equal. It inherits a lot of its
-relational arguments' properties: whenever \AB{R} is reflexive (respectively
-symmetric or transitive) so is \AF{Zip} \AB{d} \AB{R}.
+argument. It inherits a lot of its relational arguments' properties: whenever
+\AB{R} is reflexive (respectively symmetric or transitive) so is {\AF{Zip} \AB{d} \AB{R}}.
+
+It is defined by induction on the description and case analysis on the two
+layers which are meant to be equal:
+\begin{itemize}
+  \item In the stop token case \AIC{`∎} \AB{i}, the two layers are considered to
+    be trivially equal (i.e. the constraint generated is the unit type)
+  \item When facing a recursive position {\AIC{`X} \AB{\Delta} \AB{j} \AB{d}}, we
+    demand that the two substructures are related by {\AB{R} \AB{\Delta} \AB{j}}
+    and that the rest of the layers are related by \AF{Zip} \AB{d} \AB{R}
+  \item Last but not least, two nodes of type {\AIC{`\sigma} \AB{A} \AB{d}} will
+    be related if they both carry the same payload \AB{a} of type \AB{A} and if
+    the rest of the layers are related by {\AF{Zip} (\AB{d} \AB{a}) \AB{R}}
+\end{itemize}
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Zip.tex]{ziptype}
 \caption{Zip: Characterising Structurally Equal Values with Related Substructures}
 \end{figure}
+
+If we were to take a fixpoint of \AF{Zip}, we could obtain a structural
+notion of equality for terms which would be equivalent to propositional
+equality. In the section we are however interested in more advanced
+use-cases.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SIMULATION
@@ -1133,13 +1149,13 @@ symmetric or transitive) so is \AF{Zip} \AB{d} \AB{R}.
 \subsection{Simulation Lemma}
 
 A \AF{Zip} constraint appears naturally when we want to say that a
-semantics can simulate another one. Given a relation connecting values
-in \AB{𝓥_1} and \AB{𝓥_2}, and a relation connecting computations in
+semantics can simulate another one. Given a relation \AB{𝓡^𝓥} connecting values
+in \AB{𝓥_1} and \AB{𝓥_2}, and a relation \AB{𝓡^𝓒} connecting computations in
 \AB{𝓒_1} and \AB{𝓒_2}, we can define \AF{Kripke^R} relating values
 \AF{Kripke} \AB{𝓥_1} \AB{𝓒_1} and \AF{Kripke} \AB{𝓥_2} \AB{𝓒_2}
 by stating that they send related inputs to related outputs. We use
 the relation transformer \AF{∀[\_]} which lifts a relation on values
-to one on environments.
+to one on environments in a pointwise manner.
 
 \begin{figure}[h]
  \ExecuteMetaData[varlike.tex]{kripkeR}
@@ -1174,7 +1190,7 @@ and \AD{Size}s play a crucial role in ensuring that the function is indeed total
 
 Instantiating this generic simulation lemma, we can for instance get
 that Renaming and Substitution are extensional (given extensionally
-equal environments they produce syntactically equal terms) or that
+equal environments they produce syntactically equal terms), or that
 Renaming is a special case of Substitution. Of course these results
 are not new but having them generically over all syntaxes with binding
 is convenient; which we have experienced first hand when tackling the
@@ -1184,6 +1200,14 @@ POPLMark reloaded challenge where \AF{rensub} was actually needed.
 \ExecuteMetaData[Generic/Simulation.tex]{rensub}
 \caption{Renaming as a Substitution via Simulation}
 \end{figure}
+
+When studying specific languages, new opportunities to deploy the
+fundamental lemma of simulations arise. Our solution to the POPLMark
+reloaded challenge for instance describes the fact that {\AF{sub} \AB{\rho} \AB{t}}
+reduces to {\AF{sub} \AB{\rho'} \AB{t}} whenever for all \AB{v},
+\AB{\rho}(\AB{v}) reduces to \AB{\rho'}(\AB{v}) as a \AR{Sim}ulation.
+The main theorem (strong normalisation of STLC via a logical relation)
+is itself an instance of (the unary version of) the simulation lemma.
 
 This Simulation proof framework is the simplest examples of the kind of abstract
 proof frameworks Allais, Chapman, McBride and McKinna introduce for their

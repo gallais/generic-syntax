@@ -38,7 +38,8 @@ module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I → List I → Set} (�
 %<*simbody>
 \begin{code}
    sim   :  {Γ Δ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Γ ─Env) 𝓥₂ Δ} {i : I} {s : Size} → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → (t : Tm d s i Γ) → rel 𝓡^𝓒 (Sem.sem 𝓢₁ ρ₁ t) (Sem.sem 𝓢₂ ρ₂ t)
-   body  :  {Δ Θ : List I} {ρ₁ : (Δ ─Env) 𝓥₁ Θ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {s : Size} → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → ∀ Γ i t → Kripke^R 𝓡^𝓥 𝓡^𝓒 Γ i (Sem.body 𝓢₁ {s = s} ρ₁ Γ i t) (Sem.body 𝓢₂ ρ₂ Γ i t)
+   body  :  {Γ Θ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Θ} {ρ₂ : (Γ ─Env) 𝓥₂ Θ} {s : Size} → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → ∀ Δ j → (t : Scope (Tm d s) Δ j Γ) →
+            Kripke^R 𝓡^𝓥 𝓡^𝓒 Δ j (Sem.body 𝓢₁ ρ₁ Δ j t) (Sem.body 𝓢₂ ρ₂ Δ j t)
 \end{code}
 %</simbody>
 \begin{code}
