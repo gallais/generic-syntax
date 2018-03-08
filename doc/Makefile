@@ -5,15 +5,17 @@ all: finish
 
 prepare:
 	mkdir -p latex/
-	cp cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.bst *.sed latex/
+	cp *.png *.lhs cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.bst *.sed latex/
 
 paper-lagda:    
 	./build-lagda.sh
 
 paper: prepare paper-lagda
 	cd latex \
+	&& lhs2TeX lc.lhs > lc.tex \
 	&& ${SED} -f rules.sed -i ${PAPER}.tex \
 	&& ${SED} -f rules.sed -i syntax.tex \
+	&& ${SED} -f rules.sed -i motivation.tex \
         && latexmk -bibtex -xelatex -pdf -e '$$pdflatex=q/xelatex %O %S/' $(PAPER).tex \
         && cd ..
 
