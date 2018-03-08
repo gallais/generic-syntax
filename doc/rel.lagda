@@ -58,6 +58,11 @@ module _ {I : Set} where
  Eq^R : {A : I ─Scoped} → Rel A A
  rel Eq^R = _≡_
 
+ open import Relation.Binary.HeterogeneousEquality.Core
+
+ HEq^R : {A B : I ─Scoped} → Rel A B
+ rel HEq^R = λ a b → a ≅ b
+
 module _ {I : Set} {d : Desc I} where
 
  VarTm^R : Rel Var (Tm d ∞)

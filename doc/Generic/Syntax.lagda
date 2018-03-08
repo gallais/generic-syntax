@@ -24,12 +24,19 @@ data Desc (I : Set) : Set₁ where
   `∎ : I                         → Desc I
 \end{code}
 %</desc>
+\begin{code}
+reindex : {I J : Set} → (I → J) → Desc I → Desc J
+reindex f (`σ A d)   = `σ A λ a → reindex f (d a)
+reindex f (`X Δ j d) = `X (L.map f Δ) (f j) (reindex f d)
+reindex f (`∎ i)     = `∎ (f i)
+\end{code}
 %<*interp>
 \begin{code}
 ⟦_⟧ : {I : Set} → Desc I → (List I → I ─Scoped) → I ─Scoped
 ⟦ `σ A d    ⟧ X i Γ = Σ[ a ∈ A ] (⟦ d a ⟧ X i Γ)
 ⟦ `X Δ j d  ⟧ X i Γ = X Δ j Γ × ⟦ d ⟧ X i Γ
 ⟦ `∎ i′     ⟧ X i Γ = i ≡ i′
+
 \end{code}
 %</interp>
 
@@ -120,8 +127,15 @@ module _ {I : Set} {X Y : List I → I ─Scoped} where
  fmap (`X Δ j d) f = P.map (f Δ j) (fmap d f)
  fmap (`∎ i)     f = id
 
+ fmap-ext : (d : Desc I) {Γ Δ : List I} {i : I} {f g : ∀ Θ i → X Θ i Γ → Y Θ i Δ} →
+            (f≈g : ∀ Θ i x → f Θ i x ≡ g Θ i x) (v : ⟦ d ⟧ X i Γ) →
+            fmap d f v ≡ fmap d g v
+ fmap-ext (`σ A d)   f≈g (a , v) = cong (a ,_) (fmap-ext (d a) f≈g v)
+ fmap-ext (`X Δ j d) f≈g (r , v) = cong₂ _,_ (f≈g Δ j r) (fmap-ext d f≈g v)
+ fmap-ext (`∎ i)     f≈g v       = refl
 
 module _ {I : Set} {X : List I → I ─Scoped} where
+
  fmap-id : (d : Desc I) {Γ : List I} {i : I} (v : ⟦ d ⟧ X i Γ) → fmap d (λ _ _ x → x) v ≡ v
  fmap-id (`σ A d)    (a , v)  = cong (a ,_) (fmap-id (d a) v)
  fmap-id (`X Δ j d)  (r , v)  = cong (r ,_) (fmap-id d v)

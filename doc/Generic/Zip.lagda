@@ -27,7 +27,7 @@ module _ {I : Set} {X Y : List I → I → List I → Set} where
 \end{code}
 %</ziptype>
 \begin{code}
-module _ {I : Set} {X Y T : List I → I → List I → Set} 
+module _ {I : Set} {X Y T : List I → I → List I → Set}
          {P : ∀ δ i → [ X δ i ⟶ Y δ i ⟶ κ Set ]} where
  zip : (d : Desc I) {γ γ′ : List I}
        {f : ∀ δ i → T δ i γ → X δ i γ′} {g : ∀ δ i → T δ i γ → Y δ i γ′}
