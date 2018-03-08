@@ -26,21 +26,52 @@ module _  {I : Set} {𝓥₁ 𝓥₂ 𝓥₃ 𝓒₁ 𝓒₂ 𝓒₃ : I → Lis
           where
 \end{code}
 %<*fusion>
+%<*fusiontype>
 \begin{code}
  record Fus (d : Desc I) (𝓢₁ : Sem d 𝓥₁ 𝓒₁) (𝓢₂ : Sem d 𝓥₂ 𝓒₂) (𝓢₃ : Sem d 𝓥₃ 𝓒₃) : Set where
-   field  quote₁  :  (i : I) → [ 𝓒₁ i ⟶ Tm d ∞ i ]
-          vl^𝓥₁   :  VarLike 𝓥₁
-          th^R    :  {Γ Δ Θ Ξ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} → (σ : Thinning Θ Ξ) → 𝓡^E ρ₁ ρ₂ ρ₃ → 𝓡^E ρ₁ (th^Env (Sem.th^𝓥 𝓢₂) ρ₂ σ) (th^Env (Sem.th^𝓥 𝓢₃) ρ₃ σ)
-          >>^R    :  {Γ Δ Θ Ξ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} {ρ₄ : (Ξ ─Env) 𝓥₂ Θ} {ρ₅ : (Ξ ─Env) 𝓥₃ Θ} → 𝓡^E ρ₁ ρ₂ ρ₃ → ∀[ 𝓡^𝓥 ] ρ₄ ρ₅ →
-                     𝓡^E (freshˡ vl^𝓥₁ Δ {Ξ} >> th^Env (Sem.th^𝓥 𝓢₁) ρ₁ (freshʳ vl^Var Ξ)) (ρ₄ >> ρ₂) (ρ₅ >> ρ₃)
-          var^R   :  {Γ Δ Θ : List I} {i : I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} → 𝓡^E ρ₁ ρ₂ ρ₃ → (v : Var i Γ) →
-                     rel 𝓡^𝓒 (Sem.sem 𝓢₂ ρ₂ (quote₁ i (Sem.var 𝓢₁ (lookup ρ₁ v)))) (Sem.var 𝓢₃ (lookup ρ₃ v))
-          alg^R   :  {Γ Δ Θ : List I} {s : Size} {i : I} (b : ⟦ d ⟧ (Scope (Tm d s)) i Γ) {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} → 𝓡^E ρ₁ ρ₂ ρ₃ →
-                     let v₁ = fmap d (Sem.body 𝓢₁ ρ₁) b
-                         v₃ = fmap d (Sem.body 𝓢₃ ρ₃) b in
-                     Zip d (Kripke^R 𝓡^𝓥 𝓡^𝓒) (fmap d (λ Δ i → Sem.body 𝓢₂ ρ₂ Δ i ∘ quote₁ i ∘ reify vl^𝓥₁ Δ i) v₁) v₃ →
-                     rel 𝓡^𝓒 (Sem.sem 𝓢₂ ρ₂ (quote₁ i (Sem.alg 𝓢₁ v₁))) (Sem.alg 𝓢₃ v₃)
+   field
 \end{code}
+%</fusiontype>
+%<*fusionquote>
+\begin{code}
+     quote₁  :  (i : I) → [ 𝓒₁ i ⟶ Tm d ∞ i ]
+\end{code}
+%</fusionquote>
+%<*fusionvarlike>
+\begin{code}
+     vl^𝓥₁   :  VarLike 𝓥₁
+\end{code}
+%</fusionvarlike>
+%<*fusionthinnable>
+\begin{code}
+     th^R    :  {Γ Δ Θ Ξ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} → (σ : Thinning Θ Ξ) → 𝓡^E ρ₁ ρ₂ ρ₃ →
+                𝓡^E ρ₁ (th^Env (Sem.th^𝓥 𝓢₂) ρ₂ σ) (th^Env (Sem.th^𝓥 𝓢₃) ρ₃ σ)
+\end{code}
+%</fusionthinnable>
+%<*fusionappend>
+\begin{code}
+     >>^R    :  {Γ Δ Θ Ξ : List I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} {ρ₄ : (Ξ ─Env) 𝓥₂ Θ} {ρ₅ : (Ξ ─Env) 𝓥₃ Θ} → 𝓡^E ρ₁ ρ₂ ρ₃ → ∀[ 𝓡^𝓥 ] ρ₄ ρ₅ →
+                𝓡^E (freshˡ vl^𝓥₁ Δ {Ξ} >> th^Env (Sem.th^𝓥 𝓢₁) ρ₁ (freshʳ vl^Var Ξ)) (ρ₄ >> ρ₂) (ρ₅ >> ρ₃)
+\end{code}
+%</fusionappend>
+%<*fusionvar>
+\begin{code}
+     var^R   :  {Γ Δ Θ : List I} {i : I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} → 𝓡^E ρ₁ ρ₂ ρ₃ → (v : Var i Γ) →
+                rel 𝓡^𝓒  (Sem.sem 𝓢₂ ρ₂ (quote₁ i (Sem.var 𝓢₁ (lookup ρ₁ v))))
+                           (Sem.var 𝓢₃ (lookup ρ₃ v))
+\end{code}
+%</fusionvar>
+%<*fusionalg>
+\begin{code}
+     alg^R   :  {Γ Δ Θ : List I} {s : Size} {i : I} {ρ₁ : (Γ ─Env) 𝓥₁ Δ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} {ρ₃ : (Γ ─Env) 𝓥₃ Θ} → (b : ⟦ d ⟧ (Scope (Tm d s)) i Γ) → 𝓡^E ρ₁ ρ₂ ρ₃ →
+                let  v₁ = fmap d (Sem.body 𝓢₁ ρ₁) b
+                     v₃ = fmap d (Sem.body 𝓢₃ ρ₃) b
+                in Zip d (Kripke^R 𝓡^𝓥 𝓡^𝓒)
+                    (fmap d (λ Δ i → Sem.body 𝓢₂ ρ₂ Δ i ∘ quote₁ i ∘ reify vl^𝓥₁ Δ i) v₁)
+                    v₃ →
+                rel 𝓡^𝓒 (Sem.sem 𝓢₂ ρ₂ (quote₁ i (Sem.alg 𝓢₁ v₁))) (Sem.alg 𝓢₃ v₃)
+\end{code}
+%</fusionalg>
 %</fusion>
 \begin{code}
 \end{code}
@@ -101,7 +132,7 @@ module _ {I : Set} (d : Desc I) where
      ∎
 
  Fus.var^R Ren² = λ ρ^R v → cong `var (lookup^R ρ^R v)
- Fus.alg^R Ren² b {ρ₁} {ρ₂} {ρ₃} ρ^R = λ zipped → cong `con $
+ Fus.alg^R Ren² {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R = λ zipped → cong `con $
    let v₁ = fmap d (Sem.body Renaming ρ₁) b
        v₃ = fmap d (Sem.body Renaming ρ₃) b in
    begin
@@ -111,11 +142,15 @@ module _ {I : Set} (d : Desc I) where
          ≡⟨ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Var)) d zipped ⟩
      fmap d (reify vl^Var) v₃
    ∎
-
- ren² : ∀ {Γ Δ Θ i} (t : Tm d ∞ i Γ) (ρ₁ : Thinning Γ Δ) (ρ₂ : Thinning Δ Θ) →
-        ren ρ₂ (ren ρ₁ t) ≡ ren (select ρ₁ ρ₂) t
+\end{code}
+%<*renren>
+\begin{code}
+ ren² : {Γ Δ Θ : List I} {i : I} → ∀ t (ρ₁ : Thinning Γ Δ) (ρ₂ : Thinning Δ Θ) →
+        ren ρ₂ {i = i} (ren ρ₁ t) ≡ ren (select ρ₁ ρ₂) t
  ren² t ρ₁ ρ₂ = Fus.fus Ren² (pack^R (λ _ → refl)) t
-
+\end{code}
+%</renren>
+\begin{code}
  RenSub : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d Renaming Substitution Substitution
  Fus.quote₁  RenSub = λ _ t → t
  Fus.vl^𝓥₁  RenSub = vl^Var
@@ -148,7 +183,7 @@ module _ {I : Set} (d : Desc I) where
      ∎
 
  Fus.var^R   RenSub = λ ρ^R v → lookup^R ρ^R v
- Fus.alg^R   RenSub b {ρ₁} {ρ₂} {ρ₃} ρ^R = λ zipped → cong `con $
+ Fus.alg^R   RenSub {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R = λ zipped → cong `con $
    let v₁ = fmap d (Sem.body Renaming ρ₁) b
        v₃ = fmap d (Sem.body Substitution ρ₃) b in
    begin
@@ -158,10 +193,15 @@ module _ {I : Set} (d : Desc I) where
          ≡⟨ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) d zipped ⟩
       fmap d (reify vl^Tm) v₃
    ∎
-
- rensub : ∀ {Γ Δ Θ i} (t : Tm d ∞ i Γ) (ρ₁ : Thinning Γ Δ) (ρ₂ : (Δ ─Env) (Tm d ∞) Θ) →
-        sub ρ₂ (ren ρ₁ t) ≡ sub (select ρ₁ ρ₂) t
+\end{code}
+%<*rensub>
+\begin{code}
+ rensub :  {Γ Δ Θ : List I} {i : I} → ∀ t (ρ₁ : Thinning Γ Δ) (ρ₂ : (Δ ─Env) (Tm d ∞) Θ) →
+           sub ρ₂ {i = i} (ren ρ₁ t) ≡ sub (select ρ₁ ρ₂) t
  rensub t ρ₁ ρ₂ = Fus.fus RenSub (pack^R (λ _ → refl)) t
+\end{code}
+%</rensub>
+\begin{code}
 
  SubRen : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (ren ρ₂ <$> ρ₁)) VarTm^R Eq^R d Substitution Renaming Substitution
  Fus.quote₁  SubRen = λ _ → id
@@ -200,7 +240,7 @@ module _ {I : Set} (d : Desc I) where
      ∎
 
  Fus.var^R   SubRen = λ ρ^R v → lookup^R ρ^R v
- Fus.alg^R   SubRen b {ρ₁} {ρ₂} {ρ₃} ρ^R = λ zipped → cong `con $
+ Fus.alg^R   SubRen {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R = λ zipped → cong `con $
    let v₁ = fmap d (Sem.body Substitution ρ₁) b
        v₃ = fmap d (Sem.body Substitution ρ₃) b in
    begin
@@ -210,10 +250,15 @@ module _ {I : Set} (d : Desc I) where
          ≡⟨ zip^reify VarTm^R (reify^R VarTm^R Eq^R vl^VarTm) d zipped ⟩
       fmap d (reify vl^Tm) v₃
    ∎
-
- subren : ∀ {Γ Δ Θ i} (t : Tm d ∞ i Γ) (ρ₁ : (Γ ─Env) (Tm d ∞) Δ) (ρ₂ : Thinning Δ Θ) →
-          ren ρ₂ (sub ρ₁ t) ≡ sub (ren ρ₂ <$> ρ₁) t
+\end{code}
+%<*subren>
+\begin{code}
+ subren :  {Γ Δ Θ : List I} {i : I} → ∀ t (ρ₁ : (Γ ─Env) (Tm d ∞) Δ) (ρ₂ : Thinning Δ Θ) →
+           ren ρ₂ {i = i} (sub ρ₁ t) ≡ sub (ren ρ₂ <$> ρ₁) t
  subren t ρ₁ ρ₂ = Fus.fus SubRen (pack^R (λ k → refl)) t
+\end{code}
+%</subren>
+\begin{code}
 
  Sub² : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (sub ρ₂ <$> ρ₁)) Eq^R Eq^R d Substitution Substitution Substitution
  Fus.quote₁ Sub² = λ _ t → t
@@ -249,7 +294,7 @@ module _ {I : Set} (d : Desc I) where
        lookup ρ₃ kʳ
      ∎
  Fus.var^R Sub² = λ ρ^R v → lookup^R ρ^R v
- Fus.alg^R Sub² b {ρ₁} {ρ₂} {ρ₃} ρ^R = λ zipped → cong `con $
+ Fus.alg^R Sub² {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R = λ zipped → cong `con $
    let v₁ = fmap d (Sem.body Substitution ρ₁) b
        v₃ = fmap d (Sem.body Substitution ρ₃) b in
    begin
@@ -259,10 +304,15 @@ module _ {I : Set} (d : Desc I) where
          ≡⟨ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) d zipped ⟩
       fmap d (reify vl^Tm) v₃
    ∎
-
- sub² : ∀ {Γ Δ Θ i} (t : Tm d ∞ i Γ) (ρ₁ : (Γ ─Env) (Tm d ∞) Δ) (ρ₂ : (Δ ─Env) (Tm d ∞) Θ) →
-          sub ρ₂ (sub ρ₁ t) ≡ sub (sub ρ₂ <$> ρ₁) t
+\end{code}
+%<*subsub>
+\begin{code}
+ sub² :  {Γ Δ Θ : List I} {i : I} → ∀ t (ρ₁ : (Γ ─Env) (Tm d ∞) Δ) (ρ₂ : (Δ ─Env) (Tm d ∞) Θ) →
+         sub ρ₂ {i = i} (sub ρ₁ t) ≡ sub (sub ρ₂ <$> ρ₁) t
  sub² t ρ₁ ρ₂ = Fus.fus Sub² (pack^R (λ k → refl)) t
+\end{code}
+%<*subsub>
+\begin{code}
 
 
 -- Corollary

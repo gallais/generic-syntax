@@ -37,16 +37,16 @@ s/\\AgdaSymbol{λ} \\AgdaSymbol{\\{}\\AgdaBound{σ}\\AgdaSymbol{\\}} \\AgdaSymbo
 #s/\\AgdaSymbol{\\{}\\AgdaBound{σ}\\AgdaSymbol{\\}} \\AgdaSymbol{\\{}\\AgdaBound{τ}\\AgdaSymbol{\\};}/\\AgdaSymbol{;}/g
 s/\\AgdaSymbol{λ} \\AgdaSymbol{\\{}\\AgdaBound{σ}\\AgdaSymbol{\\}} \\AgdaSymbol{→} //g
 s/\\AgdaSymbol{\\{}\\AgdaBound{p}\\AgdaSymbol{\\}} //g
-s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<∀]*\\AgdaSymbol{\\}}\([^<∀=]*\)\\AgdaSymbol{=}/\1\2\\AgdaSymbol{=}/g
-s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<∀]*\\AgdaSymbol{\\}}[^<()→∀;]*\\AgdaSymbol{→} /\1/g
-s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<()∀;]*\\AgdaSymbol{\\}}/\1/g
-s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<;∀]*\\AgdaSymbol{\\}}/\1/g
+s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<∀𝓡]*\\AgdaSymbol{\\}}\([^<∀=]*\)\\AgdaSymbol{=}/\1\2\\AgdaSymbol{=}/g
+s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<𝓡∀]*\\AgdaSymbol{\\}}[^<()→𝓡∀;]*\\AgdaSymbol{→} /\1/g
+s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<()𝓡∀;]*\\AgdaSymbol{\\}}/\1/g
+s/^\([^∀]*\)\\AgdaSymbol{\\{}[^<;𝓡∀]*\\AgdaSymbol{\\}}/\1/g
 
 # Hacks
 s/`→/`\\!\\!→/g
 s/`1/`\\!1/g
 s/`2/`\\!2/g
-s/𝓡/\\mathcal{R}/g
+#s/𝓡/\\mathcal{R}/g
 s/𝓔/\\mathcal\{E\}/g
 s/𝓜/\\mathcal\{M\}/g
 s/𝓢/\\mathcal\{S\}/g

@@ -727,7 +727,7 @@ substructure in the thinned and extended evaluation environment.
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{body}
 \caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}
-\end{figure}
+\end{figure}\todo{explain \AF{>>}}
 
 Because \AF{fmap} introduces one level of indirection between the
 recursive calls and the subterms they are acting upon, the fact
@@ -1224,7 +1224,7 @@ this more complex example.
 \subsection{Fusion Lemma}
 
 Results which can be reformulated as the ability to fuse two traversals
-obtained as \AF{Semantics} into one abound. When claiming that \AF{Tm} is
+obtained as \AR{Sem}antics into one abound. When claiming that \AF{Tm} is
 a Functor, we have to prove that two successive renamings can be fused into
 a single renaming where the \AF{Thinning}s have been composed. Similarly,
 demonstrating that \AF{Tm} is a relative Monad~\cite{JFR4389} implies proving
@@ -1236,25 +1236,94 @@ that a syntactic substitution followed by the evaluation of the resulting term
 into the model is equivalent to the evaluation of the original term with an
 environment corresponding to the evaluated substitution.
 
-Because all of these statements have precisely the same structure, we can
-once more devise a framework which will, provided that its constraints are
-satisfied, prove a generic fusion lemma.
-
-\begin{figure}[h]
- \ExecuteMetaData[Generic/Fusion.tex]{fusion}
-\caption{A Generic Notion of Fusion}
-\end{figure}
-
 A direct application of these results is our (to be published) entry to the
 POPLMark Challenge Reloaded~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
 representation of intrisically well-typed and well-scoped terms we directly inherit
 not only renaming and substitution but also all four fusion lemmas as corollaries
 of our generic results. This allows us to shave off a lot of the usual boilerplate
 and go straight to the point.
+Because all of these statements have precisely the same structure, we can
+once more devise a framework which will, provided that its constraints are
+satisfied, prove a generic fusion lemma.
+
+Because fusion is quite a bit more involved than simulation, we will step through
+each one of the constraints one by one, trying to give the reader an intuition
+for why they are shaped the way they are.
+
+\subsubsection{The Fusion constraints}
+
+The notion of fusion is defined for a triple of \AR{Sem}antics; each \AB{𝓢_i}
+being defined for values in \AB{𝓥_i} and computations in \AB{𝓒_i}. The
+fundamental lemma associated to such a set of constraints will state that
+running \AB{𝓢_2} after \AB{𝓢_1} is equivalent to running \AB{𝓢_3} only.
+
+The definition of fusion is parametrised by three relations: \AB{𝓡^E} relates
+triples of environments of values in {(\Gamma \AR{─Env}) \AB{𝓥_1} \Delta},
+{(\Delta \AR{─Env}) \AB{𝓥_2} \Theta} and {(\Gamma \AR{─Env}) \AB{𝓥_3} \Theta}
+respectively; \AB{𝓡^𝓥} relates pairs of values\AB{𝓥_2} and \AB{𝓥_3};
+and \AB{𝓡^𝓒}, our notion of equivalence for evaluation results, relates pairs
+of computation in \AB{𝓒_2} and \AB{𝓒_3}.
+
+% \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
+
+The first obstacle we face is the formal definition of ``running \AB{𝓢_2}
+after \AB{𝓢_1}'': for this statement to make sense, the result of running
+\AB{𝓢_1} ought to be a term. Or rather, we ought to be able to extract a
+term from a \AB{𝓒_1}. Hence the first constraint: the existence of a \ARF{quote_1}
+function. When dealing with syntactic semantics such as renaming or substitution
+this function will be the identity. However nothing prevents to try to prove for
+instance that normalisation by evaluation is idempotent in which case a bona fide
+reification function extracting terms from model values will be used.
+
+\ExecuteMetaData[Generic/Fusion.tex]{fusionquote}
+
+Then, we have to think about what happens when going under a binder: \AB{𝓢_1}
+will produce a \AF{Kripke} function space but we'd like to have a syntactic
+value. Provided that \AB{𝓥_1} is \AR{VarLike}, we can make use of \AF{reify}
+to get a \AF{Scope} back. Hence the second constraint.
+
+\ExecuteMetaData[Generic/Fusion.tex]{fusionvarlike}
+
+Still thinking about going under binders: if three evaluation environments
+\AB{\rho_1}, \AB{\rho_2} and \AB{\rho_3} are related by \AB{𝓡^E} and we
+are given a thinning \AB{\sigma} from \Theta to \Omega then \AB{\rho_1},
+the thinned \AB{\rho_2} and the thinned \AB{\rho_3} should still be related.
+
+\ExecuteMetaData[Generic/Fusion.tex]{fusionthinnable}
+
+\todo{What is \AF{>>}?!}
+
+\ExecuteMetaData[Generic/Fusion.tex]{fusionappend}
+
+We finally arrive at the constraints focusing on the semantical counterparts
+of the terms' constructors. When evaluating a variable, on the one hand \AB{𝓢_1}
+will lookup its meaning in the evaluation environment, turn the resulting value into
+a computation which will get quoted and then the result will be evaluated with \AB{𝓢_2}.
+Provided that all three evaluation environments are related by \AB{𝓡^E} this should
+be equivalent to looking up the value in \AB{𝓢_3}'s environment and turning it into a
+computation. Hence the constraint \ARF{var^R}:
+
+\ExecuteMetaData[Generic/Fusion.tex]{fusionvar}
+
+The case of the alegbra follows a similar idea albeit 
+
+\ExecuteMetaData[Generic/Fusion.tex]{fusionalg}
+
+%\begin{figure}[h]
+% \ExecuteMetaData[Generic/Fusion.tex]{fusion}
+%\caption{A Generic Notion of Fusion}
+%\end{figure}
+
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Fusion.tex]{fusbody}
 \caption{Fundamental Lemma of \AR{Fus}ion}
+\end{figure}
+
+
+\begin{figure}[h]
+ \ExecuteMetaData[Generic/Fusion.tex]{subren}
+\caption{A Corollary: Substitution-Renaming Fusion}
 \end{figure}
 
 
@@ -1315,7 +1384,8 @@ The practice of enforcing strong invariants in the deeply-embedded syntax
 of the programming language to be studied has recently been extended to
 imperative languages~\citeyear{BachPoulsen}.
 
-\subsection{Meta-Theory Automation via Tactics} The tediousness of repeatedly
+\subsection{Meta-Theory Automation via Tactics and Code Generation} The
+tediousness of repeatedly
 proving similar statements has unsurprisingly led to various attempts at
 automating the pain away via either code generation or the definition of
 tactics. These solutions can be seen as untrusted oracle driving the
@@ -1410,5 +1480,16 @@ many such common compilation passes can be implemented generically.
 An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
 could provide an appropriate framework to highlight the connection
 between various languages, some being seen as the extension of others.
+
+
+\todo{Expand}
+Generic notion of contexts corresponding to a syntax (cite Zipper, jokers),
+and contextual closure of relations (e.g. reduction relation) together with
+lemmas guaranteeing stability under ren, sub, etc. provided the base relation
+is.
+
+\todo{Expand}
+Generic Typing Framework for raw syntaxes
+
 
 \newpage
