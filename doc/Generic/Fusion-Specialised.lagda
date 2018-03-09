@@ -52,7 +52,7 @@ module _ {I} (d : Desc I) {𝓥 𝓒} (S : Sem d 𝓥 𝓒) where
       lookup ρ₂ y
     ∎
   Fus.var^R  sem-ren = λ ρ^R v → cong (Sem.var S) (lookup^R ρ^R v)
-  Fus.alg^R  sem-ren {Γ} {Δ} {σ} {si} b {ρ₁} {ρ₂} {ρ₃} ρ^R zp =
+  Fus.alg^R  sem-ren {Γ} {Δ} {σ} {si} {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R zp =
     let rew = λ {σ Γ} (t : ⟦ d ⟧ (Scope (Tm d ∞)) σ Γ) →
               `con-inj {I} {σ} {Γ} {d} (≅⇒≡ (RenId.ren-id (`con t) (pack^R λ _ → refl)))
         v₁  = fmap d (Sem.body Renaming ρ₁) b

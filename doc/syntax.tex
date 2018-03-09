@@ -692,7 +692,7 @@ values to variables, it associates computations to terms.
 \caption{\AF{\_─Comp}: Associating Computations to Terms}
 \end{figure}
 
-\subsection{Fundamental Lemma of Semantics}
+\subsection{Fundamental Lemma of Semantics}\label{def:body}
 
 We can then define the type of the fundamental lemma (called \AF{sem}) as
 a function from environments to computations. It is defined mutually with a
@@ -722,12 +722,15 @@ The auxiliary lemma \AF{body} distinguishes two cases: if no new
 variable has been bound in the recursive substructure, it is simply
 a matter of calling \AF{sem} recursively, otherwise we are provided
 with a \AF{Thinning}, some additional values and evaluate the
-substructure in the thinned and extended evaluation environment.
+substructure in the thinned and extended evaluation environment
+(thanks to \AF{\_>>\_} which given two environments
+{(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}}
+produces an environment {(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ})}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{body}
 \caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}
-\end{figure}\todo{explain \AF{>>}}
+\end{figure}
 
 Because \AF{fmap} introduces one level of indirection between the
 recursive calls and the subterms they are acting upon, the fact
@@ -1285,13 +1288,21 @@ to get a \AF{Scope} back. Hence the second constraint.
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvarlike}
 
 Still thinking about going under binders: if three evaluation environments
-\AB{\rho_1}, \AB{\rho_2} and \AB{\rho_3} are related by \AB{𝓡^E} and we
-are given a thinning \AB{\sigma} from \Theta to \Omega then \AB{\rho_1},
-the thinned \AB{\rho_2} and the thinned \AB{\rho_3} should still be related.
+\AB{\rho_1} in {(\Gamma \AR{─Env}) \AB{𝓥_1} \Delta}, \AB{\rho_2} in
+{(\Delta \AR{─Env}) \AB{𝓥_2} \Theta}, and \AB{\rho_3} in {(\Gamma \AR{─Env}) \AB{𝓥_3} \Theta}
+are related by \AB{𝓡^E} and we are given a thinning \AB{\sigma} from \Theta to \Omega
+then \AB{\rho_1}, the thinned \AB{\rho_2} and the thinned \AB{\rho_3} should still be related.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionthinnable}
 
-\todo{What is \AF{>>}?!}
+Remembering that \AF{\_>>\_} is used in the definition of \AF{body}~\ref{def:body} to
+combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
+{(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}} into one of type
+{(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ})}, we mechanically need a
+constraint stating that \AF{\_>>\_} is compatible with \AB{𝓡^E}. We demand
+as an extra precondition that the values \AB{\rho_2} and \AB{\rho_3} are extended
+with are related according to \AB{𝓡^𝓥}. Lastly, for all the types to match up,
+\AB{\rho_1} has to be extended with dummy variables.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionappend}
 
@@ -1305,26 +1316,48 @@ computation. Hence the constraint \ARF{var^R}:
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvar}
 
-The case of the alegbra follows a similar idea albeit 
+The case of the alegbra follows a similar idea albeit being more complex:
+a term gets evaluated using \AB{𝓢_1} and in order to be able to run \AB{𝓢_2}
+afterwards we need to recover a piece of syntax. This is possible if the
+\AF{Kripke} functional spaces are reified by being fed dummy \AB{𝓥_1} arguments
+(which can be manufactured thanks to the \ARF{vl^𝓥_1} we mentioned before) and
+then quoted. Provided that the result of running \AB{𝓢_2} on that term is
+related via {\AF{Zip} \AB{d} (\AF{Kripke^R} \AB{𝓡^𝓥} \AB{𝓡^𝓒}} to the result
+of running \AB{𝓢_3} on the original term, the \ARF{alg^R} constraint states
+that the two evalutions should yield related computations.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionalg}
 
-%\begin{figure}[h]
-% \ExecuteMetaData[Generic/Fusion.tex]{fusion}
-%\caption{A Generic Notion of Fusion}
-%\end{figure}
-
+This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
+stating that from a triple of related environments, one gets a pair of related
+computations: the composition of \AB{𝓢_1} and \AB{𝓢_2} on one hand and
+\AB{𝓢_3} on the other. This lemma is once again proven mutually with its
+counterpart for \AR{Sem}'s \AF{body}'s action on \AR{Scope}s and the \AD{Size}
+indices make the proof modular.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Fusion.tex]{fusbody}
 \caption{Fundamental Lemma of \AR{Fus}ion}
 \end{figure}
 
+A direct consequence of this result is the four lemmas collectively stating
+that any pair of renamings and / or substitutions can be fused together to
+produce either a renaming (in the renaming-renaming interaction case) or a
+substitution (in all the other cases). One such example is the fusion of
+substitution followed by renaming into a single substitution where the
+renaming has been applied to the environment.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Fusion.tex]{subren}
 \caption{A Corollary: Substitution-Renaming Fusion}
 \end{figure}
+
+Another corollary of the fundamental lemma of fusion is the observation that
+Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} make: \emph{assuming
+functional extensionality}, all the ACMM~\citeyear{allais2017type} traversals
+are compatible with variable renaming. We can reproduce this result generically
+for all syntaxes but refrain from using it in practice when an axiom-free
+alternative is provable.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
