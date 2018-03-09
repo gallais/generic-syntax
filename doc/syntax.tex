@@ -1495,52 +1495,70 @@ over a generic universe of regular trees with binders inspired by Morris'~\citey
 
 
 
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION
 
-\section{Conclusion}
+\section{Conclusion and Future Work}
 
-We have started from an example of a scope safe language (the
-untyped $\lambda$-calculus), have studied various common traversals
-and noticed their similarity. After introducing a notion of semantics
-and refactoring these traversals as various instances of the same
-fundamental lemma, we have observed the tight connection between the
-abstract definition of semantics and the shape of the language. By
-extending a universe of datatype descriptions to support a notion of
-binding, we have managed to give a generic presentation of syntaxes
-with binding as well as a large class of scope safe programs acting
-on them: from Renaming and Substitution, to Normalisation by Evaluation,
-and the Desugaring of new constructors added by a language transformer.
-Last but not least, we have seen how to construct generic proofs about
-these generic programs. The diverse influences leading to this body of
-work suggest many opportunities for future research:
+Recalling ACMM~\citeyear{allais2017type} we have started from an example
+of a scope safe language (the simply-typed $\lambda$-calculus), have studied
+various common scope-and-type preserving traversals and noticed their similarity.
+After introducing a notion of semantics and refactoring these traversals as
+various instances of the same fundamental lemma, we have observed the tight
+connection between the abstract definition of semantics and the shape of the
+language.
 
-The question of a universe of syntaxes with binding which are not only
-well scoped but also intrinsically well typed by construction is an
-exciting challenge. The existing variation on the universe of datatypes
-giving a universe of inductive families~\cite{dybjer1994inductive}
-is a natural candidate.
+By extending a universe of datatype descriptions to support a notion of binding,
+we have managed to give a generic presentation of syntaxes with binding as well
+as a large class of scope-and-type safe generic programs acting on all of them:
+from Renaming and Substitution, to Normalisation by Evaluation, and the Desugaring
+of new constructors added by a language transformer. The code accompanying the
+paper also demonstrates how to generically write a Printer or a Scope-Checker
+elaborating values of a raw syntax using strings as variable names into scope-safe
+ones.
 
-Our example of the elaboration of an enriched language to a core one,
-and ACMM's implementation of a
-Continuation Passing Style conversion function begs the question of how
-many such common compilation passes can be implemented generically.
+We have seen how to construct generic proofs about these generic programs. We
+first introduced a Simulation relation showing what it means for two semantics
+to yield related outputs whenever they are fed related input environments. We
+then built on our experience to tackle a more involved case: identifying a set
+of constraints guaranteeing that two semantics run consecutively can be subsumed
+by a single pass of a third one.
+
+We have put all of these results in practice by using them to solve the (to be
+published) POPLMark reloaded challenge which consists in formalising strong
+normalisation for the simply-typed $\lambda$-caluclus via a logical-relation
+argument.
+
+Finally, we have demonstrated that this formalisation effort can be re-used
+in other domains by seeing our syntaxes with binding as potentially cyclic
+terms, defining their unfolding as a non-standard semantics and providing the
+user with a generic notion of bisimilarity to reason about them.
+
+The diverse influences leading to this body of work suggest many opportunities
+for future research.
+
+Our example of the elaboration of an enriched language to a core one, and ACMM's
+implementation of a Continuation Passing Style conversion function begs the question
+of how many such common compilation passes can be implemented generically.
+
 An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
-could provide an appropriate framework to highlight the connection
-between various languages, some being seen as the extension of others.
+could provide an appropriate framework to highlight the connection between various
+languages, some being seen as the refinement of others. This is particularly
+evident when considering the informative typechecker (see the paper's accompanying
+code) which given a scoped term produces a scoped-and-typed term by
+type-(checking/inference).
 
+Our work on the POPLMark reloaded challenge highlights a need for generic
+notions of congruence closure which would come with guarantees (if the original
+relation is stable under renaming and substitution so should the closure).
+Similarly, the ``evaluation contexts'' corresponding to a syntax could be
+derived automatically by building on the work of Huet~\citeyear{huet_1997}
+and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}.
 
-\todo{Expand}
-Generic notion of contexts corresponding to a syntax (cite Zipper, jokers),
-and contextual closure of relations (e.g. reduction relation) together with
-lemmas guaranteeing stability under ren, sub, etc. provided the base relation
-is.
-
-\todo{Expand}
-Generic Typing Framework for raw syntaxes
+Finally, now knowing how to generically describe syntaxes and their
+well-behaved semantics, we can start asking what it means to define
+well-behaved judgments. Why stop at helping the user write its specific
+language's meta-theory when we could study meta-meta-theory?
 
 
 \newpage
