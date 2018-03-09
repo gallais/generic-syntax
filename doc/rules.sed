@@ -22,6 +22,7 @@ s/ \\AgdaSymbol{(}\\AgdaSymbol{))}/\\AgdaSymbol\{)\}/g
 s/>>=/\\mathbin\{>\\!\\!>\\mkern-6.7mu=\}/g
 s/>>/\\mathbin\{>\\!\\!>}/g
 s/++/+\\!+/g
+s/==/=\\!=/g
 
 # Pointwise things
 s/⟶/\\,\\dot\{→\}\\,/g

@@ -350,7 +350,7 @@ notion of values and computations: the type of values in their respective
 environments are distinct from their type of computations.
 
 All of these examples are already described at length by Allais, Chapman,
-McBride and McKinna~\citeyear{allais2017type} so we will not spend any
+McBride and McKinna~\citeyear{allais2017type} (ACMM) so we will not spend any
 more time on them. They have also obtained the simulation and fusion
 theorems demonstrating that these traversals are well-behaved as
 corollaries of more general results expressed in terms of \AF{sem}.
@@ -855,8 +855,7 @@ dummy environment associating each variable to itself.
 In about 20 lines of code we have defined a generic extension of
 syntaxes with binding together with a semantics which corresponds
 to an elaborator translating away this new constructor. In their
-own setting working on STLC, Allais, Chapman, McBride
-and McKinna~\citeyear{allais2017type} have shown that it is similarly
+own setting working on STLC, ACMM~\citeyear{allais2017type} have shown that it is similarly
 possible to implement a Continuation Passing Style transformation as
 a semantics.
 
@@ -923,7 +922,7 @@ anything else she may want to define.
 \end{figure}
 
 Using this setup, we can write a normaliser for the untyped
-$\lambda$-calculus: we use \AF{case} to distinguish between
+$\lambda$-calculus: we use \AF{case} from section \ref{desccomb} to distinguish between
 the semantical counterpart of the application constructor on
 one hand and the $\lambda$-abstraction one on the other.
 The latter is trivial: functions are already
@@ -1109,7 +1108,7 @@ the definition of \AR{∞Tm} was made easy by reusing \AF{⟦\_⟧}.
 
 \section{Building Generic Proofs about Generic Programs}\label{section:simulation}
 
-Allais, Chapman, McBride, and McKinna~\citeyear{allais2017type} have
+ACMM~\citeyear{allais2017type} have
 already shown that, for their specific language, introducing an abstract
 notion of Semantics not only reveals the shared structure of common
 traversals, it also allows them to give abstract proof frameworks for
@@ -1213,7 +1212,7 @@ The main theorem (strong normalisation of STLC via a logical relation)
 is itself an instance of (the unary version of) the simulation lemma.
 
 This Simulation proof framework is the simplest examples of the kind of abstract
-proof frameworks Allais, Chapman, McBride and McKinna introduce for their
+proof frameworks ACMM~\citeyear{allais2017type} introduce for their
 specific language. They also explain how a similar framework can be defined
 for fusion lemmas and deploy it for the renaming-substitution interactions
 but also their respective interactions with normalisation by evaluation.
@@ -1507,7 +1506,7 @@ giving a universe of inductive families~\cite{dybjer1994inductive}
 is a natural candidate.
 
 Our example of the elaboration of an enriched language to a core one,
-and Allais, Chapman, McBride and McKinna's implementation of a
+and ACMM's implementation of a
 Continuation Passing Style conversion function begs the question of how
 many such common compilation passes can be implemented generically.
 An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
