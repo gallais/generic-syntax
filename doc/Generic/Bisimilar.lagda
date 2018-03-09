@@ -22,11 +22,13 @@ open import Relation.Binary.PropositionalEquality using (_≡_ ; subst)
 %<*bisim>
 \begin{code}
 record ≈^∞Tm {I : Set} (d : Desc I) (s : Size) (i : I) (t u : ∞Tm d s i) : Set where
-  coinductive; field force : {s′ : Size< s} → Zip d (λ _ i → ≈^∞Tm d s′ i) (∞Tm.force t) (∞Tm.force u)
+  coinductive
+  field force : {s′ : Size< s} → Zip d (λ _ i → ≈^∞Tm d s′ i) (t .force) (u .force)
 \end{code}
 %</bisim>
 
 \begin{code}
+open ≈^∞Tm public
 module _ {I : Set} (d : Desc I) where
 \end{code}
 

@@ -66,11 +66,21 @@ pattern ↶_ k      = `var k
 
 ∞Tm.force ∞1∷2 = (false , 1 , ∞2∷1 , refl)
 ∞Tm.force ∞2∷1 = (false , 2 , ∞1∷2 , refl)
+
+-- Proofs about the simple example: Potentially cyclic lists
 \end{code}
 
+%<*bisim01>
 \begin{code}
--- Proofs about the simple example: Potentially cyclic lists
+eq-01 : {i : Size} → ≈^∞Tm (CListD ℕ) i tt 01⋯ (unfold 01↺)
+eq-10 : {i : Size} → ≈^∞Tm (CListD ℕ) i tt 10⋯ (unfold (1 ∷ 0 ∷ 1 ∷ ↶ s z))
 
+eq-01 .force = refl , refl , eq-10 , tt
+eq-10 .force = refl , refl , eq-01 , tt
+\end{code}
+%</bisim01>
+
+\begin{code}
 eq₁ : ∀ {s} → ≈^∞Tm (CListD ℕ) s tt ∞1∷2 (unfold `1∷2⇖1)
 eq₂ : ∀ {s} → ≈^∞Tm (CListD ℕ) s tt ∞2∷1 (unfold (2 ∷ (th^Tm `1∷2⇖1 ε)))
 

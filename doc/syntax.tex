@@ -1010,7 +1010,7 @@ generating a type or checking that a candidate will do, we can use our \AD{Desc}
 to describe a language of evidence and generate not only an expression's type but
 also a well scoped and well typed term of that type.
 
-\subsection{Binding as Self-Reference: Representing Cyclic Structures}
+\subsection{Binding as Self-Reference: Representing Cyclic Structures}\label{def:colist}
 
 Ghani, Hamana, Uustalu and Vene~\citeyear{ghani2006representing} have
 demonstrated how Altenkirch and Reus' type-level de Bruijn
@@ -1119,7 +1119,7 @@ The most important concept in this section is (\AF{Zip} \AB{d}), a relation
 transformer which characterises structurally equal layers such that their
 substructures are themselves related by the relation it is passed as an
 argument. It inherits a lot of its relational arguments' properties: whenever
-\AB{R} is reflexive (respectively symmetric or transitive) so is {\AF{Zip} \AB{d} \AB{R}}.
+\AB{R} is reflexive (respectively symmetric or transitive) so is {\AF{Zip} \AB{d} \AB{R}}.\label{lem:zipstable}
 
 It is defined by induction on the description and case analysis on the two
 layers which are meant to be equal:
@@ -1366,35 +1366,43 @@ alternative is provable.
 
 Although we were able to use propositional equality when studying
 syntactic traversals working on terms, it is not the appropriate
-notion of equality for co-finite trees. We can use \AF{Zip} to
-define generically a coinductive notion of bisimilarity for all
-co-finite trees obtained as unfolding of descriptions. And we
-can derive from \AF{Zip}'s properties the fact that this gives
-rise to an equivalence relation.
+notion of equality for co-finite trees. What we want is a generic
+coinductive notion of bisimilarity for all co-finite tree types
+obtained as the unfolding of a description. Two trees are bisimilar
+if their top layers have the same shape and their substructures are
+themselves bisimilar. This is precisely the type of relation \AF{Zip}
+was defined to express. Hence the following coinductive relation.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Bisimilar.tex]{bisim}
- \ExecuteMetaData[Generic/Bisimilar.tex]{eqrel}
-\caption{Bisimilarity, an Equivalence Relation for Co-finite Trees}
+\caption{Generic Notion of Bisimilarity for Co-finite Trees}
 \end{figure}
 
+We can then prove by coinduction that this generic definition always gives
+rise to an equivalence relation by using \AF{Zip}'s stability properties
+(if \AB{R} is reflexive / symmetric / transitive then so is {\AF{Zip} \AB{d} \AB{R}})
+mentioned in Section~\ref{lem:zipstable}.
 
+\begin{figure}[h]
+ \ExecuteMetaData[Generic/Bisimilar.tex]{eqrel}
+\caption{Bisimilarity is an Equivalence Relation}
+\end{figure}
 
-We have also seen how this setup
-could be applied to a different domain: the representation of potentially
-cyclic structures by finite artefacts.
+This definition can be readily deployed to prove e.g. that the unfolding
+of \AF{01↺} defined in Section~\ref{def:colist} is indeed bisimilar to \AF{01⋯}
+which was defined in direct style. As the reader can see the proof is
+trivial: the first \AIC{refl} witnesses the fact that both definitions
+pick the same constructor (a cons cell), the second that they carry the
+same natural number, and we can conclude by an appeal to the coinduction
+hypothesis.
 
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Examples/Colist.tex]{bisim01}
+\caption{The unfolding of \AF{01↺} is bisimilar to the direct-style \AF{01⋯}}
+\end{figure}
 
-The potentially cyclic structures we have studied have been improved
-upon by Hamana~\citeyear{Hamana2009} who gave a presentation which
-preserves sharing: pointers can not only refer to nodes above them
-but also across from them in the cyclic tree. This yields a much more
-involved binding structure which would be interesting in its own right.
-
-
-\section{Fully Worked-out Example}
-
-\todo{system F, etc.}
+%\section{Fully Worked-out Example}
+%\todo{system F, etc.}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
