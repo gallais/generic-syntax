@@ -1420,9 +1420,20 @@ of \AD{Desc}ripton corresponding to Chlipala's Parametric Higher-Order
 Abstract Syntax~\citeyear{chlipala2008parametric} and we would be interested
 to see what the appropriate notion of Semantics is for this representation.
 
-The practice of enforcing strong invariants in the deeply-embedded syntax
-of the programming language to be studied has recently been extended to
-imperative languages~\citeyear{BachPoulsen}.
+\subsection{Alternative Binding Structures} The binding structure we
+present here is based on a flat, lexical scoping strategy. There are
+obviously other strategies and it would be interesting to see whether
+our approach could be reused in these cases.
+
+Bach Poulsen, Rouvoet, Tolmach, Krebbers and Visser~\citeyear{BachPoulsen}
+introduce notions of scope graphs and frames to scale the techniques typical
+of well scoped-and-typed deep embeddings to imperative languages. They can
+already handle a large subset of Middleweight Java.
+
+The potentially cyclic structures we have studied have been improved
+upon by Hamana~\citeyear{Hamana2009} who gave a presentation which
+preserves sharing: pointers can not only refer to nodes above them
+but also across from them in the cyclic tree.
 
 \subsection{Meta-Theory Automation via Tactics and Code Generation} The
 tediousness of repeatedly
