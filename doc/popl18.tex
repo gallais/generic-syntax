@@ -1,4 +1,4 @@
-\documentclass[format=acmsmall, review=true, screen=true]{acmart}
+\documentclass[format=acmsmall, review=true, anonymous, screen=true]{acmart}
 
 \usepackage{agda}
 \usepackage{catchfilebetweentags}
@@ -45,6 +45,9 @@
 % \received[accepted]{June 2009}
 
 
+\bibliographystyle{ACM-Reference-Format}
+\citestyle{acmauthoryear}
+
 % Document starts
 \begin{document}
 % Title portion. Note the short title for running heads 
@@ -82,10 +85,16 @@ etc.) and the proof that they are well-behaved.
 
 Building on an abstract but nonetheless expressive notion of
 semantics and a universe of syntaxes with binding, we demonstrate
+how to (1) implement these traversals once and for all by generic
+programming, and (2) how to derive their properties by generic proving.
+So, the programmer will never again have to...
+
+Building on an abstract but nonetheless expressive notion of
+semantics and a universe of syntaxes with binding, we demonstrate
 how to implement these traversals once and for all by generic
 programming, and how to derive their properties by generic proving.
 All of this work has been fully formalised in Agda and is available
-at \url{https://github.com/gallais/generic-syntax}.
+at \fbox{REDACTED (see accompanying material)}.
 \end{abstract}
 
 
@@ -145,7 +154,6 @@ multi-channel, radio interference, time synchronization}
 
 \input{syntax}
 
-\bibliographystyle{ACM-Reference-Format}
 \bibliography{main}
 
 \end{document}

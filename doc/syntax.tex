@@ -9,18 +9,18 @@ families of Type Theory~\cite{dybjer1994inductive} for their deep embedding, the
 \emph{statically} enforce some of the invariants present in
 their language. Managing the scope is a popular use case~\cite{altenkirch1999monadic} as
 directly manipulating raw de Bruijn indices is error-prone;
-solutions range from enforced well scopedness to full type
-and scope correctness.
+solutions range from only enforcing well scopedness to ensuring
+full type and scope correctness.
 
 This paper starts with primers on scope safe terms, a scope and type
 safe variant as well as invariant preserving programs acting on them
 and a generic way to represent data types. These introductory sections
 help us build an understanding of the problem at hand as well as a
-toolkit that leads us to the original content of this paper: a universe
+toolkit that leads us to the novel content of this paper: a universe
 of scope safe syntaxes with binding together with a generic notion of
 scope safe semantics for these syntaxes.
-This gives us the opportunity to write generic implementations of renaming,
-substitution but also elaboration of a surface language to a core one,
+This gives us the opportunity to write generic implementations of renaming
+and substitution but also elaboration of a surface language to a core one,
 and normalisation by evaluation. We also explore opportunities for
 generic proving by describing a framework to formally describe what
 it means for a semantics to be able to simulate another one.
@@ -32,7 +32,7 @@ it means for a semantics to be able to simulate another one.
 
 \section{A Primer on Scope Safe Terms}\label{section:primer-term}
 
-Scope safe terms are following a strict discipline which enforces statically
+Scope safe terms follow a strict discipline which enforces statically
 that they may only refer to variables introduced by a binder beforehand. A
 scope safe language is a programming language in which all the valid terms
 are guaranteed to be scope safe.
@@ -42,16 +42,17 @@ and Altenkirch and Reus~\citeyear{altenkirch1999monadic} introduced the
 nowadays classic presentation of scope safe languages using inductive
 \emph{families}~\cite{dybjer1994inductive} to track scoping information
 at the type level. Instead of describing the type of abstract syntax trees
-of the language as the fixpoint of an endofunctor on $\Set{}$, they used
+of the language as the fixpoint of an endofunctor on $\Set{}$, the latter two used
 an endofunctor on $\Set{}^{\Set{}}$ where the $\Set{}$ index corresponds
-to the set of variables in scope. Because the empty Set has no inhabitant,
+to the set of variables in scope. Because the empty $\Set$ has no inhabitant,
 it is a natural representation of the empty scope. Conversely, the functor
 $M(X) = 1 + X$ is used to extend the running scope with an extra variable.
 
 This generic presentation of scope safe languages leads to the following
-definition of the untyped $\lambda$-calculus. The endofunctor
-$T(F) = \lambda X \in \Set{}. X + (F(X) \times F(X)) + F(1 + X)$
-offers a choice of three constructors. The first one corresponds to the variable
+definition of the untyped $\lambda$-calculus:
+$T(F) = \lambda X \in \Set{}.\, X + (F(X) \times F(X)) + F(1 + X)$.
+This endofunctor offers a choice of three constructors.
+The first one corresponds to the variable
 case; it packages an inhabitant of $X$, the index $\Set{}$. The second corresponds
 to an application node; both the function and its argument live in the same
 scope as the overall expression. Last but not least, the third corresponds to
@@ -61,20 +62,23 @@ The language is obtained as the fixpoint of $T$:
    \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
    \lambda X \in \Set{}. X + (F(X) \times F(X)) + F(1 + X)
 \]
-The proof that the fixpoint is functorial then corresponds to renaming
-whilst the proof that it is monadic implements substitution: the variable
-constructor is return, and bind defines parallel substitution.
+The functorial action of the fixpoint corresponds to renaming: map is renaming,
+maping the identity yields the identity and maping the composition of two
+renamings corresponds to maping two consecutive renamings. Similarly, the monadic
+action implements substitution: the variable constructor is return, and bind defines
+parallel substitution; the expected equality constraints correspond to well-known
+results of the equational theory of substitution.
 
 \subsection{A Mechanized Typed Variant of Altenkirch and Reus' Calculus}
 
 There is no reason to restrict this technique to fixpoints of endofunctors
-on $\Set{}^{\Set{}}$ apart from the fact that renaming and substitution
-correspond to well-known structures in that specific case. The more general
+on $\Set{}^{\Set{}}$. The more general
 case of fixpoints of (strictly positive) endofunctors on $\Set{}^J$ can be
 endowed with similar operations by using what Altenkirch, Chapman and
 Uustalu~\citeyear{Altenkirch2010, JFR4389} refer to as relative monads.
 
-In this paper, we pick $J = \mathit{List} I$ which is straightforwardly the list
+In this paper, we pick $J$ the category whose objects are $\mathit{List} I$ and whose
+morphisms are thinnings (see Section~\ref{def:thinning}). This $\mathit{List} I$ is straightforwardly the list
 of the sort (/ kind / types depending on the application) of the de Bruijn variables
 in scope. We can recover an untyped approach by picking $I$ to be the unit type.
 Because of this typed setting, our functors will actually take an extra $I$ argument
@@ -95,20 +99,24 @@ families~\cite{dybjer1994inductive} ought to do.
 In order to lighten the presentation, we weaponise the observation that the
 current scope is either threaded to subterms (e.g. in the application's case)
 or adjusted (e.g. in the $\lambda$-abstraction's case) by introducing combinators
-to build indexed types. Although it may seem surprising at first to define
-infix operators of arity three, they are meant to be used partially applied,
-surrounded by \AF{[\_]} which turns an indexed Set into a Set by implicitly
-quantifying over the index. The first two combinators are the pointwise liftings
+to build indexed types.
+
+The first two combinators \AF{\_⟶\_} and \AF{\_∙×\_} are the pointwise liftings
 of the function space and the product type respectively, both silently threading
-the underlying scope. The third one is simply the constant function turning a Set
-into an indexed Set by ignoring the index. The fourth one makes explicit
+the underlying scope. The third one \AF{\_⊢\_} makes explicit
 the \emph{adjustment} made to the index by a function. We use Agda's mixfix
 operator notation (where underscores denote argument positions) to suggest its
 connection to the mathematical convention of only mentioning context \emph{extensions}
 when presenting judgements (see e.g. \cite{martin1982constructive}) and write
 \AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed set
-it operates on. The last one implicitly quantifies over the index,
-turning a family into a Set.
+it operates on. Although it may seem surprising at first to define binary
+infix operators as having arity three, they are meant to be used partially applied,
+surrounded by \AF{[\_]} which turns an indexed Set into a Set by implicitly
+quantifying over the index.
+
+The fourth one is simply the constant function turning a Set into an indexed Set
+by ignoring the index. The last one implicitly quantifies over the index, turning
+a family into a Set.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -118,12 +126,12 @@ turning a family into a Set.
 \ExecuteMetaData[indexed.tex]{product}
 \end{minipage}
 
-\begin{minipage}{0.25\textwidth}
-\ExecuteMetaData[indexed.tex]{constant}
-\end{minipage}
 \begin{minipage}{0.40\textwidth}
 \ExecuteMetaData[indexed.tex]{adjust}
 \end{minipage}\hspace{2em}
+\begin{minipage}{0.25\textwidth}
+\ExecuteMetaData[indexed.tex]{constant}
+\end{minipage}
 \begin{minipage}{0.25\textwidth}
 \ExecuteMetaData[indexed.tex]{forall}
 \end{minipage}
@@ -178,7 +186,7 @@ This type and scope safe deep embedding of the simply typed $\lambda$-calculus i
 naturally only a start: once the programmer has access to a good
 representation of the language she is interested in, she wants and
 needs to (re)implement standard traversals manipulating terms.
-Renaming and substitution are perhaps the two most iconic examples
+Renaming and substitution are perhaps the two most typical examples
 of such traversals. And now that well typedness and scopedness is enforced in
 the terms' indices, all of these traversals have to be implemented
 in a type and scope safe manner. These constraints show up in the type of
@@ -221,7 +229,7 @@ demonstrate that typechecking in the style of Atkey~\citeyear{atkey2015algebraic
 fits in that framework. To make sense of this body of work, we
 need to introduce three new notions: \AF{Thinning}s, the \AF{□} functor and
 \AF{Thinnable}s.
-
+\label{def:thinning}
 \begin{figure}[h]
 \ExecuteMetaData[environment.tex]{thinning}
 \caption{Thinnings: A Special Case of Environments}
@@ -239,8 +247,10 @@ The \AF{□} combinator turns any (\AD{List} \AB{I})-indexed Set into one that c
 thinnings. It is akin to Kripke-style quantification over all possible future
 worlds and \AF{□} (\AB{D} \AF{→} \AB{D}) indeed corresponds to the Kripke
 function space used in normalisation by evaluation via a domain \AB{D}.
-Because we can define an identity \AF{Thinning} and \AF{Thinning}s do
-compose, \AF{□} is a comonad.
+Last but not least \AF{□} is a comonad: \AF{extract} applies the identity \AF{Thinning}
+to its argument, and \AF{duplicate} is obtained by composing the two \AF{Thinning}s
+we are given. The expected laws hold trivially thanks ot Jeffrey's trick mentionned
+above.
 
 The notion of \AF{Thinnable} is the property of being stable under thinnings;
 in other words \AF{Thinnable}s are the coalgebras of \AF{□}.
@@ -272,7 +282,7 @@ computations in $\mathcal{C}$ is meant to give rise to a
 traversal which, provided a term and an environment of values
 for each one of the variables in scope, delivers a computation.
 
-A Semantics is characterised by a set of constraints on the notions of
+A Semantics must satisfy constraints on the notions of
 values $\mathcal{V}$ and computations $\mathcal{C}$ at hand. First of all,
 values should be thinnable so that \AF{sem} may push the environment
 under binders. Second, the set of computations needs to be closed
@@ -284,7 +294,7 @@ the Kripke function space one can find in normalisation by evaluation.
 In all possible thinnings of the scope at hand, it promises to deliver
 a computation whenever it is provided with a value for its newly
 bound variable. This is concisely expressed by the type
-(\AF{□} (\AB{\mathcal{V}} \AF{→} \AB{\mathcal{C}})).
+(\AF{□} (\AB{\mathcal{V}} \AB{\sigma} \AF{→} \AB{\mathcal{C}} \AB{\tau})).
 
 \begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{rsem}
@@ -362,7 +372,7 @@ semantical combinators are related to the corresponding constructors
 where the recursive occurences of the inductive family have been replaced
 with either a computation or a Kripke function space whenever an
 extra variable was bound. This suggests that it ought to be possible
-to compute the definition of \AF{Sem} from the datatype's.
+to compute the definition of \AF{Sem} from the datatype.
 
 
 
