@@ -26,11 +26,9 @@ data Type : Set where
   _⇒_ : Type → Type → Type
 
 data TermC : Set where
-  Lam  : Type → Type → TermC
-  App  : Type → Type → TermC
-  InL  : Type → Type → TermC
-  InR  : Type → Type → TermC
-  Cas  : Type → Type → Type → TermC
+  Lam App  : Type → Type → TermC
+  InL InR  : Type → Type → TermC
+  Cas      : Type → Type → Type → TermC
 
 TermD : Desc Type
 TermD =  `σ TermC λ where

@@ -19,19 +19,34 @@ open import Relation.Binary.PropositionalEquality hiding ([_]); open ≡-Reasoni
 -- a clearer definition as well as storing the needed type arguments in
 -- the constructor itself rather than having to use multiple extra `σ
 -- constructors in the Desc.
-
+\end{code}
+%<*termtype>
+\begin{code}
 data Type : Set where
-  α   : Type
-  _⇒_ : Type → Type → Type
+  α    : Type
+  _⇒_  : Type → Type → Type
+\end{code}
+%</termtype>
+\begin{code}
 
+\end{code}
+%<*termtag>
+\begin{code}
 data TermC : Set where
-  Lam App : Type → Type → TermC
+  Lam  : Type → Type → TermC
+  App  : Type → Type → TermC
+\end{code}
+%</termtag>
 
+%<*termdesc>
+\begin{code}
 TermD : Desc Type
 TermD =  `σ TermC λ where
   (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
   (App σ τ) → `X [] (σ ⇒ τ) (`X [] σ (`∎ τ))
-
+\end{code}
+%</termdesc>
+\begin{code}
 Term : Type ─Scoped
 Term = Tm TermD _
 
@@ -61,12 +76,6 @@ data _⊢_∋_↝_ Γ : ∀ τ → Term τ Γ → Term τ Γ → Set where
   [λ]  : ∀ {σ τ t u} → (σ ∷ Γ) ⊢ τ ∋ t ↝ u → Γ ⊢ σ ⇒ τ ∋ `λ t ↝ `λ u
   [∙]₁ : ∀ {σ τ t u} f → Γ ⊢ σ ∋ t ↝ u → Γ ⊢ τ ∋ f `∙ t ↝ f `∙ u
   [∙]₂ : ∀ {σ τ f g} → Γ ⊢ σ ⇒ τ ∋ f ↝ g → ∀ t → Γ ⊢ τ ∋ f `∙ t ↝ g `∙ t
-
-src : ∀ {σ Γ s t} → Γ ⊢ σ ∋ s ↝ t → Term σ Γ
-src {s = src} _ = src
-
-tgt : ∀ {σ Γ s t} → Γ ⊢ σ ∋ s ↝ t → Term σ Γ
-tgt {t = tgt} _ = tgt
 
 _⊢_∋_↝⋆_ : ∀ Γ σ → Term σ Γ → Term σ Γ → Set
 Γ ⊢ σ ∋ t ↝⋆ u = Star (Γ ⊢ σ ∋_↝_) t u
