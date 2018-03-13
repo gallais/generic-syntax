@@ -413,23 +413,19 @@ mutual
  th^↝SN ρ ([∙]₂ r t)   = [∙]₂ (th^↝SN ρ r) (ren ρ t)
 
 -- Lemma 4.12 Anti-Thinning
+\end{code}
+%<*antithinning>
+\begin{code}
 mutual
 
  -- 1.
  th⁻¹^SN : ∀ {σ Γ Δ t′} t ρ → t′ ≡ ren ρ t → Δ ⊢SN σ ∋ t′ → Γ ⊢SN σ ∋ t
- th⁻¹^SN (`var v) ρ refl (red r pr) =
-   let (v′ , eq , r′) = th⁻¹^↝SN (`var v) ρ r
-   in red r′ (th⁻¹^SN v′ ρ eq pr)
- th⁻¹^SN (f `∙ t) ρ refl (red r pr) =
-   let (ft′ , eq , r′) = th⁻¹^↝SN (f `∙ t) ρ r
-   in red r′ (th⁻¹^SN ft′ ρ eq pr)
- th⁻¹^SN (`λ t)   ρ refl (red r pr) =
-   let (λt′ , eq , r′) = th⁻¹^↝SN (`λ t) ρ r
-   in red r′ (th⁻¹^SN λt′ ρ eq pr)
- th⁻¹^SN (`var v) ρ eq   (neu pr) = neu (th⁻¹^SNe _ ρ eq pr)
- th⁻¹^SN (f `∙ t) ρ eq   (neu pr) = neu (th⁻¹^SNe _ ρ eq pr)
- th⁻¹^SN (`λ t)   ρ refl (lam pr) = lam (th⁻¹^SN t _ refl pr)
- th⁻¹^SN (`λ t)   ρ refl (neu ())
+ th⁻¹^SN t        ρ eq    (neu pr)    = neu (th⁻¹^SNe t ρ eq pr)
+ th⁻¹^SN (`λ t)   ρ refl  (lam pr)    = lam (th⁻¹^SN t _ refl pr)
+ th⁻¹^SN t        ρ refl  (red r pr)  =
+   let (t′ , eq , r′) = th⁻¹^↝SN t ρ r in red r′ (th⁻¹^SN t′ ρ eq pr)
+ th⁻¹^SN (`var v) ρ ()    (lam pr)
+ th⁻¹^SN (f `∙ t) ρ ()    (lam pr)
 
  -- 2.
  th⁻¹^SNe : ∀ {σ Γ Δ t′} t ρ → t′ ≡ ren ρ t → Δ ⊢SNe σ ∋ t′ → Γ ⊢SNe σ ∋ t
@@ -439,6 +435,9 @@ mutual
 
  -- 3.
  th⁻¹^↝SN : ∀ {σ Γ Δ u} t ρ → Δ ⊢ σ ∋ ren ρ t ↝SN u → ∃ λ u′ → u ≡ ren ρ u′ × Γ ⊢ σ ∋ t ↝SN u′
+\end{code}
+%</antithinning>
+\begin{code}
  th⁻¹^↝SN (`var v) ρ ()
  th⁻¹^↝SN (`λ b)   ρ ()
  th⁻¹^↝SN (`λ b `∙ t) ρ (β ._ ._ t^SN) = b [ t /0] , sym (renβ TermD b t ρ) , β b t (th⁻¹^SN t ρ refl t^SN)
