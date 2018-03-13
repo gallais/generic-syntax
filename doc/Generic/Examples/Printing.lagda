@@ -110,7 +110,7 @@ module _ {I : Set} {d : Desc I} where
 
 open import Generic.Examples.UntypedLC
 
-printLC : Display LCD
+printLC : Display UTLC
 getD printLC = case (λ { (f , t , _)    → f ++ "(" ++ t ++ ")" })
                     (λ { ((x , b) , _)  → "λ" ++ lookup x z ++ ". " ++ b })
 

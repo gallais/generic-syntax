@@ -70,10 +70,12 @@ open import Generic.Examples.UntypedLC
 \end{code}
 %<*nbelc>
 \begin{code}
-norm^LC : [ LC ⟶ Maybe ∘ LC ]
+norm^LC : [ Tm UTLC ∞ tt ⟶ Maybe ∘ Tm UTLC ∞ tt ]
 norm^LC = norm $ case app (C ∘ (false ,_)) where
 
-  app : [ ⟦ `X [] tt (`X [] tt (`∎ tt)) ⟧ (Kripke (Dm LCD ∞) (Dm LCD ∞)) tt ⟶ Dm LCD ∞ tt ]
+  Model = Dm UTLC ∞
+
+  app : [ ⟦ `X [] tt (`X [] tt (`∎ tt)) ⟧ (Kripke Model Model) tt ⟶ Model tt ]
   app (C (false , f , _)  , t  , _) = f (base vl^Var) (ε ∙ t)  -- redex
   app (f                  , t  , _) = C (true , f , t , refl)  -- stuck application
 \end{code}

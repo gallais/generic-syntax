@@ -14,20 +14,14 @@ open import var
 open import Generic.Syntax
 
 \end{code}
-%<*LCD>
+%<*ULC>
 \begin{code}
-LCD : Desc ⊤
-LCD =  `σ Bool $ λ isApp → if isApp
-       then `X [] tt (`X [] tt (`∎ tt))
-       else `X (tt ∷ []) tt (`∎ tt)
+UTLC : Desc ⊤
+UTLC =  `σ Bool $ λ isApp → if isApp
+        then `X [] tt (`X [] tt (`∎ tt))
+        else `X (tt ∷ []) tt (`∎ tt)
 \end{code}
-%</LCD>
-%<*LC>
-\begin{code}
-LC : List ⊤ → Set
-LC = Tm LCD ∞ tt
-\end{code}
-%</LC>
+%</ULC>
 %<*LCpat>
 \begin{code}
 pattern `V x    = `var x
@@ -37,7 +31,7 @@ pattern `L b    = `con (false , b , refl)
 %</LCpat>
 %<*LCid>
 \begin{code}
-`id : LC []
+`id : Tm UTLC ∞ tt []
 `id = `L (`V z)
 \end{code}
 %</LCid>

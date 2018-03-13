@@ -313,7 +313,7 @@ into a computation $\mathcal{C}$.
 
 Coming back to renaming and substitution, we can see that they both fit
 in the \AR{Sem} framework. We can notice that the definition of Substitution
-depends on the Renaming one: to be able to push terms under binder, we
+depends on the definition of Renaming: to be able to push terms under binder, we
 need to have already proven that they are thinnable.
 
 \begin{figure}[h]
@@ -379,7 +379,7 @@ to compute the definition of \AF{Sem} from the datatype.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DATATYPES
 
-\section{A Primer on the Universe of Data Types}
+\section{A Primer on the Universe of Data Types}\label{sec:data}
 
 Chapman, Dagand, McBride and Morris~\citeyear{Chapman:2010:GAL:1863543.1863547}
 defined a universe of data types inspired by Dybjer and Setzer's
@@ -393,9 +393,9 @@ representation of syntaxes with binding.
 
 The first component of this universe's definition is an inductive type
 of \AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to
-$\Set{}^I$. It has three constructors: one to store data (the rest of
-the description can depend upon this stored value), one to attach a
-recursive substructure indexed by $J$ and one to stop, enforcing the
+$\Set{}^I$. It has three constructors: \AIC{`σ} to store data (the rest of
+the description can depend upon this stored value), \AIC{`X} to attach a
+recursive substructure indexed by $J$ and \AIC{`∎} to stop, enforcing the
 value of the index the current structure uses.
 
 The recursive function \AF{⟦\_⟧} makes the interpretation of the
@@ -415,10 +415,10 @@ terminated right nested tuples of stored data and substructures.
 These constructors give the programmer the ability to build up the data
 types she is used to, using a dummy index of unit type whenever she does
 not need the extra expressivity. For instance, the functor corresponding
-to lists of elements in $A$ stores one bit of data: whether the current
-node is the empty list or not. Depending on that bit, the rest of the
-description is either the ``stop'' token or a pair of an element in $A$
-and a recursive substructure i.e. the tail of the list.
+to lists of elements in $A$ stores a \AD{Bool}ean which stands for whether
+the current node is the empty list or not. Depending on that value, the
+rest of the description is either the ``stop'' token or a pair of an element
+in $A$ and a recursive substructure i.e. the tail of the list.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Data.tex]{listD}
@@ -428,7 +428,7 @@ and a recursive substructure i.e. the tail of the list.
 But she can also use the index to enforce invariants as in the definition
 of the base functor for the \AD{Vec} \AB{A} \AB{n} inductive family of
 length-indexed lists. It has the same structure as the definition of \AF{listD}.
-We start with a bit of data distinguishing the two constructors: either
+We start with a \AF{Bool}ean distinguishing the two constructors: either
 the empty list (in which case the branch's index is enforced to be $0$) or a
 non-empty one in which case we store a natural number \AB{n}, the head of type
 \AB{A} and a tail of size \AB{n} (and the branch's index is enforced to be
@@ -439,21 +439,22 @@ non-empty one in which case we store a natural number \AB{n}, the head of type
 \caption{The Description of the base functor for \AD{Vec} \AB{A} \AB{n}}\label{figure:vecD}
 \end{figure}
 
-After implementing \AF{⟦\_⟧}, which acts on the objects of $\Set{}^J$, we can
-define the function \AF{fmap} by recursion over a code \AB{d}. It describes
-the action of the functor corresponding to \AB{d} over morphisms in $\Set{}^J$.
-This is the first example of generic programming over all the functors one can
-obtain as the meaning of a description.
+Now that we have seen a a few examples of descriptions we are ready to define
+a generic program over them. The decoding function \AF{⟦\_⟧} acted on the objects
+of $\Set{}^J$, and we will now define the function \AF{fmap} by recursion over a
+code \AB{d}. It describes the action of the functor corresponding to \AB{d} over
+morphisms in $\Set{}^J$. This is the first example of generic programming over all
+the functors one can obtain as the meaning of a description.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Data.tex]{fmap}
-\caption{Action on Arrows of the Functor corresponding to a \AF{Descr}iption}
+\caption{Action on Morphisms of the Functor corresponding to a \AF{Descr}iption}
 \end{figure}
 
 All the functors obtained as meanings of \AD{Desc}riptions are strictly
 positive. So we can build the least fixpoint of the ones that are endofunctors
 (i.e. the ones for which $I$ equals $J$). This fixpoint is called \AD{μ}
-and its initiality is proven by the definition of \AF{fold} \AB{d}.
+and its iterator is given by the definition of \AF{fold} \AB{d}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Data.tex]{mu}
@@ -520,13 +521,16 @@ which make our types much more readable.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{interp}
-\caption{Decsription's Meanings as ``Functors''}
+\caption{Descriptions' Meanings}
 \end{figure}
 
 If we pre-compose the meaning function \AF{⟦\_⟧} with a notion of `de Bruijn scopes'
 (denoted \AF{Scope} here) which turns any \AB{I} \AF{─Scoped} family into a function
 of type \AD{List} \AB{I} \AS{→} \AB{I} \AF{─Scoped} by simply appending the two
-\AD{List} indices, we recover a meaning function producing an endofunctor on \AB{I} \AF{─Scoped}.
+\AD{List} indices, we recover a meaning function producing an endofunctor on
+\AB{I} \AF{─Scoped}. So far we have only shown the action of the functor on objects;
+its action on morphisms is given by a function \AF{fmap} defined by induction over
+the description just like in Section~\ref{sec:data}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{scope}
@@ -553,13 +557,13 @@ The variable case will be added by the free monad construction so we
 only have to describe two constructors: application where we have two
 substructures which do not bind any extra argument and $\lambda$-abstraction
 which has exactly one substructure with precisely one extra bound variable.
-In the untyped case a single bit is enough to distinguish the two constructors
+In the untyped case a single \AD{Bool}ean is enough to distinguish the two constructors
 whilst in the typed case, we need our tags to carry extra information about the
 types involved so we use the ad-hoc \AD{`STLC} type.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCD}
+  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{ULC}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
@@ -600,13 +604,12 @@ of recursive positions.
 
 \subsection{Common Combinators and Their Properties}\label{desccomb}
 
-As seen previously, we can take the coproduct \AF{\_`+\_} of two
-descriptions by using a dependent pair whose first component
-stores a \AF{Bool}ean tagging which branch was taken whilst
-the second one uses that information to return the description
-corresponding to that branch. We can define an appropriate
-eliminator \AF{case} which given two continuations picks the
-one corresponding to the chosen branch.
+As seen previously, we can use a dependent pair whose first component
+is a \AF{Bool}ean to take the coproduct of two descriptions: depending
+on the value of the first component, we will return one or the other.
+We can abstract this common pattern as a combinator \AF{\_`+\_} together
+with an appropriate eliminator \AF{case} which, given two continuations,
+picks the one corresponding to the chosen branch.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -615,7 +618,7 @@ one corresponding to the chosen branch.
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
-\caption{Descriptions are closed under Sums}
+\caption{Descriptions are closed under Sum}
 \end{figure}
 
 Closure under product does not hold in general. Indeed, the
@@ -653,7 +656,7 @@ semantics for all syntax descriptions. It is once more parametrised
 by two \AB{I}\AF{─Scoped} families \AB{𝓥} and \AB{𝓒} corresponding
 respectively to values associated to bound variables and
 computations delivered by evaluating terms. These two families
-have to abide by three constraints
+have to abide by three constraints:
 \begin{itemize}
 \item Values should be thinnable so that we can push the
       evaluation environment under binders;
@@ -755,7 +758,7 @@ semantics with \AF{Var} as values and \AD{Tm} as computations. The
 two first constraints on \AF{Var} described earlier are trivially
 satisfied. Because renaming strictly respects the structure of the
 term it goes through, the algebra is implemented using \AF{fmap}.
-When dealing with the body a binder, we simply `reify' the
+When dealing with the body of a binder, we simply `reify' the
 \AF{Kripke} function by evaluating it in an extended context and
 feeding it dummy values corresponding to the extra variables
 introduced by that context. This is reminiscent both of what we
@@ -763,11 +766,11 @@ did in Section~\ref{section:primer-program} and the definition
 of reification in the setting of normalisation by evaluation
 (see e.g. Coquand's work~\citeyear{coquand2002formalised}).
 
-Substitution can be defined in a similar manner. Of the two
-constraints applying to terms as values, the first one corresponds
-precisely to renaming and the second one is trivial. The algebra
-can once more be defined by using \AF{fmap} and reifying the bodies
-of binders.
+Substitution can be defined in a similar manner with \AD{Tm} as both
+values and computations. Of the two constraints applying to terms as
+values, the first one corresponds precisely to renaming and the second
+one is trivial. The algebra can once more be defined by using \AF{fmap}
+and reifying the bodies of binders.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -789,11 +792,11 @@ and such that we can craft dummy ones in non-empty contexts.
 \caption{\AR{VarLike}: \AF{Thinnable} and with dummy values}
 \end{figure}
 
-Because for any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh^{r}} of
+For any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh^{r}} of
 type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})} and \AF{fresh^{l}} of
 type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Γ} \AF{++} \AB{Δ})} by combining the use
 of dummy variables and thinnings, and we can very easily prove that variables
-are \AR{VarLike} we can then write \AF{reify} like so:
+are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{reify}
@@ -821,9 +824,9 @@ an existing language.
 
 Let bindings allow the user to avoid repeating herself by naming
 sub-expressions and then using these names to refer to the associated
-terms. Preprocessors adding these type of mechanisms to existing
-languages (from C to CSS) are rather popular. We introduce \AF{Let},
-a description of such let bindings which can be used to extend any
+terms. Preprocessors adding these types of mechanisms to existing
+languages (from C to CSS) are rather popular. We introduce a
+description of \AD{Let}-bindings which can be used to extend any
 language description \AB{d} to \AF{Let} \AF{`+} \AB{d}:
 
 \begin{figure}[h]
