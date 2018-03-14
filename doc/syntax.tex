@@ -150,7 +150,7 @@ can readily use these combinators to thread, modify or quantify over the
 scope when defining such families:
 
 \begin{figure}[h]
-\begin{minipage}{0.40\textwidth}
+\noindent\begin{minipage}{0.40\textwidth}
 \ExecuteMetaData[var.tex]{var}
 \end{minipage}
 \begin{minipage}{0.5\textwidth}
@@ -167,8 +167,8 @@ name for a variable in a given scope into a name for it in the extended scope wh
 an extra variable has been bound. Both of their types have been written using combinators.
 Although we will abstain from unfolding them in the future, we do so here in the hope
 it will help the reader get acquainted with them: they respectively normalise to
-$\forall i, xs. \mathbf{Var}(i, i :\!: \mathit{xs})$ for \AIC{z},
-and $\forall i, j, xs. \mathbf{Var}(i, \mathit{xs}) \rightarrow \mathbf{Var}(i, j :\!: \mathit{xs})$ for \AIC{s}.
+{\AS{∀} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{i} \AIC{:\!:} \AB{xs})} for \AIC{z},
+and {\AS{∀} \AB{i} \AB{j} \AB{xs} → \AD{Var} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{j} \AIC{:\!:} \AB{xs})} for \AIC{s}.
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is the simply typed variant of Altenkirch
 and Reus' untyped $\lambda$-calculus. The two interesting constructors are the one
