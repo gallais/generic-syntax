@@ -44,7 +44,7 @@ nowadays classic presentation of scope safe languages using inductive
 at the type level. Instead of describing the type of abstract syntax trees
 of the language as the fixpoint of an endofunctor on $\Set{}$, the latter two used
 an endofunctor on $\Set{}^{\Set{}}$ where the $\Set{}$ index corresponds
-to the set of variables in scope. Because the empty $\Set$ has no inhabitant,
+to the set of variables in scope. As the empty $\Set$ has no inhabitant,
 it is a natural representation of the empty scope. Conversely, the functor
 $M(X) = 1 + X$ is used to extend the running scope with an extra variable.
 
@@ -81,7 +81,7 @@ In this paper, we pick $J$ the category whose objects are $\mathit{List} I$ and 
 morphisms are thinnings (see Section~\ref{def:thinning}). This $\mathit{List} I$ is straightforwardly the list
 of the sort (/ kind / types depending on the application) of the de Bruijn variables
 in scope. We can recover an untyped approach by picking $I$ to be the unit type.
-Because of this typed setting, our functors will actually take an extra $I$ argument
+Given this typed setting, our functors will actually take an extra $I$ argument
 corresponding to the type of the expression being built. This is summed up by
 the large type \AB{I}\AF{─Scoped}:
 
@@ -145,7 +145,7 @@ the compact expression
 desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
-Because the context comes second in the definition of \AF{\_─Scoped}, we
+As the context comes second in the definition of \AF{\_─Scoped}, we
 can readily use these combinators to thread, modify or quantify over the
 scope when defining such families:
 
@@ -538,7 +538,7 @@ the description just like in Section~\ref{sec:data}.
 \end{figure}
 
 The endofunctors thus defined are strictly positive and we can take their fixpoints.
-Because we want to define the terms of a language with variables, instead of
+As we want to define the terms of a language with variables, instead of
 considering the initial algebra, this time we opt for the free relative
 monad~\cite{JFR4389} (with respect to the functor \AF{Var}): the \AIC{`var}
 constructor corresponds to return, and we will define bind (also known as
@@ -745,7 +745,7 @@ produces an environment {(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}
 \caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}
 \end{figure}
 
-Because \AF{fmap} introduces one level of indirection between the
+Given that \AF{fmap} introduces one level of indirection between the
 recursive calls and the subterms they are acting upon, the fact
 that our terms are indexed by a \AF{Size} is once more crucial in
 getting the termination checker to see that our proof is indeed
@@ -756,8 +756,8 @@ trivially well-founded.
 Renaming can be defined generically for all syntax descriptions as a
 semantics with \AF{Var} as values and \AD{Tm} as computations. The
 two first constraints on \AF{Var} described earlier are trivially
-satisfied. Because renaming strictly respects the structure of the
-term it goes through, the algebra is implemented using \AF{fmap}.
+satisfied. Observing that renaming strictly respects the structure of the
+term it goes through, it makes sense for the algebra to be implemented using \AF{fmap}.
 When dealing with the body of a binder, we simply `reify' the
 \AF{Kripke} function by evaluating it in an extended context and
 feeding it dummy values corresponding to the extra variables
@@ -915,7 +915,7 @@ a step-indexed approach.
 
 But this domain does make it possible to define a generic \AF{nbe}
 semantics which, given a term, produces a value in the reflexive
-domain. Because we have picked a universe of finitary syntaxes, we
+domain. Thanks to the fact we have picked a universe of finitary syntaxes, we
 can \emph{traverse}~\cite{mcbride_paterson_2008} the functor to define
 a (potentially failing) reification function turning elements of the
 reflexive domain into terms. By composing them, we obtain the
@@ -1030,7 +1030,7 @@ demonstrated how Altenkirch and Reus' type-level de Bruijn
 indices~\citeyear{altenkirch1999monadic} can be used to represent
 potentially cyclic structures by a finite object. In their
 representation each bound variable is a pointer to the node
-that introduced it. Because we are, at the top-level, only
+that introduced it. Given that we are, at the top-level, only
 interested in structures with no ``dangling pointers'', we introduce
 the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
 \AD{Tm} \AB{d} \AF{∞} \AIC{[]}).
@@ -1062,9 +1062,9 @@ function which takes a closed tree, exposes its top node and
 unrolls any cycle which has it as its starting point. We can
 decompose it using the \AF{plug} function which, given a closed
 and an open term, closes the latter by plugging the former at
-each free \AIC{`var} leaf. Because \AF{plug}'s fundamental nature
-is that of substituting a term for each leaf, it can naturally
-be implemented using \AF{Substitution}.
+each free \AIC{`var} leaf. Noticing that \AF{plug}'s fundamental nature
+is that of substituting a term for each leaf, it makes sense to
+implement it by re-using the \AF{Substitution} semantics we already have.
 
 \begin{figure}[h]
 \begin{minipage}{0.52\textwidth}
@@ -1257,12 +1257,12 @@ representation of intrisically well-typed and well-scoped terms we directly inhe
 not only renaming and substitution but also all four fusion lemmas as corollaries
 of our generic results. This allows us to shave off a lot of the usual boilerplate
 and go straight to the point.
-Because all of these statements have precisely the same structure, we can
+As all of these statements have precisely the same structure, we can
 once more devise a framework which will, provided that its constraints are
 satisfied, prove a generic fusion lemma.
 
-Because fusion is quite a bit more involved than simulation, we will step through
-each one of the constraints one by one, trying to give the reader an intuition
+Fusion is quite a bit more involved than simulation so we will step through
+each one of the constraints individually, trying to give the reader an intuition
 for why they are shaped the way they are.
 
 \subsubsection{The Fusion constraints}
@@ -1428,7 +1428,7 @@ in formal systems has been a hot topic for decades. Part of the purpose
 of the first POPLMark challenge~\citeyear{poplmark} was to explore and
 compare various methods. Our generic universe of syntax is based on
 scope-and-typed de Bruijn indices~\cite{de1972lambda} but it is not
-a vital necessity. It is for instance possible to give an interpretation
+a necessity. It is for instance possible to give an interpretation
 of \AD{Desc}ripton corresponding to Chlipala's Parametric Higher-Order
 Abstract Syntax~\citeyear{chlipala2008parametric} and we would be interested
 to see what the appropriate notion of Semantics is for this representation.
@@ -1484,23 +1484,24 @@ in specialised forms by Needle once and for all as a set of generic programs.
 They see the existence of Needle as a pragmatic choice: working directly with
 the free monadic terms over finitary containers would be too cumbersome. In
 our experience solving the POPLMark reloaded challenge, Agda's pattern
-synonym~\cite{Pickering:patsyn} make working with an encoded definition almost
+synonyms~\cite{Pickering:patsyn} make working with an encoded definition almost
 seamless.
 
-The GMeta generic framework~\citeyear{gmeta} does provide a universe of syntaxes
+The GMeta generic framework~\citeyear{gmeta} provides a universe of syntaxes
 and offers various binding conventions (locally nameless~\cite{Charguéraud2012}
 or de Bruijn indices). It also generically implements common traversals (computing
 the sets of free / bound variables, measuring the size of a term, shifting
 de Bruijn indices or substituting terms for parameters) as well as common
-predicates (e.g. being a closed term) and provide generic lemmas proving that
+predicates (e.g. being a closed term) and provides generic lemmas proving that
 all of these are well-behaved. It does not however offer a generic framework
 for defining new well-scoped-and-typed semantics and proving that they are
 well-behaved.
 
-Érdi~\citeyear{gergodraft} defines a universe inspired by ours and gives three
-different interpretations corresponding to raw, scoped and typed syntax
-which are related via erasure. He provides scope-and-type preserving renaming
-and substitution as well as various generic proofs that they are well-behaved.
+Érdi~\citeyear{gergodraft} defines a universe inspired by a first draft of this
+paper and gives three different interpretations corresponding to raw, scoped
+and typed syntax which are related via erasure. He provides scope-and-type
+preserving renaming and substitution as well as various generic proofs that
+they are well-behaved.
 
 Copello~\citeyear{copello2017} sets out to work with \emph{named} binders and
 defines nominal techniques (such as name swapping) and ultimately $\alpha$-equivalence
