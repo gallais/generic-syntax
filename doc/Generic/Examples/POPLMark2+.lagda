@@ -530,7 +530,7 @@ cut-∘C t (cas c l r) c′ = cong (λ t → `case t l r) (cut-∘C t c c′)
 
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
 
-infix 5 _⊢_∋_↝SN_<_ _⊢SN_∋_<_ _⊢SNe_∋_<_
+infix 4 _⊢_∋_↝SN_<_ _⊢SN_∋_<_ _⊢SNe_∋_<_
 data _⊢_∋_↝SN_<_ Γ τ : Term τ Γ → Term τ Γ → Size → Set
 data _⊢SN_∋_<_ (Γ : List Type) : (σ : Type) → Term σ Γ → Size → Set
 data _⊢SNe_∋_<_ (Γ : List Type) : (σ : Type) → Term σ Γ → Size → Set
@@ -560,7 +560,7 @@ data _⊢SNe_∋_<_ Γ where
   cas : ∀ {σ τ ν t l r i} → Γ ⊢SNe σ + τ ∋ t < i →
         (σ ∷ Γ) ⊢SN ν ∋ l < i → (τ ∷ Γ) ⊢SN ν ∋ r < i → Γ ⊢SNe ν ∋ `case t l r < ↑ i
 
-infix 5 _⊢_∋_↝SN_ _⊢SN_∋_ _⊢SNe_∋_
+infix 4 _⊢_∋_↝SN_ _⊢SN_∋_ _⊢SNe_∋_
 _⊢_∋_↝SN_ = _⊢_∋_↝SN_< _
 _⊢SN_∋_ = _⊢SN_∋_< _
 _⊢SNe_∋_ = _⊢SNe_∋_< _
@@ -863,28 +863,58 @@ _∙^𝓡_ : ∀ {σ τ Γ f t} → Γ ⊢𝓡 σ ⇒ τ ∋ f → Γ ⊢𝓡 σ
 _∙^𝓡_ {σ} {τ} {Γ} {f} {t} f^𝓡 t^𝓡 = cast (f^𝓡 (base vl^Var) t^𝓡)
   where cast = subst (λ f → Γ ⊢𝓡 τ ∋ f `∙ t) (ren-id f)
 
-reify^𝓡 : ∀ σ τ {Γ Δ} (l : Term τ (σ ∷ Γ)) {ρ : (Γ ─Env) Term Δ} →
-  pred.∀[ 𝓡^P ] ρ → Kripke^P 𝓡^P 𝓡^P (σ ∷ []) τ (Sem.body Substitution ρ (σ ∷ []) τ l) →
+reify^𝓡 : ∀ σ τ {Γ Δ i} (l : Tm TermD i τ (σ ∷ Γ)) (ρ : (Γ ─Env) Term Δ) →
+  Kripke^P 𝓡^P 𝓡^P (σ ∷ []) τ (Sem.body Substitution ρ (σ ∷ []) τ l) →
   (σ ∷ Δ) ⊢SN τ ∋ sub (lift vl^Tm (σ ∷ []) ρ) l
-reify^𝓡 σ τ l ρ^P l^P =
-  let ih = quote^𝓡 τ (l^P (extend {σ = σ}) (ε^P ∙^P unquote^𝓡 σ (var z))) in
-  subst (_ ⊢SN _ ∋_) (Sim.sim SubExt {!!} l) ih
+reify^𝓡 σ τ l ρ l^P = cast (quote^𝓡 τ val) where
 
-case^𝓡 : ∀ {σ τ ν Γ Δ} (t : Term (σ + τ) Δ) l r {ρ : (Γ ─Env) Term Δ} →
-  pred.∀[ 𝓡^P ] ρ → Δ ⊢𝓡 σ + τ ∋ t →
+  val  = l^P extend (ε^P ∙^P unquote^𝓡 σ (var z))
+
+  sub^R : rel.∀[ Eq^R ] _ (lift vl^Tm (σ ∷ []) ρ)
+  lookup^R sub^R z      = refl
+  lookup^R sub^R (s v)  = Sim.sim RenExt extend-is-fresh (lookup ρ v)
+
+  cast = subst (_ ⊢SN _ ∋_) (Sim.sim SubExt sub^R l)
+
+[/0]^𝓡 :
+  ∀ σ τ {Γ Δ i} t (l : Tm TermD i τ (σ ∷ Γ)) (ρ : (Γ ─Env) Term Δ) →
+  Δ ⊢𝓡 σ ∋ t →
+  Kripke^P 𝓡^P 𝓡^P (σ ∷ []) τ (Sem.body Substitution ρ (σ ∷ []) τ l) →
+  Δ ⊢𝓡 τ ∋ sub (lift vl^Tm (σ ∷ []) ρ) l [ t /0]
+[/0]^𝓡 σ τ t l ρ t^P l^P = cast (l^P (base vl^Var) (ε^P ∙^P t^P)) where
+
+  ren^R : rel.∀[ VarTm^R ] (base vl^Var) (select (freshʳ vl^Var (σ ∷ [])) (base vl^Tm ∙ t))
+  lookup^R ren^R v = sym (lookup-base^Tm (lookup (base vl^Var) v))
+
+  sub^R : rel.∀[ Eq^R ] (sub (t /0]) <$> lift vl^Tm (σ ∷ []) ρ)
+                        ((ε ∙ t) >> th^Env (th^𝓥 vl^Tm) ρ (base vl^Var))
+  lookup^R sub^R z      = refl
+  lookup^R sub^R (s v)  = begin
+    sub (base vl^Tm ∙ t) (ren (freshʳ vl^Var (σ ∷ [])) (lookup ρ v))
+      ≡⟨ rensub TermD (lookup ρ v) _ _ ⟩
+    sub (select (freshʳ vl^Var (σ ∷ [])) (base vl^Tm ∙ t)) (lookup ρ v)
+      ≡⟨ sym $ Sim.sim sim.RenSub ren^R (lookup ρ v) ⟩
+    ren (base vl^Var) (lookup ρ v) ∎
+
+  cast = subst (_ ⊢𝓡 _ ∋_) (sym (Fus.fus (Sub² TermD) sub^R l))
+
+case^𝓡 : ∀ {i σ τ ν Γ Δ} (t : Term (σ + τ) Δ)
+  (l : Tm TermD i ν (σ ∷ Γ)) (r : Tm TermD i ν (τ ∷ Γ))
+  (ρ : (Γ ─Env) Term Δ) → Δ ⊢𝓡 σ + τ ∋ t →
   Kripke^P 𝓡^P 𝓡^P (σ ∷ []) ν (Sem.body Substitution ρ (σ ∷ []) ν l) →
   Kripke^P 𝓡^P 𝓡^P (τ ∷ []) ν (Sem.body Substitution ρ (τ ∷ []) ν r) →
   Δ ⊢𝓡 ν ∋ `case t (sub (lift vl^Tm (σ ∷ []) ρ) l) (sub (lift vl^Tm (τ ∷ []) ρ) r)
-case^𝓡 (`i₁ t) bl br ρ^P (inl t^P)   bl^P br^P =
-  ↝SN⁻¹^𝓡 _ (ι₁ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ br ρ^P br^P)) {!!}
-case^𝓡 (`i₂ t) bl br ρ^P (inr t^P)   bl^P br^P =
-  ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) ((reify^𝓡 _ _ bl ρ^P bl^P))) {!!}
-case^𝓡 t        bl br ρ^P (neu t^SNe) bl^P br^P =
-  unquote^𝓡 _ (cas t^SNe (reify^𝓡 _ _ bl ρ^P bl^P) (reify^𝓡 _ _ br ρ^P br^P))
-case^𝓡 t        bl br ρ^P (red r t^P) bl^P br^P =
-  ↝SN⁻¹^𝓡 _ ([c]₁ r (sub _ bl) (sub _ br)) (case^𝓡 _ bl br ρ^P t^P bl^P br^P)
+case^𝓡 (`i₁ t) bl br ρ (inl t^P)   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₁ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ br ρ br^P))
+             ([/0]^𝓡 _ _ t bl ρ t^P bl^P)
+case^𝓡 (`i₂ t) bl br ρ (inr t^P)   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ bl ρ bl^P))
+             ([/0]^𝓡 _ _ t br ρ t^P br^P)
+case^𝓡 t        bl br ρ (neu t^SNe) bl^P br^P =
+  unquote^𝓡 _ (cas t^SNe (reify^𝓡 _ _ bl ρ bl^P) (reify^𝓡 _ _ br ρ br^P))
+case^𝓡 t        bl br ρ (red r t^P) bl^P br^P =
+  ↝SN⁻¹^𝓡 _ ([c]₁ r (sub _ bl) (sub _ br)) (case^𝓡 _ bl br ρ t^P bl^P br^P)
 
-{-
 -- Section 6 Proving strong normalization
 -------------------------------------------------------------------
 
@@ -897,11 +927,16 @@ Fdm.alg^P fundamental = alg^P where
   alg^P : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ : (Γ ─Env) Term Δ} →
           let v = fmap TermD (Sem.body Substitution ρ) b in
           pred.∀[ 𝓡^P ] ρ → All TermD (Kripke^P 𝓡^P 𝓡^P) v → Δ ⊢𝓡 σ ∋ Sem.alg Substitution v
-  alg^P (f `∙' t)      ρ^P (f^P , t^P , _)       = f^P ∙^𝓡 t^P
-  alg^P (`case' t l r) ρ^P (t^P , l^P , r^P , _) = case^𝓡 t l r ρ^P t^P l^P r^P
-  alg^P (`i₁' t)       ρ^P (t^P , _)  = inl t^P
-  alg^P (`i₂' t)       ρ^P (t^P , _)  = inr t^P
-  alg^P (`λ' b) {ρ₁} ρ^P (b^P , _) ρ {u} u^𝓡 = ↝SN⁻¹^𝓡 _ β-step $ cast (b^P ρ (ε^P ∙^P u^𝓡))
+  -- case anlaysis
+  alg^P (`case' t l r) {ρ} ρ^P (t^P , l^P , r^P , _) = case^𝓡 (sub ρ t) l r ρ t^P l^P r^P
+  -- constructors
+  alg^P (`i₁' t)           ρ^P (t^P , _)  = inl t^P
+  alg^P (`i₂' t)           ρ^P (t^P , _)  = inr t^P
+  -- application
+  alg^P (f `∙' t)          ρ^P (f^P , t^P , _)       = f^P ∙^𝓡 t^P
+  -- lambda abstraction
+  alg^P (`λ' b) {ρ₁}       ρ^P (b^P , _) ρ {u} u^𝓡 =
+    ↝SN⁻¹^𝓡 _ β-step $ cast (b^P ρ (ε^P ∙^P u^𝓡))
   -- at this point the substitution looks HORRIBLE
     where
       β-step = β (ren _ (sub _ b)) _ (quote^𝓡 _ u^𝓡)
@@ -946,5 +981,4 @@ t ^SN = cast (quote^𝓡 _ (eval dummy t))
 
 _^sn : ∀ {Γ σ} t → Γ ⊢sn σ ∋ t
 t ^sn = sound^SN (t ^SN)
--}
 \end{code}

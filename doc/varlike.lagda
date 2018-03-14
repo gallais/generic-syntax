@@ -3,6 +3,7 @@ module varlike where
 
 open import Data.List.Base hiding ([_])
 open import Data.Sum
+open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import indexed
@@ -48,6 +49,11 @@ module _ {I : Set} {𝓥 : I ─Scoped} (vl^𝓥 : VarLike 𝓥) where
 
  lift : (Θ : List I) → ∀ {Γ Δ} → (Γ ─Env) 𝓥 Δ → (Θ ++ Γ ─Env) 𝓥 (Θ ++ Δ)
  lift Θ {Γ} {Δ} ρ = freshˡ vl^𝓥 Δ {Θ} >> th^Env (th^𝓥 vl^𝓥) ρ (freshʳ vl^Var Θ)
+
+module _ {I : Set} {σ : I} {Γ : List I} where
+
+  extend-is-fresh : ∀[ Eq^R ] (Thinning Γ (σ ∷ Γ) ∋ extend) (freshʳ vl^Var (σ ∷ []))
+  lookup^R extend-is-fresh k = cong s (sym (lookup-base^Var k))
 
 module _ {I : Set} {𝓥 : I ─Scoped} where
  open ≡-Reasoning
