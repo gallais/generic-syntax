@@ -501,11 +501,6 @@ mutual
 -- Section 4.4 Soundness and Completeness
 
 -- Theorem 4.16 Completeness of SN
--- We start with a definition of deeply nested β-redexes
-
-data RED {Γ σ} : Term σ Γ → Set where
-  β   : ∀ {τ} b (u : Term τ Γ) → RED (`λ b `∙ u)
-  app : ∀ {τ f} → RED f → ∀ (t : Term τ Γ) → RED (f `∙ t)
 
 mutual
   -- 1.

@@ -583,6 +583,11 @@ data _∣_⊢SN_∋_<_ Γ α : ∀ σ → Γ ∣ α ⊢ σ → Size → Set wher
 
 _∣_⊢SN_∋_ = _∣_⊢SN_∋_< _
 
+∘C^SN : ∀ {Γ α β σ c c′} → Γ ∣ β ⊢SN σ ∋ c → Γ ∣ α ⊢SN β ∋ c′ → Γ ∣ α ⊢SN σ ∋ c ∘C c′
+∘C^SN <>                   c′^SN = c′^SN
+∘C^SN (app c^SN t^SN)      c′^SN = app (∘C^SN c^SN c′^SN) t^SN
+∘C^SN (cas c^SN l^SN r^SN) c′^SN = cas (∘C^SN c^SN c′^SN) l^SN r^SN
+
 cut⁻¹^SNe : ∀ {Γ τ t i} → Γ ⊢SNe τ ∋ t < i → ∃ λ ctx → let (σ , c) = ctx in
             ∃ λ v → t ≡ cut (`var v) c × Γ ∣ σ ⊢SN τ ∋ c < i
 cut⁻¹^SNe (var v)          = _ , v , refl , <>
@@ -745,65 +750,120 @@ mutual
  sound^↝SN ([∙]₂ r t)           = [∙]₂ (sound^↝SN r) t
  sound^↝SN ([c]₁ r _ _)         = [c]₁ (sound^↝SN r) _ _
 
-{-
 -- Section 4.4 Soundness and Completeness
 
 -- Theorem 4.16 Completeness of SN
 -- We start with a definition of deeply nested β-redexes
 
-data RED {Γ σ} : Term σ Γ → Set where
-  β   : ∀ {τ} b (u : Term τ Γ) → RED (`λ b `∙ u)
-  app : ∀ {τ f} → RED f → ∀ (t : Term τ Γ) → RED (f `∙ t)
+data Elim (Γ : List Type) (τ : Type) : Type → Set where
+  app : ∀ {σ} → Term σ Γ → Elim Γ τ (σ ⇒ τ)
+  cas : ∀ {σ₁ σ₂} → Term τ (σ₁ ∷ Γ) → Term τ (σ₂ ∷ Γ) → Elim Γ τ (σ₁ + σ₂)
+
+elim : ∀ {Γ σ τ} → Elim Γ τ σ → Γ ∣ σ ⊢ τ
+elim (app t)   = app <> t
+elim (cas l r) = cas <> l r
+
+data Red (Γ : List Type) (τ : Type) : Set where
+  β  : ∀ {σ}     → Term τ (σ ∷ Γ) → Term σ Γ → Red Γ τ
+  ι₁ : ∀ {σ₁ σ₂} → Term σ₁ Γ → Term τ (σ₁ ∷ Γ) → Term τ (σ₂ ∷ Γ) → Red Γ τ
+  ι₂ : ∀ {σ₁ σ₂} → Term σ₂ Γ → Term τ (σ₁ ∷ Γ) → Term τ (σ₂ ∷ Γ) → Red Γ τ
+
+unRed : ∀ {Γ τ} → Red Γ τ → Term τ Γ
+unRed (β b u)    = `λ b `∙ u
+unRed (ι₁ t l r) = `case (`i₁ t) l r
+unRed (ι₂ t l r) = `case (`i₂ t) l r
+
+βιRed : ∀ {Γ τ} → Red Γ τ → Term τ Γ
+βιRed (β b u)    = b [ u /0]
+βιRed (ι₁ t l r) = l [ t /0]
+βιRed (ι₂ t l r) = r [ t /0]
 
 mutual
   -- 1.
   complete^SNe : ∀ {Γ σ α i c} v → Γ ∣ α ⊢SN σ ∋ c →
                  let t = cut (`var v) c in
                  ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SNe σ ∋ t′
-  complete^SNe v <>           refl c[v]^sn   = var v
-  complete^SNe v (app c t^SN) refl c[v]∙t^sn =
-    let (c[v]^sn , t^sn) = `∙⁻¹^sn c[v]∙t^sn in
-    app (complete^SNe v c refl c[v]^sn) t^SN
+  complete^SNe v <>                refl c[v]^sn   = var v
+  complete^SNe v (app c t^SN)      refl c[v]∙t^sn =
+    app (complete^SNe v c refl (`∙t⁻¹^sn c[v]∙t^sn)) t^SN
+  complete^SNe v (cas c l^SN r^SN) refl c[v]lr^sn =
+    cas (complete^SNe v c refl (`case₁⁻¹^sn c[v]lr^sn)) l^SN r^SN
 
   -- 2.
-  complete^SN-β : ∀ {Γ σ τ α i} (b : Term α (σ ∷ Γ)) u (c : Γ ∣ α ⊢ τ) →
-                  let t = cut (`λ b `∙ u) c in Γ ⊢ τ ∋ t ↝SN cut (b [ u /0]) c →
-                  ∀ {t′} → t′ ≡ t → Γ ⊢sn τ ∋ t′ < i → Γ ⊢SN τ ∋ t′
-  complete^SN-β b u c r refl (sn c[λb∙u]^sn) = red r (complete^SN _ (c[λb∙u]^sn (cut^↝ c (β b u))))
+  complete^SN-βι : ∀ {Γ α σ i} (r : Red Γ α) c →
+    let t = cut (unRed r) c in Γ ⊢ σ ∋ t ↝SN cut (βιRed r) c →
+    ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SN σ ∋ t′
+  complete^SN-βι (β b u)    c r^SN refl (sn c[r]^sn) =
+    red r^SN (complete^SN _ (c[r]^sn (cut^↝ c (β b u))))
+  complete^SN-βι (ι₁ t l r) c r^SN refl (sn c[r]^sn) =
+    red r^SN (complete^SN _ (c[r]^sn (cut^↝ c (ι₁ t l r))))
+  complete^SN-βι (ι₂ t l r) c r^SN refl (sn c[r]^sn) =
+    red r^SN (complete^SN _ (c[r]^sn (cut^↝ c (ι₂ t l r))))
 
   -- 3.
   complete^SN : ∀ {Γ σ i} t → Γ ⊢sn σ ∋ t < i → Γ ⊢SN σ ∋ t
-  complete^SN (`var v) v^sn  = neu (var v)
-  complete^SN (`λ b)   λb^sn = lam (complete^SN b (`λ⁻¹^sn λb^sn))
-  complete^SN (f `∙ t) ft^sn =
+  complete^SN (`var v)      v^sn  = neu (var v)
+  complete^SN (`i₁ t)       it^sn = inl (complete^SN t (`i₁⁻¹^sn it^sn))
+  complete^SN (`i₂ t)       it^sn = inr (complete^SN t (`i₂⁻¹^sn it^sn))
+  complete^SN (`λ b)        λb^sn = lam (complete^SN b (`λ⁻¹^sn λb^sn))
+  complete^SN (f `∙ t)      ft^sn =
     let (f^sn , t^sn) = `∙⁻¹^sn ft^sn in
     let t^SN = complete^SN t t^sn in
-    case unzip f t f^sn t^SN of λ where
-       (_ , c , inj₁ (v , eq , sp))        → neu (complete^SNe v sp eq ft^sn)
-       (_ , c , inj₂ (_ , b , u , eq , r)) → complete^SN-β b u c r eq ft^sn
+    elim^SN f (app t) f^sn (app <> t^SN) ft^sn
+  complete^SN (`case t l r) tlr^sn =
+    let (t^sn , l^sn , r^sn) = `case⁻¹^sn tlr^sn in
+    let (l^SN , r^SN) = (complete^SN l l^sn , complete^SN r r^sn) in
+    elim^SN t (cas l r) t^sn (cas <> l^SN r^SN) tlr^sn
 
-  -- ugly but it works
-  unzip : ∀ {Γ σ τ i} f t → Γ ⊢sn σ ⇒ τ ∋ f < i → Γ ⊢SN σ ∋ t →
-          ∃ λ α → ∃ λ (c : Γ ∣ α ⊢ τ) →
-          (∃ λ v → f `∙ t ≡ cut (`var v) c × Γ ∣ α ⊢SN τ ∋ c)
-        ⊎ (∃ λ β → ∃ λ (b : Term α (β ∷ Γ)) → ∃ λ u →
-             f `∙ t ≡ cut (`λ b `∙ u) c
-             × Γ ⊢ τ ∋ cut (`λ b `∙ u) c ↝SN cut (b [ u /0]) c)
-  unzip (`var v) t v^sn  t^SN = _ , app <> t , inj₁ (v , refl , app <> t^SN)
-  unzip (`λ b)   t λb^sn t^SN = _ , <> , inj₂ (_ , b , t , refl , β b t t^SN)
-  unzip (f `∙ u) t fu^sn t^SN =
-    let (f^sn , u^sn) = `∙⁻¹^sn fu^sn in
-    let u^SN = complete^SN u u^sn in
-    case unzip f u f^sn u^SN of λ where
-      (_ , c , inj₁ (v , eq , sp)) →
-        _ , app c t , inj₁ (v , cong (_`∙ t) eq , app sp t^SN)
-      (_ , c , inj₂ (_ , b , a , eq , r)) →
-        _ , app c t , inj₂ (_ , b , a , cong (_`∙ t) eq , [∙]₂ r t)
+  elim^SN : ∀ {Γ σ τ i} t e → Γ ⊢sn σ ∋ t < i → Γ ∣ σ ⊢SN τ ∋ elim e →
+               Γ ⊢sn τ ∋ cut t (elim e) < i → Γ ⊢SN τ ∋ cut t (elim e)
+  elim^SN t e t^sn e^SN e[t]^sn =
+    case spine^SN t e t^sn e^SN of λ where
+      (_ , c , inj₁ (v , eq , c^SN)) → neu (complete^SNe v c^SN eq e[t]^sn)
+      (_ , c , inj₂ (r , eq , r^SN)) → complete^SN-βι r c r^SN eq e[t]^sn
+
+  spine^SN : ∀ {Γ σ τ i} t e → Γ ⊢sn σ ∋ t < i → Γ ∣ σ ⊢SN τ ∋ elim e →
+             ∃ λ α → ∃ λ (c : Γ ∣ α ⊢ τ) →
+      (∃ λ v → cut t (elim e) ≡ cut (`var v) c × Γ ∣ α ⊢SN τ ∋ c)
+    ⊎ (∃ λ r → cut t (elim e) ≡ cut (unRed r) c
+             × Γ ⊢ τ ∋ cut (unRed r) c ↝SN cut (βιRed r) c)
+  spine^SN (`var v) e tm^sn e^SN = _ , elim e , inj₁ (v , refl , e^SN)
+  spine^SN (`λ b) (app t) tm^sn (app <> t^SN) = _ , <> , inj₂ (β b t , refl , β b t t^SN)
+  spine^SN (`i₁ t) (cas l r) tm^sn (cas <> l^SN r^SN) =
+    let t^SN = complete^SN t (`i₁⁻¹^sn tm^sn) in
+    _ , <> , inj₂ (ι₁ t l r , refl , ι₁ t l r t^SN r^SN)
+  spine^SN (`i₂ t) (cas l r) tm^sn (cas <> l^SN r^SN) =
+    let t^SN = complete^SN t (`i₂⁻¹^sn tm^sn) in
+    _ , <> , inj₂ (ι₂ t l r , refl , ι₂ t l r t^SN l^SN)
+  spine^SN (f `∙ t) e tm^sn e^SN =
+    let (f^sn , t^sn) = `∙⁻¹^sn tm^sn in
+    let t^SN = complete^SN t t^sn in
+    case spine^SN f (app t) f^sn (app <> t^SN) of λ where
+      (_ , c , inj₁ (v , eq , c^SN)) →
+        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^SN e^SN c^SN)
+      (_ , c , inj₂ (r , eq , r^SN)) →
+        _ , (elim e ∘C c) , inj₂ (r , spine-eq e c eq , spine-red e c r r^SN)
+  spine^SN (`case t l r) e tm^sn e^SN =
+    let (t^sn , l^sn , r^sn) = `case⁻¹^sn tm^sn in
+    let (l^SN , r^SN) = (complete^SN l l^sn , complete^SN r r^sn) in
+    case spine^SN t (cas l r) t^sn (cas <> l^SN r^SN) of λ where
+      (_ , c , inj₁ (v , eq , c^SN)) →
+        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^SN e^SN c^SN)
+      (_ , c , inj₂ (r , eq , r^SN)) →
+        _ , (elim e ∘C c) , inj₂ (r , spine-eq e c eq , spine-red e c r r^SN)
+
+  spine-eq : ∀ {Γ α β σ t tc} (e : Elim Γ σ β) (c : Γ ∣ α ⊢ β) →
+             tc ≡ cut t c → cut tc (elim e) ≡ cut t (elim e ∘C c)
+  spine-eq e c refl = cut-∘C _ (elim e) c
+
+  spine-red : ∀ {Γ α β σ} e c → (r : Red Γ α) →
+              Γ ⊢ β ∋ cut (unRed r) c ↝SN cut (βιRed r) c →
+              Γ ⊢ σ ∋ cut (unRed r) (elim e ∘C c) ↝SN cut (βιRed r) (elim e ∘C c)
+  spine-red (app t)   c r r^SN = [∙]₂ r^SN t
+  spine-red (cas _ _) c r r^SN = [c]₁ r^SN _ _
 
 -- Section 5 Reducibility Candidates
 -------------------------------------------------------------------
--}
-
 infix 3 _+𝓡_
 data _+𝓡_ {Γ σ τ} (𝓢 : Term σ Γ → Set) (𝓣 : Term τ Γ → Set) : Term (σ + τ) Γ → Set where
   -- values
