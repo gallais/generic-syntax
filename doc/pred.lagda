@@ -27,7 +27,7 @@ module _ {I : Set} {T : I ─Scoped} {𝓟 : Pred T} where
 
 module _ {I : Set} {T : I ─Scoped} {𝓟 : Pred T} {Δ : List I} where
 
- ε^P : {ρ : ([] ─Env) T Δ} → ∀[ 𝓟 ] ρ
+ ε^P : ∀[ 𝓟 ] (ε {n = Δ})
  lookup^P ε^P ()
 
 module _ {I : Set} {T : I ─Scoped} {𝓟 : Pred T} {Γ Δ : List I} where

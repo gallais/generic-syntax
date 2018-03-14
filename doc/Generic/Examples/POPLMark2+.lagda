@@ -804,10 +804,19 @@ mutual
 -------------------------------------------------------------------
 -}
 
+infix 3 _+𝓡_
+data _+𝓡_ {Γ σ τ} (𝓢 : Term σ Γ → Set) (𝓣 : Term τ Γ → Set) : Term (σ + τ) Γ → Set where
+  -- values
+  inl : ∀ {t} → 𝓢 t → (𝓢 +𝓡 𝓣) (`i₁ t)
+  inr : ∀ {t} → 𝓣 t → (𝓢 +𝓡 𝓣) (`i₂ t)
+  neu : ∀ {t} → Γ ⊢SNe σ + τ ∋ t → (𝓢 +𝓡 𝓣) t
+  -- closed under anti-reduction
+  red : ∀ {t u} → Γ ⊢ σ + τ ∋ t ↝SN u → (𝓢 +𝓡 𝓣) u → (𝓢 +𝓡 𝓣) t
+
 infix 3 _⊢𝓡_∋_
-_⊢𝓡_∋_ : ∀ Γ σ → Term σ Γ → Set
+_⊢𝓡_∋_     : ∀ Γ σ → Term σ Γ → Set
 Γ ⊢𝓡 α     ∋ t = Γ ⊢SN α ∋ t
-Γ ⊢𝓡 σ + τ ∋ t = Γ ⊢SN σ + τ ∋ t
+Γ ⊢𝓡 σ + τ ∋ t = ((Γ ⊢𝓡 σ ∋_) +𝓡 (Γ ⊢𝓡 τ ∋_)) t
 Γ ⊢𝓡 σ ⇒ τ ∋ t = ∀ {Δ} ρ {u} → Δ ⊢𝓡 σ ∋ u → Δ ⊢𝓡 τ ∋ ren ρ t `∙ u
 
 𝓡^P : Pred Term
@@ -818,9 +827,12 @@ mutual
 
  -- 1.
  quote^𝓡 : ∀ {Γ} σ {t} → Γ ⊢𝓡 σ ∋ t → Γ ⊢SN σ ∋ t
- quote^𝓡 α       t^𝓡 = t^𝓡
- quote^𝓡 (σ + τ) t^𝓡 = t^𝓡
- quote^𝓡 (σ ⇒ τ) t^𝓡 = th⁻¹^SN _ embed refl (SN-ext z tz^SN)
+ quote^𝓡 α       t^𝓡         = t^𝓡
+ quote^𝓡 (σ + τ) (inl t^𝓡)   = inl (quote^𝓡 σ t^𝓡)
+ quote^𝓡 (σ + τ) (inr t^𝓡)   = inr (quote^𝓡 τ t^𝓡)
+ quote^𝓡 (σ + τ) (neu t^SNe)  = neu t^SNe
+ quote^𝓡 (σ + τ) (red r t^𝓡) = red r (quote^𝓡 (σ + τ) t^𝓡)
+ quote^𝓡 (σ ⇒ τ) t^𝓡         = th⁻¹^SN _ embed refl (SN-ext z tz^SN)
    where z^𝓡  = unquote^𝓡 σ (var z)
          embed = pack s
          tz^SN = quote^𝓡 τ (t^𝓡 embed z^𝓡)
@@ -840,7 +852,10 @@ mutual
 
 th^𝓡 : ∀ {Γ Δ} σ ρ t → Γ ⊢𝓡 σ ∋ t → Δ ⊢𝓡 σ ∋ ren ρ t
 th^𝓡 α       ρ t t^𝓡         = th^SN ρ t^𝓡
-th^𝓡 (σ + τ) ρ t t^𝓡         = th^SN ρ t^𝓡
+th^𝓡 (σ + τ) ρ _ (inl t^𝓡)   = inl (th^𝓡 σ ρ _ t^𝓡)
+th^𝓡 (σ + τ) ρ _ (inr t^𝓡)   = inr (th^𝓡 τ ρ _ t^𝓡)
+th^𝓡 (σ + τ) ρ t (neu t^SNe)  = neu (th^SNe ρ t^SNe)
+th^𝓡 (σ + τ) ρ t (red r t^𝓡) = red (th^↝SN ρ r) (th^𝓡 (σ + τ) ρ _ t^𝓡)
 th^𝓡 (σ ⇒ τ) ρ t t^𝓡 ρ′ u^𝓡 = cast (t^𝓡 (select ρ ρ′) u^𝓡)
   where cast = subst (λ t → _ ⊢𝓡 _ ∋ t `∙ _) (sym $ ren² TermD t ρ ρ′)
 
@@ -848,6 +863,28 @@ _∙^𝓡_ : ∀ {σ τ Γ f t} → Γ ⊢𝓡 σ ⇒ τ ∋ f → Γ ⊢𝓡 σ
 _∙^𝓡_ {σ} {τ} {Γ} {f} {t} f^𝓡 t^𝓡 = cast (f^𝓡 (base vl^Var) t^𝓡)
   where cast = subst (λ f → Γ ⊢𝓡 τ ∋ f `∙ t) (ren-id f)
 
+reify^𝓡 : ∀ σ τ {Γ Δ} (l : Term τ (σ ∷ Γ)) {ρ : (Γ ─Env) Term Δ} →
+  pred.∀[ 𝓡^P ] ρ → Kripke^P 𝓡^P 𝓡^P (σ ∷ []) τ (Sem.body Substitution ρ (σ ∷ []) τ l) →
+  (σ ∷ Δ) ⊢SN τ ∋ sub (lift vl^Tm (σ ∷ []) ρ) l
+reify^𝓡 σ τ l ρ^P l^P =
+  let ih = quote^𝓡 τ (l^P (extend {σ = σ}) (ε^P ∙^P unquote^𝓡 σ (var z))) in
+  subst (_ ⊢SN _ ∋_) (Sim.sim SubExt {!!} l) ih
+
+case^𝓡 : ∀ {σ τ ν Γ Δ} (t : Term (σ + τ) Δ) l r {ρ : (Γ ─Env) Term Δ} →
+  pred.∀[ 𝓡^P ] ρ → Δ ⊢𝓡 σ + τ ∋ t →
+  Kripke^P 𝓡^P 𝓡^P (σ ∷ []) ν (Sem.body Substitution ρ (σ ∷ []) ν l) →
+  Kripke^P 𝓡^P 𝓡^P (τ ∷ []) ν (Sem.body Substitution ρ (τ ∷ []) ν r) →
+  Δ ⊢𝓡 ν ∋ `case t (sub (lift vl^Tm (σ ∷ []) ρ) l) (sub (lift vl^Tm (τ ∷ []) ρ) r)
+case^𝓡 (`i₁ t) bl br ρ^P (inl t^P)   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₁ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ br ρ^P br^P)) {!!}
+case^𝓡 (`i₂ t) bl br ρ^P (inr t^P)   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) ((reify^𝓡 _ _ bl ρ^P bl^P))) {!!}
+case^𝓡 t        bl br ρ^P (neu t^SNe) bl^P br^P =
+  unquote^𝓡 _ (cas t^SNe (reify^𝓡 _ _ bl ρ^P bl^P) (reify^𝓡 _ _ br ρ^P br^P))
+case^𝓡 t        bl br ρ^P (red r t^P) bl^P br^P =
+  ↝SN⁻¹^𝓡 _ ([c]₁ r (sub _ bl) (sub _ br)) (case^𝓡 _ bl br ρ^P t^P bl^P br^P)
+
+{-
 -- Section 6 Proving strong normalization
 -------------------------------------------------------------------
 
@@ -855,14 +892,15 @@ _∙^𝓡_ {σ} {τ} {Γ} {f} {t} f^𝓡 t^𝓡 = cast (f^𝓡 (base vl^Var) t^�
 fundamental : Fdm 𝓡^P 𝓡^P TermD Substitution
 Fdm.th^P  fundamental {σ} {v = v} = λ ρ v^𝓡 → th^𝓡 σ ρ v v^𝓡
 Fdm.var^P fundamental = λ x → x
-Fdm.alg^P fundamental = {!!}
-{-
 Fdm.alg^P fundamental = alg^P where
 
   alg^P : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ : (Γ ─Env) Term Δ} →
           let v = fmap TermD (Sem.body Substitution ρ) b in
           pred.∀[ 𝓡^P ] ρ → All TermD (Kripke^P 𝓡^P 𝓡^P) v → Δ ⊢𝓡 σ ∋ Sem.alg Substitution v
-  alg^P (f `∙' t) ρ^P (f^P , t^P , _)  = f^P ∙^𝓡 t^P
+  alg^P (f `∙' t)      ρ^P (f^P , t^P , _)       = f^P ∙^𝓡 t^P
+  alg^P (`case' t l r) ρ^P (t^P , l^P , r^P , _) = case^𝓡 t l r ρ^P t^P l^P r^P
+  alg^P (`i₁' t)       ρ^P (t^P , _)  = inl t^P
+  alg^P (`i₂' t)       ρ^P (t^P , _)  = inr t^P
   alg^P (`λ' b) {ρ₁} ρ^P (b^P , _) ρ {u} u^𝓡 = ↝SN⁻¹^𝓡 _ β-step $ cast (b^P ρ (ε^P ∙^P u^𝓡))
   -- at this point the substitution looks HORRIBLE
     where
@@ -894,7 +932,6 @@ Fdm.alg^P fundamental = alg^P where
         sub ((ε ∙ u) >> th^Env th^Tm ρ₁ ρ) b ∎
 
       cast = subst (_ ⊢𝓡 _ ∋_) eq
--}
 
 eval : ∀ {Γ Δ σ ρ} → pred.∀[ 𝓡^P ] ρ → (t : Term σ Γ) → Δ ⊢𝓡 σ ∋ sub ρ t
 eval = Fdm.fdm fundamental
@@ -909,4 +946,5 @@ t ^SN = cast (quote^𝓡 _ (eval dummy t))
 
 _^sn : ∀ {Γ σ} t → Γ ⊢sn σ ∋ t
 t ^sn = sound^SN (t ^SN)
+-}
 \end{code}
