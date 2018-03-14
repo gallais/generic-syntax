@@ -628,22 +628,16 @@ mutual
 
  -- 1.
  th⁻¹^SN : ∀ {σ Γ Δ t′} t ρ → t′ ≡ ren ρ t → Δ ⊢SN σ ∋ t′ → Γ ⊢SN σ ∋ t
- th⁻¹^SN = {!!}
-{-
- th⁻¹^SN (`var v) ρ refl (red r pr) =
-   let (v′ , eq , r′) = th⁻¹^↝SN (`var v) ρ r
-   in red r′ (th⁻¹^SN v′ ρ eq pr)
- th⁻¹^SN (f `∙ t) ρ refl (red r pr) =
-   let (ft′ , eq , r′) = th⁻¹^↝SN (f `∙ t) ρ r
-   in red r′ (th⁻¹^SN ft′ ρ eq pr)
- th⁻¹^SN (`λ t)   ρ refl (red r pr) =
-   let (λt′ , eq , r′) = th⁻¹^↝SN (`λ t) ρ r
-   in red r′ (th⁻¹^SN λt′ ρ eq pr)
- th⁻¹^SN (`var v) ρ eq   (neu pr) = neu (th⁻¹^SNe _ ρ eq pr)
- th⁻¹^SN (f `∙ t) ρ eq   (neu pr) = neu (th⁻¹^SNe _ ρ eq pr)
- th⁻¹^SN (`λ t)   ρ refl (lam pr) = lam (th⁻¹^SN t _ refl pr)
- th⁻¹^SN (`λ t)   ρ refl (neu ())
--}
+ th⁻¹^SN t         ρ eq    (neu pr) = neu (th⁻¹^SNe t ρ eq pr)
+ th⁻¹^SN (`λ t)    ρ refl  (lam pr) = lam (th⁻¹^SN t _ refl pr)
+ th⁻¹^SN (`i₁ t)   ρ refl  (inl pr) = inl (th⁻¹^SN t ρ refl pr)
+ th⁻¹^SN (`i₂ t)   ρ refl  (inr pr) = inr (th⁻¹^SN t ρ refl pr)
+ th⁻¹^SN (`var v)  ρ ()    (lam pr)
+ th⁻¹^SN (`var v)  ρ ()    (inl pr)
+ th⁻¹^SN (`var v)  ρ ()    (inr pr)
+ th⁻¹^SN t         ρ refl  (red r pr)  =
+   let (t′ , eq , r′) = th⁻¹^↝SN t ρ r in red r′ (th⁻¹^SN t′ ρ eq pr)
+
  -- 2.
  th⁻¹^SNe : ∀ {σ Γ Δ t′} t ρ → t′ ≡ ren ρ t → Δ ⊢SNe σ ∋ t′ → Γ ⊢SNe σ ∋ t
  th⁻¹^SNe (`var v) ρ refl (var _)     = var v
@@ -654,14 +648,23 @@ mutual
 
  -- 3.
  th⁻¹^↝SN : ∀ {σ Γ Δ u} t ρ → Δ ⊢ σ ∋ ren ρ t ↝SN u → ∃ λ u′ → u ≡ ren ρ u′ × Γ ⊢ σ ∋ t ↝SN u′
- th⁻¹^↝SN = {!!}
-{-
  th⁻¹^↝SN (`var v)    ρ ()
  th⁻¹^↝SN (`λ b)      ρ ()
- th⁻¹^↝SN (`λ b `∙ t) ρ (β ._ ._ t^SN) = b [ t /0] , sym (renβ TermD b t ρ) , β b t (th⁻¹^SN t ρ refl t^SN)
- th⁻¹^↝SN (f `∙ t)    ρ ([∙]₂ r ._)    =
+ th⁻¹^↝SN (`i₁ t)     ρ ()
+ th⁻¹^↝SN (`i₂ t)     ρ ()
+ -- reductions
+ th⁻¹^↝SN (`λ b `∙ t)         ρ (β ._ ._ t^SN)             =
+   b [ t /0] , sym (renβ TermD b t ρ) , β b t (th⁻¹^SN t ρ refl t^SN)
+ th⁻¹^↝SN (`case (`i₁ t) l r) ρ (ι₁ ._ ._ ._ t^SN r^SN)    =
+   l [ t /0] , sym (renβ TermD l t ρ) , ι₁ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN r _ refl r^SN)
+ th⁻¹^↝SN (`case (`i₂ t) l r) ρ (ι₂ ._ ._ ._ t^SN l^SN)    =
+   r [ t /0] , sym (renβ TermD r t ρ) , ι₂ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN l _ refl l^SN)
+-- structural
+ th⁻¹^↝SN (f `∙ t)        ρ ([∙]₂ r ._)    =
    let (g , eq , r′) = th⁻¹^↝SN f ρ r in g `∙ t , cong (_`∙ ren ρ t) eq , [∙]₂ r′ t
--}
+ th⁻¹^↝SN (`case c bl br) ρ ([c]₁ r ._ ._) = let (d , eq , r′) = th⁻¹^↝SN c ρ r in
+   `case d bl br , cong (λ c → `case c (ren _ bl) (ren _ br)) eq , [c]₁ r′ bl br
+
 -- Lemma 4.13 SNe is closed under application
 _SNe∙_ : ∀ {Γ σ τ f t} → Γ ⊢SNe σ ⇒ τ ∋ f → Γ ⊢SN σ ∋ t → Γ ⊢SN τ ∋ f `∙ t
 f^SNe SNe∙ t^SN = neu (app f^SNe t^SN)
