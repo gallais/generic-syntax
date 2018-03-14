@@ -778,11 +778,15 @@ unRed (ι₂ t l r) = `case (`i₂ t) l r
 βιRed (ι₁ t l r) = l [ t /0]
 βιRed (ι₂ t l r) = r [ t /0]
 
+fire : ∀ {Γ τ} r → Γ ⊢ τ ∋ unRed r ↝ βιRed r
+fire (β b u)     = β b u
+fire (ι₁ t l r)  = ι₁ t l r
+fire (ι₂ t l r)  = ι₂ t l r
+
 mutual
   -- 1.
   complete^SNe : ∀ {Γ σ α i c} v → Γ ∣ α ⊢SN σ ∋ c →
-                 let t = cut (`var v) c in
-                 ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SNe σ ∋ t′
+    let t = cut (`var v) c in ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SNe σ ∋ t′
   complete^SNe v <>                refl c[v]^sn   = var v
   complete^SNe v (app c t^SN)      refl c[v]∙t^sn =
     app (complete^SNe v c refl (`∙t⁻¹^sn c[v]∙t^sn)) t^SN
@@ -793,12 +797,7 @@ mutual
   complete^SN-βι : ∀ {Γ α σ i} (r : Red Γ α) c →
     let t = cut (unRed r) c in Γ ⊢ σ ∋ t ↝SN cut (βιRed r) c →
     ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SN σ ∋ t′
-  complete^SN-βι (β b u)    c r^SN refl (sn c[r]^sn) =
-    red r^SN (complete^SN _ (c[r]^sn (cut^↝ c (β b u))))
-  complete^SN-βι (ι₁ t l r) c r^SN refl (sn c[r]^sn) =
-    red r^SN (complete^SN _ (c[r]^sn (cut^↝ c (ι₁ t l r))))
-  complete^SN-βι (ι₂ t l r) c r^SN refl (sn c[r]^sn) =
-    red r^SN (complete^SN _ (c[r]^sn (cut^↝ c (ι₂ t l r))))
+  complete^SN-βι t c r refl (sn p) = red r (complete^SN _ (p (cut^↝ c (fire t))))
 
   -- 3.
   complete^SN : ∀ {Γ σ i} t → Γ ⊢sn σ ∋ t < i → Γ ⊢SN σ ∋ t
