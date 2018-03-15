@@ -1,24 +1,23 @@
 # Abstract
 
-Almost every programming language's syntax includes a notion of bound
-variable, and the accompanying notions of $\alpha$-equivalence,
-capture avoiding substitution, typing contexts, runtime environments,
-and so on. In the past, implementing and reasoning about programming
-languages has required careful handling to maintain the correct
-behaviour of bound variables. Modern programming languages now include
-features that enable constraints like scope safety to be expressed in
-types. Nevertheless, the programmer is still forced to write the same
-boilerplate over again for each new implementation of a scope safe
-operation (e.g., renaming, substitution, CPS transformation, printing,
-etc.), and then again for correctness proofs.
+Almost every programming language's syntax includes a notion of binder
+and corresponding bound occurrences, along with the accompanying
+notions of $\alpha$-equivalence, capture avoiding substitution, typing
+contexts, runtime environments, and so on. In the past, implementing
+and reasoning about programming languages required careful handling to
+maintain the correct behaviour of bound variables. Modern programming
+languages include features that enable constraints like scope safety
+to be expressed in types. Nevertheless, the programmer is still forced
+to write the same boilerplate over again for each new implementation
+of a scope safe operation (e.g., renaming, substitution, desugaring,
+printing, etc.), and then again for correctness proofs.
 
-In this paper, we present an expressive universe of syntaxes with
-binding and demonstrate how to (1) implement scope safe traversals
-once and for all by generic programming; and (2) how to derive
-properties of these traversals by generic proving. Our universe
-description, generic traversals and proofs, and our examples have all
-been formalised in Agda and are available in the accompanying
-material.
+We present an expressive universe of syntaxes with binding and
+demonstrate how to (1) implement scope safe traversals once and for
+all by generic programming; and (2) how to derive properties of these
+traversals by generic proving. Our universe description, generic
+traversals and proofs, and our examples have all been formalised in
+Agda and are available in the accompanying material.
 
 * CCS Concepts, and the Key words are wrong
 
