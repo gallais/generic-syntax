@@ -5,7 +5,7 @@ all: finish
 
 prepare:
 	mkdir -p latex/
-	cp *.png *.lhs cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.bst *.sed latex/
+	cp *.lhs cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.bst *.sed latex/
 
 paper-lagda:    
 	./build-lagda.sh
