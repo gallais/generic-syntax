@@ -74,27 +74,24 @@
 }
 
 \begin{abstract}
-Syntaxes with binding are omnipresent in Programming Languages
-research but also in the more practical setting of Embedded
-Domain Specific Languages. The advanced features available in
-some languages' type systems has made it possible to statically
-enforce well-scopedness. However the user still has to write a
-lot of boilerplate code to get common scope safe programs (e.g.
-renaming, substitution, CPS transformation, printing with names,
-etc.) and the proof that they are well-behaved.
+Almost every programming language's syntax includes a notion of binder
+and corresponding bound occurrences, along with the accompanying
+notions of $\alpha$-equivalence, capture avoiding substitution, typing
+contexts, runtime environments, and so on. In the past, implementing
+and reasoning about programming languages required careful handling to
+maintain the correct behaviour of bound variables. Modern programming
+languages include features that enable constraints like scope safety
+to be expressed in types. Nevertheless, the programmer is still forced
+to write the same boilerplate over again for each new implementation
+of a scope safe operation (e.g., renaming, substitution, desugaring,
+printing, etc.), and then again for correctness proofs.
 
-Building on an abstract but nonetheless expressive notion of
-semantics and a universe of syntaxes with binding, we demonstrate
-how to (1) implement these traversals once and for all by generic
-programming, and (2) how to derive their properties by generic proving.
-So, the programmer will never again have to...
-
-Building on an abstract but nonetheless expressive notion of
-semantics and a universe of syntaxes with binding, we demonstrate
-how to implement these traversals once and for all by generic
-programming, and how to derive their properties by generic proving.
-All of this work has been fully formalised in Agda and is available
-at \fbox{REDACTED (see accompanying material)}.
+We present an expressive universe of syntaxes with binding and
+demonstrate how to (1) implement scope safe traversals once and for
+all by generic programming; and (2) how to derive properties of these
+traversals by generic proving. Our universe description, generic
+traversals and proofs, and our examples have all been formalised in
+Agda and are available in the accompanying material.
 \end{abstract}
 
 
