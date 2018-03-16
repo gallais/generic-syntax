@@ -11,7 +11,7 @@
 -- {i : I} → S (f i) ⊎ T i → U i × V i
 -- (cf. test at the end of the file)
 
-module indexed {ℓ^I} {I : Set ℓ^I} where
+module indexed {ℓ^A} {A : Set ℓ^A} where
 
 open import Level using (Level ; _⊔_)
 open import Data.Sum using (_⊎_)
@@ -27,43 +27,43 @@ infix  8 _⊢_
 \end{code}}
 
 \begin{code}
-_∙⊎_ : {ℓ ℓ′ : Level} → (I → Set ℓ) → (I → Set ℓ′) → (I → Set (ℓ′ ⊔ ℓ))
-(S ∙⊎ T) i = S i ⊎ T i
+_∙⊎_ : {ℓ ℓ′ : Level} → (A → Set ℓ) → (A → Set ℓ′) → (A → Set (ℓ′ ⊔ ℓ))
+(S ∙⊎ T) a = S a ⊎ T a
 \end{code}
 %<*arrow>
 \begin{code}
-_⟶_ :  {ℓ ℓ′ : Level} → (I → Set ℓ) → (I → Set ℓ′) → (I → Set (ℓ′ ⊔ ℓ))
-(S ⟶ T) i = S i → T i
+_⟶_ :  {ℓ ℓ′ : Level} → (A → Set ℓ) → (A → Set ℓ′) → (A → Set (ℓ′ ⊔ ℓ))
+(S ⟶ T) a = S a → T a
 \end{code}
 %</arrow>
 %<*constant>
 \begin{code}
-κ : {ℓ : Level} → Set ℓ → (I → Set ℓ)
-κ S i = S
+κ : {ℓ : Level} → Set ℓ → (A → Set ℓ)
+κ S a = S
 \end{code}
 %</constant>
 %<*forall>
 \begin{code}
-[_] :  {ℓ : Level} → (I → Set ℓ) → Set (ℓ^I ⊔ ℓ)
-[ T ] = ∀ {i} → T i
+[_] :  {ℓ : Level} → (A → Set ℓ) → Set (ℓ^A ⊔ ℓ)
+[ T ] = ∀ {a} → T a
 \end{code}
 %</forall>
 %<*product>
 \begin{code}
-_∙×_ :  {ℓ ℓ′ : Level} → (I → Set ℓ) → (I → Set ℓ′) → (I → Set (ℓ′ ⊔ ℓ))
-(S ∙× T) i = S i × T i
+_∙×_ :  {ℓ ℓ′ : Level} → (A → Set ℓ) → (A → Set ℓ′) → (A → Set (ℓ′ ⊔ ℓ))
+(S ∙× T) a = S a × T a
 \end{code}
 %</product>
 %<*adjust>
 \begin{code}
-_⊢_ :  {ℓ : Level} → (I → I) → (I → Set ℓ) → (I → Set ℓ)
-(f ⊢ T) i = T (f i)
+_⊢_ :  {ℓ : Level} → (A → A) → (A → Set ℓ) → (A → Set ℓ)
+(f ⊢ T) a = T (f a)
 \end{code}
 %</adjust>
 
 \begin{code}
 open import Agda.Builtin.Equality
-_ : ∀ {f : I → I} {S T U V : I → Set} →
-    [ f ⊢ S ∙⊎ T ⟶ U ∙× V ] ≡ ({i : I} → S (f i) ⊎ T i → U i × V i)
+_ : ∀ {f : A → A} {S T U V : A → Set} →
+    [ f ⊢ S ∙⊎ T ⟶ U ∙× V ] ≡ ({a : A} → S (f a) ⊎ T a → U a × V a)
 _ = refl
 \end{code}

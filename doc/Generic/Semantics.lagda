@@ -62,17 +62,19 @@ record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
 %</closed>
 \begin{code}
 open import varlike
-module _ {I : Set} where
+module _ {I : Set} {𝓥 𝓒 : I ─Scoped} where
 \end{code}
 %<*reify>
 \begin{code}
- reify : {𝓥 𝓒 : I ─Scoped} → VarLike 𝓥 → {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
+ reify : VarLike 𝓥 → {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
  reify vl^𝓥 []         i b = b
  reify vl^𝓥 Δ@(_ ∷ _)  i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
 \end{code}
 
 %</reify>
 \begin{code}
+module _ {I : Set} where
+
  record Syntactic (d : Desc I) (𝓥 : I ─Scoped) : Set where
    field
      var    : {i : I} → [ 𝓥 i ⟶ Tm d ∞ i ]

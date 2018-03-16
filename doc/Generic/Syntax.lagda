@@ -36,7 +36,6 @@ reindex f (`∎ i)     = `∎ (f i)
 ⟦ `σ A d    ⟧ X i Γ = Σ[ a ∈ A ] (⟦ d a ⟧ X i Γ)
 ⟦ `X Δ j d  ⟧ X i Γ = X Δ j Γ × ⟦ d ⟧ X i Γ
 ⟦ `∎ i′     ⟧ X i Γ = i ≡ i′
-
 \end{code}
 %</interp>
 

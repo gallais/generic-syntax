@@ -32,18 +32,18 @@ module _ where
 
  private
 
-   ⟦V⟧ : ∀ {n} → [ Var n ⟶ Lam n ]
-   ⟦V⟧ = V
+   ⟦V⟧‿ren : ∀ {n} → [ Var n ⟶ Lam n ]
+   ⟦V⟧‿ren = V
 
-   extend : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
-   extend ρ = s <$> ρ ∙ z
+   extend‿ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
+   extend‿ren ρ = s <$> ρ ∙ z
 \end{code}
 %<*ren>
 \begin{code}
  ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
- ren ρ (V k)    = ⟦V⟧ (lookup ρ k)
+ ren ρ (V k)    = ⟦V⟧‿ren (lookup ρ k)
  ren ρ (A f t)  = A (ren ρ f) (ren ρ t)
- ren ρ (L b)    = L (ren (extend ρ) b)
+ ren ρ (L b)    = L (ren (extend‿ren ρ) b)
 \end{code}
 %</ren>
 \begin{code}
@@ -51,18 +51,18 @@ module _ where
 
  private
 
-   extend : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
-   extend ρ = ren E.extend <$> ρ ∙ V z
+   extend‿sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
+   extend‿sub ρ = ren E.extend <$> ρ ∙ V z
 
-   ⟦V⟧ : ∀ {n} → [ Lam n ⟶ Lam n ]
-   ⟦V⟧ x = x
+   ⟦V⟧‿sub : ∀ {n} → [ Lam n ⟶ Lam n ]
+   ⟦V⟧‿sub x = x
 \end{code}
 %<*sub>
 \begin{code}
  sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
- sub ρ (V k)    = ⟦V⟧ (lookup ρ k)
+ sub ρ (V k)    = ⟦V⟧‿sub (lookup ρ k)
  sub ρ (A f t)  = A (sub ρ f) (sub ρ t)
- sub ρ (L b)    = L (sub (extend ρ) b)
+ sub ρ (L b)    = L (sub (extend‿sub ρ) b)
 \end{code}
 %</sub>
 \begin{code}
