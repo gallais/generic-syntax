@@ -723,7 +723,7 @@ values to variables, it associates computations to terms.
 \caption{\AF{\_─Comp}: Associating Computations to Terms}
 \end{figure}
 
-\subsection{Fundamental Lemma of Semantics}\label{def:body}
+\subsection{Fundamental Lemma of Semantics}
 
 We can now define the type of the fundamental lemma (called \AF{sem}) as
 a function from environments to computations. It is defined mutually with a
@@ -761,7 +761,7 @@ produces an environment {(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{body}
-\caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}
+\caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}\label{def:body}
 \end{figure}
 
 Given that \AF{fmap} introduces one level of indirection between the
@@ -778,7 +778,7 @@ computations. The first two constraints on \AF{Var} described earlier are trivia
 satisfied. Observing that renaming strictly respects the structure of the term it
 goes through, it makes sense for the algebra to be implemented using \AF{fmap}.
 When dealing with the body of a binder, we `reify' the \AF{Kripke} function by
-evaluating it in an extended context and feeding it dummy values corresponding to
+evaluating it in an extended context and feeding it placeholder values corresponding to
 the extra variables introduced by that context. This is reminiscent both of what we
 did in Section~\ref{section:primer-program} and the definition of reification in
 the setting of normalisation by evaluation (see e.g. Coquand's work~\citeyear{coquand2002formalised}).
@@ -808,7 +808,7 @@ in non-empty contexts.
 
 \begin{figure}[h]
 \ExecuteMetaData[varlike.tex]{varlike}
-\caption{\AR{VarLike}: \AF{Thinnable} and with dummy values}
+\caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values}
 \end{figure}
 
 For any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh^{r}} of
@@ -871,7 +871,7 @@ the algebra defined generically for the \AF{Substitution} semantics whilst
 the newer one precisely provides the extra values to be added to the
 environment (we leave the definition of \AF{alg'} out because of a lack
 of space). The process of removing let binders is kickstarted with a
-dummy environment associating each variable to itself.
+placeholder environment associating each variable to itself.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -1100,8 +1100,10 @@ to represent. We can start by defining the coinductive type
 corresponding to them as the greatest fixpoint of a notion of
 layer. One layer of a co-finite tree is precisely given by the
 meaning of its description where we completely ignore the binding
-structure. We show with \AF{01⋯} which infinite list ought to
-correspond to the cyclic example \AF{01↺} given above.
+structure. We show with \AF{01⋯} the infinite list that to
+correspond to the cyclic example \AF{01↺} given above. The definition
+proceeds by copattern-matching as introduced in \cite{abel2013copatterns}
+and showcased in \cite{thibodeau2016case}.
 
 \begin{figure}[h]
 \begin{minipage}{0.55\textwidth}
@@ -1124,8 +1126,7 @@ co-recursively unfolding all the subterms.
 \caption{Generic Unfold of Potentially Cyclic Structures}
 \end{figure}
 
-We can see that this universe of descriptions allows us to
-implement generic functions once and for all. Even if the
+Even if the
 powerful notion of semantics described in Section~\ref{section:semantics}
 cannot encompass all the traversals we may be interested in,
 it provides us with reusable building blocks: the definition
@@ -1140,7 +1141,7 @@ the definition of \AR{∞Tm} was made easy by reusing \AF{⟦\_⟧}.
 \section{Building Generic Proofs about Generic Programs}
 
 ACMM~\citeyear{allais2017type} have
-already shown that, for their specific language, introducing an abstract
+already shown that, for the simply-typed $\lambda$-calculus, introducing an abstract
 notion of Semantics not only reveals the shared structure of common
 traversals, it also allows them to give abstract proof frameworks for
 simulation or fusion lemmas. Their idea naturally extends to our generic
@@ -1160,9 +1161,9 @@ layers which are meant to be equal:
   \item When facing a recursive position {\AIC{`X} \AB{\Delta} \AB{j} \AB{d}}, we
     demand that the two substructures are related by {\AB{R} \AB{\Delta} \AB{j}}
     and that the rest of the layers are related by \AF{Zip} \AB{d} \AB{R}
-  \item Last but not least, two nodes of type {\AIC{`\sigma} \AB{A} \AB{d}} will
+  \item Two nodes of type {\AIC{`\sigma} \AB{A} \AB{d}} will
     be related if they both carry the same payload \AB{a} of type \AB{A} and if
-    the rest of the layers are related by {\AF{Zip} (\AB{d} \AB{a}) \AB{R}}
+    the rest of the layers are related by {\AF{Zip} (\AB{d} \AB{a}) \AB{R}}.
 \end{itemize}
 
 \begin{figure}[h]
@@ -1242,13 +1243,13 @@ reduces to {\AF{sub} \AB{\rho'} \AB{t}} whenever for all \AB{v},
 The main theorem (strong normalisation of STLC via a logical relation)
 is itself an instance of (the unary version of) the simulation lemma.
 
-This Simulation proof framework is the simplest examples of the kind of abstract
-proof frameworks ACMM~\citeyear{allais2017type} introduce for their
-specific language. They also explain how a similar framework can be defined
+The Simulation proof framework is the simplest examples of the abstract
+proof frameworks ACMM~\citeyear{allais2017type} introduce. They also
+explain how a similar framework can be defined
 for fusion lemmas and deploy it for the renaming-substitution interactions
 but also their respective interactions with normalisation by evaluation.
 Now that we are familiarised with the techniques at hand, we can tackle
-this more complex example.
+this more complex example for all syntaxes definable in our framework.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1263,7 +1264,7 @@ a single renaming where the \AF{Thinning}s have been composed. Similarly,
 demonstrating that \AF{Tm} is a relative Monad~\cite{JFR4389} implies proving
 that two consecutive substitutions can be merged into a single one whose
 environment is the first one, where the second one has been applied in a
-pointwise manner. Last but not least, the \emph{Substitution Lemma} central
+pointwise manner. The \emph{Substitution Lemma} central
 to most model constructions (see for instance~\cite{mitchell1991kripke}) states
 that a syntactic substitution followed by the evaluation of the resulting term
 into the model is equivalent to the evaluation of the original term with an
@@ -1271,9 +1272,9 @@ environment corresponding to the evaluated substitution.
 
 A direct application of these results is our (to be published) entry to the
 POPLMark Challenge Reloaded~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
-representation of intrisically well-typed and well-scoped terms we directly inherit
+representation of intrisincally well-typed and well-scoped terms we directly inherit
 not only renaming and substitution but also all four fusion lemmas as corollaries
-of our generic results. This allows us to shave off a lot of the usual boilerplate
+of our generic results. This allows us to remove the usual boilerplate
 and go straight to the point.
 As all of these statements have precisely the same structure, we can
 once more devise a framework which will, provided that its constraints are
@@ -1291,8 +1292,8 @@ fundamental lemma associated to such a set of constraints will state that
 running \AB{𝓢_2} after \AB{𝓢_1} is equivalent to running \AB{𝓢_3} only.
 
 The definition of fusion is parametrised by three relations: \AB{𝓡^E} relates
-triples of environments of values in {(\Gamma \AR{─Env}) \AB{𝓥_1} \Delta},
-{(\Delta \AR{─Env}) \AB{𝓥_2} \Theta} and {(\Gamma \AR{─Env}) \AB{𝓥_3} \Theta}
+triples of environments of values in {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_1} \AB{\Delta}},
+{(\AB{\Delta} \AR{─Env}) \AB{𝓥_2} \AB{\Theta}} and {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_3} \AB{\Theta}}
 respectively; \AB{𝓡^𝓥} relates pairs of values\AB{𝓥_2} and \AB{𝓥_3};
 and \AB{𝓡^𝓒}, our notion of equivalence for evaluation results, relates pairs
 of computation in \AB{𝓒_2} and \AB{𝓒_3}.
@@ -1318,27 +1319,27 @@ to get a \AF{Scope} back. Hence the second constraint.
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvarlike}
 
 Still thinking about going under binders: if three evaluation environments
-\AB{\rho_1} in {(\Gamma \AR{─Env}) \AB{𝓥_1} \Delta}, \AB{\rho_2} in
-{(\Delta \AR{─Env}) \AB{𝓥_2} \Theta}, and \AB{\rho_3} in {(\Gamma \AR{─Env}) \AB{𝓥_3} \Theta}
-are related by \AB{𝓡^E} and we are given a thinning \AB{\sigma} from \Theta to \Omega
+\AB{\rho_1} in {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_1} \AB{\Delta}}, \AB{\rho_2} in
+{(\AB{\Delta} \AR{─Env}) \AB{𝓥_2} \AB{\Theta}}, and \AB{\rho_3} in {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_3} \AB{\Theta}}
+are related by \AB{𝓡^E} and we are given a thinning \AB{\sigma} from \AB{\Theta} to \AB{\Omega}
 then \AB{\rho_1}, the thinned \AB{\rho_2} and the thinned \AB{\rho_3} should still be related.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionthinnable}
 
-Remembering that \AF{\_>>\_} is used in the definition of \AF{body}~\ref{def:body} to
+Remembering that \AF{\_>>\_} is used in the definition of \AF{body} (Figure~\ref{def:body}) to
 combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
 {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}} into one of type
 {(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ})}, we mechanically need a
 constraint stating that \AF{\_>>\_} is compatible with \AB{𝓡^E}. We demand
 as an extra precondition that the values \AB{\rho_2} and \AB{\rho_3} are extended
 with are related according to \AB{𝓡^𝓥}. Lastly, for all the types to match up,
-\AB{\rho_1} has to be extended with dummy variables.
+\AB{\rho_1} has to be extended with placeholder variables.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionappend}
 
 We finally arrive at the constraints focusing on the semantical counterparts
 of the terms' constructors. When evaluating a variable, on the one hand \AB{𝓢_1}
-will lookup its meaning in the evaluation environment, turn the resulting value into
+will look up its meaning in the evaluation environment, turn the resulting value into
 a computation which will get quoted and then the result will be evaluated with \AB{𝓢_2}.
 Provided that all three evaluation environments are related by \AB{𝓡^E} this should
 be equivalent to looking up the value in \AB{𝓢_3}'s environment and turning it into a
@@ -1346,10 +1347,10 @@ computation. Hence the constraint \ARF{var^R}:
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvar}
 
-The case of the alegbra follows a similar idea albeit being more complex:
+The case of the algebra follows a similar idea albeit being more complex:
 a term gets evaluated using \AB{𝓢_1} and in order to be able to run \AB{𝓢_2}
 afterwards we need to recover a piece of syntax. This is possible if the
-\AF{Kripke} functional spaces are reified by being fed dummy \AB{𝓥_1} arguments
+\AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥_1} arguments
 (which can be manufactured thanks to the \ARF{vl^𝓥_1} we mentioned before) and
 then quoted. Provided that the result of running \AB{𝓢_2} on that term is
 related via {\AF{Zip} \AB{d} (\AF{Kripke^R} \AB{𝓡^𝓥} \AB{𝓡^𝓒}} to the result
@@ -1386,8 +1387,8 @@ Another corollary of the fundamental lemma of fusion is the observation that
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} make: \emph{assuming
 functional extensionality}, all the ACMM~\citeyear{allais2017type} traversals
 are compatible with variable renaming. We can reproduce this result generically
-for all syntaxes but refrain from using it in practice when an axiom-free
-alternative is provable.
+for all syntaxes (see accompanying code) but refrain from using it in practice
+when an axiom-free alternative is provable.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1421,8 +1422,8 @@ mentioned in Section~\ref{lem:zipstable}.
 
 This definition can be readily deployed to prove e.g. that the unfolding
 of \AF{01↺} defined in Section~\ref{def:colist} is indeed bisimilar to \AF{01⋯}
-which was defined in direct style. As the reader can see the proof is
-trivial: the first \AIC{refl} witnesses the fact that both definitions
+which was defined in direct style. The proof is straightforward due to the simplicity
+of this example: the first \AIC{refl} witnesses the fact that both definitions
 pick the same constructor (a cons cell), the second that they carry the
 same natural number, and we can conclude by an appeal to the coinduction
 hypothesis.
@@ -1461,16 +1462,19 @@ introduce notions of scope graphs and frames to scale the techniques typical
 of well scoped-and-typed deep embeddings to imperative languages. They can
 already handle a large subset of Middleweight Java.
 
-The potentially cyclic structures we have studied have been improved
-upon by Hamana~\citeyear{Hamana2009} who gave a presentation which
-preserves sharing: pointers can not only refer to nodes above them
-but also across from them in the cyclic tree.
+We have demonstrated how to write generic programs over the potentially
+cyclic structures of Ghani, Hamana, Uustalu and Vene~\citeyear{ghani2006representing}.
+Further work by Hamana~\citeyear{Hamana2009} yielded a different presentation
+of cyclic structures which preserves sharing: pointers can not only refer
+to nodes above them but also across from them in the cyclic tree. Capturing
+this class of inductive types as a set of syntaxes with binding and writing
+generic programs over them is still an open problem.
 
 \subsection{Meta-Theory Automation via Tactics and Code Generation} The
 tediousness of repeatedly
 proving similar statements has unsurprisingly led to various attempts at
 automating the pain away via either code generation or the definition of
-tactics. These solutions can be seen as untrusted oracle driving the
+tactics. These solutions can be seen as untrusted oracles driving the
 interactive theorem prover.
 
 Polonowski's DBGen~\citeyear{polonowski:db} takes as input a raw syntax with
@@ -1502,7 +1506,7 @@ in specialised forms by Needle once and for all as a set of generic programs.
 They see the existence of Needle as a pragmatic choice: working directly with
 the free monadic terms over finitary containers would be too cumbersome. In
 our experience solving the POPLMark reloaded challenge, Agda's pattern
-synonyms~\cite{Pickering:patsyn} make working with an encoded definition almost
+synonyms~\cite{Pickering:patsyn} makes working with an encoded definition almost
 seamless.
 
 The GMeta generic framework~\citeyear{gmeta} provides a universe of syntaxes
@@ -1519,7 +1523,8 @@ well-behaved.
 paper and gives three different interpretations corresponding to raw, scoped
 and typed syntax which are related via erasure. He provides scope-and-type
 preserving renaming and substitution as well as various generic proofs that
-they are well-behaved.
+they are well-behaved but offers neither a generic notion of semantics, nor
+generic proof frameworks.
 
 Copello~\citeyear{copello2017} sets out to work with \emph{named} binders and
 defines nominal techniques (such as name swapping) and ultimately $\alpha$-equivalence
@@ -1532,8 +1537,9 @@ over a generic universe of regular trees with binders inspired by Morris'~\citey
 
 \section{Conclusion and Future Work}
 
-Recalling ACMM~\citeyear{allais2017type} we have started from an example
-of a scope safe language (the simply-typed $\lambda$-calculus), have studied
+Recalling Allais, Chapman, McBride and McKinna's earlier work~\citeyear{allais2017type}
+we have started from an example
+of a scope-and-type safe language (the simply-typed $\lambda$-calculus), have studied
 various common scope-and-type preserving traversals and noticed their similarity.
 After introducing a notion of semantics and refactoring these traversals as
 various instances of the same fundamental lemma, we have observed the tight
@@ -1541,7 +1547,7 @@ connection between the abstract definition of semantics and the shape of the
 language.
 
 By extending a universe of datatype descriptions to support a notion of binding,
-we have managed to give a generic presentation of syntaxes with binding as well
+we have given a generic presentation of syntaxes with binding as well
 as a large class of scope-and-type safe generic programs acting on all of them:
 from Renaming and Substitution, to Normalisation by Evaluation, and the Desugaring
 of new constructors added by a language transformer. The code accompanying the
@@ -1568,29 +1574,29 @@ user with a generic notion of bisimilarity to reason about them.
 
 The diverse influences leading to this body of work suggest many opportunities
 for future research.
-
-Our example of the elaboration of an enriched language to a core one, and ACMM's
-implementation of a Continuation Passing Style conversion function begs the question
+\begin{itemize}
+\item Our example of the elaboration of an enriched language to a core one, and ACMM's
+implementation of a Continuation Passing Style conversion function raises the question
 of how many such common compilation passes can be implemented generically.
 
-An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
+\item An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
 could provide an appropriate framework to highlight the connection between various
-languages, some being seen as the refinement of others. This is particularly
+languages, some being seen as refinements of others. This is particularly
 evident when considering the informative typechecker (see the paper's accompanying
 code) which given a scoped term produces a scoped-and-typed term by
 type-(checking/inference).
 
-Our work on the POPLMark reloaded challenge highlights a need for generic
+\item Our work on the POPLMark reloaded challenge highlights a need for generic
 notions of congruence closure which would come with guarantees (if the original
 relation is stable under renaming and substitution so should the closure).
 Similarly, the ``evaluation contexts'' corresponding to a syntax could be
 derived automatically by building on the work of Huet~\citeyear{huet_1997}
 and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}.
 
-Finally, now knowing how to generically describe syntaxes and their
+\item Finally, now knowing how to generically describe syntaxes and their
 well-behaved semantics, we can start asking what it means to define
 well-behaved judgments. Why stop at helping the user write its specific
 language's meta-theory when we could study meta-meta-theory?
-
+\end{itemize}
 
 \newpage
