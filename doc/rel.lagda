@@ -33,6 +33,7 @@ module _ {I : Set} {T U : I ─Scoped}
 module _ {I : Set} {T U : I ─Scoped}
          {𝓡 : Rel T U} {Γ Δ : List I} where
 
+ infixl 20 _∙^R_
  _∙^R_ :  {ρ₁ : (Γ ─Env) T Δ} {ρ₂ : (Γ ─Env) U Δ} → ∀[ 𝓡 ] ρ₁ ρ₂ →
           {i : I} {v₁ : T i Δ} {v₂ : U i Δ} → rel 𝓡 v₁ v₂ →
           ∀[ 𝓡 ] (ρ₁ ∙ v₁) (ρ₂ ∙ v₂)

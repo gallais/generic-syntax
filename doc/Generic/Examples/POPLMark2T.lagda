@@ -106,6 +106,9 @@ data _⊢_∋_↝_ Γ : ∀ τ → Term τ Γ → Term τ Γ → Set where
   [r]₂ : ∀ {σ su su′} ze → σ ∷ ℕ ∷ Γ ⊢ σ ∋ su ↝ su′ → ∀ t → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze su′ t
   [r]₃ : ∀ {σ t t′} ze su → Γ ⊢ ℕ ∋ t ↝ t′ → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze su t′
 
+tgt : ∀ {Γ σ t u} → Γ ⊢ σ ∋ t ↝ u → Term σ Γ
+tgt {u = u} _ = u
+
 _⊢_∋_↝⋆_ : ∀ Γ σ → Term σ Γ → Term σ Γ → Set
 Γ ⊢ σ ∋ t ↝⋆ u = Star (Γ ⊢ σ ∋_↝_) t u
 
@@ -612,48 +615,70 @@ c[fire]⁻¹^Closed-sn r r^sn c^sn c[r]^sn@(sn c[r]^sn′) red
 ... | inj₂ (c′ , refl , c′^sn , red′) =
   sn (c[fire]⁻¹^Closed-sn r r^sn c′^sn (c[r]^sn′ (red′ (βιRed r))))
 
--- β reduction
-c[fire⁻¹]^Closed-sn c (β b u) _ c^sn c[r]^sn (β _ _) = c[r]^sn
+-- Either the redex does fire
+c[fire⁻¹]^Closed-sn c (β _ _)    _ c^sn c[r]^sn (β _ _)    = c[r]^sn
+c[fire⁻¹]^Closed-sn c (ι₁ _ _ _) _ c^sn c[r]^sn (ι₁ _ _ _) = c[r]^sn
+c[fire⁻¹]^Closed-sn c (ι₂ _ _ _) _ c^sn c[r]^sn (ι₂ _ _ _) = c[r]^sn
+c[fire⁻¹]^Closed-sn c (ιz _ _)   _ c^sn c[r]^sn (ιz _ _)   = c[r]^sn
+c[fire⁻¹]^Closed-sn c (ιs _ _ _) _ c^sn c[r]^sn (ιs _ _ _) = c[r]^sn
+
+-- Or we are in a structural case
+-- β redex
 c[fire⁻¹]^Closed-sn c (β b u) (b^sn , sn u^sn) c^sn c[r]^sn ([∙]₁ _ red) =
   let c[r′]^sn = Closed⋆-sn c[r]^sn (cut^↝⋆ c ([/0]^↝⋆ b red)) in
   sn (c[fire]⁻¹^Closed-sn (β b _) (b^sn , u^sn red) c^sn c[r′]^sn)
-c[fire⁻¹]^Closed-sn c (β b u) (sn b^sn , u^sn) c^sn (sn c[r]^sn) ([∙]₂ ([λ] red) t) =
-  sn (c[fire]⁻¹^Closed-sn (β _ u) (b^sn red , u^sn) c^sn (c[r]^sn (cut^↝ c ([/0]^↝ red u))))
+c[fire⁻¹]^Closed-sn c (β b u) (sn b^sn , u^sn) c^sn c[r]^sn ([∙]₂ ([λ] red) t) =
+  let c[r′]^sn = Closed-sn c[r]^sn (cut^↝ c ([/0]^↝ red u)) in
+  sn (c[fire]⁻¹^Closed-sn (β _ u) (b^sn red , u^sn) c^sn c[r′]^sn)
 
-c[fire⁻¹]^Closed-sn c (ι₁ l r t)   _ c^sn c[r]^sn red = {!!}
-c[fire⁻¹]^Closed-sn c (ι₂ l r t)   _ c^sn c[r]^sn red = {!!}
-c[fire⁻¹]^Closed-sn c (ιz ze su)   _ c^sn c[r]^sn red = {!!}
-c[fire⁻¹]^Closed-sn c (ιs ze su t) _ c^sn c[r]^sn red = {!!}
+-- ι₁ redex
+c[fire⁻¹]^Closed-sn c (ι₁ t l r) (sn t^sn , l^sn , r^sn) c^sn c[r]^sn ([c]₁ ([i₁] red) _ _) =
+  let c[r′]^sn = Closed⋆-sn c[r]^sn (cut^↝⋆ c ([/0]^↝⋆ l red)) in
+  sn (c[fire]⁻¹^Closed-sn (ι₁ _ l r) (t^sn red , l^sn , r^sn) c^sn c[r′]^sn)
+c[fire⁻¹]^Closed-sn c (ι₁ t l r) (t^sn , sn l^sn , r^sn) c^sn c[r]^sn ([c]₂ _ red _) =
+  let c[r′]^sn = Closed-sn c[r]^sn (cut^↝ c ([/0]^↝ red t)) in
+  sn (c[fire]⁻¹^Closed-sn (ι₁ t _ r) (t^sn , l^sn red , r^sn) c^sn c[r′]^sn)
+c[fire⁻¹]^Closed-sn c (ι₁ t l r) (t^sn , l^sn , sn r^sn) c^sn c[r]^sn ([c]₃ _ _ red) =
+  sn (c[fire]⁻¹^Closed-sn (ι₁ t l _) (t^sn , l^sn , r^sn red) c^sn c[r]^sn)
+
+-- ι₂ redex
+c[fire⁻¹]^Closed-sn c (ι₂ t l r) (sn t^sn , l^sn , r^sn) c^sn c[r]^sn ([c]₁ ([i₂] red) _ _) =
+  let c[r′]^sn = Closed⋆-sn c[r]^sn (cut^↝⋆ c ([/0]^↝⋆ r red)) in
+  sn (c[fire]⁻¹^Closed-sn (ι₂ _ l r) (t^sn red , l^sn , r^sn) c^sn c[r′]^sn)
+c[fire⁻¹]^Closed-sn c (ι₂ t l r) (t^sn , sn l^sn , r^sn) c^sn c[r]^sn ([c]₂ _ red _) =
+  sn (c[fire]⁻¹^Closed-sn (ι₂ t _ r) (t^sn , l^sn red , r^sn) c^sn c[r]^sn)
+c[fire⁻¹]^Closed-sn c (ι₂ t l r) (t^sn , l^sn , sn r^sn) c^sn c[r]^sn ([c]₃ _ _ red) =
+  let c[r′]^sn = Closed-sn c[r]^sn (cut^↝ c ([/0]^↝ red t)) in
+  sn (c[fire]⁻¹^Closed-sn (ι₂ t l _) (t^sn , l^sn , r^sn red) c^sn c[r′]^sn)
+
+-- ιz redex
+c[fire⁻¹]^Closed-sn c (ιz ze su) (sn ze^sn , su^sn) c^sn c[r]^sn ([r]₁ red _ _) =
+  let c[r′]^sn = Closed-sn c[r]^sn (cut^↝ c red) in
+  sn (c[fire]⁻¹^Closed-sn (ιz _ su) (ze^sn red , su^sn) c^sn c[r′]^sn)
+c[fire⁻¹]^Closed-sn c (ιz ze su) (ze^sn , sn su^sn) c^sn c[r]^sn ([r]₂ _ red _) =
+  sn (c[fire]⁻¹^Closed-sn (ιz ze _) (ze^sn , su^sn red) c^sn c[r]^sn)
+c[fire⁻¹]^Closed-sn c (ιz ze su) _ c^sn c[r]^sn ([r]₃ _ _ ())
+
+-- ιs redex
+c[fire⁻¹]^Closed-sn c (ιs ze su t) (sn ze^sn , su^sn , t^sn) c^sn c[r]^sn ([r]₁ red _ _) =
+  let reds = sub^↝⋆ su ([v↦t↝⋆t] ∙^R S.ε ∙^R S.return ([r]₁ red _ _)) in
+  let c[r′]^sn = Closed⋆-sn c[r]^sn (cut^↝⋆ c reds) in
+  sn (c[fire]⁻¹^Closed-sn (ιs _ su t) (ze^sn red , su^sn , t^sn) c^sn c[r′]^sn)
+c[fire⁻¹]^Closed-sn c (ιs ze su t) (ze^sn , sn su^sn , t^sn) c^sn c[r]^sn ([r]₂ _ red _) =
+  let reds = S.return (sub^↝ (base vl^Tm ∙ t ∙ `rec ze su t) red)
+             S.◅◅ sub^↝⋆ (tgt red) ([v↦t↝⋆t] ∙^R S.ε ∙^R S.return ([r]₂ _ red _)) in
+  let c[r′]^sn = Closed⋆-sn c[r]^sn (cut^↝⋆ c reds) in
+  sn (c[fire]⁻¹^Closed-sn (ιs ze _ t) (ze^sn , su^sn red , t^sn) c^sn c[r′]^sn)
+c[fire⁻¹]^Closed-sn c (ιs ze su t) (ze^sn , su^sn , sn t^sn) c^sn c[r]^sn ([r]₃ _ _ ([1+] red)) =
+  let reds = sub^↝⋆ su ([v↦t↝⋆t] ∙^R S.return red ∙^R S.return ([r]₃ _ _ red)) in
+  let c[r′]^sn = Closed⋆-sn c[r]^sn (cut^↝⋆ c reds) in
+  sn (c[fire]⁻¹^Closed-sn (ιs ze su _) (ze^sn , su^sn , t^sn red) c^sn c[r′]^sn)
+
 
 c[fire⁻¹]^sn : ∀ {Γ α σ c} r → Γ ⊢↯sn α ∋ r → Γ ∣ α ⊢sn σ ∋ c →
             Γ ⊢sn σ ∋ cut (βιRed r) c → Γ ⊢sn σ ∋ cut (unRed r) c
 c[fire⁻¹]^sn r r^sn c^sn c[r]^sn = sn (c[fire]⁻¹^Closed-sn r r^sn c^sn c[r]^sn)
 
-{-
--- 2.
-ι₁⁻¹^Closed-sn c t l r t^sn@(sn t^sn′) l^sn@(sn l^sn′) r^sn@(sn r^sn′) c[l[t]]^sn@(sn c[l[t]]^sn′) c^sn red
-  with cut⁻¹‿sn^↝ c^sn (cas (`i₁ t) l r) red
-... | inj₁ (._ , refl , ι₁ .t .l .r)            = c[l[t]]^sn
-... | inj₁ (._ , refl , [c]₁ ([i₁] red′) .l .r) =
-  let c[l[t]]^sn′ = Closed⋆-sn c[l[t]]^sn (cut^↝⋆ c ([/0]^↝⋆ l red′)) in
-  sn (ι₁⁻¹^Closed-sn c _ l r (t^sn′ red′) l^sn r^sn c[l[t]]^sn′ c^sn)
-... | inj₁ (._ , refl , [c]₂ _ red′ .r)         =
-  sn (ι₁⁻¹^Closed-sn c t _ r t^sn (l^sn′ red′) r^sn (c[l[t]]^sn′ (cut^↝ c ([/0]^↝ red′ t))) c^sn)
-... | inj₁ (._ , refl , [c]₃ _ .l red′)         =
-  sn (ι₁⁻¹^Closed-sn c t l _ t^sn l^sn (r^sn′ red′) c[l[t]]^sn c^sn)
-
--- 3.
-ι₂⁻¹^Closed-sn c t l r t^sn@(sn t^sn′) l^sn@(sn l^sn′) r^sn@(sn r^sn′) c[r[t]]^sn@(sn c[r[t]]^sn′) c^sn red
-  with cut⁻¹‿sn^↝ c^sn (cas (`i₂ t) l r) red
-... | inj₁ (._ , refl , ι₂ .t .l .r)            = c[r[t]]^sn
-... | inj₁ (._ , refl , [c]₁ ([i₂] red′) .l .r) =
-  let c[r[t]]^sn′ = Closed⋆-sn c[r[t]]^sn (cut^↝⋆ c ([/0]^↝⋆ r red′)) in
-  sn (ι₂⁻¹^Closed-sn c _ l r (t^sn′ red′) l^sn r^sn c[r[t]]^sn′ c^sn)
-... | inj₁ (._ , refl , [c]₂ _ red′ .r)         =
-  sn (ι₂⁻¹^Closed-sn c t _ r t^sn (l^sn′ red′) r^sn c[r[t]]^sn c^sn)
-... | inj₁ (._ , refl , [c]₃ _ .l red′)         =
-  sn (ι₂⁻¹^Closed-sn c t l _ t^sn l^sn (r^sn′ red′) (c[r[t]]^sn′ (cut^↝ c ([/0]^↝ red′ t))) c^sn)
--}
 {-
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
 
