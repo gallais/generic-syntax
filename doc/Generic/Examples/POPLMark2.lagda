@@ -249,22 +249,24 @@ cut^↝⋆ : ∀ {Γ α σ t u} c → Γ ⊢ α ∋ t ↝⋆ u → Γ ⊢ σ ∋
 cut^↝⋆ c = S.gmap (flip cut c) (cut^↝ c)
 
 -- Lemma 4.6 Evaluation Contexts
-data ¬λ {Γ σ} : Term σ Γ → Set where
-  var : ∀ v → ¬λ (`var v)
-  app : ∀ {τ} f (t : Term τ Γ) → ¬λ (f `∙ t)
+-- Neutrality in the sense of Girard: not (value constructor)-headed
+data Neutral {Γ σ} : Term σ Γ → Set where
+  var : ∀ v → Neutral (`var v)
+  app : ∀ {τ} f (t : Term τ Γ) → Neutral (f `∙ t)
 
-cut⁻¹‿sn^↝ : ∀ {Γ α σ u c t} → Γ ∣ α ⊢sn σ ∋ c → ¬λ t → Γ ⊢ σ ∋ cut t c ↝ u →
+cut⁻¹‿sn^↝ : ∀ {Γ α σ u c t} → Γ ∣ α ⊢sn σ ∋ c → Neutral t → Γ ⊢ σ ∋ cut t c ↝ u →
                (∃ λ t′ → u ≡ cut t′ c × Γ ⊢ α ∋ t ↝ t′)
              ⊎ (∃ λ c′ → u ≡ cut t c′ × Γ ∣ α ⊢sn σ ∋ c′
                × ∀ t′ → Γ ⊢ σ ∋ cut t′ c ↝ cut t′ c′)
-cut⁻¹‿sn^↝ <>                        ¬λ r          = inj₁ (_ , refl , r)
-cut⁻¹‿sn^↝ (app <> t^sn)             () (β b t)
-cut⁻¹‿sn^↝ (app <> t^sn)             ¬λ ([∙]₁ f r) =
-  inj₂ (app <> _ , refl , app <> (Closed-sn t^sn r) , λ u → [∙]₁ _ r)
-cut⁻¹‿sn^↝ (app <> t^sn)             ¬λ ([∙]₂ r t) = inj₁ (_ , refl , r)
-cut⁻¹‿sn^↝ (app c^sn@(app _ _) t^sn) ¬λ ([∙]₁ _ r) =
+-- reduction in the plugged subterm
+cut⁻¹‿sn^↝ <> ne r = inj₁ (_ , refl , r)
+-- no redexes at the interface thanks to Girard neutrality
+cut⁻¹‿sn^↝ (app <> t^sn) () (β b t)
+-- reduction in the context
+cut⁻¹‿sn^↝ (app c^sn t^sn) ne ([∙]₁ _ r) =
   inj₂ (_ , refl , app c^sn (Closed-sn t^sn r) , λ u → [∙]₁ _ r)
-cut⁻¹‿sn^↝ (app c^sn t^sn)           ¬λ ([∙]₂ r t) with cut⁻¹‿sn^↝ c^sn ¬λ r
+-- structural cases: reduction happens deeper
+cut⁻¹‿sn^↝ (app c^sn t^sn) ne ([∙]₂ r t) with cut⁻¹‿sn^↝ c^sn ne r
 ... | inj₁ (t′ , eq , r′)         = inj₁ (t′ , cong (_`∙ t) eq , r′)
 ... | inj₂ (c′ , eq , c′^sn , r′) =
   inj₂ (app c′ t , cong (_`∙ t) eq , app c′^sn t^sn , λ u → [∙]₂ (r′ u) t)
@@ -281,8 +283,7 @@ cut⁻¹^sn : ∀ {Γ α σ} t c → Γ ⊢sn σ ∋ cut t c → (Γ ∣ α ⊢s
 cut⁻¹^sn t <>        t^sn     = <> , t^sn
 cut⁻¹^sn t (app c u) c[t]u^sn =
   let (c[t]^sn , u^sn) = `∙⁻¹^sn c[t]u^sn in
-  let (c^sn , t^sn) = cut⁻¹^sn t c c[t]^sn in
-  app c^sn u^sn , t^sn
+  let (c^sn , t^sn) = cut⁻¹^sn t c c[t]^sn in app c^sn u^sn , t^sn
 
 -- Lemma 4.7 Closure properties of neutral terms
 -- 1.

@@ -1,4 +1,4 @@
-1\begin{code}
+\begin{code}
 module Generic where
 
 -- Module re-exporting pretty much everything that can be useful

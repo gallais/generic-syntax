@@ -84,12 +84,6 @@ data _⊢_∋_↝_ Γ : ∀ τ → Term τ Γ → Term τ Γ → Set where
   [c]₂ : ∀ {σ τ ν l m} → ∀ t → σ ∷ Γ ⊢ ν ∋ l ↝ m → (r : Term ν (τ ∷ Γ)) → Γ ⊢ ν ∋ `case t l r ↝ `case t m r
   [c]₃ : ∀ {σ τ ν r s} → ∀ t → (l : Term ν (σ ∷ Γ)) → τ ∷ Γ ⊢ ν ∋ r ↝ s → Γ ⊢ ν ∋ `case t l r ↝ `case t l s
 
-src : ∀ {σ Γ s t} → Γ ⊢ σ ∋ s ↝ t → Term σ Γ
-src {s = src} _ = src
-
-tgt : ∀ {σ Γ s t} → Γ ⊢ σ ∋ s ↝ t → Term σ Γ
-tgt {t = tgt} _ = tgt
-
 _⊢_∋_↝⋆_ : ∀ Γ σ → Term σ Γ → Term σ Γ → Set
 Γ ⊢ σ ∋ t ↝⋆ u = Star (Γ ⊢ σ ∋_↝_) t u
 
@@ -336,51 +330,38 @@ cut^↝⋆ : ∀ {Γ α σ t u} c → Γ ⊢ α ∋ t ↝⋆ u → Γ ⊢ σ ∋
 cut^↝⋆ c = S.gmap (flip cut c) (cut^↝ c)
 
 -- Lemma 4.6 Evaluation Contexts
-data ¬λι {Γ σ} : Term σ Γ → Set where
-  var : ∀ v → ¬λι (`var v)
-  app : ∀ {τ} f (t : Term τ Γ) → ¬λι (f `∙ t)
-  cas : ∀ {σ τ} (t : Term (σ + τ) Γ) l r → ¬λι (`case t l r)
+-- Neutrality in the sense of Girard: not (value constructor)-headed
+data Neutral {Γ σ} : Term σ Γ → Set where
+  var : ∀ v → Neutral (`var v)
+  app : ∀ {τ} f (t : Term τ Γ) → Neutral (f `∙ t)
+  cas : ∀ {σ τ} (t : Term (σ + τ) Γ) l r → Neutral (`case t l r)
 
-cut⁻¹‿sn^↝ : ∀ {Γ α σ u c t} → Γ ∣ α ⊢sn σ ∋ c → ¬λι t → Γ ⊢ σ ∋ cut t c ↝ u →
+cut⁻¹‿sn^↝ : ∀ {Γ α σ u c t} → Γ ∣ α ⊢sn σ ∋ c → Neutral t → Γ ⊢ σ ∋ cut t c ↝ u →
                (∃ λ t′ → u ≡ cut t′ c × Γ ⊢ α ∋ t ↝ t′)
              ⊎ (∃ λ c′ → u ≡ cut t c′ × Γ ∣ α ⊢sn σ ∋ c′
                × ∀ t′ → Γ ⊢ σ ∋ cut t′ c ↝ cut t′ c′)
-cut⁻¹‿sn^↝ <>                          ¬λι r          = inj₁ (_ , refl , r)
-cut⁻¹‿sn^↝ (app <> t^sn)               ()  (β b t)
-cut⁻¹‿sn^↝ (app <> t^sn)               ¬λι ([∙]₁ f r) =
-  inj₂ (app <> _ , refl , app <> (Closed-sn t^sn r) , λ u → [∙]₁ _ r)
-cut⁻¹‿sn^↝ (app <> t^sn)               ¬λι ([∙]₂ r t) = inj₁ (_ , refl , r)
-cut⁻¹‿sn^↝ (app c^sn@(app _ _) t^sn)   ¬λι ([∙]₁ _ r) =
+-- reduction in the plugged subterm
+cut⁻¹‿sn^↝ <> ne r = inj₁ (_ , refl , r)
+-- no redexes at the interface thanks to Girard neutrality
+cut⁻¹‿sn^↝ (app <> t^sn)      () (β b t)
+cut⁻¹‿sn^↝ (cas <> l^sn r^sn) () (ι₁ t l r)
+cut⁻¹‿sn^↝ (cas <> l^sn r^sn) () (ι₂ t l r)
+-- reduction in the context
+cut⁻¹‿sn^↝ (app c^sn t^sn) ne ([∙]₁ _ r) =
   inj₂ (_ , refl , app c^sn (Closed-sn t^sn r) , λ u → [∙]₁ _ r)
-cut⁻¹‿sn^↝ (app c^sn@(cas _ _ _) t^sn) ¬λι ([∙]₁ _ r) =
-  inj₂ (_ , refl , app c^sn (Closed-sn t^sn r) , λ u → [∙]₁ _ r)
-cut⁻¹‿sn^↝ (app c^sn t^sn)             ¬λι ([∙]₂ r t) with cut⁻¹‿sn^↝ c^sn ¬λι r
+cut⁻¹‿sn^↝ (cas c^sn l^sn r^sn) ne ([c]₂ t red r) =
+  inj₂ (cas _ _ r , refl , cas c^sn (Closed-sn l^sn red) r^sn , λ u → [c]₂ _ red r)
+cut⁻¹‿sn^↝ (cas c^sn l^sn r^sn) ne ([c]₃ t l red) =
+  inj₂ (cas _ l _ , refl , cas c^sn l^sn (Closed-sn r^sn red) , λ u → [c]₃ _ l red)
+-- structural cases: reduction happens deeper
+cut⁻¹‿sn^↝ (app c^sn t^sn) ne ([∙]₂ r t) with cut⁻¹‿sn^↝ c^sn ne r
 ... | inj₁ (t′ , eq , r′)         = inj₁ (t′ , cong (_`∙ t) eq , r′)
 ... | inj₂ (c′ , eq , c′^sn , r′) =
   inj₂ (app c′ t , cong (_`∙ t) eq , app c′^sn t^sn , λ u → [∙]₂ (r′ u) t)
-cut⁻¹‿sn^↝ (cas <> l^sn r^sn)               ()  (ι₁ t l r)
-cut⁻¹‿sn^↝ (cas <> l^sn r^sn)               ()  (ι₂ t l r)
-cut⁻¹‿sn^↝ (cas <> l^sn r^sn)               ¬λι ([c]₁ red l r) = inj₁ (_ , refl , red)
-cut⁻¹‿sn^↝ (cas <> l^sn r^sn)               ¬λι ([c]₂ t red r) =
-  inj₂ (cas <> _ r , refl , cas <> (Closed-sn l^sn red) r^sn , λ u → [c]₂ _ red r)
-cut⁻¹‿sn^↝ (cas <> l^sn r^sn)               ¬λι ([c]₃ t l red) =
-  inj₂ (cas <> l _ , refl , cas <> l^sn (Closed-sn r^sn red) , λ u → [c]₃ _ l red)
-cut⁻¹‿sn^↝ (cas c^sn@(app _ _) l^sn r^sn)   ¬λι ([c]₁ red l r) with cut⁻¹‿sn^↝ c^sn ¬λι red
+cut⁻¹‿sn^↝ (cas c^sn l^sn r^sn) ne ([c]₁ red l r) with cut⁻¹‿sn^↝ c^sn ne red
 ... | inj₁ (t′ , eq , r′)         = inj₁ (t′ , cong (λ t → `case t l r) eq , r′)
 ... | inj₂ (c′ , eq , c′^sn , r′) =
-  inj₂ (cas c′ l r , cong (λ t → `case t l r) eq , cas c′^sn l^sn r^sn , λ u → [c]₁ (r′ u) l r)
-cut⁻¹‿sn^↝ (cas c^sn@(app _ _) l^sn r^sn)   ¬λι ([c]₂ t red r) =
-  inj₂ (cas _ _ r , refl , cas c^sn (Closed-sn l^sn red) r^sn , λ u → [c]₂ _ red r)
-cut⁻¹‿sn^↝ (cas c^sn@(app _ _) l^sn r^sn)   ¬λι ([c]₃ t l red) =
-  inj₂ (cas _ l _ , refl , cas c^sn l^sn (Closed-sn r^sn red) , λ u → [c]₃ _ l red)
-cut⁻¹‿sn^↝ (cas c^sn@(cas _ _ _) l^sn r^sn) ¬λι ([c]₁ red l r) with cut⁻¹‿sn^↝ c^sn ¬λι red
-... | inj₁ (t′ , eq , r′)         = inj₁ (t′ , cong (λ t → `case t l r) eq , r′)
-... | inj₂ (c′ , eq , c′^sn , r′) =
-  inj₂ (cas c′ l r , cong (λ t → `case t l r) eq , cas c′^sn l^sn r^sn , λ u → [c]₁ (r′ u) l r)
-cut⁻¹‿sn^↝ (cas c^sn@(cas _ _ _) l^sn r^sn) ¬λι ([c]₂ t red r) =
-  inj₂ (cas _ _ r , refl , cas c^sn (Closed-sn l^sn red) r^sn , λ u → [c]₂ _ red r)
-cut⁻¹‿sn^↝ (cas c^sn@(cas _ _ _) l^sn r^sn) ¬λι ([c]₃ t l red) =
-  inj₂ (cas _ l _ , refl , cas c^sn l^sn (Closed-sn r^sn red) , λ u → [c]₃ _ l red)
+  inj₂ (_ , cong (λ t → `case t l r) eq , cas c′^sn l^sn r^sn , λ u → [c]₁ (r′ u) l r)
 
 cut⁻¹^↝ : ∀ {Γ α σ u} c {v : Var α Γ} → Γ ⊢ σ ∋ cut (`var v) c ↝ u →
           ∃ λ c′ → u ≡ cut (`var v) c′
@@ -400,12 +381,10 @@ cut⁻¹^sn : ∀ {Γ α σ} t c → Γ ⊢sn σ ∋ cut t c → (Γ ∣ α ⊢s
 cut⁻¹^sn t <>        t^sn     = <> , t^sn
 cut⁻¹^sn t (app c u) c[t]u^sn =
   let (c[t]^sn , u^sn) = `∙⁻¹^sn c[t]u^sn in
-  let (c^sn , t^sn) = cut⁻¹^sn t c c[t]^sn in
-  app c^sn u^sn , t^sn
+  let (c^sn , t^sn) = cut⁻¹^sn t c c[t]^sn in app c^sn u^sn , t^sn
 cut⁻¹^sn t (cas c l r) c[t]lr^sn =
   let (c[t]^sn , l^sn , r^sn) = `case⁻¹^sn c[t]lr^sn in
-  let (c^sn , t^sn) = cut⁻¹^sn t c c[t]^sn in
-  cas c^sn l^sn r^sn , t^sn
+  let (c^sn , t^sn) = cut⁻¹^sn t c c[t]^sn in cas c^sn l^sn r^sn , t^sn
 
 -- Lemma 4.7 Closure properties of neutral terms
 -- 1.
@@ -422,8 +401,7 @@ cut⁻¹^sn t (cas c l r) c[t]lr^sn =
   go <>        f^sne      t^sn      ([∙]₂ () t)
   go c         f^sne      (sn t^sn) ([∙]₁ _ r) = sn (go c f^sne (t^sn r))
   go c         (sn f^sne) t^sn      ([∙]₂ r t) =
-    let (c′ , eq) = cut⁻¹^↝ c r in
-    let r′ = subst (_ ⊢ _ ∋ _ ↝_) eq r in
+    let (c′ , eq) = cut⁻¹^↝ c r in let r′ = subst (_ ⊢ _ ∋ _ ↝_) eq r in
     subst (λ g → _ ⊢sn _ ∋ g `∙ t) (sym eq) (sn (go c′ (f^sne r′) t^sn))
 
 -- 3.
@@ -437,8 +415,7 @@ cut⁻¹^sn t (cas c l r) c[t]lr^sn =
   go c  s^sne      (sn l^sn) r^sn      ([c]₂ _ red _) = sn (go c s^sne (l^sn red) r^sn)
   go c  s^sne      l^sn      (sn r^sn) ([c]₃ _ _ red) = sn (go c s^sne l^sn (r^sn red))
   go c  (sn s^sne) l^sn      r^sn      ([c]₁ red l r) =
-    let (c′ , eq) = cut⁻¹^↝ c red in
-    let red′ = subst (_ ⊢ _ ∋ _ ↝_) eq red in
+    let (c′ , eq) = cut⁻¹^↝ c red in let red′ = subst (_ ⊢ _ ∋ _ ↝_) eq red in
     subst (λ g → _ ⊢sn _ ∋ `case g l r) (sym eq) (sn (go c′ (s^sne red′) l^sn r^sn))
 
 cut^sn : ∀ {Γ α σ} v {c} → Γ ∣ α ⊢sn σ ∋ c → Γ ⊢sn σ ∋ cut (`var v) c
