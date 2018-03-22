@@ -341,6 +341,9 @@ f`∙⁻¹^sn (sn ft^sn) = sn (λ r → f`∙⁻¹^sn (ft^sn ([∙]₁ _ r)))
 `i₂⁻¹^sn : ∀ {σ τ Γ t i} → Γ ⊢sn σ + τ ∋ `i₂ t < i → Γ ⊢sn τ ∋ t < i
 `i₂⁻¹^sn (sn i₂t^sn) = sn (λ r → `i₂⁻¹^sn (i₂t^sn ([i₂] r)))
 
+`1+⁻¹^sn : ∀ {Γ t i} → Γ ⊢sn ℕ ∋ `1+ t < i → Γ ⊢sn ℕ ∋ t < i
+`1+⁻¹^sn (sn st^sn) = sn (λ r → `1+⁻¹^sn (st^sn ([1+] r)))
+
 -- 6.
 `case₁⁻¹^sn : ∀ {σ τ ν Γ t l r i} → Γ ⊢sn ν ∋ `case t l r < i → Γ ⊢sn σ + τ ∋ t < i
 `case₁⁻¹^sn (sn c^sn) = sn (λ r → `case₁⁻¹^sn (c^sn ([c]₁ r _ _)))
@@ -677,36 +680,44 @@ c[fire⁻¹]^Closed-sn c (ιs ze su t) (ze^sn , su^sn , sn t^sn) c^sn c[r]^sn ([
   let c[r′]^sn = Closed⋆-sn c[r]^sn (cut^↝⋆ c reds) in
   sn (c[fire]⁻¹^Closed-sn (ιs ze su _) (ze^sn , su^sn , t^sn red) c^sn c[r′]^sn)
 
-
 c[fire⁻¹]^sn : ∀ {Γ α σ c} r → Γ ⊢↯sn α ∋ r → Γ ∣ α ⊢sn σ ∋ c →
-            Γ ⊢sn σ ∋ cut (βιRed r) c → Γ ⊢sn σ ∋ cut (unRed r) c
+               Γ ⊢sn σ ∋ cut (βιRed r) c → Γ ⊢sn σ ∋ cut (unRed r) c
 c[fire⁻¹]^sn r r^sn c^sn c[r]^sn = sn (c[fire]⁻¹^Closed-sn r r^sn c^sn c[r]^sn)
 
-{-
 -- Section 3.2 Inductive Definition of Strongly Normalizing Terms
+-- TODO: refactor computational part as: Γ ⊢↯ τ + R-constraints?
+infix 4 _⊢[_]_∋_↝_<_
+data _⊢[_]_∋_↝_<_ Γ (R : ∀ Γ σ → Term σ Γ → Size → Set) τ : (t u : Term τ Γ) → Size → Set where
+-- computational
+  β    : ∀ {σ i} t u → R Γ σ u i → Γ ⊢[ R ] τ ∋ `λ t `∙ u ↝ t [ u /0] < ↑ i
+  ι₁   : ∀ {σ₁ σ₂ i} t l r → R Γ σ₁ t i → R (σ₂ ∷ Γ) τ r i →
+         Γ ⊢[ R ] τ ∋ `case (`i₁ t) l r ↝ l [ t /0] < ↑ i
+  ι₂   : ∀ {σ₁ σ₂ i} t l r → R Γ σ₂ t i → R (σ₁ ∷ Γ) τ l i →
+         Γ ⊢[ R ] τ ∋ `case (`i₂ t) l r ↝ r [ t /0] < ↑ i
+  ιz   : ∀ {i} ze su → R (τ ∷ ℕ ∷ Γ) τ su i → Γ ⊢[ R ] τ ∋ `rec ze su `0 ↝ ze < ↑ i
+  ιs   : ∀ {i} ze su t → R Γ τ ze i → R Γ ℕ t i →
+         Γ ⊢[ R ] τ ∋ `rec ze su (`1+ t) ↝ sub (base vl^Tm ∙ t ∙ `rec ze su t) su < ↑ i
+-- structural
+  [∙]₂ : ∀ {σ i f g} → Γ ⊢[ R ] σ ⇒ τ ∋ f ↝ g < i → ∀ t → Γ ⊢[ R ] τ ∋ f `∙ t ↝ g `∙ t < ↑ i
+  [c]₁ : ∀ {σ₁ σ₂ i t u} → Γ ⊢[ R ] σ₁ + σ₂ ∋ t ↝ u < i → ∀ l r →
+         Γ ⊢[ R ] τ ∋ `case t l r ↝ `case u l r < ↑ i
+  [r]₃ : ∀ {i t u} ze su → Γ ⊢[ R ] ℕ ∋ t ↝ u < i →
+         Γ ⊢[ R ] τ ∋ `rec ze su t ↝ `rec ze su u < ↑ i
 
-infix 4 _⊢_∋_↝SN_<_ _⊢SN_∋_<_ _⊢SNe_∋_<_
-data _⊢_∋_↝SN_<_ Γ τ : Term τ Γ → Term τ Γ → Size → Set
+infix 4 _⊢_∋_↝SN_<_ _⊢SN_∋_<_ _⊢SNe_∋_<_ _⊢_∋_↝SN_ _⊢SN_∋_ _⊢SNe_∋_
+_⊢_∋_↝SN_<_ : ∀ Γ τ (t u : Term τ Γ) → Size → Set
 data _⊢SN_∋_<_ (Γ : List Type) : (σ : Type) → Term σ Γ → Size → Set
 data _⊢SNe_∋_<_ (Γ : List Type) : (σ : Type) → Term σ Γ → Size → Set
 
-data _⊢_∋_↝SN_<_ Γ τ where
--- computational
-  β    : ∀ {σ i} t u → Γ ⊢SN σ ∋ u < i → Γ ⊢ τ ∋ `λ t `∙ u ↝SN t [ u /0] < ↑ i
-  ι₁   : ∀ {σ₁ σ₂ i} t l r → Γ ⊢SN σ₁ ∋ t < i → (σ₂ ∷ Γ) ⊢SN τ ∋ r < i →
-         Γ ⊢ τ ∋ `case (`i₁ t) l r ↝SN l [ t /0] < ↑ i
-  ι₂   : ∀ {σ₁ σ₂ i} t l r → Γ ⊢SN σ₂ ∋ t < i → (σ₁ ∷ Γ) ⊢SN τ ∋ l < i →
-         Γ ⊢ τ ∋ `case (`i₂ t) l r ↝SN r [ t /0] < ↑ i
--- structural
-  [∙]₂ : ∀ {σ i f g} → Γ ⊢ σ ⇒ τ ∋ f ↝SN g < i → ∀ t → Γ ⊢ τ ∋ f `∙ t ↝SN g `∙ t < ↑ i
-  [c]₁ : ∀ {σ₁ σ₂ i t u} → Γ ⊢ σ₁ + σ₂ ∋ t ↝SN u < i → ∀ l r →
-         Γ ⊢ τ ∋ `case t l r ↝SN `case u l r < ↑ i
+_⊢_∋_↝SN_<_ = _⊢[ _⊢SN_∋_<_ ]_∋_↝_<_
 
 data _⊢SN_∋_<_ Γ where
   neu : ∀ {σ t i} → Γ ⊢SNe σ ∋ t < i → Γ ⊢SN σ ∋ t < ↑ i
   lam : ∀ {σ τ b i} → (σ ∷ Γ) ⊢SN τ ∋ b < i → Γ ⊢SN σ ⇒ τ ∋ `λ b < ↑ i
   inl : ∀ {σ τ t i} → Γ ⊢SN σ ∋ t < i → Γ ⊢SN σ + τ ∋ `i₁ t < ↑ i
   inr : ∀ {σ τ t i} → Γ ⊢SN τ ∋ t < i → Γ ⊢SN σ + τ ∋ `i₂ t < ↑ i
+  zro : ∀ {i} → Γ ⊢SN ℕ ∋ `0 < ↑ i
+  suc : ∀ {i t} → Γ ⊢SN ℕ ∋ t < i → Γ ⊢SN ℕ ∋ `1+ t < ↑ i
   red : ∀ {σ t t′ i} → Γ ⊢ σ ∋ t ↝SN t′ < i → Γ ⊢SN σ ∋ t′ < i → Γ ⊢SN σ ∋ t < ↑ i
 
 data _⊢SNe_∋_<_ Γ where
@@ -714,8 +725,9 @@ data _⊢SNe_∋_<_ Γ where
   app : ∀ {σ τ f t i} → Γ ⊢SNe σ ⇒ τ ∋ f < i → Γ ⊢SN σ ∋ t < i → Γ ⊢SNe τ ∋ f `∙ t < ↑ i
   cas : ∀ {σ τ ν t l r i} → Γ ⊢SNe σ + τ ∋ t < i →
         (σ ∷ Γ) ⊢SN ν ∋ l < i → (τ ∷ Γ) ⊢SN ν ∋ r < i → Γ ⊢SNe ν ∋ `case t l r < ↑ i
+  rec : ∀ {σ i ze su t} → Γ ⊢SN σ ∋ ze < i → (σ ∷ ℕ ∷ Γ) ⊢SN σ ∋ su < i →
+        Γ ⊢SNe ℕ ∋ t < i → Γ ⊢SNe σ ∋ `rec ze su t < ↑ i
 
-infix 4 _⊢_∋_↝SN_ _⊢SN_∋_ _⊢SNe_∋_
 _⊢_∋_↝SN_ = _⊢_∋_↝SN_< _
 _⊢SN_∋_ = _⊢SN_∋_< _
 _⊢SNe_∋_ = _⊢SNe_∋_< _
@@ -742,6 +754,9 @@ cut⁻¹^SNe (app f^SNe t^SN) =
 cut⁻¹^SNe (cas t^SNe l^SN r^SN) =
   let (_ , v , eq , c^SN) = cut⁻¹^SNe t^SNe
   in _ , v , cong (λ t → `case t _ _) eq , cas c^SN l^SN r^SN
+cut⁻¹^SNe (rec ze^SN su^SN t^SNe) =
+  let (_ , v , eq , c^SN) = cut⁻¹^SNe t^SNe
+  in _ , v , cong (`rec _ _) eq , rec ze^SN su^SN c^SN
 
 -- Lemma 4.11 Thinning
 mutual
@@ -752,26 +767,36 @@ mutual
  th^SN ρ (lam t)   = lam (th^SN _ t)
  th^SN ρ (inl t)   = inl (th^SN ρ t)
  th^SN ρ (inr t)   = inr (th^SN ρ t)
+ th^SN ρ zro       = zro
+ th^SN ρ (suc t)   = suc (th^SN ρ t)
  th^SN ρ (red r t) = red (th^↝SN ρ r) (th^SN ρ t)
 
  -- 2.
  th^SNe : ∀ {σ Γ Δ t} ρ → Γ ⊢SNe σ ∋ t → Δ ⊢SNe σ ∋ ren ρ t
- th^SNe ρ (var v)     = var (lookup ρ v)
- th^SNe ρ (app n t)   = app (th^SNe ρ n) (th^SN ρ t)
- th^SNe ρ (cas n l r) = cas (th^SNe ρ n) (th^SN _ l) (th^SN _ r)
+ th^SNe ρ (var v)       = var (lookup ρ v)
+ th^SNe ρ (app n t)     = app (th^SNe ρ n) (th^SN ρ t)
+ th^SNe ρ (cas n l r)   = cas (th^SNe ρ n) (th^SN _ l) (th^SN _ r)
+ th^SNe ρ (rec ze su t) = rec (th^SN ρ ze) (th^SN _ su) (th^SNe ρ t)
 
  -- 3.
  th^↝SN : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝SN u → Δ ⊢ σ ∋ ren ρ t ↝SN ren ρ u
- th^↝SN ρ (β t u u^SN)         =
+ -- computational
+ th^↝SN ρ (β t u u^SN)            =
    subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝SN_< _) (sym $ renβ TermD t u ρ) (β _ (ren ρ u) (th^SN ρ u^SN))
- th^↝SN ρ (ι₁ t l r t^SN r^SN) =
+ th^↝SN ρ (ι₁ t l r t^SN r^SN)    =
    subst (_ ⊢ _ ∋ ren ρ (`case (`i₁ t) l r) ↝SN_< _) (sym $ renβ TermD l t ρ)
    $ ι₁ _ _ (ren _ r) (th^SN ρ t^SN) (th^SN _ r^SN)
- th^↝SN ρ (ι₂ t l r t^SN l^SN) =
+ th^↝SN ρ (ι₂ t l r t^SN l^SN)    =
    subst (_ ⊢ _ ∋ ren ρ (`case (`i₂ t) l r) ↝SN_< _) (sym $ renβ TermD r t ρ)
    $ ι₂ _ (ren _ l) _ (th^SN ρ t^SN) (th^SN _ l^SN)
- th^↝SN ρ ([∙]₂ r t)           = [∙]₂ (th^↝SN ρ r) (ren ρ t)
- th^↝SN ρ ([c]₁ r bl br)       = [c]₁ (th^↝SN ρ r) (ren _ bl) (ren _ br)
+ th^↝SN ρ (ιz ze su su^SN)        = ιz (ren ρ ze) (ren _ su) (th^SN _ su^SN)
+ th^↝SN ρ (ιs ze su t ze^SN t^SN) =
+   subst (_ ⊢ _ ∋ ren ρ (`rec ze su (`1+ t)) ↝SN_< _) {!!}
+   $ ιs (ren ρ ze) (ren _ su) (ren ρ t) (th^SN ρ ze^SN) (th^SN ρ t^SN)
+ -- structural
+ th^↝SN ρ ([∙]₂ r t)     = [∙]₂ (th^↝SN ρ r) (ren ρ t)
+ th^↝SN ρ ([c]₁ r bl br) = [c]₁ (th^↝SN ρ r) (ren _ bl) (ren _ br)
+ th^↝SN ρ ([r]₃ ze su r) = [r]₃ (ren ρ ze) (ren _ su) (th^↝SN ρ r)
 
 -- Lemma 4.12 Anti-Thinning
 mutual
@@ -782,9 +807,13 @@ mutual
  th⁻¹^SN (`λ t)    ρ refl  (lam pr) = lam (th⁻¹^SN t _ refl pr)
  th⁻¹^SN (`i₁ t)   ρ refl  (inl pr) = inl (th⁻¹^SN t ρ refl pr)
  th⁻¹^SN (`i₂ t)   ρ refl  (inr pr) = inr (th⁻¹^SN t ρ refl pr)
+ th⁻¹^SN `0        ρ refl  zro      = zro
+ th⁻¹^SN (`1+ t)   ρ refl  (suc pr) = suc (th⁻¹^SN t ρ refl pr)
  th⁻¹^SN (`var v)  ρ ()    (lam pr)
  th⁻¹^SN (`var v)  ρ ()    (inl pr)
  th⁻¹^SN (`var v)  ρ ()    (inr pr)
+ th⁻¹^SN (`var v)  ρ ()    zro
+ th⁻¹^SN (`var v)  ρ ()    (suc pr)
  th⁻¹^SN t         ρ refl  (red r pr)  =
    let (t′ , eq , r′) = th⁻¹^↝SN t ρ r in red r′ (th⁻¹^SN t′ ρ eq pr)
 
@@ -795,25 +824,36 @@ mutual
    app (th⁻¹^SNe f ρ refl rf) (th⁻¹^SN t ρ refl rt)
  th⁻¹^SNe (`case t l r) ρ refl (cas rt rl rr) =
    cas (th⁻¹^SNe t ρ refl rt) (th⁻¹^SN l _ refl rl) (th⁻¹^SN r _ refl rr)
+ th⁻¹^SNe (`rec ze su t) ρ refl (rec rze rsu rt) =
+   rec (th⁻¹^SN ze ρ refl rze) (th⁻¹^SN su _ refl rsu) (th⁻¹^SNe t ρ refl rt)
 
  -- 3.
  th⁻¹^↝SN : ∀ {σ Γ Δ u} t ρ → Δ ⊢ σ ∋ ren ρ t ↝SN u → ∃ λ u′ → u ≡ ren ρ u′ × Γ ⊢ σ ∋ t ↝SN u′
+ -- value constructors don't head SN-reduce
  th⁻¹^↝SN (`var v)    ρ ()
  th⁻¹^↝SN (`λ b)      ρ ()
  th⁻¹^↝SN (`i₁ t)     ρ ()
  th⁻¹^↝SN (`i₂ t)     ρ ()
+ th⁻¹^↝SN `0          ρ ()
+ th⁻¹^↝SN (`1+ t)     ρ ()
  -- reductions
- th⁻¹^↝SN (`λ b `∙ t)         ρ (β ._ ._ t^SN)             =
+ th⁻¹^↝SN (`λ b `∙ t) ρ (β ._ ._ t^SN) =
    b [ t /0] , sym (renβ TermD b t ρ) , β b t (th⁻¹^SN t ρ refl t^SN)
- th⁻¹^↝SN (`case (`i₁ t) l r) ρ (ι₁ ._ ._ ._ t^SN r^SN)    =
+ th⁻¹^↝SN (`case (`i₁ t) l r) ρ (ι₁ ._ ._ ._ t^SN r^SN) =
    l [ t /0] , sym (renβ TermD l t ρ) , ι₁ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN r _ refl r^SN)
- th⁻¹^↝SN (`case (`i₂ t) l r) ρ (ι₂ ._ ._ ._ t^SN l^SN)    =
+ th⁻¹^↝SN (`case (`i₂ t) l r) ρ (ι₂ ._ ._ ._ t^SN l^SN) =
    r [ t /0] , sym (renβ TermD r t ρ) , ι₂ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN l _ refl l^SN)
+ th⁻¹^↝SN (`rec ze su `0) ρ (ιz _ _ su^SN) = ze , refl , ιz ze su (th⁻¹^SN su _ refl su^SN)
+ th⁻¹^↝SN (`rec ze su (`1+ t)) ρ (ιs _ _ _ ze^SN t^SN) =
+   sub (base vl^Tm ∙ t ∙ `rec ze su t) su , {!!}
+   , ιs ze su t (th⁻¹^SN ze ρ refl ze^SN) (th⁻¹^SN t ρ refl t^SN)
 -- structural
  th⁻¹^↝SN (f `∙ t)        ρ ([∙]₂ r ._)    =
    let (g , eq , r′) = th⁻¹^↝SN f ρ r in g `∙ t , cong (_`∙ ren ρ t) eq , [∙]₂ r′ t
  th⁻¹^↝SN (`case c bl br) ρ ([c]₁ r ._ ._) = let (d , eq , r′) = th⁻¹^↝SN c ρ r in
    `case d bl br , cong (λ c → `case c (ren _ bl) (ren _ br)) eq , [c]₁ r′ bl br
+ th⁻¹^↝SN (`rec ze su t) ρ ([r]₃ ._ ._ r) = let (t′ , eq , r′) = th⁻¹^↝SN t ρ r in
+   `rec ze su t′ , cong (`rec (ren ρ ze) (ren _ su)) eq , [r]₃ ze su r′
 
 -- Lemma 4.13 SNe is closed under application
 _SNe∙_ : ∀ {Γ σ τ f t} → Γ ⊢SNe σ ⇒ τ ∋ f → Γ ⊢SN σ ∋ t → Γ ⊢SN τ ∋ f `∙ t
@@ -831,34 +871,33 @@ SN-ext v (red (β t _ v^SN) fv^SN) = lam (th⁻¹^SN t (base vl^Var ∙ v) eq fv
 
 -- Section 4.3 Soundness (Short alternative proof)
 infix 4 _⊢_∋_↝sn_<_ _⊢_∋_↝sn_
-data _⊢_∋_↝sn_<_ Γ τ : (t u : Term τ Γ) → Size → Set where
-  β    : ∀ {σ i} b u → Γ ⊢sn σ ∋ u → Γ ⊢ τ ∋ `λ b `∙ u ↝sn b [ u /0] < ↑ i
-  ι₁   : ∀ {σ₁ σ₂ i} t l r → Γ ⊢sn σ₁ ∋ t < i → (σ₂ ∷ Γ) ⊢sn τ ∋ r < i →
-         Γ ⊢ τ ∋ `case (`i₁ t) l r ↝sn l [ t /0] < ↑ i
-  ι₂   : ∀ {σ₁ σ₂ i} t l r → Γ ⊢sn σ₂ ∋ t < i → (σ₁ ∷ Γ) ⊢sn τ ∋ l < i →
-         Γ ⊢ τ ∋ `case (`i₂ t) l r ↝sn r [ t /0] < ↑ i
--- structural
-  [∙]₂ : ∀ {σ i f g} → Γ ⊢ σ ⇒ τ ∋ f ↝sn g < i → ∀ t → Γ ⊢ τ ∋ f `∙ t ↝sn g `∙ t < ↑ i
-  [c]₁ : ∀ {σ₁ σ₂ i t u} → Γ ⊢ σ₁ + σ₂ ∋ t ↝sn u < i → ∀ l r →
-         Γ ⊢ τ ∋ `case t l r ↝sn `case u l r < ↑ i
-
+_⊢_∋_↝sn_<_ = _⊢[ _⊢sn_∋_<_ ]_∋_↝_<_
 _⊢_∋_↝sn_ = _⊢_∋_↝sn_< _
 
 -- Lemma 4.17 Backwards closure of sn
 ↝sn⁻¹^sn : ∀ {Γ σ τ t′ t i} c → Γ ⊢ σ ∋ t′ ↝sn t < i →
            Γ ⊢sn τ ∋ cut t c → Γ ⊢sn τ ∋ cut t′ c
+-- computational
 ↝sn⁻¹^sn c (β b u u^sn) c[b[u]]^sn =
   let (c^sn , b[u]^sn) = cut⁻¹^sn (b [ u /0]) c c[b[u]]^sn in
   let b^sn = [/0]⁻¹^sn b u b[u]^sn in
-  β⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn
+  c[fire⁻¹]^sn (β b u) (b^sn , u^sn) c^sn c[b[u]]^sn
 ↝sn⁻¹^sn c (ι₁ t l r t^sn r^sn) c[l[t]]^sn =
   let (c^sn , l[t]^sn) = cut⁻¹^sn (l [ t /0]) c c[l[t]]^sn in
   let l^sn = [/0]⁻¹^sn l t l[t]^sn in
-  ι₁⁻¹^sn c t l r t^sn l^sn r^sn c[l[t]]^sn c^sn
+  c[fire⁻¹]^sn (ι₁ t l r) (t^sn , l^sn , r^sn) c^sn c[l[t]]^sn
 ↝sn⁻¹^sn c (ι₂ t l r t^sn l^sn) c[r[t]]^sn =
   let (c^sn , r[t]^sn) = cut⁻¹^sn (r [ t /0]) c c[r[t]]^sn in
   let r^sn = [/0]⁻¹^sn r t r[t]^sn in
-  ι₂⁻¹^sn c t l r t^sn l^sn r^sn c[r[t]]^sn c^sn
+  c[fire⁻¹]^sn (ι₂ t l r) (t^sn , l^sn , r^sn) c^sn c[r[t]]^sn
+↝sn⁻¹^sn c (ιz ze su su^sn) c[ze]^sn =
+  let (c^sn , ze^sn) = cut⁻¹^sn ze c c[ze]^sn in
+  c[fire⁻¹]^sn (ιz ze su) (ze^sn , su^sn) c^sn c[ze]^sn
+↝sn⁻¹^sn c (ιs ze su t ze^sn t^sn) c[s[zst]]^sn =
+  let (c^sn , s[zst]^sn) = cut⁻¹^sn _ c c[s[zst]]^sn in
+  let su^sn = sub⁻¹^sn su (base vl^Tm ∙ t ∙ `rec ze su t) s[zst]^sn in
+  c[fire⁻¹]^sn (ιs ze su t) (ze^sn , su^sn , t^sn) c^sn c[s[zst]]^sn
+-- structural
 ↝sn⁻¹^sn c ([∙]₂ r^sn u) c[ft]^sn =
   let eq t   = cut-∘C t c (app <> u) in
   let ft^sn′ = subst (_ ⊢sn _ ∋_) (eq _) c[ft]^sn in
@@ -868,6 +907,11 @@ _⊢_∋_↝sn_ = _⊢_∋_↝sn_< _
   let eq t    = cut-∘C t c (cas <> l r) in
   let slr^sn′ = subst (_ ⊢sn _ ∋_) (eq _) c[slr]^sn in
   let ih      = ↝sn⁻¹^sn (c ∘C cas <> l r) r^sn slr^sn′ in
+  subst (_ ⊢sn _ ∋_) (sym (eq _)) ih
+↝sn⁻¹^sn c ([r]₃ ze su r^sn) c[zst]^sn =
+  let eq t    = cut-∘C t c (rec ze su <>) in
+  let zst^sn′ = subst (_ ⊢sn _ ∋_) (eq _) c[zst]^sn in
+  let ih      = ↝sn⁻¹^sn (c ∘C rec ze su <>) r^sn zst^sn′ in
   subst (_ ⊢sn _ ∋_) (sym (eq _)) ih
 
  -- Theorem 4.18 Soundness of SN
@@ -879,21 +923,27 @@ mutual
  sound^SN (lam b^SN)   = `λ^sn (sound^SN b^SN)
  sound^SN (inl t^SN)   = `i₁^sn (sound^SN t^SN)
  sound^SN (inr t^SN)   = `i₂^sn (sound^SN t^SN)
+ sound^SN zro          = `0^sn
+ sound^SN (suc t^SN)   = `1+^sn (sound^SN t^SN)
  sound^SN (red r t^SN) = ↝sn⁻¹^sn <> (sound^↝SN r) (sound^SN t^SN)
 
  -- 2.
  sound^∣SN : ∀ {Γ α σ c i} → Γ ∣ α ⊢SN σ ∋ c < i → Γ ∣ α ⊢sn σ ∋ c
- sound^∣SN <>                   = <>
- sound^∣SN (app c^SN t^SN)      = app (sound^∣SN c^SN) (sound^SN t^SN)
- sound^∣SN (cas c^SN l^SN r^SN) = cas (sound^∣SN c^SN) (sound^SN l^SN) (sound^SN r^SN)
+ sound^∣SN <>                     = <>
+ sound^∣SN (app c^SN t^SN)        = app (sound^∣SN c^SN) (sound^SN t^SN)
+ sound^∣SN (cas c^SN l^SN r^SN)   = cas (sound^∣SN c^SN) (sound^SN l^SN) (sound^SN r^SN)
+ sound^∣SN (rec ze^SN su^SN t^SN) = rec (sound^SN ze^SN) (sound^SN su^SN) (sound^∣SN t^SN)
 
  -- 3.
  sound^↝SN : ∀ {Γ σ t u i} → Γ ⊢ σ ∋ t ↝SN u < i → Γ ⊢ σ ∋ t ↝sn u
- sound^↝SN (β t u u^SN)         = β t u (sound^SN u^SN)
- sound^↝SN (ι₁ t l r t^SN r^SN) = ι₁ t l r (sound^SN t^SN) (sound^SN r^SN)
- sound^↝SN (ι₂ t l r t^SN l^SN) = ι₂ t l r (sound^SN t^SN) (sound^SN l^SN)
- sound^↝SN ([∙]₂ r t)           = [∙]₂ (sound^↝SN r) t
- sound^↝SN ([c]₁ r _ _)         = [c]₁ (sound^↝SN r) _ _
+ sound^↝SN (β t u u^SN)            = β t u (sound^SN u^SN)
+ sound^↝SN (ι₁ t l r t^SN r^SN)    = ι₁ t l r (sound^SN t^SN) (sound^SN r^SN)
+ sound^↝SN (ι₂ t l r t^SN l^SN)    = ι₂ t l r (sound^SN t^SN) (sound^SN l^SN)
+ sound^↝SN (ιz ze su su^SN)        = ιz ze su (sound^SN su^SN)
+ sound^↝SN (ιs ze su t ze^SN t^SN) = ιs ze su t (sound^SN ze^SN) (sound^SN t^SN)
+ sound^↝SN ([∙]₂ r t)              = [∙]₂ (sound^↝SN r) t
+ sound^↝SN ([c]₁ r _ _)            = [c]₁ (sound^↝SN r) _ _
+ sound^↝SN ([r]₃ _ _ r)            = [r]₃ _ _ (sound^↝SN r)
 
 -- Section 4.4 Soundness and Completeness
 
@@ -903,43 +953,27 @@ mutual
 data Elim (Γ : List Type) (τ : Type) : Type → Set where
   app : ∀ {σ} → Term σ Γ → Elim Γ τ (σ ⇒ τ)
   cas : ∀ {σ₁ σ₂} → Term τ (σ₁ ∷ Γ) → Term τ (σ₂ ∷ Γ) → Elim Γ τ (σ₁ + σ₂)
+  rec : Term τ Γ → Term τ (τ ∷ ℕ ∷ Γ) → Elim Γ τ ℕ
 
 elim : ∀ {Γ σ τ} → Elim Γ τ σ → Γ ∣ σ ⊢ τ
-elim (app t)   = app <> t
-elim (cas l r) = cas <> l r
-
-data Red (Γ : List Type) (τ : Type) : Set where
-  β  : ∀ {σ}     → Term τ (σ ∷ Γ) → Term σ Γ → Red Γ τ
-  ι₁ : ∀ {σ₁ σ₂} → Term σ₁ Γ → Term τ (σ₁ ∷ Γ) → Term τ (σ₂ ∷ Γ) → Red Γ τ
-  ι₂ : ∀ {σ₁ σ₂} → Term σ₂ Γ → Term τ (σ₁ ∷ Γ) → Term τ (σ₂ ∷ Γ) → Red Γ τ
-
-unRed : ∀ {Γ τ} → Red Γ τ → Term τ Γ
-unRed (β b u)    = `λ b `∙ u
-unRed (ι₁ t l r) = `case (`i₁ t) l r
-unRed (ι₂ t l r) = `case (`i₂ t) l r
-
-βιRed : ∀ {Γ τ} → Red Γ τ → Term τ Γ
-βιRed (β b u)    = b [ u /0]
-βιRed (ι₁ t l r) = l [ t /0]
-βιRed (ι₂ t l r) = r [ t /0]
-
-fire : ∀ {Γ τ} r → Γ ⊢ τ ∋ unRed r ↝ βιRed r
-fire (β b u)     = β b u
-fire (ι₁ t l r)  = ι₁ t l r
-fire (ι₂ t l r)  = ι₂ t l r
+elim (app t)     = app <> t
+elim (cas l r)   = cas <> l r
+elim (rec ze su) = rec ze su <>
 
 mutual
   -- 1.
   complete^SNe : ∀ {Γ σ α i c} v → Γ ∣ α ⊢SN σ ∋ c →
     let t = cut (`var v) c in ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SNe σ ∋ t′
-  complete^SNe v <>                refl c[v]^sn   = var v
-  complete^SNe v (app c t^SN)      refl c[v]∙t^sn =
+  complete^SNe v <>                  refl c[v]^sn   = var v
+  complete^SNe v (app c t^SN)        refl c[v]∙t^sn =
     app (complete^SNe v c refl (`∙t⁻¹^sn c[v]∙t^sn)) t^SN
-  complete^SNe v (cas c l^SN r^SN) refl c[v]lr^sn =
+  complete^SNe v (cas c l^SN r^SN)   refl c[v]lr^sn =
     cas (complete^SNe v c refl (`case₁⁻¹^sn c[v]lr^sn)) l^SN r^SN
+  complete^SNe v (rec ze^SN su^SN c) refl czs[v]^sn =
+    {!!}
 
   -- 2.
-  complete^SN-βι : ∀ {Γ α σ i} (r : Red Γ α) c →
+  complete^SN-βι : ∀ {Γ α σ i} (r : Γ ⊢↯ α) c →
     let t = cut (unRed r) c in Γ ⊢ σ ∋ t ↝SN cut (βιRed r) c →
     ∀ {t′} → t′ ≡ t → Γ ⊢sn σ ∋ t′ < i → Γ ⊢SN σ ∋ t′
   complete^SN-βι t c r refl (sn p) = red r (complete^SN _ (p (cut^↝ c (fire t))))
@@ -949,6 +983,8 @@ mutual
   complete^SN (`var v)      v^sn  = neu (var v)
   complete^SN (`i₁ t)       it^sn = inl (complete^SN t (`i₁⁻¹^sn it^sn))
   complete^SN (`i₂ t)       it^sn = inr (complete^SN t (`i₂⁻¹^sn it^sn))
+  complete^SN `0            ze^sn = zro
+  complete^SN (`1+ t)       st^sn = suc (complete^SN t (`1+⁻¹^sn st^sn))
   complete^SN (`λ b)        λb^sn = lam (complete^SN b (`λ⁻¹^sn λb^sn))
   complete^SN (f `∙ t)      ft^sn =
     let (f^sn , t^sn) = `∙⁻¹^sn ft^sn in
@@ -958,6 +994,10 @@ mutual
     let (t^sn , l^sn , r^sn) = `case⁻¹^sn tlr^sn in
     let (l^SN , r^SN) = (complete^SN l l^sn , complete^SN r r^sn) in
     elim^SN t (cas l r) t^sn (cas <> l^SN r^SN) tlr^sn
+  complete^SN (`rec ze su t) zst^sn =
+    let (ze^sn , su^sn , t^sn) = `rec⁻¹^sn zst^sn in
+    let (ze^SN , su^SN) = (complete^SN ze ze^sn , complete^SN su su^sn) in
+    elim^SN t (rec ze su) t^sn (rec ze^SN su^SN <>) zst^sn
 
   elim^SN : ∀ {Γ σ τ i} t e → Γ ⊢sn σ ∋ t < i → Γ ∣ σ ⊢SN τ ∋ elim e →
                Γ ⊢sn τ ∋ cut t (elim e) < i → Γ ⊢SN τ ∋ cut t (elim e)
@@ -971,6 +1011,7 @@ mutual
       (∃ λ v → cut t (elim e) ≡ cut (`var v) c × Γ ∣ α ⊢SN τ ∋ c)
     ⊎ (∃ λ r → cut t (elim e) ≡ cut (unRed r) c
              × Γ ⊢ τ ∋ cut (unRed r) c ↝SN cut (βιRed r) c)
+  -- redex
   spine^SN (`var v) e tm^sn e^SN = _ , elim e , inj₁ (v , refl , e^SN)
   spine^SN (`λ b) (app t) tm^sn (app <> t^SN) = _ , <> , inj₂ (β b t , refl , β b t t^SN)
   spine^SN (`i₁ t) (cas l r) tm^sn (cas <> l^SN r^SN) =
@@ -979,12 +1020,18 @@ mutual
   spine^SN (`i₂ t) (cas l r) tm^sn (cas <> l^SN r^SN) =
     let t^SN = complete^SN t (`i₂⁻¹^sn tm^sn) in
     _ , <> , inj₂ (ι₂ t l r , refl , ι₂ t l r t^SN l^SN)
+  spine^SN `0 (rec ze su) tm^sn (rec ze^SN su^SN <>) =
+    _ , <> , inj₂ (ιz ze su , refl , ιz ze su su^SN)
+  spine^SN (`1+ t) (rec ze su) tm^sn (rec ze^SN su^SN <>) =
+    let t^SN = complete^SN t (`1+⁻¹^sn tm^sn) in
+    _ , <> , inj₂ (ιs ze su t , refl , ιs ze su t ze^SN t^SN)
+  -- structural (TODO: refactor?)
   spine^SN (f `∙ t) e tm^sn e^SN =
     let (f^sn , t^sn) = `∙⁻¹^sn tm^sn in
     let t^SN = complete^SN t t^sn in
     case spine^SN f (app t) f^sn (app <> t^SN) of λ where
       (_ , c , inj₁ (v , eq , c^SN)) →
-        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^SN e^SN c^SN)
+        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^R e^SN c^SN)
       (_ , c , inj₂ (r , eq , r^SN)) →
         _ , (elim e ∘C c) , inj₂ (r , spine-eq e c eq , spine-red e c r r^SN)
   spine^SN (`case t l r) e tm^sn e^SN =
@@ -992,7 +1039,15 @@ mutual
     let (l^SN , r^SN) = (complete^SN l l^sn , complete^SN r r^sn) in
     case spine^SN t (cas l r) t^sn (cas <> l^SN r^SN) of λ where
       (_ , c , inj₁ (v , eq , c^SN)) →
-        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^SN e^SN c^SN)
+        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^R e^SN c^SN)
+      (_ , c , inj₂ (r , eq , r^SN)) →
+        _ , (elim e ∘C c) , inj₂ (r , spine-eq e c eq , spine-red e c r r^SN)
+  spine^SN (`rec ze su t) e tm^sn e^SN =
+    let (ze^sn , su^sn , t^sn) = `rec⁻¹^sn tm^sn in
+    let (ze^SN , su^SN) = (complete^SN ze ze^sn , complete^SN su su^sn) in
+    case spine^SN t (rec ze su) t^sn (rec ze^SN su^SN <>) of λ where
+      (_ , c , inj₁ (v , eq , c^SN)) →
+        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^R e^SN c^SN)
       (_ , c , inj₂ (r , eq , r^SN)) →
         _ , (elim e ∘C c) , inj₂ (r , spine-eq e c eq , spine-red e c r r^SN)
 
@@ -1000,42 +1055,67 @@ mutual
              tc ≡ cut t c → cut tc (elim e) ≡ cut t (elim e ∘C c)
   spine-eq e c refl = cut-∘C _ (elim e) c
 
-  spine-red : ∀ {Γ α β σ} e c → (r : Red Γ α) →
+  spine-red : ∀ {Γ α β σ} e c → (r : Γ ⊢↯ α) →
               Γ ⊢ β ∋ cut (unRed r) c ↝SN cut (βιRed r) c →
               Γ ⊢ σ ∋ cut (unRed r) (elim e ∘C c) ↝SN cut (βιRed r) (elim e ∘C c)
   spine-red (app t)   c r r^SN = [∙]₂ r^SN t
   spine-red (cas _ _) c r r^SN = [c]₁ r^SN _ _
+  spine-red (rec _ _) c r r^SN = [r]₃ _ _ r^SN
 
 -- Section 5 Reducibility Candidates
 -------------------------------------------------------------------
+
+infix 2 <_>
+data <_> {Γ σ} (𝓢 : Term σ Γ → Set) (t : Term σ Γ) : Set where
+  cnd : 𝓢 t → < 𝓢 > t
+  neu : Γ ⊢SNe σ ∋ t → < 𝓢 > t
+  red : ∀ {t′} → Γ ⊢ σ ∋ t ↝SN t′ → < 𝓢 > t′ → < 𝓢 > t
+
 infix 3 _+𝓡_
 data _+𝓡_ {Γ σ τ} (𝓢 : Term σ Γ → Set) (𝓣 : Term τ Γ → Set) : Term (σ + τ) Γ → Set where
-  -- values
   inl : ∀ {t} → 𝓢 t → (𝓢 +𝓡 𝓣) (`i₁ t)
   inr : ∀ {t} → 𝓣 t → (𝓢 +𝓡 𝓣) (`i₂ t)
-  neu : ∀ {t} → Γ ⊢SNe σ + τ ∋ t → (𝓢 +𝓡 𝓣) t
-  -- closed under anti-reduction
-  red : ∀ {t u} → Γ ⊢ σ + τ ∋ t ↝SN u → (𝓢 +𝓡 𝓣) u → (𝓢 +𝓡 𝓣) t
+
+data ℕ𝓡 {Γ} : Size → Term ℕ Γ → Set where
+  zro : ∀ {i} → ℕ𝓡 (↑ i) `0
+  suc : ∀ {i t} → < ℕ𝓡 i > t → ℕ𝓡 (↑ i) (`1+ t)
 
 infix 3 _⊢𝓡_∋_
 _⊢𝓡_∋_     : ∀ Γ σ → Term σ Γ → Set
 Γ ⊢𝓡 α     ∋ t = Γ ⊢SN α ∋ t
-Γ ⊢𝓡 σ + τ ∋ t = ((Γ ⊢𝓡 σ ∋_) +𝓡 (Γ ⊢𝓡 τ ∋_)) t
+Γ ⊢𝓡 ℕ     ∋ t = < ℕ𝓡 _ > t
+Γ ⊢𝓡 σ + τ ∋ t = < (Γ ⊢𝓡 σ ∋_) +𝓡 (Γ ⊢𝓡 τ ∋_) > t
 Γ ⊢𝓡 σ ⇒ τ ∋ t = ∀ {Δ} ρ {u} → Δ ⊢𝓡 σ ∋ u → Δ ⊢𝓡 τ ∋ ren ρ t `∙ u
 
 𝓡^P : Pred Term
 pred 𝓡^P = _ ⊢𝓡 _ ∋_
 
+Quote : List Type → Type → Set
+Quote Γ σ = ∀ {t} → Γ ⊢𝓡 σ ∋ t → Γ ⊢SN σ ∋ t
+
 -- Theorem 5.1
+quote^<>  : ∀ {Γ σ 𝓢} → (∀ {t} → 𝓢 t → Γ ⊢SN σ ∋ t) →
+            ∀ {t} → < 𝓢 > t → Γ ⊢SN σ ∋ t
+quote^<> σ^𝓡 (cnd t^𝓡)   = σ^𝓡 t^𝓡
+quote^<> σ^𝓡 (neu t^SNe)  = neu t^SNe
+quote^<> σ^𝓡 (red r t^𝓡) = red r (quote^<> σ^𝓡 t^𝓡)
+
+quote^+𝓡  : ∀ {Γ σ τ} → Quote Γ σ → Quote Γ τ →
+             ∀ {t} → ((Γ ⊢𝓡 σ ∋_) +𝓡 (Γ ⊢𝓡 τ ∋_)) t → Γ ⊢SN σ + τ ∋ t
+quote^+𝓡 σ^𝓡 τ^𝓡 (inl t^𝓡) = inl (σ^𝓡 t^𝓡)
+quote^+𝓡 σ^𝓡 τ^𝓡 (inr t^𝓡) = inr (τ^𝓡 t^𝓡)
+
+quote^ℕ𝓡 : ∀ {Γ t i} → ℕ𝓡 i t → Γ ⊢SN ℕ ∋ t
+quote^ℕ𝓡 zro        = zro
+quote^ℕ𝓡 (suc t^𝓡) = suc (quote^<> quote^ℕ𝓡 t^𝓡)
+
 mutual
 
  -- 1.
- quote^𝓡 : ∀ {Γ} σ {t} → Γ ⊢𝓡 σ ∋ t → Γ ⊢SN σ ∋ t
+ quote^𝓡 : ∀ {Γ} σ → Quote Γ σ
  quote^𝓡 α       t^𝓡         = t^𝓡
- quote^𝓡 (σ + τ) (inl t^𝓡)   = inl (quote^𝓡 σ t^𝓡)
- quote^𝓡 (σ + τ) (inr t^𝓡)   = inr (quote^𝓡 τ t^𝓡)
- quote^𝓡 (σ + τ) (neu t^SNe)  = neu t^SNe
- quote^𝓡 (σ + τ) (red r t^𝓡) = red r (quote^𝓡 (σ + τ) t^𝓡)
+ quote^𝓡 ℕ       t^𝓡         = quote^<> quote^ℕ𝓡 t^𝓡
+ quote^𝓡 (σ + τ) t^𝓡         = quote^<> (quote^+𝓡 (quote^𝓡 σ) (quote^𝓡 τ)) t^𝓡
  quote^𝓡 (σ ⇒ τ) t^𝓡         = th⁻¹^SN _ embed refl (SN-ext z tz^SN)
    where z^𝓡  = unquote^𝓡 σ (var z)
          embed = pack s
@@ -1044,6 +1124,7 @@ mutual
  -- 2.
  unquote^𝓡 : ∀ {Γ} σ {t} → Γ ⊢SNe σ ∋ t → Γ ⊢𝓡 σ ∋ t
  unquote^𝓡 α       t^SNe        = neu t^SNe
+ unquote^𝓡 ℕ       t^SNe        = neu t^SNe
  unquote^𝓡 (σ + τ) t^SNe        = neu t^SNe
  unquote^𝓡 (σ ⇒ τ) t^SNe ρ u^𝓡 = unquote^𝓡 τ (app (th^SNe ρ t^SNe) u^SN)
    where u^SN = quote^𝓡 σ u^𝓡
@@ -1051,9 +1132,11 @@ mutual
 -- 3.
 ↝SN⁻¹^𝓡 : ∀ {Γ} σ {t′ t} → Γ ⊢ σ ∋ t′ ↝SN t → Γ ⊢𝓡 σ ∋ t → Γ ⊢𝓡 σ ∋ t′
 ↝SN⁻¹^𝓡 α       r t^𝓡 = red r t^𝓡
+↝SN⁻¹^𝓡 ℕ       r t^𝓡 = red r t^𝓡
 ↝SN⁻¹^𝓡 (σ + τ) r t^𝓡 = red r t^𝓡
 ↝SN⁻¹^𝓡 (σ ⇒ τ) r t^𝓡 = λ ρ u^𝓡 → ↝SN⁻¹^𝓡 τ ([∙]₂ (th^↝SN ρ r) _) (t^𝓡 ρ u^𝓡)
 
+{-
 th^𝓡 : ∀ {Γ Δ} σ ρ t → Γ ⊢𝓡 σ ∋ t → Δ ⊢𝓡 σ ∋ ren ρ t
 th^𝓡 α       ρ t t^𝓡         = th^SN ρ t^𝓡
 th^𝓡 (σ + τ) ρ _ (inl t^𝓡)   = inl (th^𝓡 σ ρ _ t^𝓡)
