@@ -227,14 +227,17 @@ f`∙⁻¹^sn (sn ft^sn) = sn (λ r → f`∙⁻¹^sn (ft^sn ([∙]₁ _ r)))
 -- Evaluation contexts indexed by the Scope, the type of the hole, and the
 -- type of the overall expression.
 
-infix 3 _∣_⊢_ _∣_⊢sn_∋_
+infix 3 _∣_⊢_ _∣_⊢[_]_∋_<_ _∣_⊢[_]_∋_ _∣_⊢sn_∋_
 data _∣_⊢_ Γ α : Type → Set where
   <>  : Γ ∣ α ⊢ α
   app : ∀ {σ τ} → Γ ∣ α ⊢ σ ⇒ τ → Term σ Γ → Γ ∣ α ⊢ τ
 
-data _∣_⊢sn_∋_ Γ α : ∀ τ (c : Γ ∣ α ⊢ τ) → Set where
-  <>  : Γ ∣ α ⊢sn α ∋ <>
-  app : ∀ {σ τ c t} → Γ ∣ α ⊢sn σ ⇒ τ ∋ c → Γ ⊢sn σ ∋ t → Γ ∣ α ⊢sn τ ∋ app c t
+data _∣_⊢[_]_∋_<_ Γ α (R : ∀ Γ σ → Term σ Γ → Size → Set) : ∀ τ (c : Γ ∣ α ⊢ τ) → Size → Set where
+  <>  : ∀ {i} → Γ ∣ α ⊢[ R ] α ∋ <> < ↑ i
+  app : ∀ {σ τ c t i} → Γ ∣ α ⊢[ R ] σ ⇒ τ ∋ c < i → R Γ σ t i → Γ ∣ α ⊢[ R ] τ ∋ app c t < ↑ i
+
+_∣_⊢[_]_∋_ = _∣_⊢[_]_∋_< _
+_∣_⊢sn_∋_ = _∣_⊢[ _⊢sn_∋_<_ ]_∋_
 
 cut : ∀ {Γ α σ} → Term α Γ → Γ ∣ α ⊢ σ → Term σ Γ
 cut t <>        = t
@@ -319,9 +322,9 @@ cut-∘C : ∀ {Γ α β σ} t (c : Γ ∣ β ⊢ σ) (c′ : Γ ∣ α ⊢ β) 
 cut-∘C t <>        c′ = refl
 cut-∘C t (app c u) c′ = cong (_`∙ u) (cut-∘C t c c′)
 
-∘C^sn : ∀ {Γ α β σ c c′} → Γ ∣ β ⊢sn σ ∋ c → Γ ∣ α ⊢sn β ∋ c′ → Γ ∣ α ⊢sn σ ∋ c ∘C c′
-∘C^sn <>              c′^sn = c′^sn
-∘C^sn (app c^sn t^sn) c′^sn = app (∘C^sn c^sn c′^sn) t^sn
+∘C^R : ∀ {Γ α R β σ c c′} → Γ ∣ β ⊢[ R ] σ ∋ c → Γ ∣ α ⊢[ R ] β ∋ c′ → Γ ∣ α ⊢[ R ] σ ∋ c ∘C c′
+∘C^R <>              c′^R = c′^R
+∘C^R (app c^R t^R) c′^R = app (∘C^R c^R c′^R) t^R
 
 -- Lemma 4.9
 β⁻¹^Closed-sn : ∀ {Γ α σ τ} c b u → (σ ∷ Γ) ⊢sn α ∋ b → Γ ⊢sn σ ∋ u →
@@ -380,10 +383,7 @@ pred SNe = _ ⊢SNe _ ∋_
 lookup^P [v↦v]^SNe v rewrite lookup-base^Tm {d = TermD} v = var v
 
 infix 4 _∣_⊢SN_∋_<_ _∣_⊢SN_∋_
-data _∣_⊢SN_∋_<_ Γ α : ∀ σ → Γ ∣ α ⊢ σ → Size → Set where
-  <>  : ∀ {i} → Γ ∣ α ⊢SN α ∋ <> < ↑ i
-  app : ∀ {i σ τ c t} → Γ ∣ α ⊢SN σ ⇒ τ ∋ c < i → Γ ⊢SN σ ∋ t < i → Γ ∣ α ⊢SN τ ∋ app c t < ↑ i
-
+_∣_⊢SN_∋_<_ = _∣_⊢[ _⊢SN_∋_<_ ]_∋_<_
 _∣_⊢SN_∋_ = _∣_⊢SN_∋_< _
 
 cut⁻¹^SNe : ∀ {Γ τ t i} → Γ ⊢SNe τ ∋ t < i → ∃ λ ctx → let (σ , c) = ctx in

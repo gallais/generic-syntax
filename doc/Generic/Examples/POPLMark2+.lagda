@@ -303,17 +303,20 @@ f`∙⁻¹^sn (sn ft^sn) = sn (λ r → f`∙⁻¹^sn (ft^sn ([∙]₁ _ r)))
 -- Evaluation contexts indexed by the Scope, the type of the hole, and the
 -- type of the overall expression.
 
-infix 3 _∣_⊢_ _∣_⊢sn_∋_
+infix 3 _∣_⊢_ _∣_⊢[_]_∋_<_ _∣_⊢[_]_∋_ _∣_⊢sn_∋_
 data _∣_⊢_ Γ α : Type → Set where
   <>  : Γ ∣ α ⊢ α
   app : ∀ {σ τ} → Γ ∣ α ⊢ σ ⇒ τ → Term σ Γ → Γ ∣ α ⊢ τ
   cas : ∀ {σ τ ν} → Γ ∣ α ⊢ σ + τ → Term ν (σ ∷ Γ) → Term ν (τ ∷ Γ) → Γ ∣ α ⊢ ν
 
-data _∣_⊢sn_∋_ Γ α : ∀ τ (c : Γ ∣ α ⊢ τ) → Set where
-  <>  : Γ ∣ α ⊢sn α ∋ <>
-  app : ∀ {σ τ c t} → Γ ∣ α ⊢sn σ ⇒ τ ∋ c → Γ ⊢sn σ ∋ t → Γ ∣ α ⊢sn τ ∋ app c t
-  cas : ∀ {σ τ ν c l r} → Γ ∣ α ⊢sn σ + τ ∋ c →
-        (σ ∷ Γ) ⊢sn ν ∋ l → (τ ∷ Γ) ⊢sn ν ∋ r → Γ ∣ α ⊢sn ν ∋ cas c l r
+data _∣_⊢[_]_∋_<_ Γ α (R : ∀ Γ σ → Term σ Γ → Size → Set) : ∀ σ → Γ ∣ α ⊢ σ → Size → Set where
+  <>  : ∀ {i} → Γ ∣ α ⊢[ R ] α ∋ <> < ↑ i
+  app : ∀ {i σ τ c t} → Γ ∣ α ⊢[ R ] σ ⇒ τ ∋ c < i → R Γ σ t i → Γ ∣ α ⊢[ R ] τ ∋ app c t < ↑ i
+  cas : ∀ {i σ τ ν c l r} → Γ ∣ α ⊢[ R ] σ + τ ∋ c < i →
+        R (σ ∷ Γ) ν l i → R (τ ∷ Γ) ν r i → Γ ∣ α ⊢[ R ] ν ∋ cas c l r < ↑ i
+
+_∣_⊢[_]_∋_ = _∣_⊢[_]_∋_< _
+_∣_⊢sn_∋_ = _∣_⊢[ _⊢sn_∋_<_ ]_∋_
 
 cut : ∀ {Γ α σ} → Term α Γ → Γ ∣ α ⊢ σ → Term σ Γ
 cut t <>          = t
@@ -435,10 +438,10 @@ cut-∘C t <>          c′ = refl
 cut-∘C t (app c u)   c′ = cong (_`∙ u) (cut-∘C t c c′)
 cut-∘C t (cas c l r) c′ = cong (λ t → `case t l r) (cut-∘C t c c′)
 
-∘C^sn : ∀ {Γ α β σ c c′} → Γ ∣ β ⊢sn σ ∋ c → Γ ∣ α ⊢sn β ∋ c′ → Γ ∣ α ⊢sn σ ∋ c ∘C c′
-∘C^sn <>                   c′^sn = c′^sn
-∘C^sn (app c^sn t^sn)      c′^sn = app (∘C^sn c^sn c′^sn) t^sn
-∘C^sn (cas c^sn l^sn r^sn) c′^sn = cas (∘C^sn c^sn c′^sn) l^sn r^sn
+∘C^R : ∀ {Γ α R β σ c c′} → Γ ∣ β ⊢[ R ] σ ∋ c → Γ ∣ α ⊢[ R ] β ∋ c′ → Γ ∣ α ⊢[ R ] σ ∋ c ∘C c′
+∘C^R <>                  c′^R = c′^R
+∘C^R (app c^R t^R)       c′^R = app (∘C^R c^R c′^R) t^R
+∘C^R (cas c^R l^R r^R)   c′^R = cas (∘C^R c^R c′^R) l^R r^R
 
 -- Lemma 4.9
 -- 1.
@@ -552,18 +555,9 @@ pred SNe = _ ⊢SNe _ ∋_
 lookup^P [v↦v]^SNe v rewrite lookup-base^Tm {d = TermD} v = var v
 
 infix 4 _∣_⊢SN_∋_<_ _∣_⊢SN_∋_
-data _∣_⊢SN_∋_<_ Γ α : ∀ σ → Γ ∣ α ⊢ σ → Size → Set where
-  <>  : ∀ {i} → Γ ∣ α ⊢SN α ∋ <> < ↑ i
-  app : ∀ {i σ τ c t} → Γ ∣ α ⊢SN σ ⇒ τ ∋ c < i → Γ ⊢SN σ ∋ t < i → Γ ∣ α ⊢SN τ ∋ app c t < ↑ i
-  cas : ∀ {i σ τ ν c l r} → Γ ∣ α ⊢SN σ + τ ∋ c < i →
-        (σ ∷ Γ) ⊢SN ν ∋ l < i → (τ ∷ Γ) ⊢SN ν ∋ r < i → Γ ∣ α ⊢SN ν ∋ cas c l r < ↑ i
 
+_∣_⊢SN_∋_<_ = _∣_⊢[ _⊢SN_∋_<_ ]_∋_<_
 _∣_⊢SN_∋_ = _∣_⊢SN_∋_< _
-
-∘C^SN : ∀ {Γ α β σ c c′} → Γ ∣ β ⊢SN σ ∋ c → Γ ∣ α ⊢SN β ∋ c′ → Γ ∣ α ⊢SN σ ∋ c ∘C c′
-∘C^SN <>                   c′^SN = c′^SN
-∘C^SN (app c^SN t^SN)      c′^SN = app (∘C^SN c^SN c′^SN) t^SN
-∘C^SN (cas c^SN l^SN r^SN) c′^SN = cas (∘C^SN c^SN c′^SN) l^SN r^SN
 
 cut⁻¹^SNe : ∀ {Γ τ t i} → Γ ⊢SNe τ ∋ t < i → ∃ λ ctx → let (σ , c) = ctx in
             ∃ λ v → t ≡ cut (`var v) c × Γ ∣ σ ⊢SN τ ∋ c < i
@@ -816,7 +810,7 @@ mutual
     let t^SN = complete^SN t t^sn in
     case spine^SN f (app t) f^sn (app <> t^SN) of λ where
       (_ , c , inj₁ (v , eq , c^SN)) →
-        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^SN e^SN c^SN)
+        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^R e^SN c^SN)
       (_ , c , inj₂ (r , eq , r^SN)) →
         _ , (elim e ∘C c) , inj₂ (r , spine-eq e c eq , spine-red e c r r^SN)
   spine^SN (`case t l r) e tm^sn e^SN =
@@ -824,7 +818,7 @@ mutual
     let (l^SN , r^SN) = (complete^SN l l^sn , complete^SN r r^sn) in
     case spine^SN t (cas l r) t^sn (cas <> l^SN r^SN) of λ where
       (_ , c , inj₁ (v , eq , c^SN)) →
-        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^SN e^SN c^SN)
+        _ , (elim e ∘C c) , inj₁ (v , spine-eq e c eq , ∘C^R e^SN c^SN)
       (_ , c , inj₂ (r , eq , r^SN)) →
         _ , (elim e ∘C c) , inj₂ (r , spine-eq e c eq , spine-red e c r r^SN)
 
