@@ -6,7 +6,7 @@ open import Generic
 open import Size
 open import Data.Sum as Sum
 open import Data.Product as Prod
-open import Agda.Builtin.List
+open import Data.List.Base hiding ([_])
 open import Data.Product hiding (,_)
 open import Data.Star as S using (Star)
 open import Function hiding (_∋_)
@@ -798,6 +798,10 @@ mutual
  th^↝SN ρ ([c]₁ r bl br) = [c]₁ (th^↝SN ρ r) (ren _ bl) (ren _ br)
  th^↝SN ρ ([r]₃ ze su r) = [r]₃ (ren ρ ze) (ren _ su) (th^↝SN ρ r)
 
+freshˡ^SNe : ∀ {Γ Δ} → pred.∀[ SNe ] (freshˡ vl^Tm Δ {Γ})
+lookup^P freshˡ^SNe k = th^SNe (pack (injectˡ _)) (cast (var k))
+  where cast = subst (_ ⊢SNe _ ∋_) (sym (lookup-base^Tm k))
+
 -- Lemma 4.12 Anti-Thinning
 mutual
 
@@ -1161,62 +1165,126 @@ th^𝓡 (σ + τ) ρ t t^𝓡         = th^<> (th^+𝓡 (th^𝓡 σ) (th^𝓡 τ
 th^𝓡 (σ ⇒ τ) ρ t t^𝓡 ρ′ u^𝓡 = cast (t^𝓡 (select ρ ρ′) u^𝓡)
   where cast = subst (λ t → _ ⊢𝓡 _ ∋ t `∙ _) (sym $ ren² TermD t ρ ρ′)
 
-_∙^𝓡_ : ∀ {σ τ Γ f t} → Γ ⊢𝓡 σ ⇒ τ ∋ f → Γ ⊢𝓡 σ ∋ t → Γ ⊢𝓡 τ ∋ f `∙ t
-_∙^𝓡_ {σ} {τ} {Γ} {f} {t} f^𝓡 t^𝓡 = cast (f^𝓡 (base vl^Var) t^𝓡)
-  where cast = subst (λ f → Γ ⊢𝓡 τ ∋ f `∙ t) (ren-id f)
+app^𝓡 : ∀ {σ τ Γ} f t → Γ ⊢𝓡 σ ⇒ τ ∋ f → Γ ⊢𝓡 σ ∋ t → Γ ⊢𝓡 τ ∋ f `∙ t
+app^𝓡 f t f^𝓡 t^𝓡 = cast (f^𝓡 (base vl^Var) t^𝓡)
+  where cast = subst (λ f → _ ⊢𝓡 _ ∋ f `∙ t) (ren-id f)
 
-reify^𝓡 : ∀ σ τ {Γ Δ i} (l : Tm TermD i τ (σ ∷ Γ)) (ρ : (Γ ─Env) Term Δ) →
-  Kripke^P 𝓡^P 𝓡^P (σ ∷ []) τ (Sem.body Substitution ρ (σ ∷ []) τ l) →
-  (σ ∷ Δ) ⊢SN τ ∋ sub (lift vl^Tm (σ ∷ []) ρ) l
-reify^𝓡 σ τ l ρ l^P = cast (quote^𝓡 τ val) where
+reify^𝓡 : ∀ Θ τ {Γ Δ i} (sc : Scope (Tm TermD i) Θ τ Γ) (ρ : (Γ ─Env) Term Δ) →
+  Kripke^P 𝓡^P 𝓡^P Θ τ (Sem.body Substitution ρ Θ τ sc) →
+  (Θ ++ Δ) ⊢SN τ ∋ sub (lift vl^Tm Θ ρ) sc
+reify^𝓡 []        τ sc ρ sc^P = cast (quote^𝓡 _ sc^P) where
 
-  val  = l^P extend (ε^P ∙^P unquote^𝓡 σ (var z))
+  cast = subst (_ ⊢SN _ ∋_) (Sim.sim SubExt (lift[]^Tm ρ) sc)
+reify^𝓡 Θ@(_ ∷ _) τ sc ρ sc^P = quote^𝓡 τ (sc^P nms (nms^R)) where
 
-  sub^R : rel.∀[ Eq^R ] _ (lift vl^Tm (σ ∷ []) ρ)
-  lookup^R sub^R z      = refl
-  lookup^R sub^R (s v)  = Sim.sim RenExt extend-is-fresh (lookup ρ v)
+  nms = freshʳ vl^Var Θ
 
-  cast = subst (_ ⊢SN _ ∋_) (Sim.sim SubExt sub^R l)
+  nms^R : pred.∀[ 𝓡^P ] (freshˡ vl^Tm _)
+  lookup^P nms^R k = unquote^𝓡 _ (lookup^P freshˡ^SNe k)
 
+
+sub^𝓡 : ∀ Θ τ {i Γ Δ} (sc : Scope (Tm TermD i) Θ τ Γ) (vs : (Θ ─Env) Term Δ) (ρ : (Γ ─Env) Term Δ) →
+         Kripke^P 𝓡^P 𝓡^P Θ τ (Sem.body Substitution ρ Θ τ sc) →
+         pred.∀[ 𝓡^P ] vs →
+         Δ ⊢𝓡 τ ∋ sub (vs >> base vl^Tm) (sub (lift vl^Tm Θ ρ) sc)
+sub^𝓡 []        τ sc vs ρ sc^R vs^R = cast sc^R where
+
+  sub^R : rel.∀[ Eq^R ] (sub (vs >> base vl^Tm) <$> lift vl^Tm [] ρ) ρ
+  lookup^R sub^R k = begin
+    sub (vs >> base vl^Tm) (ren (th^Env th^Var (base vl^Var) (pack id)) (lookup ρ k))
+      ≡⟨ rensub TermD (lookup ρ k) (th^Env th^Var (base vl^Var) (pack id)) (vs >> base vl^Tm) ⟩
+    sub (select (th^Env th^Var (base vl^Var) (pack id)) (base vl^Tm)) (lookup ρ k)
+      ≡⟨ Sim.sim SubExt (pack^R (λ v → cong (lookup (base vl^Tm)) (lookup-base^Var v))) (lookup ρ k) ⟩
+    sub (base vl^Tm) (lookup ρ k)
+      ≡⟨ sub-id (lookup ρ k) ⟩
+    lookup ρ k
+      ∎
+
+  cast = subst (_ ⊢𝓡 τ ∋_) (sym (Fus.fus (Sub² TermD) sub^R sc))
+sub^𝓡 Θ@(_ ∷ _) τ sc vs ρ sc^R vs^R = cast (sc^R (base vl^Var) vs^R) where
+
+  sub^R : rel.∀[ Eq^R ] (sub (vs >> base vl^Tm) <$> lift vl^Tm Θ ρ)
+                        (vs >> th^Env th^Tm ρ (base vl^Var))
+  lookup^R sub^R k with split Θ k
+  ... | inj₁ k₁ = begin
+    sub (vs >> base vl^Tm) (ren (pack (injectˡ _)) (lookup ((th^Env th^Tm (base vl^Tm) (pack s)) ∙ `var z) k₁))
+      ≡⟨ cong (λ v → sub (vs >> base vl^Tm) (ren (pack (injectˡ _)) v)) (((lookup ((th^Env th^Tm (base vl^Tm) (pack s)) ∙ `var z) k₁) ≡ `var k₁) Function.∋ {!!}) ⟩
+     sub (vs >> base vl^Tm) (ren (pack (injectˡ _)) (`var k₁))
+       ≡⟨ injectˡ->> vs (base vl^Tm) k₁ ⟩
+    lookup vs k₁
+      ∎
+  ... | inj₂ k₂ = begin
+    sub (vs >> base vl^Tm) (ren (th^Env th^Var (base vl^Var) (pack (injectʳ Θ))) (lookup ρ k₂))
+      ≡⟨ rensub TermD (lookup ρ k₂) (th^Env th^Var (base vl^Var) (pack (injectʳ Θ))) (vs >> base vl^Tm) ⟩
+    sub (select (th^Env th^Var (base vl^Var) (pack (injectʳ Θ))) (vs >> base vl^Tm)) (lookup ρ k₂)
+      ≡⟨ Sim.sim SubExt {!!} (lookup ρ k₂) ⟩
+    sub (`var <$> base vl^Var) (lookup ρ k₂)
+      ≡⟨ sym (sim.rensub (base vl^Var) (lookup ρ k₂)) ⟩
+    ren (base vl^Var) (lookup ρ k₂)
+      ∎
+
+  cast = subst (_ ⊢𝓡 τ ∋_) (sym (Fus.fus (Sub² TermD) sub^R sc))
+
+{-
 [/0]^𝓡 :
   ∀ σ τ {Γ Δ i} t (l : Tm TermD i τ (σ ∷ Γ)) (ρ : (Γ ─Env) Term Δ) →
   Δ ⊢𝓡 σ ∋ t →
   Kripke^P 𝓡^P 𝓡^P (σ ∷ []) τ (Sem.body Substitution ρ (σ ∷ []) τ l) →
   Δ ⊢𝓡 τ ∋ sub (lift vl^Tm (σ ∷ []) ρ) l [ t /0]
-[/0]^𝓡 σ τ t l ρ t^P l^P = cast (l^P (base vl^Var) (ε^P ∙^P t^P)) where
+[/0]^𝓡 σ τ t l ρ t^P l^P = cast (sub^𝓡 (σ ∷ []) τ l (ε ∙ t) ρ l^P (ε^P ∙^P t^P)) where
 
-  ren^R : rel.∀[ VarTm^R ] (base vl^Var) (select (freshʳ vl^Var (σ ∷ [])) (base vl^Tm ∙ t))
-  lookup^R ren^R v = sym (lookup-base^Tm (lookup (base vl^Var) v))
+  sub^R : rel.∀[ Eq^R ] ((ε ∙ t) >> base vl^Tm) (t /0])
+  lookup^R sub^R z     = refl
+  lookup^R sub^R (s v) = refl
 
-  sub^R : rel.∀[ Eq^R ] (sub (t /0]) <$> lift vl^Tm (σ ∷ []) ρ)
-                        ((ε ∙ t) >> th^Env (th^𝓥 vl^Tm) ρ (base vl^Var))
-  lookup^R sub^R z      = refl
-  lookup^R sub^R (s v)  = begin
-    sub (base vl^Tm ∙ t) (ren (freshʳ vl^Var (σ ∷ [])) (lookup ρ v))
-      ≡⟨ rensub TermD (lookup ρ v) _ _ ⟩
-    sub (select (freshʳ vl^Var (σ ∷ [])) (base vl^Tm ∙ t)) (lookup ρ v)
-      ≡⟨ sym $ Sim.sim sim.RenSub ren^R (lookup ρ v) ⟩
-    ren (base vl^Var) (lookup ρ v) ∎
+  cast = subst (_ ⊢𝓡 τ ∋_) (Sim.sim SubExt sub^R (sub _ l))
 
-  cast = subst (_ ⊢𝓡 _ ∋_) (sym (Fus.fus (Sub² TermD) sub^R l))
 
-case^𝓡 : ∀ {i σ τ ν Γ Δ} (t : Term (σ + τ) Δ)
+case^𝓡 : ∀ {σ τ ν i Γ Δ} (t : Term (σ + τ) Δ)
   (l : Tm TermD i ν (σ ∷ Γ)) (r : Tm TermD i ν (τ ∷ Γ))
   (ρ : (Γ ─Env) Term Δ) → Δ ⊢𝓡 σ + τ ∋ t →
   Kripke^P 𝓡^P 𝓡^P (σ ∷ []) ν (Sem.body Substitution ρ (σ ∷ []) ν l) →
   Kripke^P 𝓡^P 𝓡^P (τ ∷ []) ν (Sem.body Substitution ρ (τ ∷ []) ν r) →
   Δ ⊢𝓡 ν ∋ `case t (sub (lift vl^Tm (σ ∷ []) ρ) l) (sub (lift vl^Tm (τ ∷ []) ρ) r)
-case^𝓡 t        bl br ρ (neu t^SNe) bl^P br^P =
-  unquote^𝓡 _ (cas t^SNe (reify^𝓡 _ _ bl ρ bl^P) (reify^𝓡 _ _ br ρ br^P))
+case^𝓡 {σ} {τ} {ν} t bl br ρ (neu t^SNe) bl^P br^P =
+  unquote^𝓡 ν (cas t^SNe (reify^𝓡 (σ ∷ []) ν bl ρ bl^P) (reify^𝓡 (τ ∷ []) ν br ρ br^P))
 case^𝓡 t        bl br ρ (red r t^P) bl^P br^P =
   ↝SN⁻¹^𝓡 _ ([c]₁ r (sub _ bl) (sub _ br)) (case^𝓡 _ bl br ρ t^P bl^P br^P)
-case^𝓡 (`i₁ t) bl br ρ (cnd (inl t^P))   bl^P br^P =
-  ↝SN⁻¹^𝓡 _ (ι₁ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ br ρ br^P))
+case^𝓡 {σ} {τ} {ν} (`i₁ t) bl br ρ (cnd (inl t^P))   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₁ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 (τ ∷ []) ν br ρ br^P))
              ([/0]^𝓡 _ _ t bl ρ t^P bl^P)
-case^𝓡 (`i₂ t) bl br ρ (cnd (inr t^P))   bl^P br^P =
-  ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ bl ρ bl^P))
+case^𝓡 {σ} {τ} {ν} (`i₂ t) bl br ρ (cnd (inr t^P))   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 (σ ∷ []) ν bl ρ bl^P))
              ([/0]^𝓡 _ _ t br ρ t^P br^P)
+-}
 
+rec^𝓡 : ∀ {σ i Γ Δ} (ze : Tm TermD i σ Γ) (su : Tm TermD i σ (σ ∷ ℕ ∷ Γ))
+  (t : Term ℕ Δ) (ρ : (Γ ─Env) Term Δ) →
+  Δ ⊢𝓡 σ ∋ sub ρ ze → Kripke^P 𝓡^P 𝓡^P (σ ∷ ℕ ∷ []) σ (Sem.body Substitution ρ (σ ∷ ℕ ∷ []) σ su) →
+  Δ ⊢𝓡 ℕ ∋ t →
+  Δ ⊢𝓡 σ ∋ `rec (sub ρ ze) (sub (lift vl^Tm (σ ∷ ℕ ∷ []) ρ) su) t
+-- stuck / ↝SN
+rec^𝓡 {σ} ze su t ρ ze^𝓡 su^𝓡 (neu t^SNe) =
+  unquote^𝓡 σ (rec (quote^𝓡 _ ze^𝓡) (reify^𝓡 (σ ∷ ℕ ∷ []) σ su ρ su^𝓡) t^SNe)
+rec^𝓡 {σ} ze su t ρ ze^𝓡 su^𝓡 (red r t^𝓡) =
+  ↝SN⁻¹^𝓡 σ ([r]₃ (sub ρ ze) (sub _ su) r) (rec^𝓡 ze su _ ρ ze^𝓡 su^𝓡 t^𝓡)
+-- ι-redex
+rec^𝓡 ze su .`0 ρ ze^𝓡 su^𝓡 (cnd zro)        =
+  ↝SN⁻¹^𝓡 _ (ιz (sub ρ ze) (sub _ su) (reify^𝓡 (_ ∷ ℕ ∷ []) _ su ρ su^𝓡)) ze^𝓡
+rec^𝓡 {σ} ze su .(`1+ _) ρ ze^𝓡 su^𝓡 (cnd (suc {t = t} t^𝓡)) =
+  ↝SN⁻¹^𝓡 _ (ιs (sub ρ ze) (sub _ su) _ (quote^𝓡 σ ze^𝓡) (quote^𝓡 ℕ t^𝓡))
+  $ subst (_ ⊢𝓡 σ ∋_) (Sim.sim SubExt sub^R (sub (lift vl^Tm (σ ∷ ℕ ∷ []) ρ) su))
+  $ sub^𝓡 (σ ∷ ℕ ∷ []) σ su (ε ∙ t ∙ `rec (sub ρ ze) (sub _  su) t) ρ su^𝓡
+    (ε^P ∙^P t^𝓡 ∙^P rec^𝓡 ze su t ρ ze^𝓡 su^𝓡 t^𝓡) where
+
+   sub^R : rel.∀[ Eq^R ] ((ε ∙ t ∙ `rec (sub ρ ze) (sub _ su) t) >> base vl^Tm)
+                         (base vl^Tm ∙ t ∙ `rec (sub ρ ze) (sub _ su) t)
+   lookup^R sub^R z          = refl
+   lookup^R sub^R (s z)      = refl
+   lookup^R sub^R (s (s v))  = refl
+
+
+{-
 -- Section 6 Proving strong normalization
 -------------------------------------------------------------------
 
@@ -1236,8 +1304,8 @@ Fdm.alg^P fundamental = alg^P where
   alg^P (`1+' t) ρ^P (t^P , _)  = cnd (suc t^P)
   -- eliminators
   alg^P (`case' t l r)  {ρ} ρ^P (t^P , l^P , r^P , _) = case^𝓡 (sub ρ t) l r ρ t^P l^P r^P
-  alg^P (`rec' ze su t)     ρ^P (z^P , s^P , t^P , _) = {!!}
-  alg^P (f `∙' t)           ρ^P (f^P , t^P , _)       = f^P ∙^𝓡 t^P
+  alg^P (`rec' ze su t)     ρ^P (z^P , s^P , t^P , _) = rec^𝓡 ze su (sub _ t) _ z^P s^P t^P
+  alg^P (f `∙' t)           ρ^P (f^P , t^P , _)       = app^𝓡 (sub _ f) (sub _ t) f^P t^P
   -- lambda abstraction
   alg^P (`λ' b) {ρ₁}       ρ^P (b^P , _) ρ {u} u^𝓡 =
     ↝SN⁻¹^𝓡 _ β-step $ cast (b^P ρ (ε^P ∙^P u^𝓡))
@@ -1285,4 +1353,5 @@ t ^SN = cast (quote^𝓡 _ (eval dummy t))
 
 _^sn : ∀ {Γ σ} t → Γ ⊢sn σ ∋ t
 t ^sn = sound^SN (t ^SN)
+-}
 \end{code}

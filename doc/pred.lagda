@@ -32,6 +32,7 @@ module _ {I : Set} {T : I ─Scoped} {𝓟 : Pred T} {Δ : List I} where
 
 module _ {I : Set} {T : I ─Scoped} {𝓟 : Pred T} {Γ Δ : List I} where
 
+ infixl 20 _∙^P_
  _∙^P_ :  {ρ : (Γ ─Env) T Δ} → ∀[ 𝓟 ] ρ → {i : I} {v : T i Δ} → pred 𝓟 v → ∀[ 𝓟 ] (ρ ∙ v)
  lookup^P (ρ ∙^P v) z      = v
  lookup^P (ρ ∙^P v) (s k)  = lookup^P ρ k

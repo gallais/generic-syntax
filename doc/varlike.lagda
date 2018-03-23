@@ -96,7 +96,6 @@ module _ {I : Set} {𝓥 : I ─Scoped} (vl^𝓥  : VarLike 𝓥) where
  VarLike^R.new^R  vl^Refl = refl
  VarLike^R.th^R   vl^Refl = λ σ → cong (λ v → th^𝓥 vl^𝓥 v σ)
 
-
 module _ {I : Set} {𝓥 𝓒 : I ─Scoped} (𝓥^P  : Pred 𝓥) (𝓒^P : Pred 𝓒) where
 
 \end{code}

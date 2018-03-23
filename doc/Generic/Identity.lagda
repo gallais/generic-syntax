@@ -77,4 +77,15 @@ module _ {I : Set} {d : Desc I} where
     sub (base vl^Tm) t  ≡⟨ sym $ Sim.sim RenSub base^VarTm^R t ⟩
     ren (base vl^Var) t ≡⟨ ren-id t ⟩
     t                   ∎
+
+  lift[]^Tm : ∀ {Γ Δ} (ρ : (Γ ─Env) (Tm d ∞) Δ) → ∀[ Eq^R ] ρ (lift vl^Tm [] ρ)
+  lookup^R (lift[]^Tm ρ) k = sym (ren-id (lookup ρ k))
+
+
+  th^base^Var : ∀ {Γ Δ} (ρ : Thinning {I} Γ Δ) → ∀[ Eq^R ] (th^Env th^Var ρ (base vl^Var)) ρ
+  lookup^R (th^base^Var ρ) k = `var-inj (ren-id (`var (lookup ρ k)))
+
+  th^base^Tm : ∀ {Γ Δ} (ρ : (Γ ─Env) (Tm d ∞) Δ) → ∀[ Eq^R ] (th^Env th^Tm ρ (base vl^Var)) ρ
+  lookup^R (th^base^Tm ρ) k = ren-id (lookup ρ k)
+
 \end{code}

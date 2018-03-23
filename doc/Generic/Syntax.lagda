@@ -57,6 +57,9 @@ data Tm {I : Set} (d : Desc I) : Size → I ─Scoped where
 %</mu>
 
 \begin{code}
+`var-inj : ∀ {I i Γ} {d : Desc I} {t u : Var i Γ} → (Tm d ∞ i Γ ∋ `var t) ≡ `var u → t ≡ u
+`var-inj refl = refl
+
 `con-inj : ∀ {I i Γ} {d : Desc I} {t u : ⟦ d ⟧ (Scope (Tm d ∞)) i Γ} → (Tm d ∞ i Γ ∋ `con t) ≡ `con u → t ≡ u
 `con-inj refl = refl
 
