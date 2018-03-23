@@ -1187,7 +1187,7 @@ sub^𝓡 : ∀ Θ τ {i Γ Δ} (sc : Scope (Tm TermD i) Θ τ Γ) (vs : (Θ ─E
          Kripke^P 𝓡^P 𝓡^P Θ τ (Sem.body Substitution ρ Θ τ sc) →
          pred.∀[ 𝓡^P ] vs →
          Δ ⊢𝓡 τ ∋ sub (vs >> base vl^Tm) (sub (lift vl^Tm Θ ρ) sc)
-sub^𝓡 []        τ sc vs ρ sc^R vs^R = cast sc^R where
+sub^𝓡 [] τ sc vs ρ sc^R vs^R = cast sc^R where
 
   sub^R : rel.∀[ Eq^R ] (sub (vs >> base vl^Tm) <$> lift vl^Tm [] ρ) ρ
   lookup^R sub^R k = begin
@@ -1208,7 +1208,7 @@ sub^𝓡 Θ@(_ ∷ _) τ sc vs ρ sc^R vs^R = cast (sc^R (base vl^Var) vs^R) whe
   lookup^R sub^R k with split Θ k
   ... | inj₁ k₁ = begin
     sub (vs >> base vl^Tm) (ren (pack (injectˡ _)) (lookup ((th^Env th^Tm (base vl^Tm) (pack s)) ∙ `var z) k₁))
-      ≡⟨ cong (λ v → sub (vs >> base vl^Tm) (ren (pack (injectˡ _)) v)) (((lookup ((th^Env th^Tm (base vl^Tm) (pack s)) ∙ `var z) k₁) ≡ `var k₁) Function.∋ {!!}) ⟩
+      ≡⟨ cong (λ v → sub (vs >> base vl^Tm) (ren (pack (injectˡ _)) v)) (lookup^R th^base^s∙z k₁) ⟩
      sub (vs >> base vl^Tm) (ren (pack (injectˡ _)) (`var k₁))
        ≡⟨ injectˡ->> vs (base vl^Tm) k₁ ⟩
     lookup vs k₁
@@ -1217,15 +1217,26 @@ sub^𝓡 Θ@(_ ∷ _) τ sc vs ρ sc^R vs^R = cast (sc^R (base vl^Var) vs^R) whe
     sub (vs >> base vl^Tm) (ren (th^Env th^Var (base vl^Var) (pack (injectʳ Θ))) (lookup ρ k₂))
       ≡⟨ rensub TermD (lookup ρ k₂) (th^Env th^Var (base vl^Var) (pack (injectʳ Θ))) (vs >> base vl^Tm) ⟩
     sub (select (th^Env th^Var (base vl^Var) (pack (injectʳ Θ))) (vs >> base vl^Tm)) (lookup ρ k₂)
-      ≡⟨ Sim.sim SubExt {!!} (lookup ρ k₂) ⟩
+      ≡⟨ Sim.sim SubExt sub'^R (lookup ρ k₂) ⟩
     sub (`var <$> base vl^Var) (lookup ρ k₂)
       ≡⟨ sym (sim.rensub (base vl^Var) (lookup ρ k₂)) ⟩
     ren (base vl^Var) (lookup ρ k₂)
-      ∎
+      ∎ where
+
+     sub'^R : rel.∀[ Eq^R ] (select (th^Env th^Var (base vl^Var) (pack (injectʳ Θ))) (vs >> base vl^Tm))
+                            (`var <$> base vl^Var)
+     lookup^R sub'^R k = begin
+       lookup (vs >> base vl^Tm) (lookup {𝓥 = Var} (pack (injectʳ Θ)) (lookup (base vl^Var) k))
+         ≡⟨ cong (λ v → lookup (vs >> base vl^Tm) (lookup {𝓥 = Var} (pack (injectʳ Θ)) v)) (lookup-base^Var k) ⟩
+       lookup (vs >> base vl^Tm) (injectʳ Θ k)
+         ≡⟨ injectʳ->> vs (base vl^Tm) k ⟩
+       lookup (base vl^Tm) k
+         ≡⟨ sym (lookup^R base^VarTm^R k) ⟩
+       lookup {𝓥 = Term} (`var <$> base vl^Var) k
+         ∎
 
   cast = subst (_ ⊢𝓡 τ ∋_) (sym (Fus.fus (Sub² TermD) sub^R sc))
 
-{-
 [/0]^𝓡 :
   ∀ σ τ {Γ Δ i} t (l : Tm TermD i τ (σ ∷ Γ)) (ρ : (Γ ─Env) Term Δ) →
   Δ ⊢𝓡 σ ∋ t →
@@ -1256,7 +1267,6 @@ case^𝓡 {σ} {τ} {ν} (`i₁ t) bl br ρ (cnd (inl t^P))   bl^P br^P =
 case^𝓡 {σ} {τ} {ν} (`i₂ t) bl br ρ (cnd (inr t^P))   bl^P br^P =
   ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 (σ ∷ []) ν bl ρ bl^P))
              ([/0]^𝓡 _ _ t br ρ t^P br^P)
--}
 
 rec^𝓡 : ∀ {σ i Γ Δ} (ze : Tm TermD i σ Γ) (su : Tm TermD i σ (σ ∷ ℕ ∷ Γ))
   (t : Term ℕ Δ) (ρ : (Γ ─Env) Term Δ) →
@@ -1283,8 +1293,6 @@ rec^𝓡 {σ} ze su .(`1+ _) ρ ze^𝓡 su^𝓡 (cnd (suc {t = t} t^𝓡)) =
    lookup^R sub^R (s z)      = refl
    lookup^R sub^R (s (s v))  = refl
 
-
-{-
 -- Section 6 Proving strong normalization
 -------------------------------------------------------------------
 
@@ -1353,5 +1361,4 @@ t ^SN = cast (quote^𝓡 _ (eval dummy t))
 
 _^sn : ∀ {Γ σ} t → Γ ⊢sn σ ∋ t
 t ^sn = sound^SN (t ^SN)
--}
 \end{code}

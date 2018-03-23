@@ -82,10 +82,18 @@ module _ {I : Set} {d : Desc I} where
   lookup^R (lift[]^Tm ρ) k = sym (ren-id (lookup ρ k))
 
 
-  th^base^Var : ∀ {Γ Δ} (ρ : Thinning {I} Γ Δ) → ∀[ Eq^R ] (th^Env th^Var ρ (base vl^Var)) ρ
-  lookup^R (th^base^Var ρ) k = `var-inj (ren-id (`var (lookup ρ k)))
+  th^base₁^Var : ∀ {Γ Δ} (ρ : Thinning {I} Γ Δ) → ∀[ Eq^R ] (th^Env th^Var (base vl^Var) ρ) ρ
+  lookup^R (th^base₁^Var ρ) k = cong (lookup ρ) (lookup-base^Var k)
+
+  th^base₂^Var : ∀ {Γ Δ} (ρ : Thinning {I} Γ Δ) → ∀[ Eq^R ] (th^Env th^Var ρ (base vl^Var)) ρ
+  lookup^R (th^base₂^Var ρ) k = `var-inj (ren-id (`var (lookup ρ k)))
 
   th^base^Tm : ∀ {Γ Δ} (ρ : (Γ ─Env) (Tm d ∞) Δ) → ∀[ Eq^R ] (th^Env th^Tm ρ (base vl^Var)) ρ
   lookup^R (th^base^Tm ρ) k = ren-id (lookup ρ k)
+
+  th^base^s∙z : ∀ {σ Γ} → ∀[ Eq^R ] (th^Env th^Tm (base vl^Tm) (pack s) ∙ `var z)
+                                    ((σ ∷ Γ ─Env) (Tm d ∞) (σ ∷ Γ) ∋ pack `var)
+  lookup^R th^base^s∙z z     = refl
+  lookup^R th^base^s∙z (s k) = cong (ren (pack s)) (lookup-base^Tm k)
 
 \end{code}
