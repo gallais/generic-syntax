@@ -1136,13 +1136,28 @@ mutual
 ↝SN⁻¹^𝓡 (σ + τ) r t^𝓡 = red r t^𝓡
 ↝SN⁻¹^𝓡 (σ ⇒ τ) r t^𝓡 = λ ρ u^𝓡 → ↝SN⁻¹^𝓡 τ ([∙]₂ (th^↝SN ρ r) _) (t^𝓡 ρ u^𝓡)
 
-{-
-th^𝓡 : ∀ {Γ Δ} σ ρ t → Γ ⊢𝓡 σ ∋ t → Δ ⊢𝓡 σ ∋ ren ρ t
+th^<> : ∀ {σ} {𝓢 : ∀ {Γ} → Term σ Γ → Set}
+        (th^𝓢 : ∀ {Γ Δ t} (ρ : Thinning Γ Δ) → 𝓢 t → 𝓢 (ren ρ t)) →
+        ∀ {Γ Δ t} (ρ : Thinning Γ Δ) → < 𝓢 > t → < 𝓢 > (ren ρ t)
+th^<> th^𝓢 ρ (cnd t^𝓢)   = cnd (th^𝓢 ρ t^𝓢)
+th^<> th^𝓢 ρ (neu t^SNe)  = neu (th^SNe ρ t^SNe)
+th^<> th^𝓢 ρ (red r t^𝓢) = red (th^↝SN ρ r) (th^<> th^𝓢 ρ t^𝓢)
+
+th^ℕ𝓡 : ∀ {i Γ Δ t} (ρ : Thinning Γ Δ) → ℕ𝓡 i t → ℕ𝓡 i (ren ρ t)
+th^ℕ𝓡 ρ zro            = zro
+th^ℕ𝓡 ρ (suc {i} t^𝓡) = suc (th^<> (th^ℕ𝓡 {i}) ρ t^𝓡)
+
+th^+𝓡 : ∀ {σ τ} {𝓢 : ∀ {Γ} → Term σ Γ → Set} {𝓣 : ∀ {Γ} → Term τ Γ → Set}
+         (th^𝓢 : ∀ {Γ Δ} (ρ : Thinning Γ Δ) → ∀ t → 𝓢 t → 𝓢 (ren ρ t)) →
+         (th^𝓣 : ∀ {Γ Δ} (ρ : Thinning Γ Δ) → ∀ t → 𝓣 t → 𝓣 (ren ρ t)) →
+         ∀ {Γ Δ t} (ρ : Thinning Γ Δ) → (𝓢 +𝓡 𝓣) t → (𝓢 +𝓡 𝓣) (ren ρ t)
+th^+𝓡 th^𝓢 th^𝓣 ρ (inl t^𝓢) = inl (th^𝓢 ρ _ t^𝓢)
+th^+𝓡 th^𝓢 th^𝓣 ρ (inr t^𝓣) = inr (th^𝓣 ρ _ t^𝓣)
+
+th^𝓡 : (σ : Type) → ∀ {Γ Δ} ρ t → Γ ⊢𝓡 σ ∋ t → Δ ⊢𝓡 σ ∋ ren ρ t
 th^𝓡 α       ρ t t^𝓡         = th^SN ρ t^𝓡
-th^𝓡 (σ + τ) ρ _ (inl t^𝓡)   = inl (th^𝓡 σ ρ _ t^𝓡)
-th^𝓡 (σ + τ) ρ _ (inr t^𝓡)   = inr (th^𝓡 τ ρ _ t^𝓡)
-th^𝓡 (σ + τ) ρ t (neu t^SNe)  = neu (th^SNe ρ t^SNe)
-th^𝓡 (σ + τ) ρ t (red r t^𝓡) = red (th^↝SN ρ r) (th^𝓡 (σ + τ) ρ _ t^𝓡)
+th^𝓡 ℕ       ρ t t^𝓡         = th^<> th^ℕ𝓡 ρ t^𝓡
+th^𝓡 (σ + τ) ρ t t^𝓡         = th^<> (th^+𝓡 (th^𝓡 σ) (th^𝓡 τ)) ρ t^𝓡
 th^𝓡 (σ ⇒ τ) ρ t t^𝓡 ρ′ u^𝓡 = cast (t^𝓡 (select ρ ρ′) u^𝓡)
   where cast = subst (λ t → _ ⊢𝓡 _ ∋ t `∙ _) (sym $ ren² TermD t ρ ρ′)
 
@@ -1191,16 +1206,16 @@ case^𝓡 : ∀ {i σ τ ν Γ Δ} (t : Term (σ + τ) Δ)
   Kripke^P 𝓡^P 𝓡^P (σ ∷ []) ν (Sem.body Substitution ρ (σ ∷ []) ν l) →
   Kripke^P 𝓡^P 𝓡^P (τ ∷ []) ν (Sem.body Substitution ρ (τ ∷ []) ν r) →
   Δ ⊢𝓡 ν ∋ `case t (sub (lift vl^Tm (σ ∷ []) ρ) l) (sub (lift vl^Tm (τ ∷ []) ρ) r)
-case^𝓡 (`i₁ t) bl br ρ (inl t^P)   bl^P br^P =
-  ↝SN⁻¹^𝓡 _ (ι₁ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ br ρ br^P))
-             ([/0]^𝓡 _ _ t bl ρ t^P bl^P)
-case^𝓡 (`i₂ t) bl br ρ (inr t^P)   bl^P br^P =
-  ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ bl ρ bl^P))
-             ([/0]^𝓡 _ _ t br ρ t^P br^P)
 case^𝓡 t        bl br ρ (neu t^SNe) bl^P br^P =
   unquote^𝓡 _ (cas t^SNe (reify^𝓡 _ _ bl ρ bl^P) (reify^𝓡 _ _ br ρ br^P))
 case^𝓡 t        bl br ρ (red r t^P) bl^P br^P =
   ↝SN⁻¹^𝓡 _ ([c]₁ r (sub _ bl) (sub _ br)) (case^𝓡 _ bl br ρ t^P bl^P br^P)
+case^𝓡 (`i₁ t) bl br ρ (cnd (inl t^P))   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₁ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ br ρ br^P))
+             ([/0]^𝓡 _ _ t bl ρ t^P bl^P)
+case^𝓡 (`i₂ t) bl br ρ (cnd (inr t^P))   bl^P br^P =
+  ↝SN⁻¹^𝓡 _ (ι₂ t (sub _ bl) (sub _ br) (quote^𝓡 _ t^P) (reify^𝓡 _ _ bl ρ bl^P))
+             ([/0]^𝓡 _ _ t br ρ t^P br^P)
 
 -- Section 6 Proving strong normalization
 -------------------------------------------------------------------
@@ -1214,13 +1229,15 @@ Fdm.alg^P fundamental = alg^P where
   alg^P : ∀ {Γ Δ σ s} (b : ⟦ TermD ⟧ (Scope (Tm TermD s)) σ Γ) {ρ : (Γ ─Env) Term Δ} →
           let v = fmap TermD (Sem.body Substitution ρ) b in
           pred.∀[ 𝓡^P ] ρ → All TermD (Kripke^P 𝓡^P 𝓡^P) v → Δ ⊢𝓡 σ ∋ Sem.alg Substitution v
-  -- case anlaysis
-  alg^P (`case' t l r) {ρ} ρ^P (t^P , l^P , r^P , _) = case^𝓡 (sub ρ t) l r ρ t^P l^P r^P
   -- constructors
-  alg^P (`i₁' t)           ρ^P (t^P , _)  = inl t^P
-  alg^P (`i₂' t)           ρ^P (t^P , _)  = inr t^P
-  -- application
-  alg^P (f `∙' t)          ρ^P (f^P , t^P , _)       = f^P ∙^𝓡 t^P
+  alg^P (`i₁' t) ρ^P (t^P , _)  = cnd (inl t^P)
+  alg^P (`i₂' t) ρ^P (t^P , _)  = cnd (inr t^P)
+  alg^P `0'      ρ^P _          = cnd zro
+  alg^P (`1+' t) ρ^P (t^P , _)  = cnd (suc t^P)
+  -- eliminators
+  alg^P (`case' t l r)  {ρ} ρ^P (t^P , l^P , r^P , _) = case^𝓡 (sub ρ t) l r ρ t^P l^P r^P
+  alg^P (`rec' ze su t)     ρ^P (z^P , s^P , t^P , _) = {!!}
+  alg^P (f `∙' t)           ρ^P (f^P , t^P , _)       = f^P ∙^𝓡 t^P
   -- lambda abstraction
   alg^P (`λ' b) {ρ₁}       ρ^P (b^P , _) ρ {u} u^𝓡 =
     ↝SN⁻¹^𝓡 _ β-step $ cast (b^P ρ (ε^P ∙^P u^𝓡))
@@ -1268,5 +1285,4 @@ t ^SN = cast (quote^𝓡 _ (eval dummy t))
 
 _^sn : ∀ {Γ σ} t → Γ ⊢sn σ ∋ t
 t ^sn = sound^SN (t ^SN)
--}
 \end{code}
