@@ -117,11 +117,11 @@ _⊢_∋_↝⋆_ : ∀ Γ σ → Term σ Γ → Term σ Γ → Set
 -- (Stability of Typing is a consequence of Term being a typed syntax)
 
 th^↝ : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ ren ρ t ↝ ren ρ u
-th^↝ ρ (β t u)        = subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝_) (sym $ renβ TermD t u ρ) (β _ _)
-th^↝ ρ (ι₁ t l r)     = subst (_ ⊢ _ ∋ ren ρ (`case (`i₁ t) l r) ↝_) (sym $ renβ TermD l t ρ) (ι₁ _ _ _)
-th^↝ ρ (ι₂ t l r)     = subst (_ ⊢ _ ∋ ren ρ (`case (`i₂ t) l r) ↝_) (sym $ renβ TermD r t ρ) (ι₂ _ _ _)
+th^↝ ρ (β t u)        = subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝_) (renβ TermD t (ε ∙ u) ρ) (β _ _)
+th^↝ ρ (ι₁ t l r)     = subst (_ ⊢ _ ∋ ren ρ (`case (`i₁ t) l r) ↝_) (renβ TermD l (ε ∙ t) ρ) (ι₁ _ _ _)
+th^↝ ρ (ι₂ t l r)     = subst (_ ⊢ _ ∋ ren ρ (`case (`i₂ t) l r) ↝_) (renβ TermD r (ε ∙ t) ρ) (ι₂ _ _ _)
 th^↝ ρ (ιz ze su)     = ιz (ren ρ ze) (ren _ su)
-th^↝ ρ (ιs ze su t)   = subst (_ ⊢ _ ∋ ren ρ (`rec ze su (`1+ t)) ↝_) {!!} (ιs _ _ _)
+th^↝ ρ (ιs ze su t)   = subst (_ ⊢ _ ∋ ren ρ (`rec ze su (`1+ t)) ↝_) (renβ TermD su (ε ∙ t ∙ `rec ze su t) ρ) (ιs _ _ _)
 th^↝ ρ ([λ] r)        = [λ] (th^↝ _ r)
 th^↝ ρ ([∙]₁ f r)     = [∙]₁ (ren ρ f) (th^↝ ρ r)
 th^↝ ρ ([∙]₂ r t)     = [∙]₂ (th^↝ ρ r) (ren ρ t)
@@ -137,11 +137,11 @@ th^↝ ρ ([r]₃ ze su c) = [r]₃ (ren ρ ze) (ren _ su) (th^↝ ρ c)
 
 -- Lemma 1.3
 sub^↝ : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ sub ρ t ↝ sub ρ u
-sub^↝ ρ (β t u)        = subst (_ ⊢ _ ∋ sub ρ (`λ t `∙ u) ↝_) (sym $ subβ TermD t u ρ) (β _ _)
-sub^↝ ρ (ι₁ t l r)     = subst (_ ⊢ _ ∋ sub ρ (`case (`i₁ t) l r) ↝_) (sym $ subβ TermD l t ρ) (ι₁ _ _ _)
-sub^↝ ρ (ι₂ t l r)     = subst (_ ⊢ _ ∋ sub ρ (`case (`i₂ t) l r) ↝_) (sym $ subβ TermD r t ρ) (ι₂ _ _ _)
+sub^↝ ρ (β t u)        = subst (_ ⊢ _ ∋ sub ρ (`λ t `∙ u) ↝_) (subβ TermD t (ε ∙ u) ρ) (β _ _)
+sub^↝ ρ (ι₁ t l r)     = subst (_ ⊢ _ ∋ sub ρ (`case (`i₁ t) l r) ↝_) (subβ TermD l (ε ∙ t) ρ) (ι₁ _ _ _)
+sub^↝ ρ (ι₂ t l r)     = subst (_ ⊢ _ ∋ sub ρ (`case (`i₂ t) l r) ↝_) (subβ TermD r (ε ∙ t) ρ) (ι₂ _ _ _)
 sub^↝ ρ (ιz ze su)     = ιz (sub ρ ze) (sub _ su)
-sub^↝ ρ (ιs ze su t)   = subst (_ ⊢ _ ∋ sub ρ (`rec ze su (`1+ t)) ↝_) {!!} (ιs _ _ _)
+sub^↝ ρ (ιs ze su t)   = subst (_ ⊢ _ ∋ sub ρ (`rec ze su (`1+ t)) ↝_) (subβ TermD su (ε ∙ t ∙ `rec ze su t) ρ) (ιs _ _ _)
 sub^↝ ρ ([λ] r)        = [λ] (sub^↝ _ r)
 sub^↝ ρ ([∙]₁ f r)     = [∙]₁ (sub ρ f) (sub^↝ ρ r)
 sub^↝ ρ ([∙]₂ r t)     = [∙]₂ (sub^↝ ρ r) (sub ρ t)
@@ -212,11 +212,12 @@ th⁻¹^↝ : ∀ {σ Γ Δ u′} t ρ → Δ ⊢ σ ∋ ren ρ t ↝ u′ →
 th⁻¹^↝ (`var v) ρ ()
 th⁻¹^↝ `0 ρ ()
 -- redex
-th⁻¹^↝ (`λ b `∙ t)           ρ (β _ _)    = b [ t /0] , sym (renβ TermD b t ρ) , β b t
-th⁻¹^↝ (`case (`i₁ t) b₁ b₂) ρ (ι₁ _ _ _) = b₁ [ t /0] , sym (renβ TermD b₁ t ρ) , ι₁ t b₁ b₂
-th⁻¹^↝ (`case (`i₂ t) b₁ b₂) ρ (ι₂ _ _ _) = b₂ [ t /0] , sym (renβ TermD b₂ t ρ) , ι₂ t b₁ b₂
+th⁻¹^↝ (`λ b `∙ t)           ρ (β _ _)    = b [ t /0] , renβ TermD b (ε ∙ t) ρ , β b t
+th⁻¹^↝ (`case (`i₁ t) b₁ b₂) ρ (ι₁ _ _ _) = b₁ [ t /0] , renβ TermD b₁ (ε ∙ t) ρ , ι₁ t b₁ b₂
+th⁻¹^↝ (`case (`i₂ t) b₁ b₂) ρ (ι₂ _ _ _) = b₂ [ t /0] , renβ TermD b₂ (ε ∙ t) ρ , ι₂ t b₁ b₂
 th⁻¹^↝ (`rec ze su `0)       ρ (ιz _ _)   = ze , refl , ιz ze su
-th⁻¹^↝ (`rec ze su (`1+ t))  ρ (ιs _ _ _) = sub (base vl^Tm ∙ t ∙ `rec ze su t) su , {!!} , ιs ze su t
+th⁻¹^↝ (`rec ze su (`1+ t))  ρ (ιs _ _ _) =
+  sub (base vl^Tm ∙ t ∙ `rec ze su t) su , renβ TermD su (ε ∙ t ∙ `rec ze su t) ρ , ιs ze su t
 -- structural
 th⁻¹^↝ (`λ t)      ρ ([λ] r) =
   let (t′ , eq , r′) = th⁻¹^↝ t _ r in `λ t′ , cong `λ eq , [λ] r′
@@ -782,16 +783,16 @@ mutual
  th^↝SN : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝SN u → Δ ⊢ σ ∋ ren ρ t ↝SN ren ρ u
  -- computational
  th^↝SN ρ (β t u u^SN)            =
-   subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝SN_< _) (sym $ renβ TermD t u ρ) (β _ (ren ρ u) (th^SN ρ u^SN))
+   subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝SN_< _) (renβ TermD t (ε ∙ u) ρ) (β _ (ren ρ u) (th^SN ρ u^SN))
  th^↝SN ρ (ι₁ t l r t^SN r^SN)    =
-   subst (_ ⊢ _ ∋ ren ρ (`case (`i₁ t) l r) ↝SN_< _) (sym $ renβ TermD l t ρ)
+   subst (_ ⊢ _ ∋ ren ρ (`case (`i₁ t) l r) ↝SN_< _) (renβ TermD l (ε ∙ t) ρ)
    $ ι₁ _ _ (ren _ r) (th^SN ρ t^SN) (th^SN _ r^SN)
  th^↝SN ρ (ι₂ t l r t^SN l^SN)    =
-   subst (_ ⊢ _ ∋ ren ρ (`case (`i₂ t) l r) ↝SN_< _) (sym $ renβ TermD r t ρ)
+   subst (_ ⊢ _ ∋ ren ρ (`case (`i₂ t) l r) ↝SN_< _) (renβ TermD r (ε ∙ t) ρ)
    $ ι₂ _ (ren _ l) _ (th^SN ρ t^SN) (th^SN _ l^SN)
  th^↝SN ρ (ιz ze su su^SN)        = ιz (ren ρ ze) (ren _ su) (th^SN _ su^SN)
  th^↝SN ρ (ιs ze su t ze^SN t^SN) =
-   subst (_ ⊢ _ ∋ ren ρ (`rec ze su (`1+ t)) ↝SN_< _) {!!}
+   subst (_ ⊢ _ ∋ ren ρ (`rec ze su (`1+ t)) ↝SN_< _) (renβ TermD su (ε ∙ t ∙ `rec ze su t) ρ)
    $ ιs (ren ρ ze) (ren _ su) (ren ρ t) (th^SN ρ ze^SN) (th^SN ρ t^SN)
  -- structural
  th^↝SN ρ ([∙]₂ r t)     = [∙]₂ (th^↝SN ρ r) (ren ρ t)
@@ -842,14 +843,14 @@ mutual
  th⁻¹^↝SN (`1+ t)     ρ ()
  -- reductions
  th⁻¹^↝SN (`λ b `∙ t) ρ (β ._ ._ t^SN) =
-   b [ t /0] , sym (renβ TermD b t ρ) , β b t (th⁻¹^SN t ρ refl t^SN)
+   b [ t /0] , renβ TermD b (ε ∙ t) ρ , β b t (th⁻¹^SN t ρ refl t^SN)
  th⁻¹^↝SN (`case (`i₁ t) l r) ρ (ι₁ ._ ._ ._ t^SN r^SN) =
-   l [ t /0] , sym (renβ TermD l t ρ) , ι₁ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN r _ refl r^SN)
+   l [ t /0] , renβ TermD l (ε ∙ t) ρ , ι₁ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN r _ refl r^SN)
  th⁻¹^↝SN (`case (`i₂ t) l r) ρ (ι₂ ._ ._ ._ t^SN l^SN) =
-   r [ t /0] , sym (renβ TermD r t ρ) , ι₂ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN l _ refl l^SN)
+   r [ t /0] , renβ TermD r (ε ∙ t) ρ , ι₂ t l r (th⁻¹^SN t ρ refl t^SN) (th⁻¹^SN l _ refl l^SN)
  th⁻¹^↝SN (`rec ze su `0) ρ (ιz _ _ su^SN) = ze , refl , ιz ze su (th⁻¹^SN su _ refl su^SN)
  th⁻¹^↝SN (`rec ze su (`1+ t)) ρ (ιs _ _ _ ze^SN t^SN) =
-   sub (base vl^Tm ∙ t ∙ `rec ze su t) su , {!!}
+   sub (base vl^Tm ∙ t ∙ `rec ze su t) su , renβ TermD su (ε ∙ t ∙ `rec ze su t) ρ
    , ιs ze su t (th⁻¹^SN ze ρ refl ze^SN) (th⁻¹^SN t ρ refl t^SN)
 -- structural
  th⁻¹^↝SN (f `∙ t)        ρ ([∙]₂ r ._)    =
@@ -974,7 +975,7 @@ mutual
   complete^SNe v (cas c l^SN r^SN)   refl c[v]lr^sn =
     cas (complete^SNe v c refl (`case₁⁻¹^sn c[v]lr^sn)) l^SN r^SN
   complete^SNe v (rec ze^SN su^SN c) refl czs[v]^sn =
-    {!!}
+    rec ze^SN su^SN (complete^SNe v c refl (`rec₃⁻¹^sn czs[v]^sn))
 
   -- 2.
   complete^SN-βι : ∀ {Γ α σ i} (r : Γ ⊢↯ α) c →

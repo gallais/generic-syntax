@@ -58,19 +58,16 @@ module _ {I : Set} {σ : I} {Γ : List I} where
 module _ {I : Set} {𝓥 : I ─Scoped} where
  open ≡-Reasoning
 
- split-freshʳ : (Δ : List I) {Γ : List I} {i : I} (v : Var i Γ) →
-                split Δ (lookup (freshʳ vl^Var Δ) v) ≡ inj₂ v
- split-freshʳ Δ v =
-   begin
-     split Δ (injectʳ Δ (lookup (base vl^Var) v)) ≡⟨ split-injectʳ Δ (lookup (base vl^Var) v) ⟩
-     inj₂ (lookup (base vl^Var) v)                ≡⟨ cong inj₂ (lookup-base^Var v) ⟩
-     inj₂ v
-   ∎
-
  freshʳ->> : (Δ : List I) {Γ Θ : List I}
              (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) {i : I} (v : Var i Γ) →
              lookup (ρ₁ >> ρ₂) (lookup (freshʳ vl^Var Δ) v) ≡ lookup ρ₂ v
- freshʳ->> Δ ρ₁ ρ₂ v rewrite split-freshʳ Δ v = refl
+ freshʳ->> Δ ρ₁ ρ₂ v = begin
+   lookup (ρ₁ >> ρ₂) (lookup (freshʳ vl^Var Δ) v)
+     ≡⟨ injectʳ->> ρ₁ ρ₂ (lookup (base vl^Var) v) ⟩
+   lookup ρ₂ (lookup (base vl^Var) v)
+     ≡⟨ cong (lookup ρ₂) (lookup-base^Var v) ⟩
+   lookup ρ₂ v
+     ∎
 
 module _ {I : Set} {𝓥₁ 𝓥₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) where
 

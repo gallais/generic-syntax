@@ -56,14 +56,12 @@ module RenId {I : Set} {d : Desc I} where
   lookup^R eq^R k with split Δ k | inspect (split Δ) k
   ... | inj₁ k₁ | PEq.[ eq ] = begin
     injectˡ Γ (lookup (base vl^Var) k₁) ≡⟨ cong (injectˡ Γ) (lookup-base^Var k₁) ⟩
-    injectˡ Γ k₁                        ≡⟨ injectˡ-split Δ k eq ⟩
-    k                                   ≡⟨ sym (lookup-base^Var k) ⟩
+    injectˡ Γ k₁                        ≡⟨ sym (lookup-base^Var k) ⟩
     lookup (base vl^Var) k              ∎
   ... | inj₂ k₂ | PEq.[ eq ] = begin
     injectʳ Δ (lookup (base vl^Var) (lookup ρ k₂)) ≡⟨ cong (injectʳ Δ) (lookup-base^Var _) ⟩
     injectʳ Δ (lookup ρ k₂)                        ≡⟨ cong (injectʳ Δ) (lookup^R ρ^R k₂) ⟩
     injectʳ Δ (lookup (base vl^Var) k₂)            ≡⟨ cong (injectʳ Δ) (lookup-base^Var k₂) ⟩
-    injectʳ Δ k₂                                   ≡⟨ injectʳ-split Δ k eq ⟩
     k                                              ≡⟨ sym (lookup-base^Var k) ⟩
     lookup (base vl^Var) k                         ∎
 

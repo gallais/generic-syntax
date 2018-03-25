@@ -85,14 +85,14 @@ _⊢_∋_↝⋆_ : ∀ Γ σ → Term σ Γ → Term σ Γ → Set
 -- (Stability of Typing is a consequence of Term being a typed syntax)
 
 th^↝ : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ ren ρ t ↝ ren ρ u
-th^↝ ρ (β t u)    = subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝_) (sym $ renβ TermD t u ρ) (β _ _)
+th^↝ ρ (β t u)    = subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝_) (renβ TermD t (ε ∙ u) ρ) (β _ _)
 th^↝ ρ ([λ] r)    = [λ] (th^↝ _ r)
 th^↝ ρ ([∙]₁ f r) = [∙]₁ (ren ρ f) (th^↝ ρ r)
 th^↝ ρ ([∙]₂ r t) = [∙]₂ (th^↝ ρ r) (ren ρ t)
 
 -- Lemma 1.3
 sub^↝ : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ sub ρ t ↝ sub ρ u
-sub^↝ ρ (β t u)    = subst (_ ⊢ _ ∋ sub ρ (`λ t `∙ u) ↝_) (sym $ subβ TermD t u ρ) (β _ _)
+sub^↝ ρ (β t u)    = subst (_ ⊢ _ ∋ sub ρ (`λ t `∙ u) ↝_) (subβ TermD t (ε ∙ u) ρ) (β _ _)
 sub^↝ ρ ([λ] r)    = [λ] (sub^↝ _ r)
 sub^↝ ρ ([∙]₁ f r) = [∙]₁ (sub ρ f) (sub^↝ ρ r)
 sub^↝ ρ ([∙]₂ r t) = [∙]₂ (sub^↝ ρ r) (sub ρ t)
@@ -141,7 +141,7 @@ th⁻¹^`λ (`λ b′)  ρ refl = b′ , refl , refl
 th⁻¹^↝ : ∀ {σ Γ Δ u′} t ρ → Δ ⊢ σ ∋ ren ρ t ↝ u′ →
           ∃ λ u → u′ ≡ ren ρ u × Γ ⊢ σ ∋ t ↝ u
 th⁻¹^↝ (`var v) ρ ()
-th⁻¹^↝ (`λ b `∙ t) ρ (β _ _) = b [ t /0] , sym (renβ TermD b t ρ) , β b t
+th⁻¹^↝ (`λ b `∙ t) ρ (β _ _) = b [ t /0] , renβ TermD b (ε ∙ t) ρ , β b t
 th⁻¹^↝ (`λ t)      ρ ([λ] r) =
   let (t′ , eq , r′) = th⁻¹^↝ t _ r in `λ t′ , cong `λ eq , [λ] r′
 th⁻¹^↝ (f `∙ t) ρ ([∙]₁ ._ r) =
@@ -409,7 +409,7 @@ mutual
 
  -- 3.
  th^↝SN : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝SN u → Δ ⊢ σ ∋ ren ρ t ↝SN ren ρ u
- th^↝SN ρ (β t u u^SN) = subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝SN_< _) (sym $ renβ TermD t u ρ)
+ th^↝SN ρ (β t u u^SN) = subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝SN_< _) (renβ TermD t (ε ∙ u) ρ)
                        $ β _ (ren ρ u) (th^SN ρ u^SN)
  th^↝SN ρ ([∙]₂ r t)   = [∙]₂ (th^↝SN ρ r) (ren ρ t)
 
@@ -441,7 +441,7 @@ mutual
 \begin{code}
  th⁻¹^↝SN (`var v) ρ ()
  th⁻¹^↝SN (`λ b)   ρ ()
- th⁻¹^↝SN (`λ b `∙ t) ρ (β ._ ._ t^SN) = b [ t /0] , sym (renβ TermD b t ρ) , β b t (th⁻¹^SN t ρ refl t^SN)
+ th⁻¹^↝SN (`λ b `∙ t) ρ (β ._ ._ t^SN) = b [ t /0] , renβ TermD b (ε ∙ t) ρ , β b t (th⁻¹^SN t ρ refl t^SN)
  th⁻¹^↝SN (f `∙ t)    ρ ([∙]₂ r ._)    =
    let (g , eq , r′) = th⁻¹^↝SN f ρ r in g `∙ t , cong (_`∙ ren ρ t) eq , [∙]₂ r′ t
 
