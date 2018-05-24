@@ -1,9 +1,4 @@
 *.agdai
 *~
-*.hash
-*.log
-*.pdf
-*.cls
-*.sty
 doc/latex/
 doc/latex-agda-output/
