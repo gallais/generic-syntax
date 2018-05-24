@@ -1,5 +1,5 @@
 SED=sed
-PAPER=popl18
+PAPER=icfp18
 AGDA=agda
 
 all: latex/$(PAPER).pdf
