@@ -6,3 +6,4 @@
 *.cls
 *.sty
 doc/latex/
+doc/latex-agda-output/

@@ -299,12 +299,12 @@ parametrised higher order abstract syntax term. We get a choice of
 useful scope-and-sort safe traversals by using different `host languages'
 for this shallow embedding.
 
-Semantics are defined in terms of a choice of values \AB{\mathcal{V}} and
-computations \AB{\mathcal{C}}. Realisation of a semantics will produce a
-computation in \AB{\mathcal{C}} for every term whose variables are assigned
-values in \AB{\mathcal{V}}.
+Semantics are defined in terms of a choice of values \AB{$\mathcal{V}$} and
+computations \AB{$\mathcal{C}$}. Realisation of a semantics will produce a
+computation in \AB{$\mathcal{C}$} for every term whose variables are assigned
+values in \AB{$\mathcal{V}$}.
 A Semantics must satisfy constraints on the notions of
-values \AB{\mathcal{V}} and computations \AB{\mathcal{C}} at hand. First of all,
+values \AB{$\mathcal{V}$} and computations \AB{$\mathcal{C}$} at hand. First of all,
 values should be thinnable so that \AF{sem} may push the environment
 under binders. Second, the set of computations needs to be closed
 under various combinators which are the semantical counterparts of
@@ -317,7 +317,7 @@ the Kripke function space one can find in normalisation by evaluation.
 In all possible thinnings of the scope at hand, it promises to deliver
 a computation whenever it is provided with a value for its newly
 bound variable. This is concisely expressed by the type
-(\AF{□} (\AB{\mathcal{V}} \AB{\sigma} \AF{→} \AB{\mathcal{C}} \AB{\tau})).
+(\AF{□} (\AB{$\mathcal{V}$} \AB{$\sigma$} \AF{→} \AB{$\mathcal{C}$} \AB{$\tau$})).
 
 \begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{rsem}
@@ -325,9 +325,9 @@ bound variable. This is concisely expressed by the type
 \end{figure}
 
 The traversal \AF{sem} realises the promise made earlier that any given
-{\AR{Sem} \AB{\mathcal{V}} \AB{\mathcal{C}}} will induce a function which,
-given a value in \AB{\mathcal{V}} for each variable in scope, turns a term
-into a computation \AB{\mathcal{C}}.
+{\AR{Sem} \AB{$\mathcal{V}$} \AB{$\mathcal{C}$}} will induce a function which,
+given a value in \AB{$\mathcal{V}$} for each variable in scope, turns a term
+into a computation \AB{$\mathcal{C}$}.
 
 \begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{sem}
@@ -351,13 +351,13 @@ have already proven that they are thinnable.
 
 In both cases we use (\AIC{pack} \AB{s}) (where \AIC{pack} is the constructor
 for environments and \AIC{s} the functionn lifting an existing de Bruijn variable
-into an extended scope) as the definition of the thinning embedding \AB{\Gamma}
-into {\AB{\sigma} \AIC{::} \AB{\Gamma}}.
+into an extended scope) as the definition of the thinning embedding \AB{$\Gamma$}
+into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
 
 We also include the definition of a basic printer relying on a
 name supply to highlight the fact that computations can very well be
 effectful. The \AF{Printing} semantics is defined by using \AD{String}s
-as values and {\AD{State} \AD{\mathbb{N}} \AD{String}} as computations. We use a
+as values and {\AD{State} \AD{$\mathbb{N}$} \AD{String}} as computations. We use a
 \AR{Wrap}per with a type and a context as phantom types in order to
 help Agda's inference propagate the appropriate constraints.
 We define a function \AF{fresh} that generates new concrete names using a
@@ -369,7 +369,7 @@ We define a function \AF{fresh} that generates new concrete names using a
 \caption{Wrapper and fresh name generation}
 \end{figure}
 
-The wrapper \AR{Wrap} does not depend on the scope \AB{\Gamma} so it is automatically
+The wrapper \AR{Wrap} does not depend on the scope \AB{$\Gamma$} so it is automatically
 a Thinnable functor. We jump straight
 to the definition of the printer. To print an application, we produce
 a string representation of the term in function position, then of its argument and combine
@@ -424,7 +424,7 @@ The first component of CDMM's universe's definition is an inductive type
 of \AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to
 $\Set{}^I$. It has three constructors: \AIC{`σ} to store data (the rest of
 the description can depend upon this stored value), \AIC{`X} to attach a
-recursive substructure indexed by $J$ and \AIC{`∎} to stop with a particular
+recursive substructure indexed by $J$ and \AIC{`$\blacksquare$} to stop with a particular
 index value.
 
 The recursive function \AF{⟦\_⟧} makes the interpretation of the
@@ -447,7 +447,7 @@ to lists of elements in $A$ stores a \AD{Bool}ean which stands for whether
 the current node is the empty list or not. Depending on that value, the
 rest of the description is either the ``stop'' token or a pair of an element
 in $A$ and a recursive substructure i.e. the tail of the list. The List type
-is unindexed, we represent the lack of an index with the unit type \AD{\top}.
+is unindexed, we represent the lack of an index with the unit type \AD{$\top$}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Data.tex]{listD}
@@ -512,7 +512,7 @@ Our universe of scope safe and well kinded syntaxes follows the same principle
 as CDMM's universe of datatypes, except that we are not building endofunctors on
 \AS{Set} anymore but rather on {\AB{I} \AF{─Scoped}}. We now think of the index
 type \AB{I} as the sorts
-used to distinguish terms in our embedded language. The \AIC{`\sigma} and
+used to distinguish terms in our embedded language. The \AIC{`$\sigma$} and
 \AIC{`∎} constructors are as in the CDMM \AD{Desc} type, and are used to
 represent data and index constraints respectively. The \AIC{`X} constructor
 is now augmented with an addtional {\AD{List} \AB{I}} argument that describes
@@ -526,7 +526,7 @@ the new binders that are brought into scope at this recursive position.
 The meaning function \AF{⟦\_⟧} we associate to a description follows closely
 its CDMM equivalent. It only departs from it in the \AIC{`X} case and the fact
 it is not an endofunctor on \AB{I} \AF{─Scoped}; it is more general than that.
-The function takes an \AB{X} of type {\AD{List} \AB{I} \rightarrow \AB{I} \AD{─Scoped}}
+The function takes an \AB{X} of type {\AD{List} \AB{I} $\rightarrow$ \AB{I} \AD{─Scoped}}
 to interpret {\AIC{`X} \AB{Δ} \AB{j}} (i.e. substructures of sort \AB{j} with
 newly-bound variables in \AB{Δ}) in an ambiant scope \AB{Γ} as {\AB{X} \AB{Δ} \AB{j} \AB{Γ}}.
 
@@ -535,8 +535,8 @@ newly-bound variables in \AB{Δ}) in an ambiant scope \AB{Γ} as {\AB{X} \AB{Δ}
 \caption{Descriptions' Meanings}
 \end{figure}
 
-The astute reader may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $Γ$; however
-refactoring \AF{⟦\_⟧} to use the partially applied $X\,\_\,\_\,Γ$ following
+The astute reader may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $\Gamma$; however
+refactoring \AF{⟦\_⟧} to use the partially applied $X\,\_\,\_\,\Gamma$ following
 this observation would lead to a definition harder to use with the
 combinators for indexed sets described in Figure~\ref{figure:indexed}
 which make our types much more readable.
@@ -677,7 +677,7 @@ respectively to values associated to bound variables and
 computations delivered by evaluating terms. These two families
 have to abide by three constraints:
 \begin{itemize}
-\item{\ARF{th^{\mathcal{V}}}} Values should be thinnable so that we can push the
+\item{\ARF{th$^{\mathcal{V}}$}} Values should be thinnable so that we can push the
       evaluation environment under binders;
 \item{\ARF{var}} Values should embed into Computations for us to be able
       to return the value associated to a variable as the
@@ -801,7 +801,7 @@ and reifying the bodies of binders.
 
 The reification process mentioned in the definition of renaming
 and substitution can be implemented generically for \AR{Sem}antics
-families which have \AR{VarLike} values (\AF{vl^{Var}} and \AF{vl^{Tm}}
+families which have \AR{VarLike} values (\AF{vl\textsuperscript{Var}} and \AF{vl\textsuperscript{Tm}}
 are proofs of \AR{VarLike} for \AD{Var} and \AD{Tm} respectively) i.e.
 values which are thinnable and such that we can craft placeholder values
 in non-empty contexts.
@@ -811,8 +811,8 @@ in non-empty contexts.
 \caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values}
 \end{figure}
 
-For any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh^{r}} of
-type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})} and \AF{fresh^{l}} of
+For any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh\textsuperscript{r}} of
+type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})} and \AF{fresh\textsuperscript{l}} of
 type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Γ} \AF{++} \AB{Δ})} by combining the use
 of placeholder values and thinnings, and it is almost immediate that variables
 are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
@@ -1158,10 +1158,10 @@ layers which are meant to be equal:
 \begin{itemize}
   \item In the stop token case \AIC{`∎} \AB{i}, the two layers are considered to
     be trivially equal (i.e. the constraint generated is the unit type)
-  \item When facing a recursive position {\AIC{`X} \AB{\Delta} \AB{j} \AB{d}}, we
-    demand that the two substructures are related by {\AB{R} \AB{\Delta} \AB{j}}
+  \item When facing a recursive position {\AIC{`X} \AB{$\Delta$} \AB{j} \AB{d}}, we
+    demand that the two substructures are related by {\AB{R} \AB{$\Delta$} \AB{j}}
     and that the rest of the layers are related by \AF{Zip} \AB{d} \AB{R}
-  \item Two nodes of type {\AIC{`\sigma} \AB{A} \AB{d}} will
+  \item Two nodes of type {\AIC{`$\sigma$} \AB{A} \AB{d}} will
     be related if they both carry the same payload \AB{a} of type \AB{A} and if
     the rest of the layers are related by {\AF{Zip} (\AB{d} \AB{a}) \AB{R}}.
 \end{itemize}
@@ -1183,10 +1183,10 @@ use-cases.
 \subsection{Simulation Lemma}\label{section:simulation}
 
 A \AF{Zip} constraint appears naturally when we want to say that a
-semantics can simulate another one. Given a relation \AB{𝓡^𝓥} connecting values
-in \AB{𝓥_1} and \AB{𝓥_2}, and a relation \AB{𝓡^𝓒} connecting computations in
-\AB{𝓒_1} and \AB{𝓒_2}, we can define \AF{Kripke^R} relating values
-\AF{Kripke} \AB{𝓥_1} \AB{𝓒_1} and \AF{Kripke} \AB{𝓥_2} \AB{𝓒_2}
+semantics can simulate another one. Given a relation \AB{$\mathcal{R}^{\mathcal{V}}$} connecting values
+in \AB{$\mathcal{V}_1$} and \AB{$\mathcal{V}_2$}, and a relation \AB{$\mathcal{R}^{\mathcal{C}}$} connecting computations in
+\AB{$\mathcal{C}_1$} and \AB{$\mathcal{C}_2$}, we can define \AF{Kripke\textsuperscript{R}} relating values
+\AF{Kripke} \AB{$\mathcal{V}_1$} \AB{$\mathcal{C}_1$} and \AF{Kripke} \AB{$\mathcal{V}_2$} \AB{$\mathcal{C}_2$}
 by stating that they send related inputs to related outputs. We use
 the relation transformer \AF{∀[\_]} which lifts a relation on values
 to one on environments in a pointwise manner.
@@ -1196,14 +1196,14 @@ to one on environments in a pointwise manner.
 \caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
 \end{figure}
 
-We can then combine \AF{Zip} and \AF{Kripke^R} to express the idea
+We can then combine \AF{Zip} and \AF{Kripke\textsuperscript{R}} to express the idea
 that two semantic objects of respective types
-\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥_1} \AB{𝓒_1}) and
-\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥_2} \AB{𝓒_2}) are
+\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_1$} \AB{$\mathcal{C}_1$}) and
+\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_2$} \AB{$\mathcal{C}_2$}) are
 synchronised. The simulation constraint on two \AF{Sem}antics' algebras
 then becomes: given synchronized objects, the algebras should yield
 related computations. Together with self-explanatory constraints on
-\ARF{var} and \ARF{th^𝓥}, this constitutes the whole \AF{Sim}ulation
+\ARF{var} and \ARF{th\textsuperscript{$\mathcal{V}$}}, this constitutes the whole \AF{Sim}ulation
 constraint:
 
 \begin{figure}[h]
@@ -1237,9 +1237,9 @@ POPLMark reloaded challenge where \AF{rensub} was actually needed.
 
 When studying specific languages, new opportunities to deploy the
 fundamental lemma of simulations arise. Our solution to the POPLMark
-reloaded challenge for instance describes the fact that {\AF{sub} \AB{\rho} \AB{t}}
-reduces to {\AF{sub} \AB{\rho'} \AB{t}} whenever for all \AB{v},
-\AB{\rho}(\AB{v}) reduces to \AB{\rho'}(\AB{v}) as a \AR{Sim}ulation.
+reloaded challenge for instance describes the fact that {\AF{sub} \AB{$\rho$} \AB{t}}
+reduces to {\AF{sub} \AB{$\rho$'} \AB{t}} whenever for all \AB{v},
+\AB{$\rho$}(\AB{v}) reduces to \AB{$\rho$'}(\AB{v}) as a \AR{Sim}ulation.
 The main theorem (strong normalisation of STLC via a logical relation)
 is itself an instance of (the unary version of) the simulation lemma.
 
@@ -1286,24 +1286,24 @@ for why they are shaped the way they are.
 
 \subsubsection{The Fusion constraints}
 
-The notion of fusion is defined for a triple of \AR{Sem}antics; each \AB{𝓢_i}
-being defined for values in \AB{𝓥_i} and computations in \AB{𝓒_i}. The
+The notion of fusion is defined for a triple of \AR{Sem}antics; each \AB{$\mathcal{S}_i$}
+being defined for values in \AB{$\mathcal{V}_i$} and computations in \AB{$\mathcal{C}_i$}. The
 fundamental lemma associated to such a set of constraints will state that
-running \AB{𝓢_2} after \AB{𝓢_1} is equivalent to running \AB{𝓢_3} only.
+running \AB{$\mathcal{S}_2$} after \AB{$\mathcal{S}_1$} is equivalent to running \AB{$\mathcal{S}_3$} only.
 
-The definition of fusion is parametrised by three relations: \AB{𝓡^E} relates
-triples of environments of values in {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_1} \AB{\Delta}},
-{(\AB{\Delta} \AR{─Env}) \AB{𝓥_2} \AB{\Theta}} and {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_3} \AB{\Theta}}
-respectively; \AB{𝓡^𝓥} relates pairs of values\AB{𝓥_2} and \AB{𝓥_3};
-and \AB{𝓡^𝓒}, our notion of equivalence for evaluation results, relates pairs
+The definition of fusion is parametrised by three relations: \AB{𝓡\textsuperscript{E}} relates
+triples of environments of values in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_1} \AB{$\Delta$}},
+{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥_2} \AB{$\Theta$}} and {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_3} \AB{$\Theta$}}
+respectively; \AB{$\mathcal{R}^{\mathcal{V}}$} relates pairs of values\AB{𝓥_2} and \AB{𝓥_3};
+and \AB{$\mathcal{R}^{\mathcal{C}}$}, our notion of equivalence for evaluation results, relates pairs
 of computation in \AB{𝓒_2} and \AB{𝓒_3}.
 
 % \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
 
-The first obstacle we face is the formal definition of ``running \AB{𝓢_2}
-after \AB{𝓢_1}'': for this statement to make sense, the result of running
-\AB{𝓢_1} ought to be a term. Or rather, we ought to be able to extract a
-term from a \AB{𝓒_1}. Hence the first constraint: the existence of a \ARF{quote_1}
+The first obstacle we face is the formal definition of ``running \AB{$\mathcal{S}_2$}
+after \AB{$\mathcal{S}_1$}'': for this statement to make sense, the result of running
+\AB{$\mathcal{S}_1$} ought to be a term. Or rather, we ought to be able to extract a
+term from a \AB{𝓒_1}. Hence the first constraint: the existence of a \ARF{quote\textsubscript{1}}
 function. When dealing with syntactic semantics such as renaming or substitution
 this function will be the identity. However nothing prevents to try to prove for
 instance that normalisation by evaluation is idempotent in which case a bona fide
@@ -1311,18 +1311,18 @@ reification function extracting terms from model values will be used.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionquote}
 
-Then, we have to think about what happens when going under a binder: \AB{𝓢_1}
+Then, we have to think about what happens when going under a binder: \AB{$\mathcal{S}_1$}
 will produce a \AF{Kripke} function space but we'd like to have a syntactic
-value. Provided that \AB{𝓥_1} is \AR{VarLike}, we can make use of \AF{reify}
+value. Provided that \AB{$\mathcal{V}_1$} is \AR{VarLike}, we can make use of \AF{reify}
 to get a \AF{Scope} back. Hence the second constraint.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvarlike}
 
 Still thinking about going under binders: if three evaluation environments
-\AB{\rho_1} in {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_1} \AB{\Delta}}, \AB{\rho_2} in
-{(\AB{\Delta} \AR{─Env}) \AB{𝓥_2} \AB{\Theta}}, and \AB{\rho_3} in {(\AB{\Gamma} \AR{─Env}) \AB{𝓥_3} \AB{\Theta}}
-are related by \AB{𝓡^E} and we are given a thinning \AB{\sigma} from \AB{\Theta} to \AB{\Omega}
-then \AB{\rho_1}, the thinned \AB{\rho_2} and the thinned \AB{\rho_3} should still be related.
+\AB{$\rho_1$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_1} \AB{$\Delta$}}, \AB{$\rho_2$} in
+{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥_2} \AB{$\Theta$}}, and \AB{$\rho_3$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_3} \AB{$\Theta$}}
+are related by \AB{𝓡\textsuperscript{E}} and we are given a thinning \AB{$\sigma$} from \AB{$\Theta$} to \AB{$\Omega$}
+then \AB{$\rho_1$}, the thinned \AB{$\rho_2$} and the thinned \AB{$\rho_3$} should still be related.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionthinnable}
 
@@ -1330,39 +1330,39 @@ Remembering that \AF{\_>>\_} is used in the definition of \AF{body} (Figure~\ref
 combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
 {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}} into one of type
 {(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ})}, we mechanically need a
-constraint stating that \AF{\_>>\_} is compatible with \AB{𝓡^E}. We demand
-as an extra precondition that the values \AB{\rho_2} and \AB{\rho_3} are extended
-with are related according to \AB{𝓡^𝓥}. Lastly, for all the types to match up,
-\AB{\rho_1} has to be extended with placeholder variables.
+constraint stating that \AF{\_>>\_} is compatible with \AB{𝓡\textsuperscript{E}}. We demand
+as an extra precondition that the values \AB{$\rho_2$} and \AB{$\rho_3$} are extended
+with are related according to \AB{$\mathcal{R}^{\mathcal{V}}$}. Lastly, for all the types to match up,
+\AB{$\rho_1$} has to be extended with placeholder variables.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionappend}
 
 We finally arrive at the constraints focusing on the semantical counterparts
-of the terms' constructors. When evaluating a variable, on the one hand \AB{𝓢_1}
+of the terms' constructors. When evaluating a variable, on the one hand \AB{$\mathcal{S}_1$}
 will look up its meaning in the evaluation environment, turn the resulting value into
-a computation which will get quoted and then the result will be evaluated with \AB{𝓢_2}.
-Provided that all three evaluation environments are related by \AB{𝓡^E} this should
-be equivalent to looking up the value in \AB{𝓢_3}'s environment and turning it into a
-computation. Hence the constraint \ARF{var^R}:
+a computation which will get quoted and then the result will be evaluated with \AB{$\mathcal{S}_2$}.
+Provided that all three evaluation environments are related by \AB{𝓡\textsuperscript{E}} this should
+be equivalent to looking up the value in \AB{$\mathcal{S}_3$}'s environment and turning it into a
+computation. Hence the constraint \ARF{var\textsuperscript{R}}:
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvar}
 
 The case of the algebra follows a similar idea albeit being more complex:
-a term gets evaluated using \AB{𝓢_1} and in order to be able to run \AB{𝓢_2}
+a term gets evaluated using \AB{$\mathcal{S}_1$} and in order to be able to run \AB{$\mathcal{S}_2$}
 afterwards we need to recover a piece of syntax. This is possible if the
 \AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥_1} arguments
-(which can be manufactured thanks to the \ARF{vl^𝓥_1} we mentioned before) and
-then quoted. Provided that the result of running \AB{𝓢_2} on that term is
-related via {\AF{Zip} \AB{d} (\AF{Kripke^R} \AB{𝓡^𝓥} \AB{𝓡^𝓒}} to the result
-of running \AB{𝓢_3} on the original term, the \ARF{alg^R} constraint states
+(which can be manufactured thanks to the \ARF{vl\textsuperscript{𝓥_1}} we mentioned before) and
+then quoted. Provided that the result of running \AB{$\mathcal{S}_2$} on that term is
+related via {\AF{Zip} \AB{d} (\AF{Kripke\textsuperscript{R}} \AB{$\mathcal{R}^{\mathcal{V}}$} \AB{$\mathcal{R}^{\mathcal{C}}$}} to the result
+of running \AB{$\mathcal{S}_3$} on the original term, the \ARF{alg\textsuperscript{R}} constraint states
 that the two evalutions should yield related computations.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionalg}
 
 This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
 stating that from a triple of related environments, one gets a pair of related
-computations: the composition of \AB{𝓢_1} and \AB{𝓢_2} on one hand and
-\AB{𝓢_3} on the other. This lemma is once again proven mutually with its
+computations: the composition of \AB{$\mathcal{S}_1$} and \AB{$\mathcal{S}_2$} on one hand and
+\AB{$\mathcal{S}_3$} on the other. This lemma is once again proven mutually with its
 counterpart for \AR{Sem}'s \AF{body}'s action on \AR{Scope}s and the \AD{Size}
 indices make the proof modular.
 
@@ -1510,7 +1510,7 @@ synonyms~\cite{Pickering:patsyn} makes working with an encoded definition almost
 seamless.
 
 The GMeta generic framework~\citeyear{gmeta} provides a universe of syntaxes
-and offers various binding conventions (locally nameless~\cite{Charguéraud2012}
+and offers various binding conventions (locally nameless~\cite{Chargueraud2012}
 or de Bruijn indices). It also generically implements common traversals (computing
 the sets of free / bound variables, measuring the size of a term, shifting
 de Bruijn indices or substituting terms for parameters) as well as common

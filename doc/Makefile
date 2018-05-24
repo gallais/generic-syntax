@@ -1,31 +1,85 @@
 SED=sed
 PAPER=popl18
+AGDA=agda
 
-all: finish
+all: latex/$(PAPER).pdf
 
-prepare:
-	mkdir -p latex/
-	cp *.lhs cc-by.pdf lipics-logo-bw.pdf *.sty *.tex *.cls *.bib *.bst *.sed latex/
+AGDA_FILES:=\
+  environment.lagda \
+  Generic/Bisimilar.lagda \
+  Generic/Cofinite.lagda \
+  Generic/Data.lagda \
+  Generic/Examples/Colist.lagda \
+  Generic/Examples/ElaborationLet.lagda \
+  Generic/Examples/NbyE.lagda \
+  Generic/Examples/STLC.lagda \
+  Generic/Examples/TypeChecking.lagda \
+  Generic/Examples/UntypedLC.lagda \
+  Generic/Fusion.lagda \
+  Generic/Semantics.lagda \
+  Generic/Simulation.lagda \
+  Generic/Syntax.lagda \
+  Generic/Zip.lagda \
+  indexed.lagda \
+  motivation.lagda \
+  varlike.lagda \
+  var.lagda
 
-paper-lagda:    
-	./build-lagda.sh
+AGDA_OUTPUT:=$(patsubst %.lagda,latex-agda-output/%.tex,$(AGDA_FILES))
+AGDA_OUTPUT_PROCESSED:=$(patsubst %.lagda,latex/%.tex,$(AGDA_FILES))
 
-paper: prepare paper-lagda
-	cd latex \
-	&& lhs2TeX lc.lhs > lc.tex \
-	&& ${SED} -f rules.sed -i ${PAPER}.tex \
-	&& ${SED} -f rules.sed -i syntax.tex \
-	&& ${SED} -f rules.sed -i motivation.tex \
-        && latexmk -bibtex -xelatex -pdf -e '$$pdflatex=q/xelatex %O %S/' $(PAPER).tex \
-        && cd ..
+.SECONDARY: $(AGDA_OUTPUT)
 
-finish: paper
-	ln -sf latex/${PAPER}.pdf .
-	xdotool search --class mupdf key --window %@ r > /dev/null 2>&1
+PAPER_DEPENDENCIES:=\
+  latex/$(PAPER).tex\
+  latex/syntax.tex \
+  latex/acmart.cls \
+  latex/commands.tex \
+  latex/agda.sty \
+  latex/main.bib \
+  latex/ACM-Reference-Format.bst \
+  $(AGDA_OUTPUT_PROCESSED)
+
+latex/$(PAPER).pdf: $(PAPER_DEPENDENCIES)
+	cd latex; latexmk -pdf -bibtex $(PAPER).tex
+
+latex/main.bib: main.bib
+	@mkdir -p $(dir $@)
+	cp $< $@
+
+latex/agda.sty: $(AGDA_OUTPUT)
+	@mkdir -p $(dir $@)
+	cp latex-agda-output/agda.sty $@
+
+latex/commands.tex: commands.tex
+	@mkdir -p $(dir $@)
+	cp $< $@
+
+latex/ACM-Reference-Format.bst: ACM-Reference-Format.bst
+	@mkdir -p $(dir $@)
+	cp $< $@
+
+latex/acmart.cls: acmart.cls
+	@mkdir -p $(dir $@)
+	cp $< $@
+
+latex/$(PAPER).tex: $(PAPER).tex rules.sed
+	@mkdir -p $(dir $@)
+	${SED} -f rules.sed $< > $@
+
+latex/syntax.tex: syntax.tex rules.sed
+	@mkdir -p $(dir $@)
+	${SED} -f rules.sed $< > $@
+
+latex/%.tex: latex-agda-output/%.tex rules.sed
+	@mkdir -p $(dir $@)
+	${SED} -f rules.sed $< > $@
+
+latex-agda-output/%.tex: %.lagda
+	@mkdir -p $(dir $@)
+	${AGDA} -i . --allow-unsolved-metas --latex $< --latex-dir=latex-agda-output > $(basename $@).log
 
 clean:
-	rm latex/${PAPER}.pdf
-
-fullclean:
-	rm -f *.agdai *.log *.hash *~ ${PAPER}.pdf
-	rm -rf latex/
+	find . -name '*.agdai' | xargs rm
+	rm -rf latex
+	rm -rf latex-agda-output
