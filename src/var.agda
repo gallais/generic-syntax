@@ -14,7 +14,6 @@ open import Data.List.All using (All ; _∷_)
 open import Function
 open import Agda.Builtin.Equality
 
-
 _─Scoped : Set → Set₁
 I ─Scoped = I → List I → Set
 
