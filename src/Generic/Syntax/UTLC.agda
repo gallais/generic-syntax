@@ -12,13 +12,18 @@ open import var
 open import Generic.Syntax
 
 -- Two constructors: Application and Lambda-abstraction
-UTLC : Desc ⊤
-UTLC =  `X [] tt (`X [] tt (`∎ tt))
-     `+ `X (tt ∷ []) tt (`∎ tt)
+data `UTLC : Set where App Lam : `UTLC
 
-pattern `V x    = `var x
-pattern `A f t  = `con (true , f , t , refl)
-pattern `L b    = `con (false , b , refl)
+UTLC : Desc ⊤
+UTLC =  `σ `UTLC $ λ where
+  App → `X [] tt (`X [] tt (`∎ tt))
+  Lam → `X (tt ∷ []) tt (`∎ tt)
+
+module PATTERNS where
+
+  pattern VAR x    = `var x
+  pattern APP f t  = `con (App , f , t , refl)
+  pattern LAM b    = `con (Lam , b , refl)
 
 `id : TM UTLC tt
-`id = `L (`V z)
+`id = let open PATTERNS in LAM (VAR z)
