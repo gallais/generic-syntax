@@ -14,6 +14,18 @@ import varlike
 -- Universe of Well Scoped-and-Sorted Syntaxes with Binding
 import Generic.Syntax
 
+-- Examples of Syntaxes
+-- * Well-scoped UnTyped Lambda-Calculus
+import Generic.Syntax.UTLC
+-- * Well-scopde-and-phased Bidirectional UnTyped Lambda-Calculus
+import Generic.Syntax.Bidirectional
+-- * Well-scoped-and-typed variants of the Simply-Typed Lambda-Calculus
+import Generic.Syntax.STLC
+import Generic.Syntax.STLC+State
+import Generic.Syntax.STLC+Product
+-- * System F as a two-phase syntax
+import Generic.Examples.SystemF
+
 
 -- SEMANTICS
 --------------------------------------------------------------------------------
@@ -24,10 +36,24 @@ import environment
 -- Semantics as Well Scoped-and-Sorted Algebras on Syntaxes with Binding
 import Generic.Semantics
 
--- Examples
+-- Trivial instance of a Semantics
 import Generic.Semantics.Unit
+
+-- Generic Unsafe Normalization by Evaluation and Printing as Semantics
+import Generic.Semantics.NbyE
+import Generic.Semantics.Printing
+-- use cases:
 import Generic.Examples.NbyE
 import Generic.Examples.Printing
+
+-- Generic Elaboration of Let-binders (single & parallel ones)
+import Generic.Semantics.Elaboration.LetBinder
+import Generic.Semantics.Elaboration.LetBinders
+
+-- Specific Semantics relating various examples of Syntaxes
+import Generic.Semantics.TypeChecking
+import Generic.Semantics.Elaboration.State
+
 
 -- PROPERTIES
 --------------------------------------------------------------------------------
@@ -51,6 +77,15 @@ import Generic.Fusion
 
 
 
+-- SYNTAX AS A FINITE REPRESENTATION OF CYCLIC STRUCTURES
+--------------------------------------------------------------------------------
+
+import Generic.Cofinite
+import Generic.Examples.Colist
+import Generic.Bisimilar
+
+
+
 
 -- Offering users convenient short names
 open module idx = indexed public
@@ -68,5 +103,5 @@ open module fus = Generic.Fusion public
 open module idt = Generic.Identity public
 
 open module uni = Generic.Semantics.Unit public
-open module nbe = Generic.Examples.NbyE public
-open module prt = Generic.Examples.Printing public
+open module nbe = Generic.Semantics.NbyE public
+open module prt = Generic.Semantics.Printing public
