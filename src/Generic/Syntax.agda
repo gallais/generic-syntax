@@ -2,7 +2,6 @@ module Generic.Syntax where
 
 open import Size
 open import Data.Bool
-open import Data.List.All
 open import Data.List.Base as L hiding ([_])
 open import Data.Product as P hiding (,_)
 open import Function hiding (case_of_)
@@ -76,10 +75,10 @@ module _ {I : Set} where
 module _ {I : Set} {d : Desc I} {X : List I → I ─Scoped} {i : I} {Γ : List I} where
 
  unXs :  (Δ : List I) → ⟦ `Xs Δ d ⟧ X i Γ →
-         All (λ i → X [] i Γ) Δ × ⟦ d ⟧ X i Γ
+         (Δ ─Env) (X []) Γ × ⟦ d ⟧ X i Γ
 
- unXs []       v       = [] , v
- unXs (σ ∷ Δ)  (r , v) = P.map (r ∷_) id (unXs Δ v)
+ unXs []       v       = ε , v
+ unXs (σ ∷ Δ)  (r , v) = P.map (_∙ r) id (unXs Δ v)
 
 -- Descriptions give rise to traversable functors
 

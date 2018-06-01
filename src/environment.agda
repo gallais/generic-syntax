@@ -14,16 +14,22 @@ infix 3 _─Env
 record _─Env (Γ : List I) (𝓥 : I ─Scoped) (Δ : List I) : Set where
   constructor pack
   field lookup : ∀ {i} → Var i Γ → 𝓥 i Δ
-
 open _─Env public
-
 
 Thinning : List I → List I → Set
 Thinning Γ Δ = (Γ ─Env) Var Δ
 
+-- Basic building blogs: empty environment & extension with one value
 
 ε : ∀ {𝓥 n} → ([] ─Env) 𝓥 n
 lookup ε ()
+
+infixl 10 _∙_
+_∙_ : ∀ {𝓥 Γ Δ σ} → (Γ ─Env) 𝓥 Δ → 𝓥 σ Δ → (σ ∷ Γ ─Env) 𝓥 Δ
+lookup (ρ ∙ v) z    = v
+lookup (ρ ∙ v) (s k) = lookup ρ k
+
+-- Transforming the values an environment carries
 
 _<$>_ : {𝓥 𝓦 : I ─Scoped} {Γ Δ Θ : List I} → ({i : I} → 𝓥 i Δ → 𝓦 i Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
 lookup (f <$> ρ) k = f (lookup ρ k)
@@ -71,17 +77,13 @@ injectʳ->> : ∀ {𝓥 Γ Δ Θ i} (ρ₁ : (Γ ─Env) 𝓥 Θ) (ρ₂ : (Δ �
              lookup (ρ₁ >> ρ₂) (injectʳ Γ v) ≡ lookup ρ₂ v
 injectʳ->> {Γ = Γ} ρ₁ ρ₂ v rewrite split-injectʳ Γ v = refl
 
-infixl 10 _∙_
-_∙_ : ∀ {𝓥 Γ Δ σ} → (Γ ─Env) 𝓥 Δ → 𝓥 σ Δ → (σ ∷ Γ ─Env) 𝓥 Δ
-lookup (ρ ∙ v) z    = v
-lookup (ρ ∙ v) (s k) = lookup ρ k
-
 select : ∀ {Γ Δ Θ 𝓥} → Thinning Γ Δ → (Δ ─Env) 𝓥 Θ → (Γ ─Env) 𝓥 Θ
 lookup (select ren ρ) k = lookup ρ (lookup ren k)
 
 extend : ∀ {Γ σ} → Thinning Γ (σ ∷ Γ)
 extend = pack s
 
+-- □ as a monad
 
 □ : (List I → Set) → (List I → Set)
 (□ T) Γ = [ Thinning Γ ⟶ T ]
@@ -94,7 +96,6 @@ duplicate t ρ σ = t (select ρ σ)
 
 join : {T : List I → Set} → [ □ (□ T) ⟶ □ T ]
 join = extract
-
 
 Thinnable : (List I → Set) → Set
 Thinnable T = [ T ⟶ □ T ]
@@ -113,10 +114,15 @@ Kripke :  (𝓥 𝓒 : I ─Scoped) → (List I → I ─Scoped)
 Kripke 𝓥 𝓒 []  i = 𝓒 i
 Kripke 𝓥 𝓒 Γ   i = □ ((Γ ─Env) 𝓥 ⟶ 𝓒 i)
 
-th^Kr : {𝓥 𝓒 : I ─Scoped}
-        (Γ : List I) → ({i : I} → Thinnable (𝓒 i)) → {i : I} → Thinnable (Kripke 𝓥 𝓒 Γ i)
-th^Kr []       th^𝓒 = th^𝓒
-th^Kr (_ ∷ _)  th^𝓒 = th^□
+module _ {𝓥 𝓒 : I ─Scoped} where
+
+  _$$_ : ∀ {Γ i} → [ Kripke 𝓥 𝓒 Γ i ⟶ (Γ ─Env) 𝓥 ⟶ 𝓒 i ]
+  _$$_ {[]}    f ts = f
+  _$$_ {_ ∷ _} f ts = extract f ts
+
+  th^Kr : (Γ : List I) → (∀ {i} → Thinnable (𝓒 i)) → ∀ {i} → Thinnable (Kripke 𝓥 𝓒 Γ i)
+  th^Kr []       th^𝓒 = th^𝓒
+  th^Kr (_ ∷ _)  th^𝓒 = th^□
 
 open import Category.Applicative
 
