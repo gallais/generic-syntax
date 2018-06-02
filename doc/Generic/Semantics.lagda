@@ -3,7 +3,7 @@ module Generic.Semantics where
 
 open import Size
 open import Data.Bool
-open import Data.List.Base as L hiding ([_])
+open import Data.List.Base as L hiding ([_]; lookup)
 open import Data.Product as P hiding (,_)
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])

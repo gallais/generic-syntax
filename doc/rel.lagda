@@ -3,7 +3,7 @@ module rel where
 
 open import Size
 open import Data.Sum
-open import Data.List.Base hiding ([_])
+open import Data.List.Base hiding ([_]; lookup)
 
 open import indexed
 open import var hiding (_<$>_)

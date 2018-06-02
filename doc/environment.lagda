@@ -2,7 +2,7 @@
 module environment {I : Set} where
 
 open import Data.Nat.Base as ℕ
-open import Data.List.Base hiding ([_])
+open import Data.List.Base hiding ([_]; lookup)
 open import Data.Sum as S
 open import Function
 open import Relation.Binary.PropositionalEquality as PEq hiding ([_])

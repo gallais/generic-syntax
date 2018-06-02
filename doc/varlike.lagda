@@ -1,7 +1,7 @@
 \begin{code}
 module varlike where
 
-open import Data.List.Base hiding ([_])
+open import Data.List.Base hiding ([_]; lookup)
 open import Data.Sum
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])

@@ -3,7 +3,7 @@ module Generic.Fusion where
 
 open import Size
 open import Data.Sum
-open import Data.List hiding ([_] ; zip)
+open import Data.List hiding ([_] ; zip; lookup)
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
