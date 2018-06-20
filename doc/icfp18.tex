@@ -17,6 +17,9 @@
 % \SetAlCapHSkip{0pt}
 % \IncMargin{-\parindent}
 
+\let\oldciteyear\citeyear
+\renewcommand{\citeyear}[1]{(\oldciteyear{#1})}
+
 
 % Metadata Information
 \acmJournal{TWEB}

@@ -66,7 +66,7 @@ The language is obtained as the fixpoint of $T$:
    \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
    \lambda X \in \Set{}. X + (F(X) \times F(X)) + F(1 + X)
 \]
-Since 'Lam' is a endofunction on Set, it makes
+Since `Lam' is a endofunction on Set, it makes
 sense to ask whether it is also a functor and a monad. Indeed it is,
 as Altenkirch and Reus have shown. The functorial action corresponds
 to renaming, the monadic 'return' corresponds to the use of variables,
@@ -196,12 +196,11 @@ naturally only a start: once the programmer has access to a good
 representation of the language they are interested in, they will naturally
 want to (re)implement standard traversals manipulating terms.
 Renaming and substitution are the two most typical examples
-of such traversals. Now that well typedness and scopedness are enforced
+of such traversals. Now that well-typedness and well-scopedness are enforced
 statically, all of these traversals have to be implemented
 in a type and scope safe manner.
 
-These constraints show up in the types of renaming and substitution which can
-be defined as follows:
+These constraints show up in the types of renaming and substitution defined as follows:
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -303,7 +302,7 @@ Semantics are defined in terms of a choice of values \AB{$\mathcal{V}$} and
 computations \AB{$\mathcal{C}$}. Realisation of a semantics will produce a
 computation in \AB{$\mathcal{C}$} for every term whose variables are assigned
 values in \AB{$\mathcal{V}$}.
-A Semantics must satisfy constraints on the notions of
+A semantics must satisfy constraints on the notions of
 values \AB{$\mathcal{V}$} and computations \AB{$\mathcal{C}$} at hand. First of all,
 values should be thinnable so that \AF{sem} may push the environment
 under binders. Second, the set of computations needs to be closed
@@ -335,8 +334,8 @@ into a computation \AB{$\mathcal{C}$}.
 \end{figure}
 
 Coming back to renaming and substitution, we see that they both fit in the
-\AR{Sem} framework. We notice that the definition of Substitution depends on
-the definition of Renaming: to be able to push terms under binder, we need to
+\AR{Sem} framework. We notice that the definition of substitution depends on
+the definition of renaming: to be able to push terms under binder, we need to
 have already proven that they are thinnable.
 
 \begin{figure}[h]
@@ -350,7 +349,7 @@ have already proven that they are thinnable.
 \end{figure}
 
 In both cases we use (\AIC{pack} \AB{s}) (where \AIC{pack} is the constructor
-for environments and \AIC{s} the functionn lifting an existing de Bruijn variable
+for environments and \AIC{s} the function lifting an existing de Bruijn variable
 into an extended scope) as the definition of the thinning embedding \AB{$\Gamma$}
 into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
 
@@ -383,7 +382,7 @@ prepend a ``$\lambda$'' binding the fresh name.
 \caption{Printing as an instance of \AR{Sem}}
 \end{figure}
 
-Both Printing and Renaming highlight the importance of distinguishing
+Both printing and renaming highlight the importance of distinguishing
 values and computations: the type of values in their respective
 environments are distinct from their type of computations.
 
@@ -428,7 +427,7 @@ recursive substructure indexed by $J$ and \AIC{`$\blacksquare$} to stop with a p
 index value.
 
 The recursive function \AF{⟦\_⟧} makes the interpretation of the
-Descriptions formal. Interpretation of descriptions give rise right nested tuples
+descriptions formal. Interpretation of descriptions give rise right nested tuples
 terminated by equality constraints.
 
 \begin{figure}[h]
@@ -493,7 +492,7 @@ and its iterator is given by the definition of \AF{fold} \AB{d}.
 In Figure~\ref{figure:datamu} the \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
 to the inductive definition of \AD{μ} plays a crucial role in getting the
 termination checker to see that \AF{fold} is a total function. Sized types
-are outside the scope of this paper; describing them in details would be a
+are outside the scope of this paper; describing them in detail would be a
 distraction.
 
 The CDMM approach therefore allows us to generically define iteration principles
@@ -592,7 +591,7 @@ For convenience we define pattern synonyms~\cite{Pickering:patsyn} corresponding
 to the original constructors in Figure~\ref{scoped-untyped}: \AIC{`V}
 for \AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the
 application one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.
-This means that the end user can saemlessly write pattern-matching programs on
+This means that the end user can seamlessly write pattern-matching programs on
 encoded terms without dealing with the gnarly details of the encoding.
 These pattern definitions can omit some arguments by using ``\AS{\_}'',
 in which case they will be filled in by unification just like any other
@@ -684,8 +683,8 @@ have to abide by three constraints:
       result of its evaluation;
 \item{\ARF{alg}} We should have an algebra turning
       a term whose substructures have been replaced with
-      Computations (possibly under some binders, represented semantically
-      by the Kripke typed defined below) into Computations
+      computations (possibly under some binders, represented semantically
+      by the \AF{Kripke} typed defined below) into computations
 \end{itemize}
 
 \begin{figure}[h]
@@ -697,14 +696,17 @@ Here we crucially use the fact that the meaning of a description is
 defined in terms of a function interpreting substructures which has
 the type \AF{List} \AB{I} \AS{→} \AB{I}\AF{─Scoped}, i.e. that gets access
 to the current scope but also the exact list of the newly bound variables' kinds.
-We define such a function, \AF{Kripke}, by case analysis on the number
-of newly bound variables: if it's $0$ we expect the substructure
-to be a computation (the result of the evaluation function's
-recursive call) but if there are newly bound variables then we expect
-that in any context extension, we will have a function which, provided
-a value for each one of these extra variables, will deliver a computation
-corresponding to the evaluation of the body of the binder in the extended
-environment.
+We define a function \AF{Kripke} by case analysis on the number of newly bound
+variables. It is essentially a subcomputation waiting for a value associated to
+each one of the fresh variables.
+\begin{itemize}
+\item If it's $0$ we expect the substructure to be a computation corresponding
+    to the result of the evaluation function's recursive call;
+  \item But if there are newly bound variables then we expect to have a function
+    space. In any context extension, it will take an environment of values for
+    the newly-bound variables and produce a computation corresponding to the
+    evaluation of the body of the binder.
+\end{itemize}
 
 \begin{figure}[h]
 \ExecuteMetaData[environment.tex]{kripke}
@@ -772,7 +774,7 @@ well-founded.
 
 \subsection{Our First Generic Programs: Renaming and Substitution}\label{section:renandsub}
 
-Similarly to ACMM~\citeyear{allais2017type} Renaming can be defined generically
+Similarly to ACMM~\citeyear{allais2017type} renaming can be defined generically
 for all syntax descriptions as a semantics with \AF{Var} as values and \AD{Tm} as
 computations. The first two constraints on \AF{Var} described earlier are trivially
 satisfied. Observing that renaming strictly respects the structure of the term it
@@ -897,7 +899,7 @@ it is possible to define \emph{generic} transformations elaborating
 these added features in terms of lower-level ones. This suggests that
 this setup could be a good candidate to implement generic compilation
 passes and could deal with a framework using a wealth of slightly
-different intermediate languages à la nanopass~\cite{Keep:2013:NFC:2544174.2500618}.
+different intermediate languages à la Nanopass~\cite{Keep:2013:NFC:2544174.2500618}.
 
 \subsection{(Unsafe) Normalisation by Evaluation}\label{section:nbyeval}
 
@@ -918,8 +920,7 @@ we can define a generic reflexive domain \AD{Dm} in which to
 interpret our syntaxes. It has three constructors corresponding
 respectively to a free variable, a constructor's counterpart where
 scopes have become \AF{Kripke} functional spaces on \AD{Dm} and
-an error token because the evaluation of untyped programs may
-(and usually does!) go wrong.
+an error token because the evaluation of untyped programs may go wrong.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{domain}
@@ -977,7 +978,7 @@ termination) we know we will get a term in normal form.
 Following Atkey~\citeyear{atkey2015algebraic}, we can consider type checking
 and type inference as a possible semantics for a bi-directional~\cite{pierce2000local}
 language. We represent the raw syntax of a simply-typed bi-directional calculus
-as a bi-sorted language using a notion of \AD{Phase} to distinguish between terms
+as a bi-sorted language using a notion of \AD{Mode} to distinguish between terms
 for which we will be able to \AIC{Infer} the type and the ones for which we will
 have to \AIC{Check} a type candidate.
 
@@ -999,8 +1000,8 @@ into \AIC{Check}ables.
 \end{figure}
 
 The values stored in the environment will be \AD{Type} information for bound
-variables no matter what their \AD{Phase} is. In constrast, the generated
-computations will, depending on the phase, either take a type candidate and
+variables no matter what their \AD{Mode} is. In constrast, the generated
+computations will, depending on the mode, either take a type candidate and
 \AIC{Check} it is valid or \AIC{Infer} a type for their argument. These
 computations are always potentially failing so we use the \AD{Maybe} monad.
 
@@ -1011,7 +1012,7 @@ computations are always potentially failing so we use the \AD{Maybe} monad.
 \begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{typemode}
 \end{minipage}
-\caption{Var- and Type- Modes indexed by the Phase}
+\caption{Var- and Type- Relations indexed by the Mode}
 \end{figure}
 
 We can now define typechecking as a \AR{Sem}antics. The algebra describes the
@@ -1056,8 +1057,12 @@ the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
 A basic example of such a structure is a potentially cyclic list which
 offers a choice of two constructors: \AIC{[]} which ends the list and
 \AIC{\_:\!:\_} which combines a head and a tail but also acts as a binder
-for a self-reference. We can see this approach in action in the examples
-\AF{[0, 1]} and \AF{01↺} which describe respectively a finite list containing
+for a self-reference; these pointers can be used by using the \AIC{var}
+constructor which we have renamed \AIC{↶} (pronounced ``backpointer'')
+to match the domain-specific meaning.
+We can see this approach in action in the examples
+\AF{[0, 1]} and \AF{01↺} (pronounced ``0-1-cycle'') which describe
+respectively a finite list containing
 0 followed by 1 and a cyclic list starting with 0, then 1, and then
 repeating the whole list again by referring to the first cons cell
 represented here by the de Bruijn variable 1 (i.e. \AIC{s} \AIC{z}).
@@ -1172,9 +1177,9 @@ layers which are meant to be equal:
 \end{figure}
 
 If we were to take a fixpoint of \AF{Zip}, we could obtain a structural
-notion of equality for terms which would be equivalent to propositional
-equality. In the section we are however interested in more advanced
-use-cases.
+notion of equality for terms which we could prove equivalent to propositional
+equality. Although interesting in its own right, this section will focus
+on more advanced use-cases.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SIMULATION
@@ -1223,12 +1228,12 @@ and \AD{Size}s play a crucial role in ensuring that the function is indeed total
 \end{figure}
 
 Instantiating this generic simulation lemma, we can for instance get
-that Renaming and Substitution are extensional (given extensionally
+that renaming and substitution are extensional (given extensionally
 equal environments they produce syntactically equal terms), or that
-Renaming is a special case of Substitution. Of course these results
+renaming is a special case of substitution. Of course these results
 are not new but having them generically over all syntaxes with binding
 is convenient; which we have experienced first hand when tackling the
-POPLMark reloaded challenge where \AF{rensub} was actually needed.
+POPLMark Reloaded challenge where \AF{rensub} was actually needed.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Simulation.tex]{rensub}
@@ -1237,7 +1242,7 @@ POPLMark reloaded challenge where \AF{rensub} was actually needed.
 
 When studying specific languages, new opportunities to deploy the
 fundamental lemma of simulations arise. Our solution to the POPLMark
-reloaded challenge for instance describes the fact that {\AF{sub} \AB{$\rho$} \AB{t}}
+Reloaded challenge for instance describes the fact that {\AF{sub} \AB{$\rho$} \AB{t}}
 reduces to {\AF{sub} \AB{$\rho$'} \AB{t}} whenever for all \AB{v},
 \AB{$\rho$}(\AB{v}) reduces to \AB{$\rho$'}(\AB{v}) as a \AR{Sim}ulation.
 The main theorem (strong normalisation of STLC via a logical relation)
@@ -1271,7 +1276,7 @@ into the model is equivalent to the evaluation of the original term with an
 environment corresponding to the evaluated substitution.
 
 A direct application of these results is our (to be published) entry to the
-POPLMark Challenge Reloaded~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
+POPLMark Reloaded challenge~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
 representation of intrisincally well-typed and well-scoped terms we directly inherit
 not only renaming and substitution but also all four fusion lemmas as corollaries
 of our generic results. This allows us to remove the usual boilerplate
@@ -1329,7 +1334,7 @@ then \AB{$\rho_1$}, the thinned \AB{$\rho_2$} and the thinned \AB{$\rho_3$} shou
 Remembering that \AF{\_>>\_} is used in the definition of \AF{body} (Figure~\ref{def:body}) to
 combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
 {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}} into one of type
-{(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ})}, we mechanically need a
+{((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}, we mechanically need a
 constraint stating that \AF{\_>>\_} is compatible with \AB{𝓡\textsuperscript{E}}. We demand
 as an extra precondition that the values \AB{$\rho_2$} and \AB{$\rho_3$} are extended
 with are related according to \AB{$\mathcal{R}^{\mathcal{V}}$}. Lastly, for all the types to match up,
@@ -1359,6 +1364,8 @@ that the two evalutions should yield related computations.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionalg}
 
+\subsubsection{The Fundamental Lemma of Fusion}
+
 This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
 stating that from a triple of related environments, one gets a pair of related
 computations: the composition of \AB{$\mathcal{S}_1$} and \AB{$\mathcal{S}_2$} on one hand and
@@ -1370,6 +1377,8 @@ indices make the proof modular.
  \ExecuteMetaData[Generic/Fusion.tex]{fusbody}
 \caption{Fundamental Lemma of \AR{Fus}ion}
 \end{figure}
+
+\subsubsection{Instances of Fusion}
 
 A direct consequence of this result is the four lemmas collectively stating
 that any pair of renamings and / or substitutions can be fused together to
@@ -1484,7 +1493,7 @@ transforming named terms into de Bruijn ones; we refrain from calling it a
 scopechecker as terms are not statically proven to be well-scoped.
 
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} build on our previous paper
-to draft possible theoretical foundations for Autosubst, a so far untrusted
+to draft possible theoretical foundations for Autosubst, a so-far untrusted
 set of tactics. The whole paper is based on a specific syntax: well-scoped
 call by value System F. In contrast, our effort has been here to carve out
 a precise universe of syntaxes with binding and give a systematic account
@@ -1505,7 +1514,7 @@ Needle~\citeyear{needleandknot} implements the traversals and lemmas generated
 in specialised forms by Needle once and for all as a set of generic programs.
 They see the existence of Needle as a pragmatic choice: working directly with
 the free monadic terms over finitary containers would be too cumbersome. In
-our experience solving the POPLMark reloaded challenge, Agda's pattern
+our experience solving the POPLMark Reloaded challenge, Agda's pattern
 synonyms~\cite{Pickering:patsyn} makes working with an encoded definition almost
 seamless.
 
@@ -1549,9 +1558,9 @@ language.
 By extending a universe of datatype descriptions to support a notion of binding,
 we have given a generic presentation of syntaxes with binding as well
 as a large class of scope-and-type safe generic programs acting on all of them:
-from Renaming and Substitution, to Normalisation by Evaluation, and the Desugaring
+from renaming and substitution, to normalisation by evaluation, and the desugaring
 of new constructors added by a language transformer. The code accompanying the
-paper also demonstrates how to generically write a Printer or a Scope-Checker
+paper also demonstrates how to generically write a printer or a scope-checker
 elaborating values of a raw syntax using strings as variable names into scope-safe
 ones.
 
@@ -1563,7 +1572,7 @@ of constraints guaranteeing that two semantics run consecutively can be subsumed
 by a single pass of a third one.
 
 We have put all of these results in practice by using them to solve the (to be
-published) POPLMark reloaded challenge which consists in formalising strong
+published) POPLMark Reloaded challenge which consists in formalising strong
 normalisation for the simply-typed $\lambda$-caluclus via a logical-relation
 argument.
 
@@ -1584,9 +1593,9 @@ could provide an appropriate framework to highlight the connection between vario
 languages, some being seen as refinements of others. This is particularly
 evident when considering the informative typechecker (see the paper's accompanying
 code) which given a scoped term produces a scoped-and-typed term by
-type-(checking/inference).
+type-checking or type-inference.
 
-\item Our work on the POPLMark reloaded challenge highlights a need for generic
+\item Our work on the POPLMark Reloaded challenge highlights a need for generic
 notions of congruence closure which would come with guarantees (if the original
 relation is stable under renaming and substitution so should the closure).
 Similarly, the ``evaluation contexts'' corresponding to a syntax could be
@@ -1595,7 +1604,7 @@ and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}.
 
 \item Finally, now knowing how to generically describe syntaxes and their
 well-behaved semantics, we can start asking what it means to define
-well-behaved judgments. Why stop at helping the user write its specific
+well-behaved judgments. Why stop at helping the user write their specific
 language's meta-theory when we could study meta-meta-theory?
 \end{itemize}
 

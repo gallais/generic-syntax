@@ -47,13 +47,13 @@ data LangC : Set where
 %</constructors>
 %<*phase>
 \begin{code}
-data Phase : Set where
-  Check Infer : Phase
+data Mode : Set where
+  Check Infer : Mode
 \end{code}
 %</phase>
 %<*bidirectional>
 \begin{code}
-Lang : Desc Phase
+Lang : Desc Mode
 Lang  =  `σ LangC $ λ where
   App      → `X [] Infer (`X [] Check (`∎ Infer))
   Lam      → `X (Infer ∷ []) Check (`∎ Check)
@@ -71,14 +71,14 @@ pattern `emb t    = `con (Emb , t , refl)
 %</langsyntax>
 %<*typemode>
 \begin{code}
-Type- : Phase → Set
+Type- : Mode → Set
 Type- Check  = Type →  Maybe ⊤
 Type- Infer  =         Maybe Type
 \end{code}
 %</typemode>
 %<*varmode>
 \begin{code}
-Var- : Phase → Set
+Var- : Mode → Set
 Var- _ = Type
 \end{code}
 %</varmode>
@@ -87,11 +87,11 @@ Var- _ = Type
 Typecheck : Sem Lang (const ∘ Var-) (const ∘ Type-)
 Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
 
-   var : (i : Phase) → Var- i → Type- i
+   var : (i : Mode) → Var- i → Type- i
    var Infer  = just
    var Check  = _==_
 
-   alg : {i : Phase} {Γ : List Phase} → ⟦ Lang ⟧ (Kripke (κ ∘ Var-) (κ ∘ Type-)) i Γ → Type- i
+   alg : {i : Mode} {Γ : List Mode} → ⟦ Lang ⟧ (Kripke (κ ∘ Var-) (κ ∘ Type-)) i Γ → Type- i
    alg (App , f , t , refl)  =  f            >>= λ σ⇒τ →
                                 isArrow σ⇒τ  >>= uncurry λ σ τ →
                                 τ <$ t σ
@@ -102,7 +102,7 @@ Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
 \end{code}
 %</typecheck>
 \begin{code}
-type- : (p : Phase) → Tm Lang ∞ p [] → Type- p
+type- : (p : Mode) → Tm Lang ∞ p [] → Type- p
 type- p t = Sem.sem Typecheck {Δ = []} ε t
 
 _ : let  id  : Tm Lang ∞ Check []
