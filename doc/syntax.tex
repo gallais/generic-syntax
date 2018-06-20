@@ -25,9 +25,9 @@ This gives us the opportunity to write generic implementations of renaming
 and substitution (Section~\ref{section:renandsub}) but also elaboration of
 a surface language to a core one (Section~\ref{section:letbinding}),
 and normalisation by evaluation (Section~\ref{section:nbyeval}). We also explore opportunities
-for generic proving by describing a framework to formally describe what
-it means for a semantics to be able to simulate another one (Section~\ref{section:simulation}),
-or for two semantics to be fusible (Section~\ref{section:fusion}).
+for generic proving by formally describing what it means for a semantics
+to be able to simulate another one (Section~\ref{section:simulation}),
+or for two semantics to be fusable (Section~\ref{section:fusion}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SCOPE SAFE TERMS
@@ -148,8 +148,9 @@ by ignoring the index.
 \caption{Combinators to build indexed Sets}\label{figure:indexed}
 \end{figure}
 
-These combinators lead to more readable type declarations. For instance,
-the compact expression
+We make \AF{⟶} associate to the right as one would expect and give it the
+highest precedence level as it is the most used combinator. These combinators
+lead to more readable type declarations.  For instance, the compact expression
 \AF{[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⟶} \AB{R} \AF{]}
 desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
@@ -292,7 +293,7 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 
 As Allais, Chapman, McBride and McKinna (ACMM)~\citeyear{allais2017type} shows,
 equipped with these new notions
-we can define an abstract concept of semantics for our scope safe language
+we can define an abstract concept of semantics for our scope-and-type safe language
 (cf. Figures~\ref{figure:lamsem} and \ref{figure:fdmlamsem}).
 Broadly speaking, a semantics turns our deeply embedded abstract
 syntax trees into the shallow embedding of the corresponding
@@ -300,10 +301,10 @@ parametrised higher order abstract syntax term. We get a choice of
 useful scope-and-sort safe traversals by using different `host languages'
 for this shallow embedding.
 
-Semantics are defined in terms of a choice of values \AB{$\mathcal{V}$} and
+Semantics are defined in Figure~\ref{figure:lamsem} in terms of a choice of values \AB{$\mathcal{V}$} and
 computations \AB{$\mathcal{C}$}. Realisation of a semantics will produce a
 computation in \AB{$\mathcal{C}$} for every term whose variables are assigned
-values in \AB{$\mathcal{V}$}.
+values in \AB{$\mathcal{V}$} as demonstrated in Figure~\ref{figure:fdmlamsem}.
 A semantics must satisfy constraints on the notions of
 values \AB{$\mathcal{V}$} and computations \AB{$\mathcal{C}$} at hand. First of all,
 values should be thinnable so that \AF{sem} may push the environment
@@ -518,7 +519,10 @@ used to distinguish terms in our embedded language. The \AIC{`$\sigma$} and
 \AIC{`∎} constructors are as in the CDMM \AD{Desc} type, and are used to
 represent data and index constraints respectively. The \AIC{`X} constructor
 is now augmented with an addtional {\AD{List} \AB{I}} argument that describes
-the new binders that are brought into scope at this recursive position.
+the new binders that are brought into scope at this recursive position. This
+list of the kinds of the newly-bound variables will play a crucial role when
+defining the description's semantics as a binding structure in
+Figures~\ref{figure:syntaxmeaning}, \ref{figure:debruijnscope} and \ref{figure:freemonad}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{desc}
@@ -534,7 +538,7 @@ newly-bound variables in \AB{Δ}) in an ambient scope \AB{Γ} as {\AB{X} \AB{Δ}
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{interp}
-\caption{Descriptions' Meanings}
+\caption{Descriptions' Meanings}\label{figure:syntaxmeaning}
 \end{figure}
 
 The astute reader may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $\Gamma$; however
@@ -553,7 +557,7 @@ the description just like in Section~\ref{section:data}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{scope}
-\caption{De Bruijn Scopes}
+\caption{De Bruijn Scopes}\label{figure:debruijnscope}
 \end{figure}
 
 The endofunctors thus defined are strictly positive and we can take their fixpoints.
@@ -566,7 +570,7 @@ a \AD{Size} index to get all the benefits of type based termination checking.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{mu}
-\caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}
+\caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}\label{figure:freemonad}
 \end{figure}
 
 Coming back to our original examples, we now have the ability to give
