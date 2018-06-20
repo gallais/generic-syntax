@@ -78,7 +78,7 @@ select : ∀ {Γ Δ Θ 𝓥} → Thinning Γ Δ → (Δ ─Env) 𝓥 Θ → (Γ 
 lookup (select ren ρ) k = lookup ρ (lookup ren k)
 
 extend : ∀ {Γ σ} → Thinning Γ (σ ∷ Γ)
-extend = pack s
+lookup extend v = s v
 
 -- Like the flipped version of _>>_ but it computes. Which is convenient when
 -- dealing with concrete Γs (cf. βred)
