@@ -24,7 +24,7 @@ with a generic notion of scope safe semantics for these syntaxes (Section~\ref{s
 This gives us the opportunity to write generic implementations of renaming
 and substitution (Section~\ref{section:renandsub}) but also elaboration of
 a surface language to a core one (Section~\ref{section:letbinding}),
-and normalisation by evaluation (Section~\ref{section:nbyeval}. We also explore opportunities
+and normalisation by evaluation (Section~\ref{section:nbyeval}). We also explore opportunities
 for generic proving by describing a framework to formally describe what
 it means for a semantics to be able to simulate another one (Section~\ref{section:simulation}),
 or for two semantics to be fusible (Section~\ref{section:fusion}).
@@ -218,7 +218,8 @@ for \AF{ren} and \AF{sub} but they serve the same purpose: \AF{⟦V⟧} is used 
 turn a value looked up in the evaluation environment into a term and \AF{extend}
 is used to alter the environment when going under a binder. This presentation
 highlights the common structure between \AF{ren} and \AF{sub} which we will exploit
-later in this section, particularly in Figures~\ref{figure:lamsem} and \ref{figure:fdmlamsem}.
+later in this section, particularly in Figures~\ref{figure:lamsem} and \ref{figure:fdmlamsem}
+where we define an abstract notion of semantics and the corresponding generic traversal.
 
 Both renaming and substitution are defined in terms of \emph{environments}
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ}} that describe how to associate a value \AB{𝓥}
@@ -291,7 +292,8 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 
 As Allais, Chapman, McBride and McKinna (ACMM)~\citeyear{allais2017type} shows,
 equipped with these new notions
-we can define an abstract concept of semantics for our scope safe language.
+we can define an abstract concept of semantics for our scope safe language
+(cf. Figures~\ref{figure:lamsem} and \ref{figure:fdmlamsem}).
 Broadly speaking, a semantics turns our deeply embedded abstract
 syntax trees into the shallow embedding of the corresponding
 parametrised higher order abstract syntax term. We get a choice of
@@ -348,8 +350,9 @@ have already proven that they are thinnable.
 \caption{Renaming and Substitution as Instances of \AR{Sem}}
 \end{figure}
 
-In both cases we use (\AIC{pack} \AB{s}) (where \AIC{pack} is the constructor
-for environments and \AIC{s} the function lifting an existing de Bruijn variable
+In both cases we use (\AIC{pack} \AIC{s}) (where \AIC{pack} is the constructor
+for environments and \AIC{s}, defined in Figure~\ref{scoped-untyped}, is the function
+lifting an existing de Bruijn variable
 into an extended scope) as the definition of the thinning embedding \AB{$\Gamma$}
 into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
 
@@ -427,7 +430,7 @@ recursive substructure indexed by $J$ and \AIC{`$\blacksquare$} to stop with a p
 index value.
 
 The recursive function \AF{⟦\_⟧} makes the interpretation of the
-descriptions formal. Interpretation of descriptions give rise right nested tuples
+descriptions formal. Interpretation of descriptions give rise right-nested tuples
 terminated by equality constraints.
 
 \begin{figure}[h]
@@ -496,7 +499,7 @@ are outside the scope of this paper; describing them in detail would be a
 distraction.
 
 The CDMM approach therefore allows us to generically define iteration principles
-for all data types that can be described. This are exactly the features we desire
+for all data types that can be described. These are exactly the features we desire
 for a universe of data types with binding, so in the next section we will see how
 to extend CDMM's approach to include binding.
 
@@ -527,7 +530,7 @@ its CDMM equivalent. It only departs from it in the \AIC{`X} case and the fact
 it is not an endofunctor on \AB{I} \AF{─Scoped}; it is more general than that.
 The function takes an \AB{X} of type {\AD{List} \AB{I} $\rightarrow$ \AB{I} \AD{─Scoped}}
 to interpret {\AIC{`X} \AB{Δ} \AB{j}} (i.e. substructures of sort \AB{j} with
-newly-bound variables in \AB{Δ}) in an ambiant scope \AB{Γ} as {\AB{X} \AB{Δ} \AB{j} \AB{Γ}}.
+newly-bound variables in \AB{Δ}) in an ambient scope \AB{Γ} as {\AB{X} \AB{Δ} \AB{j} \AB{Γ}}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{interp}
