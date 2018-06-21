@@ -70,11 +70,20 @@ module _ {I : Set} {d : Desc I} where
   ren-id : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → ren (base vl^Var) t ≡ t
   ren-id t = ≅⇒≡ (RenId.ren-id t (pack^R λ _ → refl))
 
+  ren-id′ : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → ren (pack id) t ≡ t
+  ren-id′ t = ≅⇒≡ (RenId.ren-id t (pack^R λ v → sym (lookup-base^Var v)))
+
   sub-id : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → sub (base vl^Tm) t ≡ t
   sub-id t = begin
     sub (base vl^Tm) t  ≡⟨ sym $ Sim.sim RenSub base^VarTm^R t ⟩
     ren (base vl^Var) t ≡⟨ ren-id t ⟩
     t                   ∎
+
+  sub-id′ : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → sub (pack `var) t ≡ t
+  sub-id′ t = begin
+    sub (pack `var) t ≡⟨ sym $ Sim.sim RenSub (pack^R λ v → refl) t ⟩
+    ren (pack id)   t ≡⟨ ren-id′ t ⟩
+    t                 ∎
 
   lift[]^Tm : ∀ {Γ Δ} (ρ : (Γ ─Env) (Tm d ∞) Δ) → ∀[ Eq^R ] ρ (lift vl^Tm [] ρ)
   lookup^R (lift[]^Tm ρ) k = sym (ren-id (lookup ρ k))

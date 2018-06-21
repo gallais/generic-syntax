@@ -146,10 +146,16 @@ Kripke 𝓥 𝓒 Γ   i = □ ((Γ ─Env) 𝓥 ⟶ 𝓒 i)
 %</kripke>
 
 \begin{code}
-th^Kr : {𝓥 𝓒 : I ─Scoped}
-        (Γ : List I) → ({i : I} → Thinnable (𝓒 i)) → {i : I} → Thinnable (Kripke 𝓥 𝓒 Γ i)
-th^Kr []       th^𝓒 = th^𝓒
-th^Kr (_ ∷ _)  th^𝓒 = th^□
+module _ {𝓥 𝓒 : I ─Scoped} where
+
+  _$$_ : ∀ {Γ i} → [ Kripke 𝓥 𝓒 Γ i ⟶ (Γ ─Env) 𝓥 ⟶ 𝓒 i ]
+  _$$_ {[]}    f ts = f
+  _$$_ {_ ∷ _} f ts = extract f ts
+
+  th^Kr : (Γ : List I) → ({i : I} → Thinnable (𝓒 i)) →
+          {i : I} → Thinnable (Kripke 𝓥 𝓒 Γ i)
+  th^Kr []       th^𝓒 = th^𝓒
+  th^Kr (_ ∷ _)  th^𝓒 = th^□
 \end{code}
 
 

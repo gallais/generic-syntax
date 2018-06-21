@@ -127,6 +127,9 @@ module _ {I : Set} {d : Desc I} where
  new   vl^Tm = `var z
  th^𝓥  vl^Tm = th^Tm
 
+ reify^Tm : ∀ Δ {σ} → [ Kripke (Tm d ∞) (Tm d ∞) Δ σ ⟶ (Δ ++_) ⊢ Tm d ∞ σ ]
+ reify^Tm Δ = reify vl^Tm Δ _
+
  lookup-base^Tm : {Γ : List I} {σ : I} (k : Var σ Γ) → lookup (base vl^Tm) k ≡ `var k
  lookup-base^Tm z                              = refl
  lookup-base^Tm (s k) rewrite lookup-base^Tm k = refl

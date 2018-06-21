@@ -24,7 +24,7 @@ module _ {I : Set} where
 %</varlike>
 \begin{code}
    base : ∀ {Γ} → (Γ ─Env) 𝓥 Γ
-   base {[]}  = ε
+   base {[]}    = ε
    base {σ ∷ Γ} = th^Env th^𝓥 base extend ∙ new
 
    freshʳ : (Δ : List I) → ∀ {Γ} → (Γ ─Env) 𝓥 (Δ ++ Γ)
