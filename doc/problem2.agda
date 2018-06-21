@@ -109,40 +109,12 @@ th^↝⋆T : ∀ {Γ Δ σ t u} (ρ : Thinning Γ Δ) →
 th^↝⋆T ρ Star.ε   = Star.ε
 th^↝⋆T ρ (r ◅ rs) = th^↝T ρ r ◅ th^↝⋆T ρ rs
 
-lemma :
-  ∀ {Γ Δ Θ Ξ : List Type} {ρ₁ : Thinning Γ Δ} {ρ₂ : (Δ ─Env) T Θ}
-  {ρ₃ : (Γ ─Env) T Θ} {ρ₄ ρ₅ : (Ξ ─Env) T Θ}
-  (ρ^R : ∀[ Eq^R ] (select ρ₁ ρ₂) ρ₃) (vs^R : ∀[ Eq^R ] ρ₄ ρ₅) →
-  let σ : (Ξ ++ Γ ─Env) Var (Ξ ++ Δ)
-      σ = freshˡ vl^Var Δ {Ξ} >> th^Env th^Var ρ₁ (freshʳ vl^Var Ξ)
-  in ∀[ Eq^R ] (select σ (ρ₄ >> ρ₂)) (ρ₅ >> ρ₃)
-lookup^R (lemma {Γ} {Δ} {Θ} {Ξ} {ρ₁} {ρ₂} {ρ₃} {ρ₄} {ρ₅} ρ^R vs^R) k
-  with split Ξ k
-... | inj₁ kˡ = begin
-  lookup (ρ₄ >> ρ₂) (injectˡ Δ (lookup (base vl^Var) kˡ))
-    ≡⟨ injectˡ->> ρ₄ ρ₂ (lookup (base vl^Var) kˡ) ⟩
-  lookup ρ₄ (lookup (base vl^Var) kˡ)
-    ≡⟨ cong (lookup ρ₄) (lookup-base^Var kˡ) ⟩
-  lookup ρ₄ kˡ
-    ≡⟨ lookup^R vs^R kˡ ⟩
-  lookup ρ₅ kˡ
-    ∎
-... | inj₂ kʳ = begin
-  lookup (ρ₄ >> ρ₂) (injectʳ Ξ (lookup (base vl^Var) (lookup ρ₁ kʳ)))
-    ≡⟨ injectʳ->> ρ₄ ρ₂ (lookup (base vl^Var) (lookup ρ₁ kʳ)) ⟩
-  lookup ρ₂ (lookup (base vl^Var) (lookup ρ₁ kʳ))
-    ≡⟨ cong (lookup ρ₂) (lookup-base^Var (lookup ρ₁ kʳ)) ⟩
-  lookup ρ₂ (lookup ρ₁ kʳ)
-    ≡⟨ lookup^R ρ^R kʳ ⟩
-  lookup ρ₃ kʳ
-    ∎
-
 ThElab : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (select ρ₁ ρ₂)) Eq^R Eq^R
              Source Renaming Elab Elab
 Fus.quote₁ ThElab = λ σ t → t
 Fus.vl^𝓥₁ ThElab = vl^Var
 Fus.th^R   ThElab = λ σ ρ^R → pack^R (λ k → cong (ren σ) (lookup^R ρ^R k))
-Fus.>>^R ThElab  = lemma
+Fus.>>^R   ThElab = thBodyEnv
 Fus.var^R  ThElab = λ ρ^R → lookup^R ρ^R
 Fus.alg^R  ThElab (app' f t) ρ^R (refl , eq^f , eq^t , _) = cong₂ app eq^f eq^t
 Fus.alg^R  ThElab (def' e t) ρ^R (refl , eq^e , eq^t , _) = eq^t (pack id) (ε^R ∙^R eq^e)
@@ -194,7 +166,7 @@ Fus.th^R   SubElab {ρ₁ = ρ₁} {ρ₂} {ρ₃} = λ σ ρ^R → pack^R λ v 
     ≡⟨ cong (ren σ) (lookup^R ρ^R v) ⟩
   ren σ (lookup ρ₃ v)
     ∎
-Fus.>>^R   SubElab = λ ρ^R vs^R → {!!}
+Fus.>>^R   SubElab {ρ₁ = ρ₁} = subBodyEnv Elab ThElab (λ σ t → refl) ρ₁
 Fus.var^R  SubElab = λ ρ^R → lookup^R ρ^R
 Fus.alg^R  SubElab (app' f t) ρ^R (refl , eq^f , eq^t , _) = cong₂ app eq^f eq^t
 Fus.alg^R  SubElab (def' e t) ρ^R (refl , eq^e , eq^t , _) = eq^t (pack id) (ε^R ∙^R eq^e)
