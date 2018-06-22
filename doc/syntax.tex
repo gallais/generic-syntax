@@ -602,14 +602,19 @@ substructures which do not bind any extra argument and $\lambda$-abstraction
 which has exactly one substructure with precisely one extra bound variable.
 In the untyped case a single \AD{Bool}ean is enough to distinguish the two constructors
 whilst in the typed case, we need our tags to carry extra information about the
+%%% JHM version
 types involved so we use the ad-hoc \AD{`STLC} type, 
 and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression in Agda.
+%%% GALLAIS version
+% types involved so we use the ad-hoc \AD{`STLC} type. In the definition of
+% \AF{STLC}, ``{\AS{$\lambda$} \AK{where}}'' introduces a pattern-matching lambda
+% which allows us to immediately inspect the tag bound in the \AIC{`$\sigma$} node.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.40\textwidth}
   \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{ULC}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.50\textwidth}
   \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
 \end{minipage}
 \caption{Examples: The Untyped and Simply Typed Lambda Calculi}
@@ -619,8 +624,10 @@ For convenience we define pattern synonyms~\cite{Pickering:patsyn} corresponding
 to the original constructors in Figure~\ref{scoped-untyped}: \AIC{`V}
 for \AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the
 application one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.
-This means that the end user can seamlessly write pattern-matching programs on
-encoded terms without dealing with the gnarly details of the encoding.
+These synonyms can be used when pattern-matching on a term and Agda
+resugars them when displaying a goal. This means that the end user
+can seamlessly work with encoded terms without dealing with the gnarly
+details of the encoding.
 These pattern definitions can omit some arguments by using ``\AS{\_}'',
 in which case they will be filled in by unification just like any other
 implicit argument: there is no extra cost to using an encoding!
@@ -661,7 +668,7 @@ picks the one corresponding to the chosen branch.
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
-\caption{Descriptions are closed under Sum}
+\caption{Descriptions are closed under Sum}\label{figure:descsum}
 \end{figure}
 
 Closure under product does not hold in general. Indeed, the
@@ -755,8 +762,9 @@ values to variables, it associates computations to terms.
 
 \subsection{Fundamental Lemma of Semantics}
 
-We can now define the type of the fundamental lemma (called \AF{sem}) as
-a function from environments to computations. It is defined mutually with a
+We can now define the type of the fundamental lemma (called \AF{sem}) which
+takes a semantics and returns a function from environments to computations.
+It is defined mutually with a
 function \AF{body} turning syntactic binders into semantics binders: to
 each de Bruijn \AF{Scope} (i.e. a substructure in a potentially extended
 context) it associates a \AF{Kripke} (i.e. a subcomputation expecting a
@@ -769,6 +777,8 @@ value for each newly bound variable).
 
 The proof of \AF{sem} is straightforward now that we have clearly
 identified the problem structure and the constraints we need to enforce.
+We use postfix projections (of the form \AS{.}\ARF{name}) to make use of
+the semantic combinators packaged in the \AR{Sem} parameter \AB{$\mathcal{S}$}.
 If the term considered is a variable, we lookup the associated value in
 the evaluation environment and turn it into a computation using \ARF{var}.
 If it is a non variable constructor then we call \AF{fmap} to evaluate the
@@ -780,14 +790,14 @@ these results.
 \caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{sem}}
 \end{figure}
 
-The auxiliary lemma \AF{body} distinguishes two cases: if no new
+The auxiliary lemma \AF{body} distinguishes two cases. If no new
 variable has been bound in the recursive substructure, it is
-a matter of calling \AF{sem} recursively, otherwise we are provided
+a matter of calling \AF{sem} recursively. Otherwise we are provided
 with a \AF{Thinning}, some additional values and evaluate the
 substructure in the thinned and extended evaluation environment
 (thanks to a auxiliary function \AF{\_>>\_} which given two environments
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}}
-produces an environment {(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ})}.
+produces an environment {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{body}
@@ -875,14 +885,21 @@ sub-expressions and then using these names to refer to the associated
 terms. Preprocessors adding these types of mechanisms to existing
 languages (from C to CSS) are rather popular. We introduce a
 description of \AD{Let}-bindings which can be used to extend any
-language description \AB{d} to \AF{Let} \AF{`+} \AB{d}:
+language description \AB{d} to \AB{d} \AF{`+} \AF{Let} (where \AF{`+}
+is the disjoint of sum of two descriptions defined in Figure~\ref{figure:descsum}):
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{letcode}
-\caption{Parallel Let Binding}
+\caption{Description of a Single Let Binding}
 \end{figure}
 
-In a dependently typed language a type may depend on a value which
+This description states that a let-binding node stores a pair of types
+\AB{$\sigma$} and \AB{$\tau$} and two subterms. First comes the let-bound
+expression of type \AB{$\sigma$} and second comes the body of the let which
+has type \AB{$\tau$} in a context extended with a fresh variable of type
+\AB{$\sigma$}. This defines a term of type \AB{$\tau$}.
+
+In a dependently typed language, a type may depend on a value which
 in the presence of let bindings may be a variable standing for an
 expression. The user naturally does not want it to make any difference
 whether they used a variable referring to a let-bound expression or
@@ -894,13 +911,13 @@ by inlining.
 
 This latter approach to extending a language \AB{d} with let bindings
 by inlining them before typechecking can be implemented generically as
-a Semantics over (\AF{Let} \AF{`+} \AB{d}) where values in the environment and
-computations are both let-free terms. The algebra of the semantics can
-be defined by parts: the old constructors are simply interpreted using
-the algebra defined generically for the \AF{Substitution} semantics whilst
-the newer one precisely provides the extra values to be added to the
-environment (we leave the definition of \AF{alg'} out because of a lack
-of space). The process of removing let binders is kickstarted with a
+a semantics over (\AB{d} \AF{`+} \AF{Let}). For this semantics values
+in the environment and computations are both let-free terms. The algebra
+of the semantics can be defined by parts thanks to \AF{case} defined in
+Section~\ref{desccomb}: the old constructors are kept the same by interpreting
+them using the generic \AF{Substitution} algebra;
+whilst the let-binder precisely provides the extra value to be added to the
+environment. The process of removing let binders is kickstarted with a
 placeholder environment associating each variable to itself.
 
 \begin{figure}[h]
@@ -913,12 +930,12 @@ placeholder environment associating each variable to itself.
 \caption{Inlining Let Binding}
 \end{figure}
 
-In about 20 lines of code we have defined a generic extension of
+In less than 10 lines of code we have defined a generic extension of
 syntaxes with binding together with a semantics which corresponds
-to an elaborator translating away this new constructor. In their
-own setting working on STLC, ACMM~\citeyear{allais2017type} have shown that it is similarly
-possible to implement a Continuation Passing Style transformation as
-a semantics.
+to an elaborator translating away this new construct. In their
+own setting working on STLC, ACMM~\citeyear{allais2017type} have
+shown that it is similarly possible to implement a Continuation
+Passing Style transformation as a semantics.
 
 We have demonstrated how easily one can define extensions and combine
 them on top of a base language without having to reimplement common
