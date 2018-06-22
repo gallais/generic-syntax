@@ -231,7 +231,7 @@ values \AB{𝓥} for us):
 
 \begin{figure}[h]
 \ExecuteMetaData[environment.tex]{env}
-\caption{Well Typed and Scoped Environments of Values}
+\caption{Well-Typed and Scoped Environments of Values}
 \end{figure}
 
 As we have already observed, the definitions of renaming and substitution have very
@@ -249,6 +249,11 @@ fits in that framework. To make sense of this body of work, we
 need to introduce three new notions: \AF{Thinning}, a generalisation of
 renaming; \AF{Thinnable}s which are types that permit thinning; and the
 \AF{□} functor, which freely adds Thinnability to any indexed type.
+%%%
+We use \AF{□}, and our compact notation for the indexed function space
+between indexed types, to crisply encapsulate the additional quantification 
+over environment extensions which is typical of Kripke semantics.
+%%%
 \label{def:thinning}
 \begin{figure}[h]
 \ExecuteMetaData[environment.tex]{thinning}
@@ -301,7 +306,9 @@ parametrised higher order abstract syntax term. We get a choice of
 useful scope-and-sort safe traversals by using different `host languages'
 for this shallow embedding.
 
-Semantics are defined in Figure~\ref{figure:lamsem} in terms of a choice of values \AB{$\mathcal{V}$} and
+Semantics, 
+   specified in terms of a record \AR{Sem}, 
+are defined in Figure~\ref{figure:lamsem} in terms of a choice of values \AB{$\mathcal{V}$} and
 computations \AB{$\mathcal{C}$}. Realisation of a semantics will produce a
 computation in \AB{$\mathcal{C}$} for every term whose variables are assigned
 values in \AB{$\mathcal{V}$} as demonstrated in Figure~\ref{figure:fdmlamsem}.
@@ -326,14 +333,17 @@ bound variable. This is concisely expressed by the type
 \caption{Semantics for \AD{Lam}}\label{figure:lamsem}
 \end{figure}
 
-The traversal \AF{sem} realises the promise made earlier that any given
-{\AR{Sem} \AB{$\mathcal{V}$} \AB{$\mathcal{C}$}} will induce a function which,
-given a value in \AB{$\mathcal{V}$} for each variable in scope, turns a term
-into a computation \AB{$\mathcal{C}$}.
+Agda allows us to package, together with the fields of the record
+\AR{Sem}, the generic traversal function \AF{sem}, which is brought
+into scope for any instance of \AR{Sem}. We thus realise the promise
+made earlier, namely that any given {\AR{Sem} \AB{$\mathcal{V}$}
+  \AB{$\mathcal{C}$}} induces a function which, given a value in
+\AB{$\mathcal{V}$} for each variable in scope, transforms a  \AD{Lam} term into a
+computation \AB{$\mathcal{C}$}.
 
 \begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{sem}
-\caption{Fundamental Lemma of Semantics for \AD{Lam}}\label{figure:fdmlamsem}
+\caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \AR{Sem}\;\AB{$\mathcal{V}$}\;\AB{$\mathcal{C}$}}\label{figure:fdmlamsem}
 \end{figure}
 
 Coming back to renaming and substitution, we see that they both fit in the
@@ -485,7 +495,15 @@ programming over all the functors one can obtain as the meaning of a description
 All the functors obtained as meanings of \AD{Desc}riptions are strictly
 positive. So we can build the least fixpoint of the ones that are endofunctors
 (i.e. the ones for which $I$ equals $J$). This fixpoint is called \AD{μ}
-and its iterator is given by the definition of \AF{fold} \AB{d}.
+and its iterator is given by the definition of \AF{fold} \AB{d}%%%
+\footnote{\textbf{NB} 
+In Figure~\ref{figure:datamu} the \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
+to the inductive definition of \AD{μ} plays a crucial role in getting the
+termination checker to see that \AF{fold} is a total function. 
+% Sized types are outside the scope of this paper; describing them in
+% detail would be a distraction.  
+}
+.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Data.tex]{mu}
@@ -493,11 +511,6 @@ and its iterator is given by the definition of \AF{fold} \AB{d}.
 \caption{Least Fixpoint of an Endofunctor and Corresponding Generic Fold}\label{figure:datamu}
 \end{figure}
 
-In Figure~\ref{figure:datamu} the \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
-to the inductive definition of \AD{μ} plays a crucial role in getting the
-termination checker to see that \AF{fold} is a total function. Sized types
-are outside the scope of this paper; describing them in detail would be a
-distraction.
 
 The CDMM approach therefore allows us to generically define iteration principles
 for all data types that can be described. These are exactly the features we desire
@@ -509,7 +522,7 @@ to extend CDMM's approach to include binding.
 %% UNIVERSE OF SYNTAXES
 
 
-\section{A Universe of Scope Safe and Well Kinded Syntaxes}\label{section:universe}
+\section{A Universe of Scope Safe and Well-Kinded Syntaxes}\label{section:universe}
 
 Our universe of scope safe and well kinded syntaxes follows the same principle
 as CDMM's universe of datatypes, except that we are not building endofunctors on
@@ -517,8 +530,13 @@ as CDMM's universe of datatypes, except that we are not building endofunctors on
 type \AB{I} as the sorts
 used to distinguish terms in our embedded language. The \AIC{`$\sigma$} and
 \AIC{`∎} constructors are as in the CDMM \AD{Desc} type, and are used to
-represent data and index constraints respectively. The \AIC{`X} constructor
-is now augmented with an addtional {\AD{List} \AB{I}} argument that describes
+represent data and index constraints respectively. 
+%%%
+What distinguishes this new universe \AD{Desc} from that of Section~\ref{section:data} 
+is that the
+%%%     The 
+\AIC{`X} constructor
+is now augmented with an additional {\AD{List} \AB{I}} argument that describes
 the new binders that are brought into scope at this recursive position. This
 list of the kinds of the newly-bound variables will play a crucial role when
 defining the description's semantics as a binding structure in
@@ -565,8 +583,10 @@ As we want to define the terms of a language with variables, instead of
 considering the initial algebra, this time we opt for the free relative
 monad~\cite{JFR4389} (with respect to the functor \AF{Var}): the \AIC{`var}
 constructor corresponds to return, and we will define bind (also known as
-the parallel substitution \AF{sub}) in the next section. We have once more
-a \AD{Size} index to get all the benefits of type based termination checking.
+the parallel substitution \AF{sub}) in the next section. 
+
+% We have once more a \AD{Size} index to get all the benefits of type
+% based termination checking.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{mu}
@@ -582,7 +602,8 @@ substructures which do not bind any extra argument and $\lambda$-abstraction
 which has exactly one substructure with precisely one extra bound variable.
 In the untyped case a single \AD{Bool}ean is enough to distinguish the two constructors
 whilst in the typed case, we need our tags to carry extra information about the
-types involved so we use the ad-hoc \AD{`STLC} type.
+types involved so we use the ad-hoc \AD{`STLC} type, 
+and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression in Agda.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -685,13 +706,13 @@ have to abide by three constraints:
 \begin{itemize}
 \item{\ARF{th$^{\mathcal{V}}$}} Values should be thinnable so that we can push the
       evaluation environment under binders;
-\item{\ARF{var}} Values should embed into Computations for us to be able
+\item{\ARF{var}} Values should embed into computations for us to be able
       to return the value associated to a variable as the
       result of its evaluation;
 \item{\ARF{alg}} We should have an algebra turning
       a term whose substructures have been replaced with
       computations (possibly under some binders, represented semantically
-      by the \AF{Kripke} typed defined below) into computations
+      by the \AF{Kripke} type-valued function defined below) into computations
 \end{itemize}
 
 \begin{figure}[h]
@@ -1316,7 +1337,7 @@ The first obstacle we face is the formal definition of ``running \AB{$\mathcal{S
 after \AB{$\mathcal{S}_1$}'': for this statement to make sense, the result of running
 \AB{$\mathcal{S}_1$} ought to be a term. Or rather, we ought to be able to extract a
 term from a \AB{𝓒_1}. Hence the first constraint: the existence of a \ARF{quote\textsubscript{1}}
-function. When dealing with syntactic semantics such as renaming or substitution
+function, which we supply as a field of the record \AR{Fusion}. When dealing with syntactic semantics such as renaming or substitution
 this function will be the identity. However nothing prevents to try to prove for
 instance that normalisation by evaluation is idempotent in which case a bona fide
 reification function extracting terms from model values will be used.

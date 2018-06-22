@@ -1,0 +1,524 @@
+Review #75A
+===========================================================================
+* Updated: 7 May 2018 9:22:51pm EDT
+
+Overall merit
+-------------
+A. Good paper, I will champion it
+
+Reviewer expertise
+------------------
+X. I am an expert in this area
+
+Paper summary
+-------------
+This paper defines a generic universe encoding for representing the
+syntax of languages with lexically-scoped bindings as well as generic
+programs for making use of abstract syntax trees that are described by
+codes in the universe.
+
+Describing a datatype as codes in a universe is interesting for a
+number of reasons. First, it allows generic programming by recursion
+on the codes, for instance to implement capture-avoiding substitution
+once and for all. Second, it allows descriptions of datatypes to be
+composed, permitting incremental extensions in the style of nanopass
+compilers as well as code re-use between interpretations of the
+extended and unextended datatypes. Third, it allows difficult proofs
+to be composed once and for all, and then applied to any language that
+is encoded in the universe.
+
+The universe encoding in this paper is closely related to that in "The
+Gentle Art of Levitation" by Chapman et al. In their work, a datatype
+description can be interpreted as a strictly positive functor, and a
+separate operator takes the fixed point to yield an inductive
+structure. Chapman et al focus on enabling a very small core type
+theory to contain _only_ described inductive types. This paper instead
+focuses on using described datatypes in Agda, and it reveals some of
+the important tricks (like using sized types in the fixed point
+construction to satisfy the termination checker).
+
+The secret to this universe encoding of syntax is found in the
+replacement of Chapman et al's constructor for fixed points with a
+free monad construction that provides a suitable notion of
+variable. Multi-sorted systems are recovered by a suitable indexing,
+and binding structures are encoded by passing lists of binders through
+the recursion. Having generically defined syntax, the paper then defines a
+parameterized notion of semantics that can encode renaming and
+substition as well as more usual notions of evaluation. 
+
+A number of examples are provided, such as encoding self-referential
+structures, writing type checkers, and normalization by evaluation.
+
+Rating rationale and comments for author
+----------------------------------------
+This paper was a pleasure to read. It clearly sets forth its goals,
+and provides a number of good examples to illustrate the key
+points. The problem that it solves is real: implementing safe binding
+structures is a continual tedious slog for anyone using dependent
+types to encode just the meaningful binding trees for a language. The
+examples given in the paper are convincing, and the Agda notations are
+generally chosen tastefully to illuminate rather than obscure the
+structure of the programs.
+
+The paper did leave behind some curiosity about some more practical
+aspects of the encoding. While the paper made good use of pattern
+synonyms to make the encodings of data more readable, systems like
+Agda are interactive. How are the proof goals printed? Do they resugar
+into pattern synonyms, or must the proof developer run the encoding
+backwards in her or his head? Also, does the technique scale to
+slightly larger languages with more constructors, or does the encoding
+provide sufficient overhead that it becomes a performance problem for
+the proof checker?
+
+The related work section should probably explore the relationship
+between this encoding and Fiore et al's work on inductive structures
+with binding (see e.g. "Abstract Syntax and Variable Binding by Fiore,
+Plotkin, and Turi), as well as to Pitts' nominal logic. It seems that
+there is a close connection between the free monad structure used to
+tie the knot and these approaches.
+
+Because this work relies so heavily on Chapman et al's universe of
+descriptions, it would have been useful to hear how the technique
+could be applied in a closed type theory. Can this Desc and free monad
+construction be represented in their system? If not, would it be
+sufficient to directly import the free monad construction?
+
+There were some small presentation issues that appeared consistently
+throughout. Textual citations were missing the parentheses around the
+year, so it said "A paper by Author 2011 showed..." rather than "A
+paper by Author (2011) showed...". There were also a number of run-on
+sentences with many subclauses, but no intervening
+punctuation. Finally, there was a tendency to overuse participle
+constructions where explicit relative clauses could be less ambiguous.
+
+One change that might make the paper accessible to many more readers
+in the functional programming community would be to include a bit more
+explanation of Kripke models. It seems likely that many more readers
+will know about bidirectional type checking, which receives a few
+lines of explanation, than about Kripke semantics for modal logic,
+which does not.
+
+Overall, this is a clearly written paper that offers an interesting
+solution to a complicated and difficult problem.
+
+------------------------------------------------------------------------------------------
+
+Small nitpicks on the presentation:
+
+Page 1 should have a warning that the paper should be printed in
+color. These work well right below the abstract.
+
+AUTHORS> Fixed.
+
+On page 2, a right-quote is used to the left of "Lam", by line marker
+70. There's also a citation for Coq that protrudes far into the right
+margin at the bottom.
+
+AUTHORS> Fixed.
+
+On page 4, "well-typedness" should be hyphenated.
+
+AUTHORS> Fixed.
+
+On page 5, near line marker 231, "Semantics" is capitalized, as are
+"Substitution" and "Renaming".
+
+AUTHORS> Fixed.
+
+On page 6, "functionn" has two ns. It would also be useful to include
+a brief summary of operators such as <$ that some readers may not
+know.
+
+AUTHORS> We have replaced this with more verbose, but hopefully more
+familiar, '>>' syntax
+
+On page 7, "Descriptions" is needlessly capitalized by marker 336.
+
+AUTHORS> Fixed.
+
+On page 9, "describing them in details" should be "describing them in detail".
+
+AUTHORS> Fixed.
+
+On page 10, fig 22, the "lambda where" syntax should be described as a
+pattern-matching function. At the bottom, by 489, it says "saemlessly".
+
+AUTHORS> Fixed with some clarifying text.
+
+On page 12, line 550, "Kripke" should probably be highlighted as a
+type former. Also, "Computations" is needlessly capitalized.  The
+sentence beginning "We define such a function..." on line 565 is
+extremely long, with very little punctuation.
+
+AUTHORS> Fixed.
+
+On page 13 in the parentheses on line 593, there is a nice description
+of Kripke that could be nearer to its definition. Line 629 has another
+unnecessary capital, in "Renaming".
+
+AUTHORS> Fixed.
+
+On page 15, "Nanopass" should be capitalized, based on the way
+nanopass.org uses it.
+
+AUTHORS> Fixed.
+
+Page 16 declares that untyped programs "usually" go wrong. This kind
+of snark seems like it will only alienate readers, and it is also
+presented without evidence.
+
+AUTHORS> Fixed.
+
+On page 17, are "Check" and "Infer" best described as "phases"? That
+seems to imply a linear progression throughout time, but checking and
+inference are interleaved. I've heard them called "modes" before.
+
+AUTHORS> Fixed.
+
+The names with the circular and semicircular arrows seem overly clever
+on page 19. If you're going to use these, please at least tell the
+reader how to pronounce them.
+
+On page 20, the sentence "In the section we are however interested in
+more advance use-cases." seems ungrammatical.
+
+AUTHORS> Fixed.
+
+Starting on page 22, POPLMark Reloaded is capitalized inconsistently.
+
+AUTHORS> Fixed in accordance With Abel et al. 
+
+
+There is also the start of subsection 8.2.1, but there is never an
+8.2.2.
+
+AUTHORS> There is now!
+
+Also, in 8.2.1, Agda colors are used to indicate that quote_1,
+vl^{v_1}, and such are field projections from a record, but this is
+never indicated in the text. Not every reader knows Agda or can see
+color reliably.
+
+AUTHORS> We indicate in the abstract the desirability of viewing in
+colour to be able to profit from Agda's syntax highlighting. We make
+clear here that quote is a field label.
+
+On page 23, \Gamma ++ \Delta -Env is written where (\Gamma ++ \Delta) -Env
+would probably be more clear.
+
+On page 25, "a so far untrusted set of tactics" should read "a so-far
+untrusted set of tactics".
+
+On page 26, when "a call-by-value System F" should have the
+hyphens. "scope-and-type-safe" should also have the hyphen between
+"type" and "safe".
+
+On page 27, "type-(checking/inference)" isn't saving you any lines. It
+also sounds as thouh "its" should be "their" on the last line, because
+it is a reference to a user of indeterminate gender rather than an
+inanimate object. It's also a bit unfortunate to end with a bullet
+point.
+
+# After Author Response
+Review #75A asks about the practicality of our approach, particularly in the presence of pattern synonyms. In fact, Agda does resugar the pattern synonyms in displayed goals. We will also add some reflections on the use of our library for larger developments.
+This is good to know.
+Review #75A also points out some related work by Fiore et al. and Pitts. We will add discussion of these.
+Great.
+We will also discuss the possibility of a implementing our approach in a closed theory à la Chapman et al. (no, it gives the wrong free monad structure).
+Huh. It would be very interesting to see exactly why this is the case.
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #75B
+===========================================================================
+
+Overall merit
+-------------
+C. Weak paper, though I will not fight strongly against it
+
+Reviewer expertise
+------------------
+Y. I am knowledgeable in this area, but not an expert
+
+Paper summary
+-------------
+The authors describe a generic approach toward embedding λ-calculi in a
+dependently typed language. All terms are well scoped by construction.
+Their approach permits for succinct language
+definitions and can automatically derive various properties/algorithms of interest,
+including substitution, evaluation, and simulation.
+
+Rating rationale and comments for author
+----------------------------------------
+The formal approach taken in this paper is undoubtedly correct, thanks to
+Agda's soundness. I believe the authors' claims of the applicability of their
+approach to a variety of language forms, and the handiness of the
+automation inherent in this approach.
+
+Nevertheless, I am left without enthusiasm for this paper. For me, this paper
+falls flat on two potential motivating factors:
+
+- Many ICFP papers propose a solution to some problem. The paper outlines
+  the problem and then details a solution. The reader is motivated to understand
+  the solution by appealing to the poignancy of the problem.
+
+  However, this paper does not describe any problem in need of solving, instead
+  implicitly appealing to *intrinsic* motivation: that is, this encoding is interesting,
+  so let's therefore develop it and look for problems it can solve. Intrinsic
+  motivation can be worthwhile, but I find it works best when the reader can follow
+  along and experience the joy of learning along with the authors. Which brings
+  me to:
+
+- The code in this paper is incomplete, hindering my ability to learn while reading.
+  By this, I don't mean that some definitions are omitted -- these omissions are commonplace
+  (and tend to benefit the reader). However, the authors' use of Agda's parameterized
+  modules means that key arguments to functions are simply elided. Even worse, the authors
+  do not describe this phenomenon, inviting the reader into a puzzle from which there is
+  no escape. I recognize and laud the authors' goal of elegance, but they should explain
+  to readers how they have structured their code, allowing for elided parameters.
+
+  Indeed, at the end of section 3, I was left baffled how `Printing` could produce a
+  `String`. After all, the paper does not include any eliminator of `Sem`. It was
+  only after translating the paper's code into Haskell that I figured out that
+  `Sem V C` is an elided parameter to `sem`. Perhaps the authors think this to be
+  obvious, but my own style in dependently typed programming is to avoid parameterized
+  modules (or Coq sections) used in this way, precisely because it means that type
+  signatures become incomplete and hard to refer back to.
+
+  AUTHORS> We have now added some further clarifiying text to Fig.9
+  and preceding paragraph.
+
+Beyond the lack of motivation in this work, I found the introduction disappointing, leaving
+me without a clear sense of where the paper was going. The prose table of contents indeed
+gives some sense of what to expect, but I would have loved an early-on example of the framework
+this paper was building up to.
+
+In the end, I would want
+to see this work accepted for publication, but with a more thorough explanation of the
+definitions and an easier line of argument for the applicability of this work.
+
+Smaller notes:
+
+* Presenting renaming and substitution as two different traversals did not excite me. They're
+  always going to be so similar! So showing the similarity is not much of a leap.
+
+AUTHORS> We have a new introduction with a new motivating example. 
+
+* Perhaps this is just typesetting, but Fig. 9 occurs after much discussion of `sem` and `Sem`.
+  Without a forward reference, the reader doesn't know these are about to be defined.
+
+AUTHORS> Fixed. 
+
+* The authors cite [Pickering et al. 2016] for pattern synonyms, yet the Pickering work focuses
+  on pattern synonyms in Haskell. Pattern synonyms in Agda are, as I understand it, merely
+  defined by macro-substitution. I'm thus not sure if this citation is appropriate here.
+
+* The appearance of ∞ in types surprised me, having not worked with Agda's `Size`. It might
+  be worth a brief explanation.
+
+AUTHORS> In line with Reviewer #C, we have relegated discussion of Sizes to a
+footnote, in the interests of reducing clutter.
+
+Typos, etc:
+
+AUTHORS> Fixed. 
+
+L37: (Section 7.2.  -->  (Section 7.2).
+
+L273: The s in `pack s` should be green.
+
+L274: functionn --> function
+
+L274: Remind me that `s` is defined in Fig. 3.
+
+Fig. 12: Shouldn't `extend` be `(pack s)`?
+AUTHORS> No, and the code typechecks correctly (!)
+
+L337: give rise right nested --> give rise to right-nested
+
+L404: details --> detail
+
+L406: This --> These
+
+L428: ambiant --> ambient
+
+L489: saemlessly --> seamlessly
+
+L1206: 2017 --> 2018 (that's a POPL'18 paper)
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #75C
+===========================================================================
+* Updated: 15 May 2018 4:46:15am EDT
+
+Overall merit
+-------------
+C. Weak paper, though I will not fight strongly against it
+
+Reviewer expertise
+------------------
+Y. I am knowledgeable in this area, but not an expert
+
+Paper summary
+-------------
+This paper combines two previous avenues of research: the scope preserving programs by Allais, Chapman, McBride and McKinna and the 'sigma-of-sigmas' universe for describing dependent types by Chapman, Dagand, McBride and Morris. The prior gives an account of how to handle variable binding, substitution, and various traversals of data types with binders. The latter presents a universe for describing a wide variety of (dependent) data types. Putting the two together, the authors present a single, generic framework that lets you describing the binding structure of a syntax tree, while generating proofs and programs generically from such descriptions.
+
+Rating rationale and comments for author
+----------------------------------------
+I find it difficult to assess this contribution. It builds on two previous publications -- and as a result -- needs to provide a summary of existing work in the first nine pages of the paper. The generic framework presented seems promising and is carefully explained. However, the paper makes the (implicit) assumption that readers are already intimately familiar with the techniques for defining languages with binders in Agda (and all the associated machinery/headaches involved). To truly appreciate the contribution it would be very useful to compare the generic framework with a hand-written alternative. Without such a comparison, it's almost impossible to measure what the paper achieves and how much is gained by the generic constructions presented in the paper.
+
+Even when after 15 pages, the first example generic program is given (the desugaring of let-bound variables) -- the papers chooses to introduce a sequence of let bindings, requiring the additional lifting operation `Xs to transform the underlying descriptions. While I appreciate the generality of these operations, it would be much easier on your readers to start with let bindings that introduce a single variable. When it comes to Figure 36 later on, I really lose the ability to keep track of the types of all the ingredients in my head.
+
+The second example, an (unsafe) implementation of normalization by evaluation doesn't seem to be playing to the library's strengths. It seems wasteful to do all this work to define the types and binders of your object language, but throw them all away to define an unsafe normalization procedure.
+
+The next example, a bidirectional type checker, is equally cryptic. It mixes applicative and monadic shorthand in somewhat puzzling style to define the algebra that performs the type checking. Being familiar with similar type checkers, such as that presented by Norell in his Agda lecture notes, I can understand how this type checker works, but I remain unconvinced that the generic universe of binders presented in the paper is worth the conceptual overhead that it introduces. 
+
+Similarly, the cyclic lists presented illustrate the generality of the approach (another familiar data type that can be described using the proposed universe), but when it comes to reaping the rewards of using the library, I remain unconvinced. The plugging/unrolling functions are really not that hard to write by hand.
+
+All in all, I would love to be convinced to use this library the next time I need to embed a language with binders in Agda. As it stands, however, I remain unconvinced that the library finds a sweet spot in the design space.
+
+# Minor comments
+
+The style file seems slightly different (for example the font used in the headings) to some of the other papers I have reviewed. Could you double check your LaTeX settings?
+
+AUTHORS> Fixed
+
+Many of the citations are missing parentheses, e.g., Bellegarde and Hook [1994] on line 54. I believe the ACM style guidelines may have something to say about this.
+
+AUTHORS> Fixed
+
+Line 37 -- Missing closing parenthesis after Section 7.2
+
+AUTHORS> Fixed
+
+Line 38 -- 'describing a framework to formally describe' -- is not very descriptive.
+
+Line 125 -- I interpreted this expression as (suc |- ((P \times Q) -> R)). This was rather puzzling. The |- (\vdash) notation suggests that the suc function is applied to both the product and the function space. You may want to clarify this.
+
+AUTHORS> We have added clarifying text. 
+
+Line 197 (and elsewhere) -- I found myself expanding type synonyms all the time when reading this paper. Much of the notation helps keep the types compact, but the definition of Thinnings for example, make it quite hard to appreciate what's going on. Is '(\Gamma-Env) Var \Delta' really easier to understand than the \forall i . Var i Gamma -> Var i Delta? Similarly I found it hard to appreciate what Thinnable was doing, without expanding the definition.
+
+AUTHORS> We have added some more clarifying text before Figure 6. 
+
+Line 230 -- I struggled to see what sem was, until I turned the page. Could you forward reference Figure 9 at this point?
+
+AUTHORS> Fixed, with additional clarifying text. 
+
+Line 416 -- My first reaction to the generic universe was -- why not define this as a special case of Desc? It wasn't until the semantics were presented later, that this became clear. The
+
+More generally, the sized types seem like a bit of a distraction. I'd strongly suggest optimizing the paper for your readers -- and only mentioning the necessity of the sizes in a footnote.
+
+AUTHORS> We have footnoted the first use of Size, and suppressed subsequent discussion, following this suggestion. 
+
+## Comments based on author response
+
+I agree that my assessment of some of the examples was too harsh. Certainly the normalization function does not 'throw away' type information and it is impossible to prove termination in general. Yet I do find the example a bit disappointing: if you do so much work to ensure type safety of your object language, why not choose examples where you can reap the rewards of this work?
+
+## Comments based on the PC discussion
+
+Overall, the PC can see the important technical contribution that this work makes. Having said that however, the presentation is currently lacking. We are therefore willing to conditionally accept this paper.
+
+In particular, the introduction **needs to make clear what problem the paper is solving**, both by means of a motivating example and expository text. Furthermore, we expect the suggestions for improvement in presentation to be taken very seriously. The typesetting issues, such as the fonts, citation style and class file used, must be addressed. 
+
+The reviewers will reassess the final version of this paper to decide before deciding on the definitive acceptance.
+
+
+Comments
+===========================================================================
+
+Response by Guillaume ALLAIS <guillaume.allais@ens-lyon.org>
+---------------------------------------------------------------------------
+We would like to thank the reviewers for their time and helpful
+comments!
+
+We address the major points raised by the reviews below.
+
+- Review #75A asks about the practicality of our approach,
+  particularly in the presence of pattern synonyms. In fact, Agda does
+  resugar the pattern synonyms in displayed goals. We will also add
+  some reflections on the use of our library for larger developments.
+
+- Review #75A also points out some related work by Fiore et al. and
+  Pitts. We will add discussion of these. We will also discuss the
+  possibility of a implementing our approach in a closed theory
+  à la Chapman et al. (no, it gives the wrong free monad structure).
+
+- Review #75B and #75C both rightly point out that our current
+  introduction does not provide a widely accessible motivation. We
+  will engage our readers early on by describing the burden
+  re-implementing (and proving correct!) common traversals for
+  syntaxes with binding represents for a programmer.
+
+  As evidence in support of our approach, all of the current solutions
+  to the POPLMark Reloaded challenge either use language support
+  (Beluga), code generation (Coq) or our library to avoid repeatedly
+  writing boilerplate code and proofs.
+
+- Review #75B points out readability problems with implicit parameters
+  in the current presentation. We will make explicit the parametrised
+  module used to defined `sem` and for each `Sem`antics in Section 3
+  we will insert a toplevel definition corresponding to its meaning
+  via `sem` to guide the reader.
+
+- Review #75C raises some points with our examples:
+
+  - We will simplify the let-binder example (Sec 7.1) by switching to
+    single let-binders. This will also allow us to show the full
+    definition of `alg`.
+
+  - We disagree that the unsafe normalization example amounts to
+    throwing away type information. The library makes no assumption on
+    the sorts the variables may have. This makes the framework
+    general, but also means we can't hope to have a total
+    normalization procedure. In specific cases, the user can use
+    additional knowledge to define a total evaluator. Characterizing
+    generically a large class of intrinsically normalizing languages
+    is one of the future works we suggest.
+
+  - We will clarify the type checker example to highlight the
+    advantages of our approach. In particular, structuring it as a
+    fold-like eliminator creates opportunities for safe optimizations
+    to be applied (as demonstrated by our Fusion framework in Sec
+    8.2). This also applies to the Printing example.
+
+  - We think that the benefits brought by the library in the
+    potentially cyclic structures example is twofold: generality and
+    concision. The operations and relations are defined for all such
+    structures and not only potentially cyclic lists (note that
+    `unfold` at the top of page 20 is generic in the description
+    `d`!). Additionally, all the syntactic operations and reasoning
+    principles in the earlier examples can be used to define
+    operations on the finite representations of the infinite
+    structures.
+
+Comment @A1
+---------------------------------------------------------------------------
+Conditionally Accepted with Mandatory Revisions
+-----------------------------------------------
+
+Your paper has been conditionally accepted to ICFP 2018, pending revisions as listed below.
+
+The deadline for completing and submitting the revised version of your paper is June 22. In a brief second phase of reviewing, the program committee will determine whether the mandatory revisions have been applied, and the paper will be conclusively accepted or rejected. The intent and expectation is that mandatory revisions can be performed within the five-week period between notification and June 22 — and that conditionally accepted papers will, in general, be accepted in the second phase.
+
+Your revised submission *must* be accompanied by a cover letter mapping each mandatory revision to specific parts of the paper. The cover letter should facilitate a quick second review, allowing for confirmation of final acceptance within two weeks. Both the final version and the cover letter must be uploaded to https://icfp18.hotcrp.com.
+
+ Of course, you are also encouraged to make other changes to your paper in response reviews and comments. You must also ensure that the revised version of your paper meets the formatting requirements specified in the call for papers, including both the document style and a specific form and use of citations, which are necessary for inclusion in PACM PL.
+
+You will receive information from Conference Publishing about *separately* submitting a camera-ready version of your paper by July 7, pending acceptance in the second round of review. The caremera-ready version is likely the same as the final version that you submit by June 22, but there will be a little time for small changes if needed.
+
+Please contact the program chair, Matthew Flatt <mflatt@cs.utah.edu>, if you have any questions about the process.
+
+Mandatory Revisions
+-------------------
+
+ * Add a discussion of the problem being solved to the beginning of the paper, with an example, so that readers who haven't implemented many languages in Agda have a chance to understand what is happening. This is proposed in your author's response.
+
+ * Implement the further details suggested in your author's response, such as including the implicit module information, discussing the interactive use of the system, and so forth.
+
+See also review C, which elaborates on these revisions in the context of the PC discussion.

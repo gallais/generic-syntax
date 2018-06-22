@@ -165,7 +165,7 @@ open import Data.Product
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 module Printer where
- open RawMonadState (StateMonadState ℕ)
+ open RawMonadState (StateMonadState ℕ) 
 
 \end{code}
 
@@ -184,12 +184,12 @@ module Printer where
  map^Wrap : {A B : Set} → ∀ {σ} → (A → B) → [ Wrap A σ ⟶ Wrap B σ ]
  map^Wrap f (MkW a) = MkW (f a)
 
- open E
+ open E hiding (_>>_)
 \end{code}
 %<*freshprint>
 \begin{code}
  fresh : {Γ : List Type} → ∀ σ → State ℕ (Wrap String σ (σ ∷ Γ))
- fresh σ = get >>= λ x → MkW (show x) <$ put (suc x)
+ fresh σ = get >>= λ x → put (suc x) >> return (MkW (show x)) 
 \end{code}
 %</freshprint>
 %<*semprint>
