@@ -15,11 +15,12 @@ use types to ensure that ``illegal states are unrepresentable'', where
 illegal states are ill scoped or ill typed terms.
 
 Despite the large body of knowledge in how to use types to define well
-formed syntax, it is still necessary for the working DSL designer or
-formaliser to redefine essential functions like renaming and
-substitution for each new syntax, and then to reprove essential lemmas
-about those functions. To reduce the burden of such repeated work and
-boilerplate, we apply the methodology of data-genericity to
+formed syntax (see the Related Work in Section
+\ref{section:related-work}), it is still necessary for the working DSL
+designer or formaliser to redefine essential functions like renaming
+and substitution for each new syntax, and then to reprove essential
+lemmas about those functions. To reduce the burden of such repeated
+work and boilerplate, we apply the methodology of data-genericity to
 programming and proving with syntaxes with binding.
 
 To motivate our approach, let us look at the formalisation of an
@@ -79,20 +80,29 @@ programmable descriptions of data types (Section~\ref{section:data}).
 These introductory sections help us build an understanding of the
 problem at hand as well as a toolkit that leads us to the novel
 content of this paper: a universe of scope safe syntaxes with binding
-(Section~\ref{section:universe}) together with a notion of
-scope safe semantics for these syntaxes
-(Section~\ref{section:semantics}).  This gives us the opportunity to
-write generic implementations of renaming and substitution
-(Section~\ref{section:renandsub}), a generic let-binding removal
-transformation (generalising the problem stated above)
-(Section~\ref{section:letbinding}), and normalisation by evaluation
-(Section~\ref{section:nbyeval}). We also explore opportunities for
-generic proving by formally describing what it means for a semantics
-to be able to simulate another one (Section~\ref{section:simulation}),
-or for two semantics to be fusable
-(Section~\ref{section:fusion}). This allows us to prove the lemmas we
+(Section~\ref{section:universe}) together with a notion of scope safe
+semantics for these syntaxes (Section~\ref{section:semantics}).  This
+gives us the opportunity to write generic implementations of renaming
+and substitution (Section~\ref{section:renandsub}), a generic
+let-binding removal transformation (generalising the problem stated
+above) (Section~\ref{section:letbinding}), and normalisation by
+evaluation (Section~\ref{section:nbyeval}). Further, we show how to
+construct generic proofs by formally describing what it means for a
+semantics to be able to simulate another one
+(Section~\ref{section:simulation}), or for two semantics to be fusable
+(Section~\ref{section:fusion}). This allows us to prove the lemmas
 required above for renaming and substitution generically, for
 \emph{every} syntax in our universe.
+
+\medskip
+
+Our implementation language is
+Agda~\cite{norell2009dependently}. However, our techniques are
+language independent: any dependently typed language at least as
+powerful as Martin-L\"of Type Theory~\cite{martin1982constructive}
+equipped with inductive families~\cite{dybjer1994inductive} such as
+Coq~\cite{Coq:manual}, Lean~\cite{DBLP:conf/cade/MouraKADR15} or
+Idris~\cite{brady2013idris} ought to do.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SCOPE SAFE TERMS
@@ -135,7 +145,7 @@ monad laws correspond to well known properties from the equational
 theories of renaming and subsitution. We will revisit these properties
 below in Section~\ref{section:fusion}.
 
-\subsection{A Mechanized Typed Variant of Altenkirch and Reus' Calculus}
+\subsection{A Mechanized Typed Variant of Altenkirch and Reus' Calculus}\label{section:mech-reus}
 
 There is no reason to restrict this technique to fixpoints of endofunctors
 on $\Set{}^{\Set{}}$. The more general
@@ -143,52 +153,34 @@ case of fixpoints of (strictly positive) endofunctors on $\Set{}^J$ can be
 endowed with similar operations by using Altenkirch, Chapman and
 Uustalu's relative monads~\citeyear{Altenkirch2010, JFR4389}.
 
-We pick as our $J$ the category whose objects are inhabitants of \AD{List} \AB{I}
-(\AB{I} is a parameter of the construction meant to represents the set of sorts for
-our language) and whose morphisms are thinnings (see Section~\ref{def:thinning}).
-This \AD{List} \AB{I} is intended to represent the list
-of the sort (/ kind / types depending on the application) of the de Bruijn variables
-in scope. We can recover an untyped approach by picking $I$ to be the unit type.
-Given this typed setting, our functors will actually take an extra $I$ argument
-corresponding to the type of the expression being built. This is summed up by
-the large type \AB{I}\AF{─Scoped}:
+We pick as our $J$ the category whose objects are inhabitants of
+\AD{List} \AB{I} (\AB{I} is a parameter of the construction meant to
+represent the set of sorts for our language) and whose morphisms are
+thinnings (see Section~\ref{def:thinning}).  This \AD{List} \AB{I} is
+intended to represent the list of the sort (/ kind / types depending
+on the application) of the de Bruijn variables in scope. We can
+recover an untyped approach by picking $I$ to be the unit type.  Given
+this typed setting, our functors take an extra $I$ argument
+corresponding to the type of the expression being built. This is
+summed up by the large type \AB{I}
+\AF{─Scoped}:% = $I$ $\to$ \AD{List} $I$ $\to$ \AF{Set}.
 
 \begin{center}
 \ExecuteMetaData[var.tex]{scoped}
 %\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
 \end{center}
 
-Our implementation language is Agda~\cite{norell2009dependently} however
-these techniques are language independent: any dependently typed language
-whose logic is at least as powerful as Martin-L\"of Type
-Theory~\cite{martin1982constructive} equipped with inductive
-families~\cite{dybjer1994inductive} such as Coq~\cite{Coq:manual},
-Lean~\cite{DBLP:conf/cade/MouraKADR15} or Idris~\cite{brady2013idris} ought to do.
+We use Agda's mixfix operator notation where underscores denote
+argument positions.
 
 To lighten the presentation, we exploit the observation that the
 current scope is either passed unchanged to subterms (e.g. in the application case)
 or extended (e.g. in the $\lambda$-abstraction case) by introducing combinators
-to build indexed types. All the definitions are polymorphic in the index type
-(called \AB{A} in Figure~\ref{figure:indexed}).
+to build indexed types.
+% All the definitions are polymorphic in the index type
+% (called \AB{A} in Figure~\ref{figure:indexed}).
 
-The first two combinators \AF{\_⟶\_} and \AF{\_∙×\_} are the pointwise liftings
-of the function space and the product type respectively, both silently threading
-the underlying scope.
-
-The third combinator \AF{\_⊢\_} makes explicit the \emph{adjustment} made to the index
-by a function. We use Agda's mixfix operator notation (where underscores denote argument
-positions) to suggest its connection to the mathematical convention of only mentioning
-context \emph{extensions} when presenting judgements (see e.g. \cite{martin1982constructive})
-and write \AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed
-Set it operates on. Although it may seem surprising at first to define binary
-infix operators as having arity three, they are meant to be used partially applied,
-surrounded by \AF{[\_]} which turns an indexed Set into a Set by implicitly
-quantifying over the index.
-
-The fourth combinator \AF{κ} is the constant function turning a Set into an indexed Set
-by ignoring the index.
-
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[indexed.tex]{arrow}
 \end{minipage}\hspace{2em}
@@ -199,14 +191,26 @@ by ignoring the index.
 \begin{minipage}{0.40\textwidth}
 \ExecuteMetaData[indexed.tex]{adjust}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.20\textwidth}
 \ExecuteMetaData[indexed.tex]{constant}
-\end{minipage}
+\end{minipage}\hspace{1em}
 \begin{minipage}{0.25\textwidth}
 \ExecuteMetaData[indexed.tex]{forall}
 \end{minipage}
-\caption{Combinators to build indexed Sets}\label{figure:indexed}
-\end{figure}
+%\caption{Combinators to build indexed Sets}\label{figure:indexed}
+\end{center}
+
+We lift the function space and the product type pointwise with
+\AF{\_⟶\_} and \AF{\_∙×\_} respectively, silently threading the
+underlying scope. The \AF{\_⊢\_} makes explicit the \emph{adjustment} made to the index
+by a function, conforming to the convention (see e.g.~\cite{martin1982constructive}) of mentioning only
+context \emph{extensions} when presenting judgements 
+and write \AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed
+Set it operates on. Although it may seem surprising at first to define binary
+infix operators as having arity three, they are meant to be used partially applied,
+surrounded by \AF{[\_]} which turns an indexed Set into a Set by implicitly
+quantifying over the index.
+Lastly, \AF{κ} is the constant combinator, ignoring the index.
 
 We make \AF{⟶} associate to the right as one would expect and give it the
 highest precedence level as it is the most used combinator. These combinators
@@ -216,34 +220,34 @@ desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
 As the context comes second in the definition of \AF{\_─Scoped}, we
-can readily use these combinators to thread, modify or quantify over the
+can readily use these combinators to thread, modify, or quantify over the
 scope when defining such families:
 
-\begin{figure}[h]
-\begin{minipage}{0.4\textwidth}
+%\begin{center}
+\begin{minipage}[t]{0.4\textwidth}
 \ExecuteMetaData[var.tex]{var}
 \end{minipage}
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}[t]{0.5\textwidth}
 \ExecuteMetaData[motivation.tex]{tm}
 \end{minipage}
-\caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
-\end{figure}
+%\caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
+%\end{center}
 
-The inductive family \AD{Var} represents to well scoped and well kinded
+The inductive family \AD{Var} represents well scoped and well kinded
 de Bruijn~\citeyear{de1972lambda}
-indices. Its first constructor (\AIC{z} for zero) states that we have a name to refer to
-the nearest binder in a non-empty scope. The second one (\AIC{s} for successor) lifts a
-name for a variable in a given scope into a name for it in the extended scope where
-an extra variable has been bound. Both of the constructors types have been written using combinators.
-Although we will abstain from unfolding them in the future, we do so here in the hope
-it will help the reader get acquainted with them: they respectively normalise to
-{\AS{∀} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{i} \AIC{:\!:} \AB{xs})} for \AIC{z},
-and {\AS{∀} \AB{i} \AB{j} \AB{xs} → \AD{Var} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{j} \AIC{:\!:} \AB{xs})} for \AIC{s}.
+indices. Its \AIC{z} (for zero) constructor refers to
+the nearest binder in a non-empty scope. The \AIC{s} (for successor) constructor lifts a
+a variable in a given scope to the extended scope where
+an extra variable has been bound. Both of the constructors types have been written using the combinators defined above.
+They respectively normalise to:
+\begin{center}
+  \AIC{z} : {\AS{∀} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{i} \AIC{:\!:} \AB{xs})}
+  \qquad
+  \AIC{s} : {\AS{∀} \AB{i} \AB{j} \AB{xs} → \AD{Var} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{j} \AIC{:\!:} \AB{xs})}
+\end{center}
 
-The \AD{Type} \AF{─Scoped} family \AD{Lam} is the simply typed variant of Altenkirch
-and Reus' untyped $\lambda$-calculus. The two interesting constructors are the one
-lifting variables to terms and the $\lambda$-abstraction whose body lives in an
-extended context.
+The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch
+and Reus' simply typed $\lambda$-calculus representation. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -422,7 +426,7 @@ have already proven that they are thinnable.
 \end{figure}
 
 In both cases we use (\AIC{pack} \AIC{s}) (where \AIC{pack} is the constructor
-for environments and \AIC{s}, defined in Figure~\ref{scoped-untyped}, is the function
+for environments and \AIC{s}, defined in Section \ref{section:mech-reus}, is the function
 lifting an existing de Bruijn variable
 into an extended scope) as the definition of the thinning embedding \AB{$\Gamma$}
 into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
@@ -622,7 +626,7 @@ newly-bound variables in \AB{Δ}) in an ambient scope \AB{Γ} as {\AB{X} \AB{Δ}
 The astute reader may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $\Gamma$; however
 refactoring \AF{⟦\_⟧} to use the partially applied $X\,\_\,\_\,\Gamma$ following
 this observation would lead to a definition harder to use with the
-combinators for indexed sets described in Figure~\ref{figure:indexed}
+combinators for indexed sets described in Section \ref{section:mech-reus}
 which make our types much more readable.
 
 If we pre-compose the meaning function \AF{⟦\_⟧} with a notion of `de Bruijn scopes'
@@ -680,19 +684,19 @@ and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression 
 \caption{Examples: The Untyped and Simply Typed Lambda Calculi}
 \end{figure}
 
-For convenience we define pattern synonyms~\cite{Pickering:patsyn} corresponding
-to the original constructors in Figure~\ref{scoped-untyped}: \AIC{`V}
-for \AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the
-application one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.
-These synonyms can be used when pattern-matching on a term and Agda
-resugars them when displaying a goal. This means that the end user
-can seamlessly work with encoded terms without dealing with the gnarly
-details of the encoding.
-These pattern definitions can omit some arguments by using ``\AS{\_}'',
-in which case they will be filled in by unification just like any other
-implicit argument: there is no extra cost to using an encoding!
-The only downside is that the language currently does not allow the
-user to specify type annotations for pattern synonyms.
+For convenience we use Agda's pattern synonyms corresponding to the
+original constructors in Section \ref{section:mech-reus}: \AIC{`V} for
+\AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the application
+one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.  These
+synonyms can be used when pattern-matching on a term and Agda resugars
+them when displaying a goal. This means that the end user can
+seamlessly work with encoded terms without dealing with the gnarly
+details of the encoding.  These pattern definitions can omit some
+arguments by using ``\AS{\_}'', in which case they will be filled in
+by unification just like any other implicit argument: there is no
+extra cost to using an encoding!  The only downside is that the
+language currently does not allow the user to specify type annotations
+for pattern synonyms.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
@@ -1554,7 +1558,7 @@ hypothesis.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RELATED WORK
 
-\section{Related Work}
+\section{Related Work}\label{section:related-work}
 
 \subsection{Variable Binding} The representation of variable binding
 in formal systems has been a hot topic for decades. Part of the purpose

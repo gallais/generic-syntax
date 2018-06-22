@@ -1,3 +1,46 @@
+Below are the final reviews, interspered with descriptions of the
+changes we have made. Our comments are on lines prefixed by
+'AUTHORS>'.
+
+
+
+
+Comment @A1
+---------------------------------------------------------------------------
+Conditionally Accepted with Mandatory Revisions
+-----------------------------------------------
+
+Your paper has been conditionally accepted to ICFP 2018, pending revisions as listed below.
+
+The deadline for completing and submitting the revised version of your paper is June 22. In a brief second phase of reviewing, the program committee will determine whether the mandatory revisions have been applied, and the paper will be conclusively accepted or rejected. The intent and expectation is that mandatory revisions can be performed within the five-week period between notification and June 22 — and that conditionally accepted papers will, in general, be accepted in the second phase.
+
+Your revised submission *must* be accompanied by a cover letter mapping each mandatory revision to specific parts of the paper. The cover letter should facilitate a quick second review, allowing for confirmation of final acceptance within two weeks. Both the final version and the cover letter must be uploaded to https://icfp18.hotcrp.com.
+
+ Of course, you are also encouraged to make other changes to your paper in response reviews and comments. You must also ensure that the revised version of your paper meets the formatting requirements specified in the call for papers, including both the document style and a specific form and use of citations, which are necessary for inclusion in PACM PL.
+
+You will receive information from Conference Publishing about *separately* submitting a camera-ready version of your paper by July 7, pending acceptance in the second round of review. The caremera-ready version is likely the same as the final version that you submit by June 22, but there will be a little time for small changes if needed.
+
+Please contact the program chair, Matthew Flatt <mflatt@cs.utah.edu>, if you have any questions about the process.
+
+Mandatory Revisions
+-------------------
+
+ * Add a discussion of the problem being solved to the beginning of the paper, with an example, so that readers who haven't implemented many languages in Agda have a chance to understand what is happening. This is proposed in your author's response.
+
+AUTHORS> We have now rewritten and extend the introduction to describe
+the problem we are solving, and motivate our approach by describing a
+simple formalisation problem that requires a large volume of generic
+traversals and proofs, which our approach obivates. This is on pages 1
+and 2 in a self contained introduction.
+
+ * Implement the further details suggested in your author's response, such as including the implicit module information, discussing the interactive use of the system, and so forth.
+
+AUTHORS> We have described the use of module parameters where
+we use them. This appears on Page 6, between figures 5 and 6.
+
+See also review C, which elaborates on these revisions in the context of the PC discussion.
+
+
 Review #75A
 ===========================================================================
 * Updated: 7 May 2018 9:22:51pm EDT
@@ -497,28 +540,3 @@ We address the major points raised by the reviews below.
     operations on the finite representations of the infinite
     structures.
 
-Comment @A1
----------------------------------------------------------------------------
-Conditionally Accepted with Mandatory Revisions
------------------------------------------------
-
-Your paper has been conditionally accepted to ICFP 2018, pending revisions as listed below.
-
-The deadline for completing and submitting the revised version of your paper is June 22. In a brief second phase of reviewing, the program committee will determine whether the mandatory revisions have been applied, and the paper will be conclusively accepted or rejected. The intent and expectation is that mandatory revisions can be performed within the five-week period between notification and June 22 — and that conditionally accepted papers will, in general, be accepted in the second phase.
-
-Your revised submission *must* be accompanied by a cover letter mapping each mandatory revision to specific parts of the paper. The cover letter should facilitate a quick second review, allowing for confirmation of final acceptance within two weeks. Both the final version and the cover letter must be uploaded to https://icfp18.hotcrp.com.
-
- Of course, you are also encouraged to make other changes to your paper in response reviews and comments. You must also ensure that the revised version of your paper meets the formatting requirements specified in the call for papers, including both the document style and a specific form and use of citations, which are necessary for inclusion in PACM PL.
-
-You will receive information from Conference Publishing about *separately* submitting a camera-ready version of your paper by July 7, pending acceptance in the second round of review. The caremera-ready version is likely the same as the final version that you submit by June 22, but there will be a little time for small changes if needed.
-
-Please contact the program chair, Matthew Flatt <mflatt@cs.utah.edu>, if you have any questions about the process.
-
-Mandatory Revisions
--------------------
-
- * Add a discussion of the problem being solved to the beginning of the paper, with an example, so that readers who haven't implemented many languages in Agda have a chance to understand what is happening. This is proposed in your author's response.
-
- * Implement the further details suggested in your author's response, such as including the implicit module information, discussing the interactive use of the system, and so forth.
-
-See also review C, which elaborates on these revisions in the context of the PC discussion.
