@@ -582,13 +582,15 @@ substructures which do not bind any extra argument and $\lambda$-abstraction
 which has exactly one substructure with precisely one extra bound variable.
 In the untyped case a single \AD{Bool}ean is enough to distinguish the two constructors
 whilst in the typed case, we need our tags to carry extra information about the
-types involved so we use the ad-hoc \AD{`STLC} type.
+types involved so we use the ad-hoc \AD{`STLC} type. In the definition of
+\AF{STLC}, ``{\AS{$\lambda$} \AK{where}}'' introduces a pattern-matching lambda
+which allows us to immediately inspect the tag bound in the \AIC{`$\sigma$} node.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.40\textwidth}
   \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{ULC}
 \end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.50\textwidth}
   \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
 \end{minipage}
 \caption{Examples: The Untyped and Simply Typed Lambda Calculi}
@@ -598,8 +600,10 @@ For convenience we define pattern synonyms~\cite{Pickering:patsyn} corresponding
 to the original constructors in Figure~\ref{scoped-untyped}: \AIC{`V}
 for \AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the
 application one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.
-This means that the end user can seamlessly write pattern-matching programs on
-encoded terms without dealing with the gnarly details of the encoding.
+These synonyms can be used when pattern-matching on a term and Agda
+resugars them when displaying a goal. This means that the end user
+can seamlessly work with encoded terms without dealing with the gnarly
+details of the encoding.
 These pattern definitions can omit some arguments by using ``\AS{\_}'',
 in which case they will be filled in by unification just like any other
 implicit argument: there is no extra cost to using an encoding!
