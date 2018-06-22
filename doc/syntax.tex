@@ -133,8 +133,8 @@ The language is obtained as the fixpoint of $T$:
 Since `Lam' is a endofunction on Set, it makes
 sense to ask whether it is also a functor and a monad. Indeed it is,
 as Altenkirch and Reus have shown. The functorial action corresponds
-to renaming, the monadic 'return' corresponds to the use of variables,
-and the monadic 'join' corresponds to substitution. The functor and
+to renaming, the monadic `return' corresponds to the use of variables,
+and the monadic `join' corresponds to substitution. The functor and
 monad laws correspond to well known properties from the equational
 theories of renaming and subsitution. We will revisit these properties
 below in Section~\ref{section:fusion}.
@@ -170,8 +170,8 @@ families~\cite{dybjer1994inductive} such as Coq~\cite{Coq:manual},
 Lean~\cite{DBLP:conf/cade/MouraKADR15} or Idris~\cite{brady2013idris} ought to do.
 
 To lighten the presentation, we exploit the observation that the
-current scope is either passed unchanged to subterms (e.g. in the application's case)
-or extended (e.g. in the $\lambda$-abstraction's case) by introducing combinators
+current scope is either passed unchanged to subterms (e.g. in the application case)
+or extended (e.g. in the $\lambda$-abstraction case) by introducing combinators
 to build indexed types. All the definitions are polymorphic in the index type
 (called \AB{A} in Figure~\ref{figure:indexed}).
 
@@ -467,7 +467,7 @@ environments are distinct from their type of computations.
 All of these examples are already described at length by ACMM~\citeyear{allais2017type}
 so we will not spend any
 more time on them. They have also obtained the simulation and fusion
-theorems demonstrating that these traversals are well-behaved as
+theorems demonstrating that these traversals are well behaved as
 corollaries of more general results expressed in terms of \AF{sem}.
 We will come back to this in Section~\ref{section:simulation}.
 
@@ -586,7 +586,7 @@ to extend CDMM's approach to include binding.
 %% UNIVERSE OF SYNTAXES
 
 
-\section{A Universe of Scope Safe and Well-Kinded Syntaxes}\label{section:universe}
+\section{A Universe of Scope Safe and Well Kinded Syntaxes}\label{section:universe}
 
 Our universe of scope safe and well kinded syntaxes follows the same principle
 as CDMM's universe of datatypes, except that we are not building endofunctors on
@@ -658,7 +658,7 @@ the parallel substitution \AF{sub}) in the next section.
 \end{figure}
 
 Coming back to our original examples, we now have the ability to give
-codes for the well-scoped untyped $\lambda$-calculus and, just as well,
+codes for the well scoped untyped $\lambda$-calculus and, just as well,
 the intrinsically typed simply typed $\lambda$-calculus.
 The variable case will be added by the free monad construction so we
 only have to describe two constructors: application where we have two
@@ -705,7 +705,7 @@ user to specify type annotations for pattern synonyms.
 \begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[Generic/Examples/STLC.tex]{patST}
 \end{minipage}
-\caption{Respective Pattern Synonyms for the Untyped and Simply-Typed Lambda Calculus}
+\caption{Respective Pattern Synonyms for the Untyped and Simply Typed Lambda Calculus}
 \end{figure}
 
 It is the third time (the first and second times being the definition of
@@ -767,7 +767,7 @@ and how to use the \AR{Sem} framework to elaborate them away.
 \section{Generic Scope Safe and Well Kinded Programs for Syntaxes}\label{section:semantics}
 
 Based on the \AR{Sem} type we defined for the specific example of the
-simply-typed $\lambda$-calculus in Section~\ref{section:primer-program},
+simply typed $\lambda$-calculus in Section~\ref{section:primer-program},
 we can define a generic notion of
 semantics for all syntax descriptions. It is once more parametrised
 by two \AB{I}\AF{─Scoped} families \AB{𝓥} and \AB{𝓒} corresponding
@@ -872,7 +872,7 @@ Given that \AF{fmap} introduces one level of indirection between the
 recursive calls and the subterms they are acting upon, the fact
 that our terms are indexed by a \AF{Size} is once more crucial in
 getting the termination checker to see that our proof is indeed
-well-founded.
+well founded.
 
 \subsection{Our First Generic Programs: Renaming and Substitution}\label{section:renandsub}
 
@@ -1078,7 +1078,7 @@ applications.
 \caption{Normalisation by Evaluation for the Untyped $\lambda$-Calculus}
 \end{figure}
 
-We haven't used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
+We have not used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
 (by disabling totality checking we have lost all guarantees with respect to
 termination) we know we will get a term in normal form.
 
@@ -1086,7 +1086,7 @@ termination) we know we will get a term in normal form.
 
 Following Atkey~\citeyear{atkey2015algebraic}, we can consider type checking
 and type inference as a possible semantics for a bi-directional~\cite{pierce2000local}
-language. We represent the raw syntax of a simply-typed bi-directional calculus
+language. We represent the raw syntax of a simply typed bi-directional calculus
 as a bi-sorted language using a notion of \AD{Mode} to distinguish between terms
 for which we will be able to \AIC{Infer} the type and the ones for which we will
 have to \AIC{Check} a type candidate.
@@ -1105,7 +1105,7 @@ into \AIC{Check}ables.
 \begin{minipage}{0.55\textwidth}
   \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{bidirectional}
 \end{minipage}
-\caption{A Bidirectional Simply-Typed Language}
+\caption{A Bidirectional Simply Typed Language}
 \end{figure}
 
 The values stored in the environment will be \AD{Type} information for bound
@@ -1131,7 +1131,7 @@ algorithm:
     it is an arrow type, check the argument at the domain's type and return the
     codomain
   \item for a $\lambda$-abstraction: check the input type is an arrow type and
-    check the body at the codomain type in the extended environmnent where the
+    check the body at the codomain type in the extended environment where the
     newly-bound variable as the domain's type
   \item a cut always comes with a type candidate against which to check the term
     and to be returned in case of success
@@ -1255,7 +1255,7 @@ the definition of \AR{∞Tm} was made easy by reusing \AF{⟦\_⟧}.
 \section{Building Generic Proofs about Generic Programs}
 
 ACMM~\citeyear{allais2017type} have
-already shown that, for the simply-typed $\lambda$-calculus, introducing an abstract
+already shown that, for the simply typed $\lambda$-calculus, introducing an abstract
 notion of Semantics not only reveals the shared structure of common
 traversals, it also allows them to give abstract proof frameworks for
 simulation or fusion lemmas. Their idea naturally extends to our generic
@@ -1314,7 +1314,7 @@ We can then combine \AF{Zip} and \AF{Kripke\textsuperscript{R}} to express the i
 that two semantic objects of respective types
 \AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_1$} \AB{$\mathcal{C}_1$}) and
 \AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_2$} \AB{$\mathcal{C}_2$}) are
-synchronised. The simulation constraint on two \AF{Sem}antics' algebras
+synchronised. The simulation constraint on the algebras for two \AF{Sem}antics 
 then becomes: given synchronized objects, the algebras should yield
 related computations. Together with self-explanatory constraints on
 \ARF{var} and \ARF{th\textsuperscript{$\mathcal{V}$}}, this constitutes the whole \AF{Sim}ulation
@@ -1386,7 +1386,7 @@ environment corresponding to the evaluated substitution.
 
 A direct application of these results is our (to be published) entry to the
 POPLMark Reloaded challenge~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
-representation of intrisincally well-typed and well-scoped terms we directly inherit
+representation of intrisincally well typed and well scoped terms we directly inherit
 not only renaming and substitution but also all four fusion lemmas as corollaries
 of our generic results. This allows us to remove the usual boilerplate
 and go straight to the point.
@@ -1426,8 +1426,8 @@ reification function extracting terms from model values will be used.
 \ExecuteMetaData[Generic/Fusion.tex]{fusionquote}
 
 Then, we have to think about what happens when going under a binder: \AB{$\mathcal{S}_1$}
-will produce a \AF{Kripke} function space but we'd like to have a syntactic
-value. Provided that \AB{$\mathcal{V}_1$} is \AR{VarLike}, we can make use of \AF{reify}
+will produce a \AF{Kripke} function space where a syntactic
+value is required. Provided that \AB{$\mathcal{V}_1$} is \AR{VarLike}, we can make use of \AF{reify}
 to get a \AF{Scope} back. Hence the second constraint.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvarlike}
@@ -1577,7 +1577,7 @@ our approach could be reused in these cases.
 
 Bach Poulsen, Rouvoet, Tolmach, Krebbers and Visser~\citeyear{BachPoulsen}
 introduce notions of scope graphs and frames to scale the techniques typical
-of well scoped-and-typed deep embeddings to imperative languages. They can
+of well scoped and typed deep embeddings to imperative languages. They can
 already handle a large subset of Middleweight Java.
 
 We have demonstrated how to write generic programs over the potentially
@@ -1599,11 +1599,11 @@ Polonowski's DBGen~\citeyear{polonowski:db} takes as input a raw syntax with
 comments annotating binding sites. It generates a module defining lifting,
 substitution as well as a raw syntax using names and a validation function
 transforming named terms into de Bruijn ones; we refrain from calling it a
-scopechecker as terms are not statically proven to be well-scoped.
+scopechecker as terms are not statically proven to be well scoped.
 
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} build on our previous paper
 to draft possible theoretical foundations for Autosubst, a so-far untrusted
-set of tactics. The whole paper is based on a specific syntax: well-scoped
+set of tactics. The whole paper is based on a specific syntax: well scoped
 call by value System F. In contrast, our effort has been here to carve out
 a precise universe of syntaxes with binding and give a systematic account
 of their semantics and proofs.
@@ -1633,15 +1633,15 @@ or de Bruijn indices). It also generically implements common traversals (computi
 the sets of free / bound variables, measuring the size of a term, shifting
 de Bruijn indices or substituting terms for parameters) as well as common
 predicates (e.g. being a closed term) and provides generic lemmas proving that
-all of these are well-behaved. It does not however offer a generic framework
-for defining new well-scoped-and-typed semantics and proving that they are
-well-behaved.
+all of these are well behaved. It does not however offer a generic framework
+for defining new well scoped-and-typed semantics and proving that they are
+well behaved.
 
 Érdi~\citeyear{gergodraft} defines a universe inspired by a first draft of this
 paper and gives three different interpretations corresponding to raw, scoped
 and typed syntax which are related via erasure. He provides scope-and-type
 preserving renaming and substitution as well as various generic proofs that
-they are well-behaved but offers neither a generic notion of semantics, nor
+they are well behaved but offers neither a generic notion of semantics, nor
 generic proof frameworks.
 
 Copello~\citeyear{copello2017} sets out to work with \emph{named} binders and
@@ -1657,7 +1657,7 @@ over a generic universe of regular trees with binders inspired by Morris'~\citey
 
 Recalling Allais, Chapman, McBride and McKinna's earlier work~\citeyear{allais2017type}
 we have started from an example
-of a scope-and-type safe language (the simply-typed $\lambda$-calculus), have studied
+of a scope-and-type safe language (the simply typed $\lambda$-calculus), have studied
 various common scope-and-type preserving traversals and noticed their similarity.
 After introducing a notion of semantics and refactoring these traversals as
 various instances of the same fundamental lemma, we have observed the tight
@@ -1682,7 +1682,7 @@ by a single pass of a third one.
 
 We have put all of these results in practice by using them to solve the (to be
 published) POPLMark Reloaded challenge which consists in formalising strong
-normalisation for the simply-typed $\lambda$-caluclus via a logical-relation
+normalisation for the simply typed $\lambda$-caluclus via a logical-relation
 argument.
 
 Finally, we have demonstrated that this formalisation effort can be re-used
@@ -1712,8 +1712,8 @@ derived automatically by building on the work of Huet~\citeyear{huet_1997}
 and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}.
 
 \item Finally, now knowing how to generically describe syntaxes and their
-well-behaved semantics, we can start asking what it means to define
-well-behaved judgments. Why stop at helping the user write their specific
+well behaved semantics, we can start asking what it means to define
+well behaved judgments. Why stop at helping the user write their specific
 language's meta-theory when we could study meta-meta-theory?
 \end{itemize}
 
