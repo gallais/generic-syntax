@@ -109,6 +109,15 @@ th^↝⋆T : ∀ {Γ Δ σ t u} (ρ : Thinning Γ Δ) →
 th^↝⋆T ρ Star.ε   = Star.ε
 th^↝⋆T ρ (r ◅ rs) = th^↝T ρ r ◅ th^↝⋆T ρ rs
 
+Elab^↝⋆T : Sim ↝⋆T^R ↝⋆T^R Source Elab Elab
+Sim.th^R  Elab^↝⋆T = th^↝⋆T
+Sim.var^R Elab^↝⋆T = id
+Sim.alg^R Elab^↝⋆T = λ where
+  (app' f t) ρ^R (refl , f^r , t^r , _) → gmap (λ f → app f _) (λ r → `appl r _) f^r
+                                       ◅◅ gmap (app _) (`appr _) t^r
+  (lam' b)   ρ^R (refl , b^r , _)       → gmap lam `lam (b^r _ (pack^R (λ v → Star.ε)))
+  (def' e t) ρ^R (refl , e^r , t^r , _) → t^r _ (ε^R ∙^R e^r)
+
 ThElab : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (select ρ₁ ρ₂)) Eq^R Eq^R
              Source Renaming Elab Elab
 Fus.quote₁ ThElab = λ σ t → t
@@ -202,3 +211,55 @@ elab-sub (def e t) {ρ₁} {ρ₃} {ρ₂} ρ^R = elab-sub t $ pack^R λ where
       ≡⟨ sym (ren-id′ (lookup ρ₃ v)) ⟩
     th^Tm (lookup ρ₃ v) (pack id)
       ∎
+
+simulation : ∀ {Γ Δ σ t u ρ ρ′} → ∀[ ↝⋆T^R ] ρ ρ′ → Γ ⊢ σ ∋ t ↝S u →
+             Δ ⊢ σ ∋ elab ρ t ↝⋆T elab ρ′ u
+simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρ^R (`β b u)    =
+    subst (Δ ⊢ _ ∋ _ ↝⋆T_) (sym (Fus.fus SubElab refl^R b))
+  $ `β (elab _ b) (elab _ u)
+  ◅_ $  subst (Δ ⊢ _ ∋_↝⋆T _) (sym (elab-sub b eq^R))
+  $ Sim.sim Elab^↝⋆T ρ∙u^R b where
+
+  eq′^R : ∀[ Eq^R ] (select (freshʳ vl^Var (_ ∷ [])) (elab ρ u /0])) (base vl^Tm)
+  lookup^R eq′^R z     = refl
+  lookup^R eq′^R (s v) = cong (ren extend ∘ lookup (base vl^Tm)) (lookup-base^Var v)
+
+  eq^R : ∀[ Eq^R ] (sub (elab ρ u /0]) <$> (freshˡ vl^Tm Δ {_ ∷ []} >> _))
+                   (elab ρ <$> (0↦ u))
+  lookup^R eq^R z     = refl
+  lookup^R eq^R (s v) = begin
+    sub (elab ρ u /0]) (ren (freshʳ vl^Var (_ ∷ [])) (lookup ρ v))
+      ≡⟨ Fus.fus (F.RenSub Target) eq′^R (lookup ρ v) ⟩
+    sub (base vl^Tm) (lookup ρ v)
+      ≡⟨ sub-id (lookup ρ v) ⟩
+    lookup ρ v
+      ∎
+
+  ρ∙u^R : ∀[ ↝⋆T^R ] (elab ρ <$> (0↦ u)) (elab ρ′ <$> (0↦ u))
+  lookup^R ρ∙u^R z     = Sim.sim Elab^↝⋆T ρ^R u
+  lookup^R ρ∙u^R (s v) = lookup^R ρ^R v
+
+simulation {ρ = ρ} {ρ′} ρ^R (`ζ e t) =
+  subst (_ ⊢ _ ∋ _ ↝⋆T_) (sym (Fus.fus SubElab refl^R t))
+  $ Sim.sim Elab^↝⋆T ρ′^R t where
+
+  ρ′^R : ∀[ ↝⋆T^R ] ((E.ε ∙ elab ρ e) >> th^Env th^Tm ρ (pack id)) (elab ρ′ <$> (0↦ e))
+  lookup^R ρ′^R k with split (_ ∷ []) k
+  ... | inj₁ z  = Sim.sim Elab^↝⋆T ρ^R e
+  ... | inj₁ (s ())
+  ... | inj₂ kʳ = subst (_ ⊢ _ ∋_↝⋆T _) (sym (ren-id′ (lookup ρ kʳ))) (lookup^R ρ^R kʳ)
+
+simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρ^R (`lam r) = gmap lam `lam (simulation ρ′^R r) where
+
+  ρ′^R : ∀[ ↝⋆T^R ] (freshˡ vl^Tm Δ {_ ∷ []} >> th^Env th^Tm ρ (freshʳ vl^Var (_ ∷ [])))
+                    (freshˡ vl^Tm Δ {_ ∷ []} >> th^Env th^Tm ρ′ (freshʳ vl^Var (_ ∷ [])))
+  lookup^R ρ′^R k with split (_ ∷ []) k
+  ... | inj₁ kˡ = Star.ε
+  ... | inj₂ kʳ = th^↝⋆T (th^Env th^Var (base vl^Var) extend) (lookup^R ρ^R kʳ)
+
+simulation ρ^R (`appl r t) =
+     gmap (λ f → app f _) (λ r → `appl r _) (simulation ρ^R r)
+  ◅◅ gmap (app _) (`appr _) (Sim.sim Elab^↝⋆T ρ^R t)
+simulation ρ^R (`appr f r) =
+    gmap (app _) (`appr _) (simulation ρ^R r)
+ ◅◅ gmap (λ f → app f _) (λ r → `appl r _) (Sim.sim Elab^↝⋆T ρ^R f)
