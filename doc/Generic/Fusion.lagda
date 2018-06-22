@@ -28,13 +28,13 @@ module _  {I : Set} {𝓥₁ 𝓥₂ 𝓥₃ 𝓒₁ 𝓒₂ 𝓒₃ : I → Lis
 %<*fusion>
 %<*fusiontype>
 \begin{code}
- record Fus (d : Desc I) (𝓢₁ : Sem d 𝓥₁ 𝓒₁) (𝓢₂ : Sem d 𝓥₂ 𝓒₂) (𝓢₃ : Sem d 𝓥₃ 𝓒₃) : Set where
+ record Fus (d e : Desc I) (𝓢₁ : Sem d 𝓥₁ 𝓒₁) (𝓢₂ : Sem e 𝓥₂ 𝓒₂) (𝓢₃ : Sem d 𝓥₃ 𝓒₃) : Set where
    field
 \end{code}
 %</fusiontype>
 %<*fusionquote>
 \begin{code}
-     quote₁  :  (i : I) → [ 𝓒₁ i ⟶ Tm d ∞ i ]
+     quote₁  :  (i : I) → [ 𝓒₁ i ⟶ Tm e ∞ i ]
 \end{code}
 %</fusionquote>
 %<*fusionvarlike>
@@ -134,7 +134,7 @@ module _ {I : Set} {T : I ─Scoped} where
 
 module _ {I : Set} {d : Desc I}  {𝓥 𝓒 : I ─Scoped}
          (𝓢 : Sem d 𝓥 𝓒)
-         (𝓕 : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (select ρ₁ ρ₂)) Eq^R Eq^R d Renaming 𝓢 𝓢)
+         (𝓕 : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (select ρ₁ ρ₂)) Eq^R Eq^R d d Renaming 𝓢 𝓢)
          (eq^quote : ∀ σ {Γ} t → Fus.quote₁ 𝓕 σ {Γ} t ≡ t) where
 
   open ≡-Reasoning
@@ -188,7 +188,7 @@ module _ {I : Set} (d : Desc I) where
 
  open ≡-Reasoning
 
- Ren² : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d Renaming Renaming Renaming
+ Ren² : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d d Renaming Renaming Renaming
  Fus.quote₁ Ren² = λ _ t → t
  Fus.vl^𝓥₁ Ren² = vl^Var
  Fus.th^R Ren² = λ σ ρ^R → pack^R (cong (lookup σ) ∘ (lookup^R ρ^R))
@@ -213,7 +213,7 @@ module _ {I : Set} (d : Desc I) where
 \end{code}
 %</renren>
 \begin{code}
- RenSub : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d Renaming Substitution Substitution
+ RenSub : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d d Renaming Substitution Substitution
  Fus.quote₁  RenSub = λ _ t → t
  Fus.vl^𝓥₁  RenSub = vl^Var
  Fus.th^R    RenSub = λ σ ρ^R → pack^R (cong (ren σ) ∘ (lookup^R ρ^R))
@@ -239,7 +239,7 @@ module _ {I : Set} (d : Desc I) where
 %</rensub>
 \begin{code}
 
- SubRen : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (ren ρ₂ <$> ρ₁)) VarTm^R Eq^R d Substitution Renaming Substitution
+ SubRen : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (ren ρ₂ <$> ρ₁)) VarTm^R Eq^R d d Substitution Renaming Substitution
  Fus.quote₁  SubRen = λ _ → id
  Fus.vl^𝓥₁  SubRen = vl^Tm
  Fus.th^R    SubRen {ρ₁ = ρ₁} {ρ₂} {ρ₃} = λ σ ρ^R → pack^R $ λ k →
@@ -270,7 +270,7 @@ module _ {I : Set} (d : Desc I) where
 %</subren>
 \begin{code}
 
- Sub² : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (sub ρ₂ <$> ρ₁)) Eq^R Eq^R d Substitution Substitution Substitution
+ Sub² : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (sub ρ₂ <$> ρ₁)) Eq^R Eq^R d d Substitution Substitution Substitution
  Fus.quote₁ Sub² = λ _ t → t
  Fus.vl^𝓥₁ Sub² = vl^Tm
  Fus.th^R Sub² {ρ₁ = ρ₁} {ρ₂} {ρ₃} = λ σ ρ^R → pack^R $ λ k →
