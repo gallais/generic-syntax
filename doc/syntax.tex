@@ -738,8 +738,9 @@ values to variables, it associates computations to terms.
 
 \subsection{Fundamental Lemma of Semantics}
 
-We can now define the type of the fundamental lemma (called \AF{sem}) as
-a function from environments to computations. It is defined mutually with a
+We can now define the type of the fundamental lemma (called \AF{sem}) which
+takes a semantics and returns a function from environments to computations.
+It is defined mutually with a
 function \AF{body} turning syntactic binders into semantics binders: to
 each de Bruijn \AF{Scope} (i.e. a substructure in a potentially extended
 context) it associates a \AF{Kripke} (i.e. a subcomputation expecting a
@@ -752,6 +753,8 @@ value for each newly bound variable).
 
 The proof of \AF{sem} is straightforward now that we have clearly
 identified the problem structure and the constraints we need to enforce.
+We use postfix projections (of the form \AS{.}\ARF{name}) to make use of
+the semantic combinators packaged in the \AR{Sem} parameter \AB{$\mathcal{S}$}.
 If the term considered is a variable, we lookup the associated value in
 the evaluation environment and turn it into a computation using \ARF{var}.
 If it is a non variable constructor then we call \AF{fmap} to evaluate the
@@ -763,14 +766,14 @@ these results.
 \caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{sem}}
 \end{figure}
 
-The auxiliary lemma \AF{body} distinguishes two cases: if no new
+The auxiliary lemma \AF{body} distinguishes two cases. If no new
 variable has been bound in the recursive substructure, it is
-a matter of calling \AF{sem} recursively, otherwise we are provided
+a matter of calling \AF{sem} recursively. Otherwise we are provided
 with a \AF{Thinning}, some additional values and evaluate the
 substructure in the thinned and extended evaluation environment
 (thanks to a auxiliary function \AF{\_>>\_} which given two environments
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}}
-produces an environment {(\AB{Γ} \AF{++} \AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ})}.
+produces an environment {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{body}

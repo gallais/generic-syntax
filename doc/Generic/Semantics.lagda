@@ -36,28 +36,44 @@ record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
         alg    : {i : I} → [ ⟦ d ⟧ (Kripke 𝓥 𝓒) i  ⟶ 𝓒 i ]
 \end{code}
 %</semantics>
-%<*semtype>
 \begin{code}
  sem   :  {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
  body  :  {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
+
+ sem ρ (`var k) = var (lookup ρ k)
+ sem ρ (`con t) = alg (fmap d (body ρ) t)
+
+ body ρ []       i t = sem ρ t
+ body ρ (_ ∷ _)  i t = λ σ vs → sem (vs >> th^Env th^𝓥 ρ σ) t
+
+ closed : ([] ─Comp) 𝓒 []
+ closed = sem ε
+
+module OnlyforShow {I : Set} {d : Desc I} {𝓥 𝓒 : I ─Scoped} where
+ open Sem hiding (sem ; body ; closed)
+\end{code}
+%<*semtype>
+\begin{code}
+ sem   :  {Γ Δ : List I} → Sem d 𝓥 𝓒 → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
+ body  :  {Γ Δ : List I} {s : Size} → Sem d 𝓥 𝓒 → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
 \end{code}
 %</semtype>
 %<*sem>
 \begin{code}
- sem ρ (`var k) = var (lookup ρ k)
- sem ρ (`con t) = alg (fmap d (body ρ) t)
+ sem 𝓢 ρ (`var k) = (𝓢 .var) (lookup ρ k)
+ sem 𝓢 ρ (`con t) = (𝓢 .alg) (fmap d (body 𝓢 ρ) t)
 \end{code}
 %</sem>
 %<*body>
 \begin{code}
- body ρ []       i t = sem ρ t
- body ρ (_ ∷ _)  i t = λ σ vs → sem (vs >> th^Env th^𝓥 ρ σ) t
+ body 𝓢 ρ []       i t = sem 𝓢 ρ t
+ body 𝓢 ρ (_ ∷ _)  i t = λ σ vs → sem 𝓢 (vs >> th^Env (𝓢 .th^𝓥) ρ σ) t
 \end{code}
 %</body>
 %<*closed>
 \begin{code}
- closed : ([] ─Comp) 𝓒 []
- closed = sem ε
+ closed : Sem d 𝓥 𝓒 → ([] ─Comp) 𝓒 []
+ closed 𝓢 = sem 𝓢 ε
 \end{code}
 %</closed>
 \begin{code}
