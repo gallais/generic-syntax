@@ -24,8 +24,8 @@ module _ {I : Set} where
 %<*letcode>
 \begin{code}
  Let : Desc I
- Let = `σ (I × I) $ uncurry λ σ τ →
-       `X [] σ (`X (σ ∷ []) τ (`∎ τ))
+ Let =  `σ (I × I) $ uncurry λ σ τ →
+        `X [] σ (`X (σ ∷ []) τ (`∎ τ))
 \end{code}
 %</letcode>
 \begin{code}
@@ -36,7 +36,8 @@ module _ {I : Set} {d : Desc I} where
  UnLet : Sem (d `+ Let) (Tm d ∞) (Tm d ∞)
  Sem.th^𝓥  UnLet = th^Tm
  Sem.var   UnLet = id
- Sem.alg   UnLet = case (Sem.alg Substitution) λ where
+ Sem.alg   UnLet =
+   case (Sem.alg Substitution) λ where
    (_ , e , t , refl) → extract t (ε ∙ e)
 \end{code}
 %</unletcode>
