@@ -1,34 +1,33 @@
 
 \section{Introduction}
 
-Nowadays programmers writing an embedded DSL~\cite{hudak1996building}
-and the researcher formalising a calculus know how to leverage the
-host language's type system to help them. Using Generalised Algebraic
-Data Types (GADTs) or the more general indexed families of Type
-Theory~\cite{dybjer1994inductive} for representing their syntax,
+In modern typed programming languages, programmers writing embedded
+DSLs~\cite{hudak1996building} and researchers formalising them can now
+use the host language's type system to help them. Using Generalised
+Algebraic Data Types (GADTs) or the more general indexed families of
+Type Theory~\cite{dybjer1994inductive} for representing their syntax,
 programmers can \emph{statically} enforce some of the invariants
-present in their language. Managing the scope is a popular use
+present in their language. Managing variable scope is a popular use
 case~\cite{altenkirch1999monadic} as directly manipulating raw de
-Bruijn indices is error-prone.  Solutions range from enforcing only
-well scopedness to ensuring full type and scope correctness. In short,
-we use types to ensure that ``illegal states are unrepresentable'',
-where illegal states are now ill-scoped or ill-typed programs.
+Bruijn indices is error-prone.  Solutions range from enforcing well
+scopedness to ensuring full type and scope correctness. In short, we
+use types to ensure that ``illegal states are unrepresentable'', where
+illegal states are ill scoped or ill typed terms.
 
-Despite the now large body of knowledge in how to use types for
-defining well-formed syntaxes, it is still necessary for the working
-DSL designer or formaliser to redefine essential functions like
-renaming and substitution for each new syntax, and then to reprove
-essential lemmas for those functions, such as fusion lemmas. To reduce
-this large amount of repeated work and boilerplate, in this paper we
-apply the methodology of generic programming to programming and
-proving with syntaxes with binding, in order to bring regularity and
-order to this diversity.
+Despite the large body of knowledge in how to use types for defining
+well formed by construction syntax representations, it is still
+necessary for the working DSL designer or formaliser to redefine
+essential functions like renaming and substitution for each new
+syntax, and then to reprove essential lemmas about those functions. To
+reduce this large amount of repeated work and boilerplate, we apply
+the methodology of generic programming to programming and proving with
+syntaxes with binding.
 
 To motivate our approach, let us look at the formalisation of an
 apparently straightforward program transformation: the inling of
 let-bound variables by substitution. We have two languages: the source
-(\AD{S}), which has let-bindings, and the target (\AD{T}), which does
-not:
+(\AD{S}), which has let-bindings, and the target (\AD{T}), which only
+differs in that it does not:
 
 \begin{displaymath}
   \AD{S} ::= x \mid \AD{S}~\AD{S} \mid \lambda x. \AD{S} \mid \textrm{let }x=\AD{S}\textrm{ in }\AD{S}
@@ -46,7 +45,7 @@ we discover that we actually have a large amount of work to do:
 \begin{enumerate}
 \item To define the operational semantics we need to define
   substitution, and hence renaming, for both the source and target
-  languages;
+  languages, even though they are very similar;
 \item In the course of proving the correctness lemma, we discover that
   we need to prove eight lemmas about the interactions of renaming,
   substitution, and transformation that are all remarkably similar, but
@@ -54,24 +53,22 @@ we discover that we actually have a large amount of work to do:
 \end{enumerate}
 
 Even after doing all of this work, we only have a result for a single
-pair of source and target languages. If we were to change our object
-of study, we would have to repeat the same work all over again (or at
-least do a lot of cutting, pasting, and editing). The cases for
-$\lambda$s and applications in the transformation are structural, but
-if we add more constructs to both languages, we would have to write
-more and more code to say we are doing nothing interesting to them.
+pair of source and target languages. If we were to change our
+languages $\AD{S}$ or $\AD{T}$, we would have to repeat the same work
+all over again (or at least do a lot of cutting, pasting, and
+editing).
+% The cases for $\lambda$s and applications in the
+% transformation are structural, but if we add more constructs to both
+% languages, we would have to write more and more code to say we are
+% doing nothing interesting to them.
 
-Using our universe of syntaxes with bindings we are able to solve the
-problem of repetition once and 
-
-
-generically define renaming and substitution \ref{section:renandsub},
-generically define the let-binding removal transformation
-\ref{section:letbinding}, and generically prove the required renaming,
-substitution and transformation fusion lemmas (\ref{section:fusion}. All of these
-definitions are generic in the underlying syntax, so we do this work
-once and for all, leaving the user to focus on the interesting
-properties and proofs.
+Using the universe of syntaxes with binding we present in this paper,
+we are able to solve this repetition problem once and for all. For
+\emph{every} syntax in our universe, we are able to generically define
+renaming and substitution \ref{section:renandsub}, generically define
+the let-binding removal transformation \ref{section:letbinding}, and
+generically prove the required renaming, substitution and
+transformation fusion lemmas (\ref{section:fusion}.
 
 \paragraph{Content and Contributions}
 We start with primers on scoped and sorted terms
