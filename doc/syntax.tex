@@ -101,24 +101,20 @@ it means for a semantics to be able to simulate another one
 
 Scope safe terms follow the discipline that every variable is
 either bound by some binder or is explicitly accounted for in a
-context. A scope safe programming language is one in which all valid
-terms are scope safe.
-
-Bellegarde and Hook~\citeyear{BELLEGARDE1994287}, Bird and Patterson~\citeyear{bird_paterson_1999},
+context. Bellegarde and Hook~\citeyear{BELLEGARDE1994287}, Bird and Patterson~\citeyear{bird_paterson_1999},
 and Altenkirch and Reus~\citeyear{altenkirch1999monadic} introduced the
-nowadays classic presentation of a scope safe languages by using inductive
+classic presentation of scope safety using inductive
 \emph{families}~\cite{dybjer1994inductive} instead of inductive types to
 represent abstract syntax trees. Indeed, using a family indexed by a $\Set{}$,
-we can track scoping information at the type level. As the empty $\Set$ has no
-inhabitant, it is a natural representation of the empty scope. The functor
-$M(X) = 1 + X$ is used to extend the running scope with an extra variable.
+we can track scoping information at the type level. The empty $\Set$ represents the empty scope. The functor
+$1 + (\_)$ is used to extend the running scope with an extra variable.
 
-An inductive type can be seen as the fixpoint of an endofunctor on $\Set{}$.
-Similarly, an inductive family can be obtained by taking the fixpoint on an
+An inductive type is the fixpoint of an endofunctor on $\Set{}$.
+Similarly, an inductive family is the fixpoint of an
 endofunctor on $\Set \to \Set$. With this generic presentation of scope safe
 languages as inductive families in mind, we get the following definition of
 the untyped $\lambda$-calculus:
-$T(F) = \lambda X \in \Set{}.\, X + (F(X) \times F(X)) + F(1 + X)$.
+$T(F) = \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)$.
 This endofunctor offers a choice of three constructors.
 The first one corresponds to the variable
 case; it packages an inhabitant of $X$, the index $\Set{}$. The second corresponds
@@ -128,7 +124,7 @@ a $\lambda$-abstraction; it extends the current scope with a fresh variable.
 The language is obtained as the fixpoint of $T$:
 \[
    \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
-   \lambda X \in \Set{}. X + (F(X) \times F(X)) + F(1 + X)
+   \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)
 \]
 Since `Lam' is a endofunction on Set, it makes
 sense to ask whether it is also a functor and a monad. Indeed it is,
@@ -157,10 +153,10 @@ Given this typed setting, our functors will actually take an extra $I$ argument
 corresponding to the type of the expression being built. This is summed up by
 the large type \AB{I}\AF{─Scoped}:
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[var.tex]{scoped}
-\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
-\end{figure}
+%\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
+\end{center}
 
 Our implementation language is Agda~\cite{norell2009dependently} however
 these techniques are language independent: any dependently typed language
@@ -295,7 +291,7 @@ values \AB{𝓥} for us):
 
 \begin{figure}[h]
 \ExecuteMetaData[environment.tex]{env}
-\caption{Well-Typed and Scoped Environments of Values}
+\caption{Well Typed and Scoped Environments of Values}
 \end{figure}
 
 As we have already observed, the definitions of renaming and substitution have very
