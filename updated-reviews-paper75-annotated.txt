@@ -498,6 +498,8 @@ We address the major points raised by the reviews below.
   re-implementing (and proving correct!) common traversals for
   syntaxes with binding represents for a programmer.
 
+  AUTHORS> We have added a new motivating example and expanded the introduction.
+
   As evidence in support of our approach, all of the current solutions
   to the POPLMark Reloaded challenge either use language support
   (Beluga), code generation (Coq) or our library to avoid repeatedly
@@ -509,11 +511,16 @@ We address the major points raised by the reviews below.
   we will insert a toplevel definition corresponding to its meaning
   via `sem` to guide the reader.
 
+  AUTHORS> We have now added some further clarifiying text to Fig.9
+  and preceding paragraph.
+
 - Review #75C raises some points with our examples:
 
   - We will simplify the let-binder example (Sec 7.1) by switching to
     single let-binders. This will also allow us to show the full
     definition of `alg`.
+
+    AUTHORS> Fixed.
 
   - We disagree that the unsafe normalization example amounts to
     throwing away type information. The library makes no assumption on
