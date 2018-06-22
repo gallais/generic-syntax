@@ -6,50 +6,49 @@ DSLs~\cite{hudak1996building} and researchers formalising them can now
 use the host language's type system to help them. Using Generalised
 Algebraic Data Types (GADTs) or the more general indexed families of
 Type Theory~\cite{dybjer1994inductive} for representing their syntax,
-programmers can \emph{statically} enforce some of the invariants
-present in their language. Managing variable scope is a popular use
+programmers can \emph{statically} enforce some of the invariants in
+their languages. Managing variable scope is a popular use
 case~\cite{altenkirch1999monadic} as directly manipulating raw de
 Bruijn indices is error-prone.  Solutions range from enforcing well
 scopedness to ensuring full type and scope correctness. In short, we
 use types to ensure that ``illegal states are unrepresentable'', where
 illegal states are ill scoped or ill typed terms.
 
-Despite the large body of knowledge in how to use types for defining
-well formed by construction syntax representations, it is still
-necessary for the working DSL designer or formaliser to redefine
-essential functions like renaming and substitution for each new
-syntax, and then to reprove essential lemmas about those functions. To
-reduce this large amount of repeated work and boilerplate, we apply
-the methodology of generic programming to programming and proving with
-syntaxes with binding.
+Despite the large body of knowledge in how to use types to define well
+formed syntax, it is still necessary for the working DSL designer or
+formaliser to redefine essential functions like renaming and
+substitution for each new syntax, and then to reprove essential lemmas
+about those functions. To reduce the burden of such repeated work and
+boilerplate, we apply the methodology of data-genericity to
+programming and proving with syntaxes with binding.
 
 To motivate our approach, let us look at the formalisation of an
 apparently straightforward program transformation: the inling of
-let-bound variables by substitution. We have two languages: the source
+let-bound variables by substitution. You have two languages: the source
 (\AD{S}), which has let-bindings, and the target (\AD{T}), which only
 differs in that it does not:
-
 \begin{displaymath}
   \AD{S} ::= x \mid \AD{S}~\AD{S} \mid \lambda x. \AD{S} \mid \textrm{let }x=\AD{S}\textrm{ in }\AD{S}
   \qquad
   \AD{T} ::= x \mid \AD{T}~\AD{T} \mid \lambda x. \AD{T}
 \end{displaymath}
 
-Breaking down our formalisation task, we will need to define
-operational semantics for the two languages, define the program
-transformation itself, and prove a correctness lemma that states each
-step in the source language is simulated by zero or more steps of the
-transformed terms in the target language. In the course of doing this,
-we discover that we actually have a large amount of work to do:
+Breaking the task down, you need to define an operational semantics for
+each language, define the program transformation itself, and prove a
+correctness lemma that states each step in the source language is
+simulated by zero or more steps of the transformed terms in the target
+language. In the course of doing this, you discover that you actually
+have a large amount of work to do:
 
 \begin{enumerate}
-\item To define the operational semantics we need to define
+\item To define the operational semantics you need to define
   substitution, and hence renaming, for both the source and target
   languages, even though they are very similar;
-\item In the course of proving the correctness lemma, we discover that
-  we need to prove eight lemmas about the interactions of renaming,
-  substitution, and transformation that are all remarkably similar, but
-  must be stated and proved separately. 
+\item In the course of proving the correctness lemma, you discover
+  that you need to prove eight lemmas about the interactions of
+  renaming, substitution, and transformation that are all remarkably
+  similar, but must be stated and proved separately (e.g, as in
+  \cite{benton2012strongly}).
 \end{enumerate}
 
 Even after doing all of this work, we only have a result for a single
@@ -63,12 +62,14 @@ editing).
 % doing nothing interesting to them.
 
 Using the universe of syntaxes with binding we present in this paper,
-we are able to solve this repetition problem once and for all. For
-\emph{every} syntax in our universe, we are able to generically define
-renaming and substitution \ref{section:renandsub}, generically define
-the let-binding removal transformation \ref{section:letbinding}, and
-generically prove the required renaming, substitution and
-transformation fusion lemmas (\ref{section:fusion}.
+we are able to solve this repetition problem \emph{once and for all}.
+
+%  For
+% \emph{every} syntax in our universe, we are able to generically define
+% renaming and substitution \ref{section:renandsub}, generically define
+% the let-binding removal transformation \ref{section:letbinding}, and
+% generically prove the required renaming, substitution and
+% transformation fusion lemmas (\ref{section:fusion}.
 
 \paragraph{Content and Contributions}
 We start with primers on scoped and sorted terms
@@ -78,17 +79,20 @@ programmable descriptions of data types (Section~\ref{section:data}).
 These introductory sections help us build an understanding of the
 problem at hand as well as a toolkit that leads us to the novel
 content of this paper: a universe of scope safe syntaxes with binding
-(Section~\ref{section:universe}) together with a generic notion of
+(Section~\ref{section:universe}) together with a notion of
 scope safe semantics for these syntaxes
 (Section~\ref{section:semantics}).  This gives us the opportunity to
 write generic implementations of renaming and substitution
-(Section~\ref{section:renandsub}) but also elaboration of a surface
-language to a core one (Section~\ref{section:letbinding}), and
-normalisation by evaluation (Section~\ref{section:nbyeval}). We also
-explore opportunities for generic proving by formally describing what
-it means for a semantics to be able to simulate another one
-(Section~\ref{section:simulation}), or for two semantics to be fusable
-(Section~\ref{section:fusion}).
+(Section~\ref{section:renandsub}), a generic let-binding removal
+transformation (generalising the problem stated above)
+(Section~\ref{section:letbinding}), and normalisation by evaluation
+(Section~\ref{section:nbyeval}). We also explore opportunities for
+generic proving by formally describing what it means for a semantics
+to be able to simulate another one (Section~\ref{section:simulation}),
+or for two semantics to be fusable
+(Section~\ref{section:fusion}). This allows us to prove the lemmas we
+required above for renaming and substitution generically, for
+\emph{every} syntax in our universe.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SCOPE SAFE TERMS
@@ -102,23 +106,22 @@ context. Bellegarde and Hook~\citeyear{BELLEGARDE1994287}, Bird and Patterson~\c
 and Altenkirch and Reus~\citeyear{altenkirch1999monadic} introduced the
 classic presentation of scope safety using inductive
 \emph{families}~\cite{dybjer1994inductive} instead of inductive types to
-represent abstract syntax trees. Indeed, using a family indexed by a $\Set{}$,
+represent abstract syntax. Indeed, using a family indexed by a $\Set{}$,
 we can track scoping information at the type level. The empty $\Set$ represents the empty scope. The functor
-$1 + (\_)$ is used to extend the running scope with an extra variable.
+$1 + (\_)$ extends the running scope with an extra variable.
 
 An inductive type is the fixpoint of an endofunctor on $\Set{}$.
-Similarly, an inductive family is the fixpoint of an
-endofunctor on $\Set \to \Set$. With this generic presentation of scope safe
-languages as inductive families in mind, we get the following definition of
-the untyped $\lambda$-calculus:
-$T(F) = \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)$.
-This endofunctor offers a choice of three constructors.
-The first one corresponds to the variable
-case; it packages an inhabitant of $X$, the index $\Set{}$. The second corresponds
-to an application node; both the function and its argument live in the same
-scope as the overall expression. The third corresponds to
-a $\lambda$-abstraction; it extends the current scope with a fresh variable.
-The language is obtained as the fixpoint of $T$:
+Similarly, an inductive family is the fixpoint of an endofunctor on
+$\Set \to \Set$. Using inductive families to enforce scope safety, we
+get the following definition of the untyped $\lambda$-calculus: $T(F)
+= \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)$.
+This endofunctor offers a choice of three constructors.  The first one
+corresponds to the variable case; it packages an inhabitant of $X$,
+the index $\Set{}$. The second corresponds to an application node;
+both the function and its argument live in the same scope as the
+overall expression. The third corresponds to a $\lambda$-abstraction;
+it extends the current scope with a fresh variable.  The language is
+obtained as the fixpoint of $T$:
 \[
    \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
    \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)
