@@ -154,8 +154,7 @@ endowed with similar operations by using Altenkirch, Chapman and
 Uustalu's relative monads~\citeyear{Altenkirch2010, JFR4389}.
 
 We pick as our $J$ the category whose objects are inhabitants of
-\AD{List} \AB{I} (\AB{I} is a parameter of the construction meant to
-represent the set of sorts for our language) and whose morphisms are
+\AD{List} \AB{I} (\AB{I} is a parameter of the construction) and whose morphisms are
 thinnings (see Section~\ref{def:thinning}).  This \AD{List} \AB{I} is
 intended to represent the list of the sort (/ kind / types depending
 on the application) of the de Bruijn variables in scope. We can
@@ -254,7 +253,7 @@ and Reus' simply typed $\lambda$-calculus representation.
 %% SCOPE SAFE PROGRAMS
 
 
-\section{A Primer on Kind and Scope Safe Programs}\label{section:primer-program}
+\section{A Primer on Type and Scope Safe Programs}\label{section:primer-program}
 
 The scope-and-type safe representation described in the previous section is
 naturally only a start: once the programmer has access to a good
@@ -1474,14 +1473,14 @@ computation. Hence the constraint \ARF{var\textsuperscript{R}}:
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvar}
 
 The case of the algebra follows a similar idea albeit being more complex:
-a term gets evaluated using \AB{$\mathcal{S}_1$} and in order to be able to run \AB{$\mathcal{S}_2$}
+a term gets evaluated using \AB{$\mathcal{S}_1$} and to be able to run \AB{$\mathcal{S}_2$}
 afterwards we need to recover a piece of syntax. This is possible if the
 \AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥_1} arguments
 (which can be manufactured thanks to the \ARF{vl\textsuperscript{𝓥_1}} we mentioned before) and
 then quoted. Provided that the result of running \AB{$\mathcal{S}_2$} on that term is
 related via {\AF{Zip} \AB{d} (\AF{Kripke\textsuperscript{R}} \AB{$\mathcal{R}^{\mathcal{V}}$} \AB{$\mathcal{R}^{\mathcal{C}}$}} to the result
 of running \AB{$\mathcal{S}_3$} on the original term, the \ARF{alg\textsuperscript{R}} constraint states
-that the two evalutions should yield related computations.
+that the two evalutions yield related computations.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionalg}
 
@@ -1491,8 +1490,8 @@ This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
 stating that from a triple of related environments, one gets a pair of related
 computations: the composition of \AB{$\mathcal{S}_1$} and \AB{$\mathcal{S}_2$} on one hand and
 \AB{$\mathcal{S}_3$} on the other. This lemma is once again proven mutually with its
-counterpart for \AR{Sem}'s \AF{body}'s action on \AR{Scope}s and the \AD{Size}
-indices make the proof modular.
+counterpart for \AR{Sem}'s \AF{body}'s action on \AR{Scope}s.
+% and the \AD{Size} indices make the proof modular.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Fusion.tex]{fusbody}
@@ -1545,10 +1544,12 @@ rise to an equivalence relation by using \AF{Zip}'s stability properties
 (if \AB{R} is reflexive / symmetric / transitive then so is {\AF{Zip} \AB{d} \AB{R}})
 mentioned in Section~\ref{lem:zipstable}.
 
-\begin{figure}[h]
+\begin{center}
+%\begin{figure}[h]
  \ExecuteMetaData[Generic/Bisimilar.tex]{eqrel}
-\caption{Bisimilarity is an Equivalence Relation}
-\end{figure}
+% \caption{Bisimilarity is an Equivalence Relation}
+% \end{figure}
+\end{center}
 
 This definition can be readily deployed to prove e.g. that the unfolding
 of \AF{01↺} defined in Section~\ref{def:colist} is indeed bisimilar to \AF{01⋯}
@@ -1558,10 +1559,13 @@ pick the same constructor (a cons cell), the second that they carry the
 same natural number, and we can conclude by an appeal to the coinduction
 hypothesis.
 
-\begin{figure}[h]
+\begin{center}
+%\begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/Colist.tex]{bisim01}
-\caption{The unfolding of \AF{01↺} is bisimilar to the direct-style \AF{01⋯}}
-\end{figure}
+%\caption{The unfolding of \AF{01↺} is bisimilar to the direct-style \AF{01⋯}}
+%\end{figure}
+\end{center}
+
 
 %\section{Fully Worked-out Example}
 %\todo{system F, etc.}
@@ -1585,13 +1589,13 @@ Pitts' and Gabbay's nominal syntax~\cite{gabbay:newaas-jv}.
 Our generic universe of syntax is based on
 scope-and-typed de Bruijn indices~\cite{de1972lambda} but it is not
 a necessity. It is for instance possible to give an interpretation
-of \AD{Desc}ripton corresponding to Chlipala's Parametric Higher-Order
+of \AD{Desc}riptions corresponding to Chlipala's Parametric Higher-Order
 Abstract Syntax~\citeyear{chlipala2008parametric} and we would be interested
 to see what the appropriate notion of Semantics is for this representation.
 
 \subsection{Alternative Binding Structures} The binding structure we
 present here is based on a flat, lexical scoping strategy. There are
-obviously other strategies and it would be interesting to see whether
+other strategies and it would be interesting to see whether
 our approach could be reused in these cases.
 
 Bach Poulsen, Rouvoet, Tolmach, Krebbers and Visser~\citeyear{BachPoulsen}
@@ -1644,8 +1648,8 @@ scopechecker as terms are not statically proven to be well scoped.
 
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} build on our previous paper
 to draft possible theoretical foundations for Autosubst, a so-far untrusted
-set of tactics. The whole paper is based on a specific syntax: well scoped
-call by value System F. In contrast, our effort has been here to carve out
+set of tactics. The paper is based on a specific syntax: well-scoped call-by-value
+System F. In contrast, our effort has been here to carve out
 a precise universe of syntaxes with binding and give a systematic account
 of their semantics and proofs.
 
@@ -1659,35 +1663,35 @@ in dependently-typed languages~\citeyear{genericprogramming-dtp}, we can natural
 expect generic, provably sound, treatments of these notions in tools such as
 Agda or Coq.
 
-Keuchel, Weirich, and Schrijvers' Knot presented in the same paper as
-Needle~\citeyear{needleandknot} implements the traversals and lemmas generated
-in specialised forms by Needle once and for all as a set of generic programs.
-They see the existence of Needle as a pragmatic choice: working directly with
-the free monadic terms over finitary containers would be too cumbersome. In
+Keuchel, Weirich, and Schrijvers' Knot~\citeyear{needleandknot} implements
+as a set of generic programs the traversals and lemmas generated in specialised
+forms by their Needle program. They see Needle as a pragmatic choice: working
+directly with the free monadic terms over finitary containers would be too cumbersome. In
 our experience solving the POPLMark Reloaded challenge, Agda's pattern
-synonyms~\cite{Pickering:patsyn} makes working with an encoded definition almost
+synonyms~\cite{Pickering:patsyn} make working with an encoded definition almost
 seamless.
 
 The GMeta generic framework~\citeyear{gmeta} provides a universe of syntaxes
 and offers various binding conventions (locally nameless~\cite{Chargueraud2012}
-or de Bruijn indices). It also generically implements common traversals (computing
-the sets of free / bound variables, measuring the size of a term, shifting
+or de Bruijn indices). It also generically implements common traversals (e.g. computing
+the sets of free variables,
+% measuring the size of a term,
+shifting
 de Bruijn indices or substituting terms for parameters) as well as common
 predicates (e.g. being a closed term) and provides generic lemmas proving that
-all of these are well behaved. It does not however offer a generic framework
-for defining new well scoped-and-typed semantics and proving that they are
-well behaved.
+they are well behaved. It does not offer a generic framework
+for defining new well scoped-and-typed semantics and proving their properties.
 
 Érdi~\citeyear{gergodraft} defines a universe inspired by a first draft of this
-paper and gives three different interpretations corresponding to raw, scoped
-and typed syntax which are related via erasure. He provides scope-and-type
+paper and gives three different interpretations (raw, scoped and typed syntax)
+related via erasure. He provides scope-and-type
 preserving renaming and substitution as well as various generic proofs that
 they are well behaved but offers neither a generic notion of semantics, nor
 generic proof frameworks.
 
-Copello~\citeyear{copello2017} sets out to work with \emph{named} binders and
-defines nominal techniques (such as name swapping) and ultimately $\alpha$-equivalence
-over a generic universe of regular trees with binders inspired by Morris'~\citeyear{morris-regulartt}.
+Copello~\citeyear{copello2017} works with \emph{named} binders and
+defines nominal techniques (e.g. name swapping) and ultimately $\alpha$-equivalence
+over a universe of regular trees with binders inspired by Morris'~\citeyear{morris-regulartt}.
 
 
 
@@ -1699,9 +1703,9 @@ over a generic universe of regular trees with binders inspired by Morris'~\citey
 Recalling Allais, Chapman, McBride and McKinna's earlier work~\citeyear{allais2017type}
 we have started from an example
 of a scope-and-type safe language (the simply typed $\lambda$-calculus), have studied
-various common scope-and-type preserving traversals and noticed their similarity.
+common invariant preserving traversals and noticed their similarity.
 After introducing a notion of semantics and refactoring these traversals as
-various instances of the same fundamental lemma, we have observed the tight
+instances of the same fundamental lemma, we have observed the tight
 connection between the abstract definition of semantics and the shape of the
 language.
 
@@ -1728,36 +1732,37 @@ argument. This also gave us the opportunity to try our framework on larger
 languages by tackling the challenge's extensions to sum types and G\"{o}del's
 System T.
 
-Finally, we have demonstrated that this formalisation effort can be re-used
+Finally, we have demonstrated that this formalisation can be re-used
 in other domains by seeing our syntaxes with binding as potentially cyclic
-terms, defining their unfolding as a non-standard semantics and providing the
+terms. Their unfolding is a non-standard semantics and we provide the
 user with a generic notion of bisimilarity to reason about them.
 
-The diverse influences leading to this body of work suggest many opportunities
+% \subsection{Future work}
+
+The diverse influences leading to this work suggest many opportunities
 for future research.
-\begin{itemize}
-\item Our example of the elaboration of an enriched language to a core one, and ACMM's
+
+Our example of the elaboration of an enriched language to a core one, and ACMM's
 implementation of a Continuation Passing Style conversion function raises the question
 of how many such common compilation passes can be implemented generically.
 
-\item An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
+An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
 could provide an appropriate framework to highlight the connection between various
 languages, some being seen as refinements of others. This is particularly
-evident when considering the informative typechecker (see the paper's accompanying
+evident when considering the informative typechecker (see the accompanying
 code) which given a scoped term produces a scoped-and-typed term by
 type-checking or type-inference.
 
-\item Our work on the POPLMark Reloaded challenge highlights a need for generic
+Our work on the POPLMark Reloaded challenge highlights a need for generic
 notions of congruence closure which would come with guarantees (if the original
 relation is stable under renaming and substitution so should the closure).
 Similarly, the ``evaluation contexts'' corresponding to a syntax could be
 derived automatically by building on the work of Huet~\citeyear{huet_1997}
 and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}.
 
-\item Finally, now knowing how to generically describe syntaxes and their
+Finally, now knowing how to generically describe syntaxes and their
 well behaved semantics, we can start asking what it means to define
 well behaved judgments. Why stop at helping the user write their specific
 language's meta-theory when we could study meta-meta-theory?
-\end{itemize}
 
 \newpage
