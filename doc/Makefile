@@ -74,6 +74,8 @@ latex/syntax.tex: syntax.tex rules.sed
 latex/%.tex: latex-agda-output/%.tex rules.sed
 	@mkdir -p $(dir $@)
 	${SED} -f rules.sed $< > $@
+	${SED} -f rules.sed -i $@
+	${SED} -f rules.sed -i $@
 
 latex-agda-output/%.tex: %.lagda
 	@mkdir -p $(dir $@)
