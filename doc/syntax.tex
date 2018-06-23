@@ -581,6 +581,18 @@ for all data types that can be described. These are exactly the features we desi
 for a universe of data types with binding, so in the next section we will see how
 to extend CDMM's approach to include binding.
 
+The functor underlying any well scoped and sorted syntax can be coded as some
+{\AD{Desc} (I \AR{$\times$} \AD{List} I) (I \AR{$\times$} \AD{List} I)}, with the
+free monad construction from CDMM uniformly adding the variable case. Whilst a
+good start, \AD{Desc} treats its index types as unstructured, so this construction
+is blind to what makes the {\AD{List} I} index a \emph{scope}. The resulting
+`bind' operator demands a function which maps variables in \emph{any} sort and
+scope to terms in the \emph{same} sort and scope. However, the behaviour we need
+is to preserve sort while mapping between specific source and target scopes which
+may differ. We need to account for the fact that scopes change only by extension,
+and hence that our specifically scoped operations can be pushed under binders by
+weakening.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% UNIVERSE OF SYNTAXES

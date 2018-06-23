@@ -270,6 +270,8 @@ Great.
 We will also discuss the possibility of a implementing our approach in a closed theory à la Chapman et al. (no, it gives the wrong free monad structure).
 Huh. It would be very interesting to see exactly why this is the case.
 
+AUTHORS> We have added a new paragraph at the ended of Section 4 discussing
+the issues with using CDMM's universe of data to model syntaxes with binding.
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
