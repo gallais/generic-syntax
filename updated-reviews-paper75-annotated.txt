@@ -108,10 +108,19 @@ aspects of the encoding. While the paper made good use of pattern
 synonyms to make the encodings of data more readable, systems like
 Agda are interactive. How are the proof goals printed? Do they resugar
 into pattern synonyms, or must the proof developer run the encoding
-backwards in her or his head? Also, does the technique scale to
+backwards in her or his head?
+
+AUTHORS> We have mentioned the fact that patterns are resugared in
+goals.
+
+Also, does the technique scale to
 slightly larger languages with more constructors, or does the encoding
 provide sufficient overhead that it becomes a performance problem for
 the proof checker?
+
+AUTHORS> We have mentioned the extensions to the POPLMark Reloaded challenge
+to STLC + Sum, and Godel's System T (8 constructors). We didn't notice
+any difference in the way Agda behaves.
 
 The related work section should probably explore the relationship
 between this encoding and Fiore et al's work on inductive structures
@@ -119,6 +128,9 @@ with binding (see e.g. "Abstract Syntax and Variable Binding by Fiore,
 Plotkin, and Turi), as well as to Pitts' nominal logic. It seems that
 there is a close connection between the free monad structure used to
 tie the knot and these approaches.
+
+AUTHORS> Added discussion of Fiore et al. & Pitts et al. in the
+related work section
 
 Because this work relies so heavily on Chapman et al's universe of
 descriptions, it would have been useful to hear how the technique
@@ -548,4 +560,3 @@ We address the major points raised by the reviews below.
     principles in the earlier examples can be used to define
     operations on the finite representations of the infinite
     structures.
-
