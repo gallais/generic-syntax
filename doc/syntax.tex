@@ -238,7 +238,7 @@ de Bruijn~\citeyear{de1972lambda}
 indices. Its \AIC{z} (for zero) constructor refers to
 the nearest binder in a non-empty scope. The \AIC{s} (for successor) constructor lifts a
 a variable in a given scope to the extended scope where
-an extra variable has been bound. Both of the constructors types have been written using the combinators defined above.
+an extra variable has been bound. Both of the constructors' types have been written using the combinators defined above.
 They respectively normalise to:
 \begin{center}
   \AIC{z} : {\AS{∀} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{i} \AIC{:\!:} \AB{xs})}
@@ -1695,7 +1695,9 @@ by a single pass of a third one.
 We have put all of these results in practice by using them to solve the (to be
 published) POPLMark Reloaded challenge which consists in formalising strong
 normalisation for the simply typed $\lambda$-caluclus via a logical-relation
-argument.
+argument. This also gave us the opportunity to try our framework on larger
+languages by tackling the challenge's extensions to sum types and G\"{o}del's
+System T.
 
 Finally, we have demonstrated that this formalisation effort can be re-used
 in other domains by seeing our syntaxes with binding as potentially cyclic
