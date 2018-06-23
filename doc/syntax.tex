@@ -1575,7 +1575,14 @@ hypothesis.
 \subsection{Variable Binding} The representation of variable binding
 in formal systems has been a hot topic for decades. Part of the purpose
 of the first POPLMark challenge~\citeyear{poplmark} was to explore and
-compare various methods. Our generic universe of syntax is based on
+compare various methods.
+
+Having based our work on a de Bruijn encoding of variables, and thus a
+canonical treatment of \(\alpha\)-equivalence classes, our work has no
+direct comparison with permutation-based treatments such as those of
+Pitts' and Gabbay's nominal syntax~\cite{gabbay:newaas-jv}.
+
+Our generic universe of syntax is based on
 scope-and-typed de Bruijn indices~\cite{de1972lambda} but it is not
 a necessity. It is for instance possible to give an interpretation
 of \AD{Desc}ripton corresponding to Chlipala's Parametric Higher-Order
@@ -1599,6 +1606,28 @@ of cyclic structures which preserves sharing: pointers can not only refer
 to nodes above them but also across from them in the cyclic tree. Capturing
 this class of inductive types as a set of syntaxes with binding and writing
 generic programs over them is still an open problem.
+
+\subsection{Semantics of Syntaxes with Binding} An early foundational study
+of a general \emph{semantic} framework for signatures with binding, algebras
+for such signatures, and initiality of the term algebra, giving rise to a
+categorical `program' for substitution and proofs of its properties, was given
+by Fiore, Plotkin and Turi~\cite{FiorePlotkinTuri99}, working in the category of presheaves
+over renamings, (a skeleton of) the category of finite sets. The presheaf
+condition corresponds to our notion of being \AF{Thinnable}. Exhibiting
+algebras based on both de Bruijn \emph{level} and \emph{index} encodings,
+their approach isolates the usual (abstract) arithmetic required of such encodings.
+
+By contrast, working in an \emph{implemented} type theory, where the encoding
+can be understood as its own foundation, without appeal to an external mathematical
+semantics, we are able to go further in developing machine-checked such
+implementations and proofs, themselves generic with respect to an abstract syntax
+\AD{Desc} of syntaxes-with-binding. Moreover, the usual source of implementation
+anxiety, namely concrete arithmetic on de Bruijn indices, has been successfully
+encapsulated via the \AF{□} coalgebra structure. It is perhaps noteworthy that
+our type-theoretic constructions, by contrast with their categorical ones,
+appear to make fewer commitments as to functoriality, thinnability, etc. in our
+specification of semantics, with such properties typically being \emph{provable}
+as a further instance of our framework.
 
 \subsection{Meta-Theory Automation via Tactics and Code Generation} The
 tediousness of repeatedly
