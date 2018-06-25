@@ -1417,18 +1417,18 @@ fundamental lemma associated to such a set of constraints will state that
 running \AB{$\mathcal{S}_2$} after \AB{$\mathcal{S}_1$} is equivalent to running \AB{$\mathcal{S}_3$} only.
 
 The definition of fusion is parametrised by three relations: \AB{𝓡\textsuperscript{E}} relates
-triples of environments of values in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_1} \AB{$\Delta$}},
-{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥_2} \AB{$\Theta$}} and {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_3} \AB{$\Theta$}}
-respectively; \AB{$\mathcal{R}^{\mathcal{V}}$} relates pairs of values\AB{𝓥_2} and \AB{𝓥_3};
+triples of environments of values in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_1$} \AB{$\Delta$}},
+{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥$_2$} \AB{$\Theta$}} and {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_3$} \AB{$\Theta$}}
+respectively; \AB{$\mathcal{R}^{\mathcal{V}}$} relates pairs of values \AB{𝓥$_2$} and \AB{𝓥$_3$};
 and \AB{$\mathcal{R}^{\mathcal{C}}$}, our notion of equivalence for evaluation results, relates pairs
-of computation in \AB{𝓒_2} and \AB{𝓒_3}.
+of computation in \AB{𝓒$_2$} and \AB{𝓒$_3$}.
 
 % \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
 
 The first obstacle we face is the formal definition of ``running \AB{$\mathcal{S}_2$}
 after \AB{$\mathcal{S}_1$}'': for this statement to make sense, the result of running
 \AB{$\mathcal{S}_1$} ought to be a term. Or rather, we ought to be able to extract a
-term from a \AB{𝓒_1}. Hence the first constraint: the existence of a \ARF{quote\textsubscript{1}}
+term from a \AB{𝓒$_1$}. Hence the first constraint: the existence of a \ARF{quote\textsubscript{1}}
 function, which we supply as a field of the record \AR{Fusion}. When dealing with syntactic semantics such as renaming or substitution
 this function will be the identity. However nothing prevents to try to prove for
 instance that normalisation by evaluation is idempotent in which case a bona fide
@@ -1444,8 +1444,8 @@ to get a \AF{Scope} back. Hence the second constraint.
 \ExecuteMetaData[Generic/Fusion.tex]{fusionvarlike}
 
 Still thinking about going under binders: if three evaluation environments
-\AB{$\rho_1$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_1} \AB{$\Delta$}}, \AB{$\rho_2$} in
-{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥_2} \AB{$\Theta$}}, and \AB{$\rho_3$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥_3} \AB{$\Theta$}}
+\AB{$\rho_1$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_1$} \AB{$\Delta$}}, \AB{$\rho_2$} in
+{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥$_2$} \AB{$\Theta$}}, and \AB{$\rho_3$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_3$} \AB{$\Theta$}}
 are related by \AB{𝓡\textsuperscript{E}} and we are given a thinning \AB{$\sigma$} from \AB{$\Theta$} to \AB{$\Omega$}
 then \AB{$\rho_1$}, the thinned \AB{$\rho_2$} and the thinned \AB{$\rho_3$} should still be related.
 
@@ -1475,8 +1475,8 @@ computation. Hence the constraint \ARF{var\textsuperscript{R}}:
 The case of the algebra follows a similar idea albeit being more complex:
 a term gets evaluated using \AB{$\mathcal{S}_1$} and to be able to run \AB{$\mathcal{S}_2$}
 afterwards we need to recover a piece of syntax. This is possible if the
-\AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥_1} arguments
-(which can be manufactured thanks to the \ARF{vl\textsuperscript{𝓥_1}} we mentioned before) and
+\AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥$_1$} arguments
+(which can be manufactured thanks to the \ARF{vl\textsuperscript{𝓥$_1$}} we mentioned before) and
 then quoted. Provided that the result of running \AB{$\mathcal{S}_2$} on that term is
 related via {\AF{Zip} \AB{d} (\AF{Kripke\textsuperscript{R}} \AB{$\mathcal{R}^{\mathcal{V}}$} \AB{$\mathcal{R}^{\mathcal{C}}$}} to the result
 of running \AB{$\mathcal{S}_3$} on the original term, the \ARF{alg\textsuperscript{R}} constraint states
@@ -1758,7 +1758,9 @@ notions of congruence closure which would come with guarantees (if the original
 relation is stable under renaming and substitution so should the closure).
 Similarly, the ``evaluation contexts'' corresponding to a syntax could be
 derived automatically by building on the work of Huet~\citeyear{huet_1997}
-and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}.
+and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}, 
+allowing us to revisit previous work based on concrete instances of
+ACMM such as McLaughlin, McKinna and Stark~\citeyear{craig2018triangle}.
 
 Finally, now knowing how to generically describe syntaxes and their
 well behaved semantics, we can start asking what it means to define
