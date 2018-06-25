@@ -30,8 +30,8 @@ Mandatory Revisions
 AUTHORS> We have now rewritten and extend the introduction to describe
 the problem we are solving, and motivate our approach by describing a
 simple formalisation problem that requires a large volume of generic
-traversals and proofs, which our approach obivates. This is on pages 1
-and 2 in a self contained introduction.
+traversals and proofs, which our approach obviates. This is on pages 1
+and 2 in a self-contained introduction.
 
  * Implement the further details suggested in your author's response, such as including the implicit module information, discussing the interactive use of the system, and so forth.
 
@@ -234,6 +234,8 @@ The names with the circular and semicircular arrows seem overly clever
 on page 19. If you're going to use these, please at least tell the
 reader how to pronounce them.
 
+AUTHORS> Fixed. "0-1-cycle" and "backpointer" respectively. 
+
 On page 20, the sentence "In the section we are however interested in
 more advance use-cases." seems ungrammatical.
 
@@ -372,6 +374,8 @@ AUTHORS> Fixed.
   on pattern synonyms in Haskell. Pattern synonyms in Agda are, as I understand it, merely
   defined by macro-substitution. I'm thus not sure if this citation is appropriate here.
 
+AUTHORS> Fixed, in favour of merely mentioning "Agda's pattern synonyms"
+
 * The appearance of ∞ in types surprised me, having not worked with Agda's `Size`. It might
   be worth a brief explanation.
 
@@ -391,7 +395,7 @@ L274: functionn --> function
 L274: Remind me that `s` is defined in Fig. 3.
 
 Fig. 12: Shouldn't `extend` be `(pack s)`?
-AUTHORS> No, and the code typechecks correctly (!)
+AUTHORS> (Now Fig. 9) No, and the code typechecks correctly (!) as as instance of the general case of sem. In the Printing instance 'extend' uses the trivial Thinnable structure on Wrap. 
 
 L337: give rise right nested --> give rise to right-nested
 
