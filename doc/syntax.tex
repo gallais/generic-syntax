@@ -23,8 +23,8 @@ lemmas about those functions. To reduce the burden of such repeated
 work and boilerplate, we apply the methodology of datatype-genericity to
 programming and proving with syntaxes with binding.
 
-To motivate our approach, let us look at the formalisation of an
-apparently straightforward program transformation: the inling of
+To motivate our approach, let us look at the formalisation of an 
+apparently straightforward program transformation: the inlining of
 let-bound variables by substitution. You have two languages: the source
 (\AD{S}), which has let-bindings, and the target (\AD{T}), which only
 differs in that it does not:
@@ -142,7 +142,7 @@ as Altenkirch and Reus have shown. The functorial action corresponds
 to renaming, the monadic `return' corresponds to the use of variables,
 and the monadic `join' corresponds to substitution. The functor and
 monad laws correspond to well known properties from the equational
-theories of renaming and subsitution. We will revisit these properties
+theories of renaming and substitution. We will revisit these properties
 below in Section~\ref{section:fusion}.
 
 \subsection{A Mechanized Typed Variant of Altenkirch and Reus' Calculus}\label{section:mech-reus}
@@ -338,7 +338,7 @@ from the current scope, akin to an S4-style necessity modality. The axioms of S4
 modal logic incite us to observe that the functor \AF{□} is a comonad: \AF{extract}
 applies the identity \AF{Thinning} to its argument, and \AF{duplicate} is obtained
 by composing the two \AF{Thinning}s we are given. The expected laws hold trivially
-thanks to Jeffrey's trick mentionned above.
+thanks to Jeffrey's trick mentioned above.
 
 The notion of \AF{Thinnable} is the property of being stable under thinnings;
 in other words \AF{Thinnable}s are the coalgebras of \AF{□}.
@@ -552,7 +552,7 @@ programming over all the functors one can obtain as the meaning of a description
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Data.tex]{fmap}
-\caption{Action on Morphisms of the Functor corresponding to a \AF{Descr}iption}
+\caption{Action on Morphisms of the Functor corresponding to a \AF{Desc}ription}
 \end{figure}
 
 All the functors obtained as meanings of \AD{Desc}riptions are strictly
@@ -601,7 +601,7 @@ weakening.
 
 Our universe of scope safe and well kinded syntaxes follows the same principle
 as CDMM's universe of datatypes, except that we are not building endofunctors on
-\AS{Set} anymore but rather on {\AB{I} \AF{─Scoped}}. We now think of the index
+\AS{Set} any more but rather on {\AB{I} \AF{─Scoped}}. We now think of the index
 type \AB{I} as the sorts
 used to distinguish terms in our embedded language. The \AIC{`$\sigma$} and
 \AIC{`∎} constructors are as in the CDMM \AD{Desc} type, and are used to
@@ -978,7 +978,7 @@ In a dependently typed language, a type may depend on a value which
 in the presence of let bindings may be a variable standing for an
 expression. The user naturally does not want it to make any difference
 whether they used a variable referring to a let-bound expression or
-the expression itself. Various typechecking strategies can accomodate
+the expression itself. Various typechecking strategies can accommodate
 this expectation: in Coq~\cite{Coq:manual} let bindings are primitive
 constructs of the language and have their own typing and reduction
 rules whereas in Agda they are elaborated away to the core language
@@ -1120,7 +1120,7 @@ into \AIC{Check}ables.
 \end{figure}
 
 The values stored in the environment will be \AD{Type} information for bound
-variables no matter what their \AD{Mode} is. In constrast, the generated
+variables no matter what their \AD{Mode} is. In contrast, the generated
 computations will, depending on the mode, either take a type candidate and
 \AIC{Check} it is valid or \AIC{Infer} a type for their argument. These
 computations are always potentially failing so we use the \AD{Maybe} monad.
@@ -1397,7 +1397,7 @@ environment corresponding to the evaluated substitution.
 
 A direct application of these results is our (to be published) entry to the
 POPLMark Reloaded challenge~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
-representation of intrisincally well typed and well scoped terms we directly inherit
+representation of intrinsically well typed and well scoped terms we directly inherit
 not only renaming and substitution but also all four fusion lemmas as corollaries
 of our generic results. This allows us to remove the usual boilerplate
 and go straight to the point.
@@ -1480,7 +1480,7 @@ afterwards we need to recover a piece of syntax. This is possible if the
 then quoted. Provided that the result of running \AB{$\mathcal{S}_2$} on that term is
 related via {\AF{Zip} \AB{d} (\AF{Kripke\textsuperscript{R}} \AB{$\mathcal{R}^{\mathcal{V}}$} \AB{$\mathcal{R}^{\mathcal{C}}$}} to the result
 of running \AB{$\mathcal{S}_3$} on the original term, the \ARF{alg\textsuperscript{R}} constraint states
-that the two evalutions yield related computations.
+that the two evaluations yield related computations.
 
 \ExecuteMetaData[Generic/Fusion.tex]{fusionalg}
 
