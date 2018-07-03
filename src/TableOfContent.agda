@@ -67,6 +67,7 @@ import Generic.Syntax
 
 --------------------------------------------------------------------------------
 -- 6. Generic Scope Safe Well Sorted Programs for Syntaxes
+--------------------------------------------------------------------------------
 
 -- The generic notion of a Semantics together with its fundamental lemma are in
 import Generic.Semantics
@@ -118,7 +119,6 @@ import Generic.Examples.Colist
 -- The generic notion of a potentially infinite tree and the unrolling function are
 -- defined in
 import Generic.Cofinite
-
 
 --------------------------------------------------------------------------------
 -- 8. Building Generic Proofs about Generic Programs
