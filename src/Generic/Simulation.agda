@@ -39,32 +39,3 @@ module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I → List I → Set} (�
 
    body ρ []       i t = sim ρ t
    body ρ (σ ∷ Δ)  i t = λ σ ρ′ → sim (ρ′ >>^R (th^R σ <$>^R ρ)) t
-
-module _ {I : Set} {d : Desc I} where
-
- RenExt : Sim Eq^R Eq^R d Renaming Renaming
- Sim.th^R   RenExt = λ ρ → cong (lookup ρ)
- Sim.var^R  RenExt = cong `var
- Sim.alg^R  RenExt = λ _ _ →
-   cong `con ∘ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Var)) d
-
- SubExt : Sim Eq^R Eq^R d Substitution Substitution
- Sim.th^R   SubExt = λ ρ → cong (ren ρ)
- Sim.var^R  SubExt = id
- Sim.alg^R  SubExt = λ _ _ →
-   cong `con ∘ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) d
-
-module _ {I : Set} {d : Desc I} where
-
- vl^VarTm : VarLike^R VarTm^R vl^Var (vl^Tm {d = d})
- VarLike^R.new^R  vl^VarTm = refl
- VarLike^R.th^R   vl^VarTm = λ σ → cong (ren σ)
-
- RenSub : Sim VarTm^R Eq^R d Renaming Substitution
- Sim.var^R  RenSub = id
- Sim.th^R   RenSub = λ { _ refl → refl }
- Sim.alg^R  RenSub = λ _ _ →
-   cong `con ∘ zip^reify (mkRel (_≡_ ∘ `var)) (reify^R VarTm^R Eq^R vl^VarTm) d
-
- rensub :  {Γ Δ : List I} (ρ : Thinning Γ Δ) {i : I} (t : Tm d ∞ i Γ) → ren ρ t ≡ sub (`var <$> ρ) t
- rensub ρ = Sim.sim RenSub (pack^R (λ _ → refl))
