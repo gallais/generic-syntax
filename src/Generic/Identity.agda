@@ -55,14 +55,12 @@ module RenId {I : Set} {d : Desc I} where
   lookup^R eq^R k with split Δ k | inspect (split Δ) k
   ... | inj₁ k₁ | PEq.[ eq ] = begin
     injectˡ Γ (lookup (base vl^Var) k₁) ≡⟨ cong (injectˡ Γ) (lookup-base^Var k₁) ⟩
-    injectˡ Γ k₁                        ≡⟨ injectˡ-split Δ k eq ⟩
-    k                                   ≡⟨ sym (lookup-base^Var k) ⟩
+    injectˡ Γ k₁                        ≡⟨ sym (lookup-base^Var k) ⟩
     lookup (base vl^Var) k              ∎
   ... | inj₂ k₂ | PEq.[ eq ] = begin
     injectʳ Δ (lookup (base vl^Var) (lookup ρ k₂)) ≡⟨ cong (injectʳ Δ) (lookup-base^Var _) ⟩
     injectʳ Δ (lookup ρ k₂)                        ≡⟨ cong (injectʳ Δ) (lookup^R ρ^R k₂) ⟩
     injectʳ Δ (lookup (base vl^Var) k₂)            ≡⟨ cong (injectʳ Δ) (lookup-base^Var k₂) ⟩
-    injectʳ Δ k₂                                   ≡⟨ injectʳ-split Δ k eq ⟩
     k                                              ≡⟨ sym (lookup-base^Var k) ⟩
     lookup (base vl^Var) k                         ∎
 
@@ -71,8 +69,36 @@ module _ {I : Set} {d : Desc I} where
   ren-id : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → ren (base vl^Var) t ≡ t
   ren-id t = ≅⇒≡ (RenId.ren-id t (pack^R λ _ → refl))
 
+  ren-id′ : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → ren (pack id) t ≡ t
+  ren-id′ t = ≅⇒≡ (RenId.ren-id t (pack^R λ v → sym (lookup-base^Var v)))
+
   sub-id : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → sub (base vl^Tm) t ≡ t
   sub-id t = begin
     sub (base vl^Tm) t  ≡⟨ sym $ Sim.sim RenSub base^VarTm^R t ⟩
     ren (base vl^Var) t ≡⟨ ren-id t ⟩
     t                   ∎
+
+  sub-id′ : ∀ {σ Γ} (t : Tm d ∞ σ Γ) → sub (pack `var) t ≡ t
+  sub-id′ t = begin
+    sub (pack `var) t ≡⟨ sym $ Sim.sim RenSub (pack^R λ v → refl) t ⟩
+    ren (pack id)   t ≡⟨ ren-id′ t ⟩
+    t                 ∎
+
+  lift[]^Tm : ∀ {Γ Δ} (ρ : (Γ ─Env) (Tm d ∞) Δ) → ∀[ Eq^R ] ρ (lift vl^Tm [] ρ)
+  lookup^R (lift[]^Tm ρ) k = sym (ren-id (lookup ρ k))
+
+
+  th^base₁^Var : ∀ {Γ Δ} (ρ : Thinning {I} Γ Δ) → ∀[ Eq^R ] (th^Env th^Var (base vl^Var) ρ) ρ
+  lookup^R (th^base₁^Var ρ) k = cong (lookup ρ) (lookup-base^Var k)
+
+  th^base₂^Var : ∀ {Γ Δ} (ρ : Thinning {I} Γ Δ) → ∀[ Eq^R ] (th^Env th^Var ρ (base vl^Var)) ρ
+  lookup^R (th^base₂^Var ρ) k = `var-inj (ren-id (`var (lookup ρ k)))
+
+  th^base^Tm : ∀ {Γ Δ} (ρ : (Γ ─Env) (Tm d ∞) Δ) → ∀[ Eq^R ] (th^Env th^Tm ρ (base vl^Var)) ρ
+  lookup^R (th^base^Tm ρ) k = ren-id (lookup ρ k)
+
+  th^base^s∙z : ∀ {σ Γ} → ∀[ Eq^R ] (th^Env th^Tm (base vl^Tm) (pack s) ∙ `var z)
+                                    ((σ ∷ Γ ─Env) (Tm d ∞) (σ ∷ Γ) ∋ pack `var)
+  lookup^R th^base^s∙z z     = refl
+  lookup^R th^base^s∙z (s k) = cong (ren (pack s)) (lookup-base^Tm k)
+

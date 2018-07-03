@@ -32,6 +32,7 @@ module _ {I : Set} {T U : I ─Scoped}
 module _ {I : Set} {T U : I ─Scoped}
          {𝓡 : Rel T U} {Γ Δ : List I} where
 
+ infixl 20 _∙^R_
  _∙^R_ :  {ρ₁ : (Γ ─Env) T Δ} {ρ₂ : (Γ ─Env) U Δ} → ∀[ 𝓡 ] ρ₁ ρ₂ →
           {i : I} {v₁ : T i Δ} {v₂ : U i Δ} → rel 𝓡 v₁ v₂ →
           ∀[ 𝓡 ] (ρ₁ ∙ v₁) (ρ₂ ∙ v₂)
@@ -52,14 +53,19 @@ module _ {I : Set} {T U : I ─Scoped}
            ∀[ 𝓡 ] ρ₁ ρ₂ → ∀[ 𝓡 ] (f <$> ρ₁) (g <$> ρ₂)
  lookup^R (F <$>^R ρ) k = F (lookup^R ρ k)
 
-module _ {I : Set} where
+module _ {I : Set} {A : I ─Scoped} where
 
- Eq^R : {A : I ─Scoped} → Rel A A
+ Eq^R : Rel A A
  rel Eq^R = _≡_
+
+ refl^R : ∀ {Γ Δ} {ρ : (Γ ─Env) A Δ} → ∀[ Eq^R ] ρ ρ
+ lookup^R refl^R k = refl
+
+module _ {I : Set} {A B : I ─Scoped} where
 
  open import Relation.Binary.HeterogeneousEquality.Core
 
- HEq^R : {A B : I ─Scoped} → Rel A B
+ HEq^R : Rel A B
  rel HEq^R = λ a b → a ≅ b
 
 module _ {I : Set} {d : Desc I} where
