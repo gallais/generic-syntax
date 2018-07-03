@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>TableOfContent</title><link rel="stylesheet" href="Agda.css"></head><body><pre><a id="1" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="82" class="Comment">-- This module precisely maps sections in the paper to Agda modules</a>
+<a id="150" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="232" class="Keyword">module</a> <a id="239" href="TableOfContent.html" class="Module">TableOfContent</a> <a id="254" class="Keyword">where</a>
+
+<a id="261" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="342" class="Comment">-- 1. Introduction</a>
+<a id="361" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="443" class="Comment">-- The motivating problem for the paper is solved twice:</a>
+<a id="500" class="Comment">-- * Once by writing a lot of boilerplate</a>
+<a id="542" class="Comment">-- * Once by using the library, thus skipping directly to the interesting parts</a>
+
+<a id="623" class="Keyword">import</a> <a id="630" href="Motivation.Problem.Na%25C3%25AFve.html" class="Module">Motivation.Problem.Naïve</a>
+<a id="655" class="Keyword">import</a> <a id="662" href="Motivation.Problem.WithLibrary.html" class="Module">Motivation.Problem.WithLibrary</a>
+
+<a id="694" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="775" class="Comment">-- 2. A Primer on Scope and Sort Safe Terms</a>
+<a id="819" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="901" class="Comment">-- The combinators to build indexed types are introduced in</a>
+<a id="961" class="Keyword">import</a> <a id="968" href="indexed.html" class="Module">indexed</a>
+
+<a id="977" class="Comment">-- The generic notion of well scoped-and-sorted variable is defined in</a>
+<a id="1048" class="Keyword">import</a> <a id="1055" href="var.html" class="Module">var</a>
+
+<a id="1060" class="Comment">-- The well scoped-and-typed STLC is defined in</a>
+<a id="1108" class="Keyword">import</a> <a id="1115" href="StateOfTheArt.ACMM.html" class="Module">StateOfTheArt.ACMM</a>
+
+<a id="1135" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="1216" class="Comment">-- 3. A Primer on Type and Scope Safe Programs</a>
+<a id="1263" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="1345" class="Comment">-- The similar-looking type-and-scope safe traversals (renaming, substitution,</a>
+<a id="1424" class="Comment">-- but also normalization by evaluation) are also defined in</a>
+<a id="1485" class="Keyword">import</a> <a id="1492" href="StateOfTheArt.ACMM.html" class="Module">StateOfTheArt.ACMM</a>
+
+<a id="1512" class="Comment">-- Environments and Thinnings are available in</a>
+<a id="1559" class="Keyword">import</a> <a id="1566" href="environment.html" class="Module">environment</a>
+
+<a id="1579" class="Comment">-- The generic notion of Semantics and its fundamental lemma as well as the</a>
+<a id="1655" class="Comment">-- various instances (renaming, substitution, printing) are in</a>
+<a id="1718" class="Keyword">import</a> <a id="1725" href="StateOfTheArt.ACMM.html" class="Module">StateOfTheArt.ACMM</a>
+
+<a id="1745" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="1826" class="Comment">-- 4. A Primer on the Universe of Data Types</a>
+<a id="1871" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="1953" class="Comment">-- The whole section refers to content in</a>
+<a id="1995" class="Keyword">import</a> <a id="2002" href="StateOfTheArt.CDMM.html" class="Module">StateOfTheArt.CDMM</a>
+
+<a id="2022" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="2103" class="Comment">-- 5. A Universe of Scope Safe and Well Sorted Syntaxes</a>
+<a id="2159" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="2241" class="Comment">-- The Universe, the meaning of its codes as relative functors and terms of a</a>
+<a id="2319" class="Comment">-- syntax with binding as free relative-monads over that functor are all in</a>
+<a id="2395" class="Keyword">import</a> <a id="2402" href="Generic.Syntax.html" class="Module">Generic.Syntax</a>
+
+<a id="2418" class="Comment">-- The examples of (Untyped/Simply-Typed) Lambda Calculus are in</a>
+<a id="2483" class="Keyword">import</a> <a id="2490" href="Generic.Syntax.UTLC.html" class="Module">Generic.Syntax.UTLC</a>
+<a id="2510" class="Keyword">import</a> <a id="2517" href="Generic.Syntax.STLC.html" class="Module">Generic.Syntax.STLC</a>
+
+<a id="2538" class="Comment">-- The common combinators (and their properties) are all in</a>
+<a id="2598" class="Keyword">import</a> <a id="2605" href="Generic.Syntax.html" class="Module">Generic.Syntax</a>
+
+<a id="2621" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="2702" class="Comment">-- 6. Generic Scope Safe Well Sorted Programs for Syntaxes</a>
+<a id="2761" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="2843" class="Comment">-- The generic notion of a Semantics together with its fundamental lemma are in</a>
+<a id="2923" class="Keyword">import</a> <a id="2930" href="Generic.Semantics.html" class="Module">Generic.Semantics</a>
+
+<a id="2949" class="Comment">-- The Kripke function space is defined in</a>
+<a id="2992" class="Keyword">import</a> <a id="2999" href="environment.html" class="Module">environment</a> <a id="3011" class="Keyword">using</a> <a id="3017" class="Symbol">(</a><a id="3018" href="environment.html#3741" class="Function">Kripke</a><a id="3024" class="Symbol">)</a>
+
+<a id="3027" class="Comment">-- The generic definition of Renaming and Substitution as instances of Sem can</a>
+<a id="3106" class="Comment">-- be found in</a>
+<a id="3121" class="Keyword">import</a> <a id="3128" href="Generic.Semantics.Syntactic.html" class="Module">Generic.Semantics.Syntactic</a>
+
+<a id="3157" class="Comment">-- For the reification of the Kripke Spaces back to Scopes they rely on</a>
+<a id="3229" class="Keyword">import</a> <a id="3236" href="varlike.html" class="Module">varlike</a>
+
+<a id="3245" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="3326" class="Comment">-- 7. A Catalogue of Generic Programs for Syntax with Binding</a>
+<a id="3388" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="3470" class="Comment">-- 7.1 Sugar and Desugaring as a Semantics</a>
+
+<a id="3514" class="Comment">-- Single let binders are defined as a description in</a>
+<a id="3568" class="Keyword">import</a> <a id="3575" href="Generic.Syntax.LetBinder.html" class="Module">Generic.Syntax.LetBinder</a>
+
+<a id="3601" class="Comment">-- The elaboration semantics inlining let binders is in</a>
+<a id="3657" class="Keyword">import</a> <a id="3664" href="Generic.Semantics.Elaboration.LetBinder.html" class="Module">Generic.Semantics.Elaboration.LetBinder</a>
+
+<a id="3705" class="Comment">-- 7.2 (Unsafe) Normalization by Evaluation</a>
+
+<a id="3750" class="Comment">-- The non-strictly positive domain, reification and normalization functions are</a>
+<a id="3831" class="Comment">-- all in:</a>
+<a id="3842" class="Keyword">import</a> <a id="3849" href="Generic.Semantics.NbyE.html" class="Module">Generic.Semantics.NbyE</a>
+
+<a id="3873" class="Comment">-- The application to normalizing the Untyped Lambda Calculus is in</a>
+<a id="3941" class="Keyword">import</a> <a id="3948" href="Generic.Examples.NbyE.html" class="Module">Generic.Examples.NbyE</a>
+
+<a id="3971" class="Comment">-- 7.3 An Algebraic Approach to Typechecking</a>
+
+<a id="4017" class="Comment">-- The specific bidirectional language at hand is defined in</a>
+<a id="4078" class="Keyword">import</a> <a id="4085" href="Generic.Syntax.Bidirectional.html" class="Module">Generic.Syntax.Bidirectional</a>
+
+<a id="4115" class="Comment">-- The Typechecker itself is in</a>
+<a id="4147" class="Keyword">import</a> <a id="4154" href="Generic.Semantics.TypeChecking.html" class="Module">Generic.Semantics.TypeChecking</a>
+
+<a id="4186" class="Comment">-- 7.4 Binding as Self-Reference: Reprensenting Cyclic Structures</a>
+
+<a id="4253" class="Comment">-- The example of potentially cyclic lists is in</a>
+<a id="4302" class="Keyword">import</a> <a id="4309" href="Generic.Examples.Colist.html" class="Module">Generic.Examples.Colist</a>
+
+<a id="4334" class="Comment">-- The generic notion of a potentially infinite tree and the unrolling function are</a>
+<a id="4418" class="Comment">-- defined in</a>
+<a id="4432" class="Keyword">import</a> <a id="4439" href="Generic.Cofinite.html" class="Module">Generic.Cofinite</a>
+
+<a id="4457" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="4538" class="Comment">-- 8. Building Generic Proofs about Generic Programs</a>
+<a id="4591" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="4673" class="Comment">-- The Zip relation transformer is in:</a>
+<a id="4712" class="Keyword">import</a> <a id="4719" href="Generic.Zip.html" class="Module">Generic.Zip</a>
+
+<a id="4732" class="Comment">-- 8.1 Simulation Lemma</a>
+
+<a id="4757" class="Comment">-- The relational version of the Kripke function space is in</a>
+<a id="4818" class="Keyword">import</a> <a id="4825" href="varlike.html" class="Module">varlike</a> <a id="4833" class="Keyword">using</a> <a id="4839" class="Symbol">(</a><a id="4840" href="varlike.html#3548" class="Function">Kripke^R</a><a id="4848" class="Symbol">)</a>
+
+<a id="4851" class="Comment">-- The simulation framework and its fundamental lemma are in</a>
+<a id="4912" class="Keyword">import</a> <a id="4919" href="Generic.Simulation.html" class="Module">Generic.Simulation</a>
+
+<a id="4939" class="Comment">-- The proof that renaming and substitution are extensional, and that renaming</a>
+<a id="5018" class="Comment">-- is a form of substitution are in</a>
+<a id="5054" class="Keyword">import</a> <a id="5061" href="Generic.Simulation.Syntactic.html" class="Module">Generic.Simulation.Syntactic</a>
+
+<a id="5091" class="Comment">-- 8.2 Fusion Lemma</a>
+
+<a id="5112" class="Comment">-- The fusion constraints and the fundamental lemma of fusions are in</a>
+<a id="5182" class="Keyword">import</a> <a id="5189" href="Generic.Fusion.html" class="Module">Generic.Fusion</a>
+
+<a id="5205" class="Comment">-- The instances proving that substitution and renaming can be fused every which way</a>
+<a id="5290" class="Comment">-- are all in</a>
+<a id="5304" class="Keyword">import</a> <a id="5311" href="Generic.Fusion.Syntactic.html" class="Module">Generic.Fusion.Syntactic</a>
+
+<a id="5337" class="Comment">-- The compatibility of Renaming, Substitution, and Let-inlining is demonstrated in</a>
+<a id="5421" class="Keyword">import</a> <a id="5428" href="Generic.Fusion.Elaboration.LetBinder.html" class="Module">Generic.Fusion.Elaboration.LetBinder</a>
+
+<a id="5466" class="Comment">-- The replicated result of Kaiser, Schäfer, and Stark relying on the axiom</a>
+<a id="5542" class="Comment">-- of functional extensionality is in</a>
+<a id="5580" class="Keyword">import</a> <a id="5587" href="Generic.Fusion.Specialised.html" class="Module">Generic.Fusion.Specialised</a>
+
+<a id="5615" class="Comment">-- 8.3 Definition of Bisimilarity for co-finite objects</a>
+
+<a id="5672" class="Comment">-- The notion and its properties are established in</a>
+<a id="5724" class="Keyword">import</a> <a id="5731" href="Generic.Bisimilar.html" class="Module">Generic.Bisimilar</a>
+
+<a id="5750" class="Comment">-- The examples are in</a>
+<a id="5773" class="Keyword">import</a> <a id="5780" href="Generic.Examples.Colist.html" class="Module">Generic.Examples.Colist</a>
+</pre></body></html>
