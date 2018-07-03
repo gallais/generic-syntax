@@ -22,7 +22,7 @@ cache:
 install:
   - export PATH=$HOME/.cabal/bin:/opt/ghc/8.2.2/bin:/opt/cabal/2.0/bin:$PATH
   - cd travis/
-  - travis_wait ./install_agda.sh
+  - travis_wait 50 ./install_agda.sh
 
 script:
   - cd ../src/
