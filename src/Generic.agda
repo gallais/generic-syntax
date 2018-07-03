@@ -1,7 +1,11 @@
 module Generic where
 
-open import Motivation.Problem.Naïve
-open import Motivation.Problem.WithLibrary
+import Motivation.Problem.Naïve
+import Motivation.Problem.WithLibrary
+import Motivation.POPLMark2.STLC
+import Motivation.POPLMark2.Sums
+import Motivation.POPLMark2.GodelT
+
 
 -- Notations for indexed types
 import indexed
