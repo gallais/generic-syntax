@@ -16,20 +16,27 @@ open import Data.Product as Prod
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
+--------------------------------------------------------------------------------
+-- The universe of Descriptions of Base Functors Data Types
+
 data Desc (I J : Set) : Set₁ where
   `σ : (A : Set) → (A → Desc I J)  →  Desc I J
   `X : J → Desc I J                →  Desc I J
   `∎ : I                           →  Desc I J
 
 module _ {I J : Set} where
- infixr 5 _`+_
 
+-- handy shortcuts
  `K : Set → I → Desc I J
  `K A i = `σ A (λ _ → `∎ i)
 
+ infixr 5 _`+_
  _`+_ : Desc I J → Desc I J → Desc I J
  d `+ e = `σ Bool $ λ { true  → d ; false → e }
 
+-- Desc's interpretation as a positive functor:
+-- * Action on indexed Sets: ⟦_⟧
+-- * Action on morphisms: fmap
  ⟦_⟧ : Desc I J → (J → Set) → (I → Set)
  ⟦ `σ A d  ⟧ X i = Σ[ a ∈ A ] (⟦ d a ⟧ X i)
  ⟦ `X j d  ⟧ X i = X j × ⟦ d ⟧ X i
@@ -40,11 +47,21 @@ module _ {I J : Set} where
  fmap (`X j d)  f (r , v)  = (f r , fmap d f v)
  fmap (`∎ i)    f t        = t
 
+--------------------------------------------------------------------------------
+-- Taking the fixpoint of strictly positive endofunctors
+
 data μ {I : Set} (d : Desc I I) : Size → I → Set where
   `con : {i : I} {s : Size} → ⟦ d ⟧ (μ d s) i → μ d (↑ s) i
 
-fold : {I : Set} {X : I → Set} {s : Size} → (d : Desc I I) → [ ⟦ d ⟧ X ⟶ X ] → [ μ d s ⟶ X ]
-fold d alg (`con t) = alg (fmap d (fold d alg) t)
+fold : {I : Set} {X : I → Set} {s : Size} →
+       ∀ {d} → [ ⟦ d ⟧ X ⟶ X ] → [ μ d s ⟶ X ]
+fold alg (`con t) = alg (fmap _ (fold alg) t)
+
+
+--------------------------------------------------------------------------------
+-- Examples
+
+-- Fin (indexed)
 
 finD : Desc ℕ ℕ
 finD =  `σ ℕ $ λ index →
@@ -64,6 +81,8 @@ fz n = `con (n , true , refl)
 
 fs : ∀ n → fin n → fin (suc n)
 fs n k = `con (n , false , k , refl)
+
+-- List (not indexed)
 
 listD : Set → Desc ⊤ ⊤
 listD A =  `σ Bool $ λ isNil →
@@ -93,7 +112,7 @@ Vec : Set → ℕ → Set
 Vec A = μ (vecD A) ∞
 
 foldr : {A B : Set} → (A → B → B) → B → List A → B
-foldr {A} {B} c n = fold (listD A) alg where
+foldr {A} {B} c n = fold alg where
 
   alg : ⟦ listD A ⟧ (const B) tt → B
   alg (true             , refl)  = n

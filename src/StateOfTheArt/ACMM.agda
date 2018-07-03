@@ -15,8 +15,10 @@ open import Data.Nat.Base
 open import Data.List.Base hiding ([_] ; _++_ ; lookup)
 open import Function
 
-infixr 3 _⇒_
+--------------------------------------------------------------------------------
+-- Well scoped-and-typed Simply-Typed Lambda Calculus
 
+infixr 3 _⇒_
 data Type : Set where
   α    : Type
   _⇒_  : Type → Type → Type
@@ -26,70 +28,70 @@ data Lam : Type ─Scoped where
   A : {σ τ : Type} →  [ Lam (σ ⇒ τ) ⟶ Lam σ  ⟶ Lam τ        ]
   L : {σ τ : Type} →  [ (σ ∷_) ⊢ Lam τ       ⟶ Lam (σ ⇒ τ)  ]
 
+--------------------------------------------------------------------------------
+-- Observation: the code of the traversals implementing renaming, substitution,
+-- and normalization by evaluation looks the same!
 
-module _ where
 
- private
+-- Renaming
+⟦V⟧‿ren : ∀ {n} → [ Var n ⟶ Lam n ]
+⟦V⟧‿ren = V
 
-   ⟦V⟧‿ren : ∀ {n} → [ Var n ⟶ Lam n ]
-   ⟦V⟧‿ren = V
+extend‿ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
+extend‿ren ρ = s <$> ρ ∙ z
 
-   extend‿ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
-   extend‿ren ρ = s <$> ρ ∙ z
+ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
+ren ρ (V k)    = ⟦V⟧‿ren (lookup ρ k)
+ren ρ (A f t)  = A (ren ρ f) (ren ρ t)
+ren ρ (L b)    = L (ren (extend‿ren ρ) b)
 
- ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
- ren ρ (V k)    = ⟦V⟧‿ren (lookup ρ k)
- ren ρ (A f t)  = A (ren ρ f) (ren ρ t)
- ren ρ (L b)    = L (ren (extend‿ren ρ) b)
+-- Substitution
+extend‿sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
+extend‿sub ρ = ren E.extend <$> ρ ∙ V z
 
-module _ where
+⟦V⟧‿sub : ∀ {n} → [ Lam n ⟶ Lam n ]
+⟦V⟧‿sub x = x
 
- private
+sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
+sub ρ (V k)    = ⟦V⟧‿sub (lookup ρ k)
+sub ρ (A f t)  = A (sub ρ f) (sub ρ t)
+sub ρ (L b)    = L (sub (extend‿sub ρ) b)
 
-   extend‿sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
-   extend‿sub ρ = ren E.extend <$> ρ ∙ V z
 
-   ⟦V⟧‿sub : ∀ {n} → [ Lam n ⟶ Lam n ]
-   ⟦V⟧‿sub x = x
+Val : Type ─Scoped
+Val α       = Lam α
+Val (σ ⇒ τ) = □ (Val σ ⟶ Val τ)
 
- sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
- sub ρ (V k)    = ⟦V⟧‿sub (lookup ρ k)
- sub ρ (A f t)  = A (sub ρ f) (sub ρ t)
- sub ρ (L b)    = L (sub (extend‿sub ρ) b)
+th^Val : (σ : Type) → Thinnable (Val σ)
+th^Val α       = λ ρ t → ren t ρ
+th^Val (σ ⇒ τ) = th^□
 
-module _ where
+reify   : (σ : Type) → [ Val σ ⟶ Lam σ ]
+reflect : (σ : Type) → [ Lam σ ⟶ Val σ ]
 
- private
-   Val : Type ─Scoped
-   Val α       = Lam α
-   Val (σ ⇒ τ) = □ (Val σ ⟶ Val τ)
+reify   α = id
+reify   (σ ⇒ τ) = λ b → L (reify τ (b E.extend (reflect σ (V z))))
 
-   th^Val : (σ : Type) → Thinnable (Val σ)
-   th^Val α       = λ ρ t → ren t ρ
-   th^Val (σ ⇒ τ) = th^□
+reflect α = id
+reflect (σ ⇒ τ) = λ b ρ v → reflect τ (A (ren ρ b) (reify σ v))
 
-   reify   : (σ : Type) → [ Val σ ⟶ Lam σ ]
-   reflect : (σ : Type) → [ Lam σ ⟶ Val σ ]
+extend‿nbe : {Γ Δ Θ : List Type} {σ : Type} →
+         Thinning Δ Θ → (Γ ─Env) Val Δ → Val σ Θ → (σ ∷ Γ ─Env) Val Θ
+extend‿nbe r ρ v = (λ {σ} v → th^Val σ v r) <$> ρ ∙ v
 
-   reify   α = id
-   reify   (σ ⇒ τ) = λ b → L (reify τ (b E.extend (reflect σ (V z))))
+⟦V⟧‿nbe : ∀ {n Γ} → Var n Γ → [ Val n ⟶ Val n ]
+⟦V⟧‿nbe _ x = x
 
-   reflect α = id
-   reflect (σ ⇒ τ) = λ b ρ v → reflect τ (A (ren ρ b) (reify σ v))
+⟦A⟧‿nbe : ∀ {σ τ Γ} → Lam (σ ⇒ τ) Γ → [ Val (σ ⇒ τ) ⟶ Val σ ⟶ Val τ ]
+⟦A⟧‿nbe _ f t = extract f t
 
-   extend : {Γ Δ Θ : List Type} {σ : Type} → Thinning Δ Θ → (Γ ─Env) Val Δ → Val σ Θ → (σ ∷ Γ ─Env) Val Θ
-   extend r ρ v = (λ {σ} v → th^Val σ v r) <$> ρ ∙ v
+nbe : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Val Δ → Lam σ Γ → Val σ Δ
+nbe ρ (V k)    = ⟦V⟧‿nbe k (lookup ρ k)
+nbe ρ (A f t)  = ⟦A⟧‿nbe f (nbe ρ f) (nbe ρ t)
+nbe ρ (L b)    = λ σ v → nbe (extend‿nbe σ ρ v) b
 
-   ⟦V⟧ : ∀ {n Γ} → Var n Γ → [ Val n ⟶ Val n ]
-   ⟦V⟧ _ x = x
-
-   ⟦A⟧ : ∀ {σ τ Γ} → Lam (σ ⇒ τ) Γ → [ Val (σ ⇒ τ) ⟶ Val σ ⟶ Val τ ]
-   ⟦A⟧ _ f t = f (pack id) t
-
- nbe : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Val Δ → Lam σ Γ → Val σ Δ
- nbe ρ (V k)    = ⟦V⟧ k (lookup ρ k)
- nbe ρ (A f t)  = ⟦A⟧ f (nbe ρ f) (nbe ρ t)
- nbe ρ (L b)    = λ σ v → nbe (extend σ ρ v) b
+--------------------------------------------------------------------------------
+-- A Generic Notion of Semantics and the corresponding generic traversal
 
 record Sem (𝓥 𝓒 : Type ─Scoped) : Set where
   field  th^𝓥  : ∀ {σ} → Thinnable (𝓥 σ)
@@ -97,19 +99,19 @@ record Sem (𝓥 𝓒 : Type ─Scoped) : Set where
          ⟦A⟧   : {σ τ : Type} →             [ 𝓒 (σ ⇒ τ) ⟶ 𝓒 σ   ⟶ 𝓒 τ        ]
          ⟦L⟧   : (σ : Type) → {τ : Type} →  [ □ (𝓥 σ ⟶ 𝓒 τ)     ⟶ 𝓒 (σ ⇒ τ)  ]
 
-module _ {𝓥 𝓒} (𝓢 : Sem 𝓥 𝓒) where
- open Sem 𝓢
 
- sem : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
- sem ρ (V k)    = ⟦V⟧ (lookup ρ k)
- sem ρ (A f t)  = ⟦A⟧ (sem ρ f) (sem ρ t)
- sem ρ (L b)    = ⟦L⟧ _ (λ σ v → sem (extend σ ρ v) b)
-
-   where
+  sem : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
+  sem ρ (V k)    = ⟦V⟧ (lookup ρ k)
+  sem ρ (A f t)  = ⟦A⟧ (sem ρ f) (sem ρ t)
+  sem ρ (L b)    = ⟦L⟧ _ (λ σ v → sem (extend σ ρ v) b) where
 
    extend : {Γ Δ Θ : List Type} {σ : Type} →
             Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
    extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
+open Sem
+
+--------------------------------------------------------------------------------
+-- Defining various traversals as instances of Sem
 
 Renaming : Sem Var Lam
 Renaming = record
@@ -120,7 +122,7 @@ Renaming = record
 
 Substitution : Sem Lam Lam
 Substitution = record
-   { th^𝓥  = λ t ρ → sem Renaming ρ t
+   { th^𝓥  = λ t ρ → Sem.sem Renaming ρ t
    ; ⟦V⟧    = id
    ; ⟦A⟧    = A
    ; ⟦L⟧    = λ σ b → L (b (pack s) (V z)) }
@@ -130,11 +132,9 @@ open import Category.Applicative
 open import Data.String hiding (show)
 open import Data.Nat.Show
 open import Data.Product
-open import Relation.Binary.PropositionalEquality hiding ([_])
 
 module Printer where
  open RawMonadState (StateMonadState ℕ)
-
 
  record Wrap (A : Set) (σ : Type) (Γ : List Type) : Set where
    constructor MkW; field getW : A
@@ -162,13 +162,17 @@ module Printer where
                getW (mb extend x) >>= λ b →
                return $ "λ" ++ getW x ++ "." ++ b }
 
+-- Test runs of Printing as a semantics:
 open Printer using (Printing)
 
 print : (σ : Type) → Lam σ [] → String
-print _ t = proj₁ $ Printer.getW (sem Printing {Δ = []} (pack λ ()) t) 0
+print _ t = proj₁ $ Printer.getW (sem Printing {Δ = []} ε t) 0
+
+open import Relation.Binary.PropositionalEquality
 
 _ : print (α ⇒ α) (L (V z)) ≡ "λ0.0"
 _ = refl
 
-_ : print ((α ⇒ α) ⇒ (α ⇒ α)) (L (L (A (V (s z)) (A (V (s z)) (V z))))) ≡ "λ0.λ1.0(0(1))"
+_ : print ((α ⇒ α) ⇒ (α ⇒ α)) (L (L (A (V (s z)) (A (V (s z)) (V z)))))
+        ≡ "λ0.λ1.0(0(1))"
 _ = refl
