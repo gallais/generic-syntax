@@ -10,6 +10,7 @@ open import environment
 open import rel
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 open import Generic.Zip
 open import Generic.Simulation
 
@@ -28,10 +29,6 @@ module _ {I : Set} {d : Desc I} where
    cong `con ∘ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) d
 
 module _ {I : Set} {d : Desc I} where
-
- vl^VarTm : VarLike^R VarTm^R vl^Var (vl^Tm {d = d})
- VarLike^R.new^R  vl^VarTm = refl
- VarLike^R.th^R   vl^VarTm = λ σ → cong (ren σ)
 
  RenSub : Sim VarTm^R Eq^R d Renaming Substitution
  Sim.var^R  RenSub = id

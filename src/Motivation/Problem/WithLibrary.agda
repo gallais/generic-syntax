@@ -9,6 +9,7 @@ open import rel
 open import Generic.Syntax
 open import Generic.Syntax.LetBinder
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 open import Generic.Semantics.Elaboration.LetBinder
 open import Generic.Simulation as S
 open import Generic.Fusion

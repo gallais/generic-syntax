@@ -10,6 +10,7 @@ open import indexed
 open import environment
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 
 infixr 5 _⇒_
 infixr 6 _⊗_

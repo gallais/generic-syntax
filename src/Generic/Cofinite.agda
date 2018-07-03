@@ -8,6 +8,7 @@ open import var
 open import environment
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 
 module _ {I : Set} where
 

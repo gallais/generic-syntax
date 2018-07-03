@@ -41,6 +41,9 @@ import Generic.Semantics
 -- Trivial instance of a Semantics
 import Generic.Semantics.Unit
 
+-- Renaming and Substitution as Semantics
+import Generic.Semantics.Syntactic
+
 -- Generic Unsafe Normalization by Evaluation and Printing as Semantics
 import Generic.Semantics.NbyE
 import Generic.Semantics.Printing
@@ -70,6 +73,7 @@ import Generic.Fundamental
 -- Generic Notion of Simulation Between Two Semantics
 import rel as R
 import Generic.Simulation
+import Generic.Simulation.Syntactic
 
 -- Applying the Identity Substitution is the Identity
 import Generic.Identity
@@ -101,7 +105,7 @@ open module env = environment public hiding (traverse)
 open module syn = Generic.Syntax public
 open module sem = Generic.Semantics public
 open module zip = Generic.Zip public
-open module sim = Generic.Simulation public hiding (RenSub ; rensub)
+open module sim = Generic.Simulation public
 open module fdm = Generic.Fundamental public
 open module fus = Generic.Fusion public
 open module idt = Generic.Identity public

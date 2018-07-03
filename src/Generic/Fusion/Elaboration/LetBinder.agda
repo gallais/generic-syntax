@@ -17,9 +17,11 @@ open import environment
 open import Generic.Syntax
 open import Generic.Syntax.LetBinder
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 open import Generic.Semantics.Elaboration.LetBinder
 open import Generic.Zip
 open import Generic.Simulation
+open import Generic.Simulation.Syntactic
 open import Generic.Identity
 open import Generic.Fusion
 open import Generic.Fusion.Syntactic as F

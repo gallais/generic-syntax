@@ -10,8 +10,10 @@ open import varlike
 open import environment
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 open import Generic.Zip
 open import Generic.Simulation
+open import Generic.Simulation.Syntactic
 
 open import Function
 open import Relation.Binary.PropositionalEquality as PEq

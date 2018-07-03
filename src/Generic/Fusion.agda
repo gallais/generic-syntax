@@ -1,7 +1,6 @@
 module Generic.Fusion where
 
 open import Size
-open import Data.Sum
 open import Data.List hiding ([_] ; zip ; lookup)
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -14,6 +13,7 @@ open import environment
 
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 open import Generic.Zip
 
 module _  {I : Set} {𝓥₁ 𝓥₂ 𝓥₃ 𝓒₁ 𝓒₂ 𝓒₃ : I → List I → Set}

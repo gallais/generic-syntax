@@ -12,7 +12,9 @@ open import environment
 open import rel
 open import Generic.Syntax
 open import Generic.Semantics
-open import Generic.Simulation hiding (RenSub ; rensub)
+open import Generic.Semantics.Syntactic
+open import Generic.Simulation
+import Generic.Simulation.Syntactic as S
 open import Generic.Zip
 open import Generic.Identity
 open import Generic.Fusion
@@ -175,7 +177,7 @@ module _ {I : Set} (d : Desc I) where
    sub (base vl^Tm <+> (sub ρ <$> σ)) (ren (th^Env th^Var (base vl^Var) (pack (injectʳ Δ))) (lookup ρ k₂))
      ≡⟨ Fus.fus RenSub (pack^R (λ v → injectʳ-<+> Δ (base vl^Tm) (sub ρ <$> σ) (lookup (base vl^Var) v))) (lookup ρ k₂) ⟩
    sub (select (base vl^Var) (base vl^Tm)) (lookup ρ k₂)
-     ≡⟨ Sim.sim SubExt (pack^R (λ v → cong (lookup (base vl^Tm)) (lookup-base^Var v))) (lookup ρ k₂) ⟩
+     ≡⟨ Sim.sim S.SubExt (pack^R (λ v → cong (lookup (base vl^Tm)) (lookup-base^Var v))) (lookup ρ k₂) ⟩
    sub (base vl^Tm) (lookup ρ k₂)
      ≡⟨ sub-id (lookup ρ k₂) ⟩
    lookup ρ k₂

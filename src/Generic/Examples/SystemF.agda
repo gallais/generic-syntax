@@ -4,7 +4,7 @@ open import Size
 open import Data.Unit
 open import Data.Bool
 open import Data.Product
-open import Data.List.Base hiding ([_])
+open import Data.List.Base hiding ([_] ; lookup)
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
@@ -14,6 +14,7 @@ open import varlike
 open import environment hiding (_<$>_)
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 
 data Kind : Set where
   Term Type : Kind

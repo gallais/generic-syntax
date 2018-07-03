@@ -12,6 +12,7 @@ open import Generic.Syntax
 open import Generic.Syntax.STLC+State
 open import Generic.Syntax.STLC+Product
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 
 -- Importing the proven-injective type translation
 open import Generic.Semantics.Elaboration.State.Type

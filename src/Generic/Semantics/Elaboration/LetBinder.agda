@@ -10,6 +10,7 @@ open import environment
 open import Generic.Syntax
 open import Generic.Syntax.LetBinder
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 
 -- Elaborating away a single let-binder. The algebra is defined by case analysis
 -- over the constructors:

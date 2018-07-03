@@ -9,6 +9,7 @@ open import environment
 open import Generic.Syntax
 open import Generic.Syntax.LetBinders
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 
 module _ {I : Set} {d : Desc I} where
 

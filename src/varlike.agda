@@ -1,7 +1,6 @@
 module varlike where
 
 open import Data.List.Base hiding (lookup ; [_])
-open import Data.Sum
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
@@ -10,7 +9,7 @@ open import var
 open import pred hiding (∀[_])
 open import rel
 open import environment
-
+open import Generic.Syntax
 
 module _ {I : Set} where
 
@@ -39,6 +38,12 @@ module _ {I : Set} where
  lookup-base^Var : {Γ : List I} {σ : I} (k : Var σ Γ) → lookup (base vl^Var) k ≡ k
  lookup-base^Var z     = refl
  lookup-base^Var (s k) = cong s (lookup-base^Var k)
+
+module _ {I : Set} {𝓥 𝓒 : I ─Scoped} where
+
+ reify : VarLike 𝓥 → {Γ : List I} → ∀ Δ i → Kripke 𝓥 𝓒 Δ i Γ → Scope 𝓒 Δ i Γ
+ reify vl^𝓥 []         i b = b
+ reify vl^𝓥 Δ@(_ ∷ _)  i b = b (freshʳ vl^Var Δ) (freshˡ vl^𝓥 _)
 
 module _ {I : Set} {𝓥 : I ─Scoped} (vl^𝓥 : VarLike 𝓥) where
 
@@ -99,8 +104,6 @@ module _ {I : Set} {𝓥 𝓒 : I ─Scoped} (𝓥^P  : Pred 𝓥) (𝓒^P : Pre
 
 module _ {I : Set} {𝓥₁ 𝓥₂ 𝓒₁ 𝓒₂ : I ─Scoped} (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) (𝓡^𝓒  : Rel 𝓒₁ 𝓒₂) where
 
-
  Kripke^R : (Δ : List I) (τ : I) → [ Kripke 𝓥₁ 𝓒₁ Δ τ ⟶ Kripke 𝓥₂ 𝓒₂ Δ τ ⟶ κ Set ]
  Kripke^R []         σ k₁ k₂ = rel 𝓡^𝓒 k₁ k₂
  Kripke^R Δ@(_ ∷ _)  σ k₁ k₂ = {Θ : List I} {ρ₁ : (Δ ─Env) 𝓥₁ Θ} {ρ₂ : (Δ ─Env) 𝓥₂ Θ} → ∀ th → ∀[ 𝓡^𝓥 ] ρ₁ ρ₂ → rel 𝓡^𝓒 (k₁ th ρ₁) (k₂ th ρ₂)
-
