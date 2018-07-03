@@ -1,6 +1,17 @@
 module Generic where
 
 --------------------------------------------------------------------------------
+-- STATE OF THE ART
+--------------------------------------------------------------------------------
+
+-- This work relies on previous efforts in dependently-typed programming:
+-- CDMM defines a generic universe of datatypes
+import StateOfTheArt.CDMM
+-- ACMM defines a generic notion of semantics for a well scoped-and-typed language
+import StateOfTheArt.ACMM
+
+
+--------------------------------------------------------------------------------
 -- MOTIVATION
 --------------------------------------------------------------------------------
 

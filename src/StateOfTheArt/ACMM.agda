@@ -1,4 +1,11 @@
-module motivation where
+--------------------------------------------------------------------------------
+-- This module demonstrates the similitudes between various semantics for STLC
+-- before giving a generic notion of Scope-and-Type Safe Semantics à la
+-- Type-and-scope Safe Programs and Their Proofs
+-- (Allais, Chapman, McBride, and McKinna, CPP 17)
+--------------------------------------------------------------------------------
+
+module StateOfTheArt.ACMM where
 
 open import indexed
 open import var hiding (_<$>_ ; get)

@@ -1,4 +1,10 @@
-module Generic.Data where
+--------------------------------------------------------------------------------
+-- This module implements a Universe of Data Types à la
+-- The Gentle Art of Levitation
+-- (Chapman, Dagand, McBride, and Morris, ICFP 10)
+--------------------------------------------------------------------------------
+
+module StateOfTheArt.CDMM where
 
 open import indexed
 open import Size
@@ -9,7 +15,6 @@ open import Data.Unit
 open import Data.Product as Prod
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
-
 
 data Desc (I J : Set) : Set₁ where
   `σ : (A : Set) → (A → Desc I J)  →  Desc I J
