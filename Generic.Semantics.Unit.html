@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Generic.Semantics.Unit</title><link rel="stylesheet" href="Agda.css"></head><body><pre><a id="1" class="Keyword">module</a> <a id="8" href="Generic.Semantics.Unit.html" class="Module">Generic.Semantics.Unit</a> <a id="31" class="Keyword">where</a>
+
+<a id="38" class="Keyword">open</a> <a id="43" class="Keyword">import</a> <a id="50" href="Data.Unit.html" class="Module">Data.Unit</a>
+<a id="60" class="Keyword">open</a> <a id="65" class="Keyword">import</a> <a id="72" href="var.html" class="Module">var</a>
+<a id="76" class="Keyword">open</a> <a id="81" class="Keyword">import</a> <a id="88" href="Generic.Semantics.html" class="Module">Generic.Semantics</a>
+
+<a id="107" class="Keyword">module</a> <a id="114" href="Generic.Semantics.Unit.html#114" class="Module">_</a> <a id="116" class="Symbol">{</a><a id="117" href="Generic.Semantics.Unit.html#117" class="Bound">I</a> <a id="119" class="Symbol">:</a> <a id="121" class="PrimitiveType">Set</a><a id="124" class="Symbol">}</a> <a id="126" class="Keyword">where</a>
+
+ <a id="134" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a> <a id="139" class="Symbol">:</a> <a id="141" href="Generic.Semantics.Unit.html#117" class="Bound">I</a> <a id="143" href="var.html#469" class="Function Operator">─Scoped</a>
+ <a id="152" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a> <a id="157" class="Symbol">=</a> <a id="159" class="Symbol">λ</a> <a id="161" href="Generic.Semantics.Unit.html#161" class="Bound">_</a> <a id="163" href="Generic.Semantics.Unit.html#163" class="Bound">_</a> <a id="165" class="Symbol">→</a> <a id="167" href="Agda.Builtin.Unit.html#69" class="Record">⊤</a>
+
+ <a id="171" href="Generic.Semantics.Unit.html#171" class="Function">SemUnit</a> <a id="179" class="Symbol">:</a> <a id="181" class="Symbol">∀</a> <a id="183" class="Symbol">{</a><a id="184" href="Generic.Semantics.Unit.html#184" class="Bound">d</a><a id="185" class="Symbol">}</a> <a id="187" class="Symbol">→</a> <a id="189" href="Generic.Semantics.html#487" class="Record">Sem</a> <a id="193" href="Generic.Semantics.Unit.html#184" class="Bound">d</a> <a id="195" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a> <a id="200" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a>
+ <a id="206" href="Generic.Semantics.Unit.html#171" class="Function">SemUnit</a> <a id="214" class="Symbol">=</a> <a id="216" class="Symbol">_</a>
+</pre></body></html>
