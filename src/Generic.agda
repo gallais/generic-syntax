@@ -99,10 +99,17 @@ import Generic.Simulation.Syntactic
 -- Applying the Identity Substitution is the Identity
 import Generic.Identity
 
+-- FUSION
+
 -- Generic Notion of Fusible Semantics
 import Generic.Fusion
+
+-- Renaming and Substitution interact well with each other and let-elaboration
 import Generic.Fusion.Syntactic
 import Generic.Fusion.Elaboration.LetBinder
+
+-- Replicating Kaiser, Schäfer, and Stark's result (assumes functional extensionality)
+import Generic.Fusion.Specialised
 
 
 

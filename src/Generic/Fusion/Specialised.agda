@@ -1,4 +1,19 @@
-module Generic.Fusion-Specialised where
+--------------------------------------------------------------------------------
+-- This module replicates (a generic version of) the result proven in
+-- Binder Aware Recursion over Well-scoped De Bruijn Syntax
+-- (Kaiser, Schäfer, and Stark, CPP 2018)
+--
+-- In it they claim that assuming functional extensionality it is possible to
+-- prove that all of the Semantics in the sense of
+-- Type-and-scope Safe Programs and Their Proofs
+-- (Allais, Chapman, McBride, and McKinna, CPP 2017)
+-- are renaming-compatible.
+--
+-- In practice we however refrain from using this module whenever we can obtain
+-- an axiom-free version of the result (cf. Generic.Fusion.Syntactic for instance).
+--------------------------------------------------------------------------------
+
+module Generic.Fusion.Specialised where
 
 open import indexed
 open import var
@@ -7,6 +22,7 @@ open import varlike
 open import rel
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 open import Generic.Zip
 open import Generic.Fusion
 open import Generic.Identity
@@ -25,30 +41,25 @@ module _ {I} (d : Desc I) {𝓥 𝓒} (S : Sem d 𝓥 𝓒) where
   Fus.quote₁ sem-ren = λ _ t → t
   Fus.vl^𝓥₁ sem-ren = vl^Var
   Fus.th^R   sem-ren = λ σ ρ^R → pack^R (λ v → cong (λ ρ → Sem.th^𝓥 S ρ σ) (lookup^R ρ^R v))
-  lookup^R (Fus.>>^R sem-ren {Γ} {Δ} {Θ} {Ξ} {σ} {ρ₁} {ρ₂} {vs} {ws} ρ^R vs^R) v
-    with split Ξ v | split-injectˡ Δ | split-injectʳ Ξ
-  ... | inj₁ x | eq | _ =
-    let dispatch = [ lookup vs , lookup ρ₁ ]′ in
-    begin
-      dispatch (split Ξ (injectˡ Δ (lookup (base vl^Var) x)))
-        ≡⟨ cong (λ v → dispatch (split Ξ (injectˡ Δ v))) (lookup-base^Var x) ⟩
-      dispatch (split Ξ (injectˡ Δ x))
-        ≡⟨ cong dispatch (eq x) ⟩
-      lookup vs x
-        ≡⟨ lookup^R vs^R x ⟩
-      lookup ws x
-    ∎
-  ... | inj₂ y | _ | eq =
-    let dispatch = [ lookup vs , lookup ρ₁ ]′ in
-    begin
-      dispatch (split Ξ (injectʳ Ξ (lookup (base vl^Var) (lookup σ y))))
-        ≡⟨ cong dispatch (eq (lookup (base vl^Var) (lookup σ y))) ⟩
-      lookup ρ₁ (lookup (base vl^Var) (lookup σ y))
-        ≡⟨ cong (lookup ρ₁) (lookup-base^Var _) ⟩
-      lookup ρ₁ (lookup σ y)
-        ≡⟨ lookup^R ρ^R y ⟩
-      lookup ρ₂ y
-    ∎
+  lookup^R (Fus.>>^R sem-ren {Γ} {Δ} {Θ} {Ξ} {σ} {ρ₁} {ρ₂} {vs} {ws} ρ^R vs^R) v with split Ξ v
+  ... | inj₁ vˡ = begin
+    lookup (vs >> ρ₁) (injectˡ Δ (lookup (base vl^Var) vˡ))
+      ≡⟨ injectˡ->> vs ρ₁ (lookup (base vl^Var) vˡ) ⟩
+    lookup vs (lookup (base vl^Var) vˡ)
+      ≡⟨ cong (lookup vs) (lookup-base^Var vˡ) ⟩
+    lookup vs vˡ
+      ≡⟨ lookup^R vs^R vˡ ⟩
+    lookup ws vˡ
+      ∎
+  ... | inj₂ vʳ = begin
+    lookup (vs >> ρ₁) (injectʳ Ξ (lookup (base vl^Var) (lookup σ vʳ)))
+      ≡⟨ injectʳ->> vs ρ₁ (lookup (base vl^Var) (lookup σ vʳ)) ⟩
+    lookup ρ₁ (lookup (base vl^Var) (lookup σ vʳ))
+      ≡⟨ cong (lookup ρ₁) (lookup-base^Var (lookup σ vʳ)) ⟩
+    lookup ρ₁ (lookup σ vʳ)
+      ≡⟨ lookup^R ρ^R vʳ ⟩
+    lookup ρ₂ vʳ
+      ∎
   Fus.var^R  sem-ren = λ ρ^R v → cong (Sem.var S) (lookup^R ρ^R v)
   Fus.alg^R  sem-ren {Γ} {Δ} {σ} {si} {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R zp =
     let rew = λ {σ Γ} (t : ⟦ d ⟧ (Scope (Tm d ∞)) σ Γ) →
@@ -88,4 +99,3 @@ module _ {I} (d : Desc I) {𝓥 𝓒} (S : Sem d 𝓥 𝓒) where
                         (∀ x → f x ≡ g x) → f ≡ g
               ifun-ext : ∀ {ℓ ℓ′} {A : Set ℓ} {B : A → Set ℓ′} {f g : {a : A} → B a} →
                          (∀ x → f {x} ≡ g {x}) → (λ {x} → f {x}) ≡ g
-
