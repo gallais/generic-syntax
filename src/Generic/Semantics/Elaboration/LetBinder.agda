@@ -5,6 +5,7 @@ open import Data.Product
 open import Agda.Builtin.List
 open import Function
 
+open import indexed
 open import environment
 open import Generic.Syntax
 open import Generic.Syntax.LetBinder
@@ -18,10 +19,17 @@ open import Generic.Semantics
 
 -- * the other constructors are left as is by reusing Substitution's algebra
 
-module _ {I : Set} where
+module _ {I : Set} {d : Desc I} where
 
-  UnLet : (d : Desc I) → Sem (d `+ Let) (Tm d ∞) (Tm d ∞)
-  Sem.th^𝓥  (UnLet d) = th^Tm
-  Sem.var    (UnLet d) = id
-  Sem.alg    (UnLet d) = case (Sem.alg Substitution) $ λ where
-   (`IN' e t) → let ↑t = reify^Tm (_ ∷ []) t in ↑t [ e /0]
+  UnLet : Sem (d `+ Let) (Tm d ∞) (Tm d ∞)
+  Sem.th^𝓥  UnLet = th^Tm
+  Sem.var    UnLet = id
+  Sem.alg    UnLet = case (Sem.alg Substitution) $ λ where
+   (`IN' e t) →  extract t (ε ∙ e)
+
+  unLet : ∀{Γ Δ σ s} → (Γ ─Env) (Tm d ∞) Δ → Tm (d `+ Let) s σ Γ → Tm d ∞ σ Δ
+  unLet ρ t = Sem.sem UnLet ρ t
+
+  unlet : {i : I} → [ Tm (d `+ Let) ∞ i ⟶ Tm d ∞ i ]
+  unlet = Sem.sem UnLet (pack `var)
+

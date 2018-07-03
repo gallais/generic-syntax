@@ -1,8 +1,10 @@
 module Generic where
 
+open import Motivation.Problem.Naïve
+open import Motivation.Problem.WithLibrary
+
 -- Notations for indexed types
 import indexed
-
 
 -- SYNTAX
 --------------------------------------------------------------------------------
@@ -74,6 +76,8 @@ import Generic.Identity
 
 -- Generic Notion of Fusible Semantics
 import Generic.Fusion
+import Generic.Fusion.Syntactic
+import Generic.Fusion.Elaboration.LetBinder
 
 
 
