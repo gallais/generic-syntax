@@ -1,11 +1,28 @@
 module Generic where
 
+--------------------------------------------------------------------------------
+-- MOTIVATION
+--------------------------------------------------------------------------------
+
+-- Expository problem described in the paper: two languages (S with lets, T without),
+-- an elaboration from S to T, two operational semantics and a desired proof:
+-- a simulation lemma between a term s in S and its elaboration in T.
+
 import Motivation.Problem.Naïve
 import Motivation.Problem.WithLibrary
+
+-- Solutions to the POPLMark Reloaded challenge: proving using a logical relation
+-- argument the strong normalization of the Simply Typed Lambda Calculus, its
+-- extensions with Sums, and finally Gödel T.
+
 import Motivation.POPLMark2.STLC
 import Motivation.POPLMark2.Sums
 import Motivation.POPLMark2.GodelT
 
+
+--------------------------------------------------------------------------------
+-- THE LIBRARY
+--------------------------------------------------------------------------------
 
 -- Notations for indexed types
 import indexed
