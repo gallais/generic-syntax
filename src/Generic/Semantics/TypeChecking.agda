@@ -41,21 +41,21 @@ isArrow _       = nothing
 -- The output of the semantics is the Type-(Check/Infer) process itself.
 -- Hence the following definition
 
-Type- : Phase → Set
+Type- : Mode → Set
 Type- Check  = Type →  Maybe ⊤
 Type- Infer  =         Maybe Type
 
-Var- : Phase → Set
+Var- : Mode → Set
 Var- _ = Type
 
 Typecheck : Sem Lang (const ∘ Var-) (const ∘ Type-)
 Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
 
-   var : (i : Phase) → Var- i → Type- i
+   var : (i : Mode) → Var- i → Type- i
    var Infer  = just
    var Check  = _==_
 
-   alg : {i : Phase} {Γ : List Phase} →
+   alg : {i : Mode} {Γ : List Mode} →
          ⟦ Lang ⟧ (Kripke (κ ∘ Var-) (κ ∘ Type-)) i Γ → Type- i
    -- Application:
    --  * Infer the type of the function
@@ -80,7 +80,7 @@ Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
    --  * Check it is equal to the candidate
    alg (Emb , t , refl)      =  λ σ → t >>= λ τ → σ == τ
 
-type- : (p : Phase) → TM Lang p → Type- p
+type- : (p : Mode) → TM Lang p → Type- p
 type- p t = Sem.sem Typecheck {Δ = []} ε t
 
 ----------------------------------------------------------------------

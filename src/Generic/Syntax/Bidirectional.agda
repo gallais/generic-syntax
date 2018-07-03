@@ -19,8 +19,8 @@ data `Lang : Set where
   App Lam Emb : `Lang
   Cut : Type → `Lang
 
-data Phase : Set where
-  Check Infer : Phase
+data Mode : Set where
+  Check Infer : Mode
 
 -- On top of the traditional Application and Lambda-Abstraction constructors,
 -- we have two change of direction ones: `Emb` which takes inferable terms and
@@ -28,7 +28,7 @@ data Phase : Set where
 -- candidate provided); and `Cut` which takes a checkable term and makes it
 -- inferrable thanks to a type-annotation.
 
-Lang : Desc Phase
+Lang : Desc Mode
 Lang  =  `σ `Lang $ λ where
   App      → `X [] Infer (`X [] Check (`∎ Infer))
   Lam      → `X (Infer ∷ []) Check (`∎ Check)
