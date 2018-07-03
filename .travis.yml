@@ -27,6 +27,7 @@ install:
 script:
   - cd ../src/
   - agda --html Generic.agda
+  - agda --html TableOfContent.agda
   - cd ../
   - mv src/html/* .
 
