@@ -25,7 +25,7 @@ open import Generic.Simulation.Syntactic
 open import Generic.Identity
 open import Generic.Fusion
 open import Generic.Fusion.Syntactic as F
-
+import Generic.Fusion.Specialised.Propositional as FusProp
 
 module _ {I : Set} {d : Desc I} where
 
@@ -35,22 +35,10 @@ module _ {I : Set} {d : Desc I} where
 
  RenUnLet : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (select ρ₁ ρ₂)) Eq^R Eq^R
             (d `+ Let) Renaming UnLet UnLet
- Fus.quote₁ RenUnLet = λ σ t → t
- Fus.vl^𝓥₁ RenUnLet = vl^Var
- Fus.th^R   RenUnLet = λ σ ρ^R → pack^R (cong (ren σ) ∘ lookup^R ρ^R)
- Fus.>>^R   RenUnLet = thBodyEnv
- Fus.var^R  RenUnLet = λ ρ^R → lookup^R ρ^R
- Fus.alg^R RenUnLet (false , `IN' e t) ρ^R (refl , refl , eq^e , eq^t , _)
-   = eq^t (pack id) (ε^R ∙^R eq^e)
- Fus.alg^R RenUnLet {ρ₁ = ρ₁} {ρ₂} {ρ₃} (true , t) ρ^R eq^t
-   = cong `con $ begin
-     let t′ = fmap d (Sem.body Renaming ρ₁) t in
-     fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₂) (fmap d (reify vl^Var) t′))
-       ≡⟨ cong (fmap d (reify vl^Tm)) (fmap² d (reify vl^Var) (Sem.body UnLet ρ₂) t′) ⟩
-     fmap d (reify vl^Tm) (fmap d (λ Δ i → (Sem.body UnLet ρ₂ Δ i) ∘ reify vl^Var Δ i) t′)
-       ≡⟨ proj₂-eq $ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) (d `+ Let) eq^t ⟩
-     fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₃) t)
-       ∎
+ RenUnLet = FusProp.ren-sem (d `+ Let) UnLet $ λ where
+   (false , `IN' e t) ρ^R (refl , refl , eq^e , eq^t , _) → eq^t (pack id) (ε^R ∙^R eq^e)
+   (true , t)         ρ^R zp → cong `con $ proj₂-eq $
+     zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) (d `+ Let) zp
 
  unLetRen : ∀ {Γ Δ Θ σ s} (t : Tm (d `+ Let) s σ Γ) {ρ₁ ρ₃} {ρ₂ : Thinning Δ Θ} →
             ∀[ Eq^R ] (ren ρ₂ <$> ρ₁) ρ₃ → ren ρ₂ (unLet ρ₁ t) ≡ unLet ρ₃ t
@@ -268,4 +256,3 @@ module _ {I : Set} {d : Desc I} where
     eq^R : ∀[ Eq^R ] (select (pack (injectʳ Ξ)) ρ₁₃) (th^Env th^Tm ρ₂ (pack (injectʳ Ξ)))
     lookup^R eq^R k with split Ξ (injectʳ Ξ k) | split-injectʳ Ξ k
     lookup^R eq^R k | .(inj₂ k) | refl = refl
-

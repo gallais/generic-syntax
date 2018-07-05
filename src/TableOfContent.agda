@@ -153,7 +153,7 @@ import Generic.Fusion.Elaboration.LetBinder
 
 -- The replicated result of Kaiser, Schäfer, and Stark relying on the axiom
 -- of functional extensionality is in
-import Generic.Fusion.Specialised
+import Generic.Fusion.Specialised.Replication
 
 -- 8.3 Definition of Bisimilarity for co-finite objects
 

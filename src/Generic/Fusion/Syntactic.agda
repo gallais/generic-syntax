@@ -18,51 +18,25 @@ import Generic.Simulation.Syntactic as S
 open import Generic.Zip
 open import Generic.Identity
 open import Generic.Fusion
+import Generic.Fusion.Specialised.Propositional as FusProp
 
 module _ {I : Set} (d : Desc I) where
 
  Ren² : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d Renaming Renaming Renaming
- Fus.quote₁ Ren² = λ _ t → t
- Fus.vl^𝓥₁ Ren² = vl^Var
- Fus.th^R Ren² = λ σ ρ^R → pack^R (cong (lookup σ) ∘ (lookup^R ρ^R))
- Fus.>>^R Ren² = λ ρ^R vs^R → thBodyEnv ρ^R vs^R
- Fus.var^R Ren² = λ ρ^R v → cong `var (lookup^R ρ^R v)
- Fus.alg^R Ren² {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R = λ zipped → cong `con $
-   let v₁ = fmap d (Sem.body Renaming ρ₁) b
-       v₃ = fmap d (Sem.body Renaming ρ₃) b in
-   begin
-     fmap d (reify vl^Var) (fmap d (Sem.body Renaming ρ₂) (fmap d (reify vl^Var) v₁))
-         ≡⟨ cong (fmap d (reify vl^Var)) (fmap² d (reify vl^Var) (Sem.body Renaming ρ₂) v₁) ⟩
-     fmap d (reify vl^Var) (fmap d (λ Φ i → (Sem.body Renaming ρ₂ Φ i) ∘ (reify vl^Var Φ i)) v₁)
-         ≡⟨ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Var)) d zipped ⟩
-     fmap d (reify vl^Var) v₃
-   ∎
+ Ren² = FusProp.ren-sem d Renaming $ λ b ρ^R zp →
+   cong `con $ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Var)) d zp
 
  ren² : {Γ Δ Θ : List I} {i : I} {s : Size} → (t : Tm d s i Γ) (ρ₁ : Thinning Γ Δ) (ρ₂ : Thinning Δ Θ) →
         ren ρ₂ (ren ρ₁ t) ≡ ren (select ρ₁ ρ₂) t
  ren² t ρ₁ ρ₂ = Fus.fus Ren² (pack^R (λ _ → refl)) t
 
  RenSub : Fus (λ ρ₁ → ∀[ Eq^R ] ∘ (select ρ₁)) Eq^R Eq^R d Renaming Substitution Substitution
- Fus.quote₁  RenSub = λ _ t → t
- Fus.vl^𝓥₁  RenSub = vl^Var
- Fus.th^R    RenSub = λ σ ρ^R → pack^R (cong (ren σ) ∘ (lookup^R ρ^R))
- Fus.>>^R   RenSub = λ ρ^R vs^R → thBodyEnv ρ^R vs^R
- Fus.var^R   RenSub = λ ρ^R v → lookup^R ρ^R v
- Fus.alg^R   RenSub {ρ₁ = ρ₁} {ρ₂} {ρ₃} b ρ^R = λ zipped → cong `con $
-   let v₁ = fmap d (Sem.body Renaming ρ₁) b
-       v₃ = fmap d (Sem.body Substitution ρ₃) b in
-   begin
-     fmap d (reify vl^Tm) (fmap d (Sem.body Substitution ρ₂) (fmap d (reify vl^Var) v₁))
-         ≡⟨ cong (fmap d (reify vl^Tm)) (fmap² d (reify vl^Var) (Sem.body Substitution ρ₂) v₁) ⟩
-     fmap d (reify vl^Tm) (fmap d (λ Φ i → (Sem.body Substitution ρ₂ Φ i) ∘ (reify vl^Var Φ i)) v₁)
-         ≡⟨ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) d zipped ⟩
-      fmap d (reify vl^Tm) v₃
-   ∎
+ RenSub = FusProp.ren-sem d Substitution $ λ b ρ^R zp →
+   cong `con $ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) d zp
 
  rensub :  {Γ Δ Θ : List I} {i : I} {s : Size} → (t : Tm d s i Γ) (ρ₁ : Thinning Γ Δ) (ρ₂ : (Δ ─Env) (Tm d ∞) Θ) →
            sub ρ₂ (ren ρ₁ t) ≡ sub (select ρ₁ ρ₂) t
  rensub t ρ₁ ρ₂ = Fus.fus RenSub (pack^R (λ _ → refl)) t
-
 
  SubRen : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (ren ρ₂ <$> ρ₁)) VarTm^R Eq^R d Substitution Renaming Substitution
  Fus.quote₁  SubRen = λ _ → id

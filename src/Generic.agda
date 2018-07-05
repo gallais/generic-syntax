@@ -119,8 +119,12 @@ import Generic.Fusion
 import Generic.Fusion.Syntactic
 import Generic.Fusion.Elaboration.LetBinder
 
--- Replicating Kaiser, Schäfer, and Stark's result (assumes functional extensionality)
-import Generic.Fusion.Specialised
+-- Based on Kaiser, Schäfer, and Stark's remark, we can concoct an axiom-free
+-- specialised version of fusion for renaming-semantics interactions (it makes
+-- some of the previous proofs shorter).
+-- We can also use it to replicate their result assuming functional extensionality
+import Generic.Fusion.Specialised.Propositional
+import Generic.Fusion.Specialised.Replication
 
 
 
