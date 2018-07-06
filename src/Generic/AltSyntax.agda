@@ -42,11 +42,12 @@ module ToPHOAS {I : Set} {V : I → Set} where
 open import Data.String as String
 
 Names : {I : Set} → (I → Set) → List I → I ─Scoped
-Names T Δ j Γ = All (κ String) Δ × T j
+Names T [] j Γ = T j
+Names T Δ  j Γ = All (κ String) Δ × T j
 
 data Raw {I : Set} (d : Desc I) : Size → I → Set where
-  V[_] : ∀ {s σ} → String → Raw d (↑ s) σ
-  T[_] : ∀ {s σ} → ⟦ d ⟧ (Names (Raw d s)) σ [] → Raw d (↑ s) σ
+  `var : ∀ {s σ} → String → Raw d (↑ s) σ
+  `con : ∀ {s σ} → ⟦ d ⟧ (Names (Raw d s)) σ [] → Raw d (↑ s) σ
 
 open import Data.Maybe hiding (All)
 open import Category.Monad
@@ -65,12 +66,14 @@ module ScopeCheck {I : Set} {d : Desc I} (I-dec : (i j : I) → Dec (i ≡ j)) w
 
 
  scopeCheck     : ∀ {s} σ Γ → All (κ String) Γ → Raw d s σ → Maybe (Tm d s σ Γ)
- scopeCheckBody : ∀ Γ → All (κ String) Γ → ∀ {s} Δ σ → Names (Raw d s) Δ σ Γ → Maybe (Scope (Tm d s) Δ σ Γ)
+ scopeCheckBody : ∀ Γ → All (κ String) Γ →
+                  ∀ {s} Δ σ → Names (Raw d s) Δ σ [] → Maybe (Scope (Tm d s) Δ σ Γ)
 
- scopeCheck σ Γ scp V[ v ] = `var <$> varCheck v σ Γ scp
- scopeCheck σ Γ scp T[ t ] = `con <$> traverse rawIApplicative d
-                                      (fmap d (scopeCheckBody Γ scp) t)
+ scopeCheck σ Γ scp (`var v) = `var <$> varCheck v σ Γ scp
+ scopeCheck σ Γ scp (`con t) = `con <$> traverse rawIApplicative d
+                                        (fmap d (scopeCheckBody Γ scp) t)
 
- scopeCheckBody Γ scp Δ σ (nms , b) =
+ scopeCheckBody Γ scp []        σ b         = scopeCheck σ Γ scp b
+ scopeCheckBody Γ scp Δ@(_ ∷ _) σ (nms , b) =
    scopeCheck σ (Δ L.++ Γ) (Inverse.to ++↔ ⟨$⟩ (nms , scp)) b
 
