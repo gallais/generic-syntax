@@ -61,6 +61,13 @@ import Generic.Syntax.STLC+Product
 import Generic.Examples.SystemF
 
 
+-- Alternative interpretation of descriptions from PHOAS to raw terms.
+-- This empowers us to prove that:
+-- * to each syntactic term we can associate a term in PHOAS
+-- * to each raw term we can try to associate a syntactic term via *generic*
+--   scopechecking
+open import Generic.AltSyntax
+
 -- SEMANTICS
 --------------------------------------------------------------------------------
 
