@@ -62,99 +62,106 @@
 <a id="2144" class="Keyword">import</a> <a id="2151" href="Generic.Examples.SystemF.html" class="Module">Generic.Examples.SystemF</a>
 
 
-<a id="2178" class="Comment">-- SEMANTICS</a>
-<a id="2191" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="2178" class="Comment">-- Alternative interpretation of descriptions from PHOAS to raw terms.</a>
+<a id="2249" class="Comment">-- This empowers us to prove that:</a>
+<a id="2284" class="Comment">-- * to each syntactic term we can associate a term in PHOAS</a>
+<a id="2345" class="Comment">-- * to each raw term we can try to associate a syntactic term via *generic*</a>
+<a id="2422" class="Comment">--   scopechecking</a>
+<a id="2441" class="Keyword">open</a> <a id="2446" class="Keyword">import</a> <a id="2453" href="Generic.AltSyntax.html" class="Module">Generic.AltSyntax</a>
 
-<a id="2273" class="Comment">-- Environments as Well Scoped-and-Sorted Functions from Variables to Values</a>
-<a id="2350" class="Keyword">import</a> <a id="2357" href="environment.html" class="Module">environment</a>
+<a id="2472" class="Comment">-- SEMANTICS</a>
+<a id="2485" class="Comment">--------------------------------------------------------------------------------</a>
 
-<a id="2370" class="Comment">-- Semantics as Well Scoped-and-Sorted Algebras on Syntaxes with Binding</a>
-<a id="2443" class="Keyword">import</a> <a id="2450" href="Generic.Semantics.html" class="Module">Generic.Semantics</a>
+<a id="2567" class="Comment">-- Environments as Well Scoped-and-Sorted Functions from Variables to Values</a>
+<a id="2644" class="Keyword">import</a> <a id="2651" href="environment.html" class="Module">environment</a>
 
-<a id="2469" class="Comment">-- Trivial instance of a Semantics</a>
-<a id="2504" class="Keyword">import</a> <a id="2511" href="Generic.Semantics.Unit.html" class="Module">Generic.Semantics.Unit</a>
+<a id="2664" class="Comment">-- Semantics as Well Scoped-and-Sorted Algebras on Syntaxes with Binding</a>
+<a id="2737" class="Keyword">import</a> <a id="2744" href="Generic.Semantics.html" class="Module">Generic.Semantics</a>
 
-<a id="2535" class="Comment">-- Renaming and Substitution as Semantics</a>
-<a id="2577" class="Keyword">import</a> <a id="2584" href="Generic.Semantics.Syntactic.html" class="Module">Generic.Semantics.Syntactic</a>
+<a id="2763" class="Comment">-- Trivial instance of a Semantics</a>
+<a id="2798" class="Keyword">import</a> <a id="2805" href="Generic.Semantics.Unit.html" class="Module">Generic.Semantics.Unit</a>
 
-<a id="2613" class="Comment">-- Generic Unsafe Normalization by Evaluation and Printing as Semantics</a>
-<a id="2685" class="Keyword">import</a> <a id="2692" href="Generic.Semantics.NbyE.html" class="Module">Generic.Semantics.NbyE</a>
-<a id="2715" class="Keyword">import</a> <a id="2722" href="Generic.Semantics.Printing.html" class="Module">Generic.Semantics.Printing</a>
-<a id="2749" class="Comment">-- use cases:</a>
-<a id="2763" class="Keyword">import</a> <a id="2770" href="Generic.Examples.NbyE.html" class="Module">Generic.Examples.NbyE</a>
-<a id="2792" class="Keyword">import</a> <a id="2799" href="Generic.Examples.Printing.html" class="Module">Generic.Examples.Printing</a>
+<a id="2829" class="Comment">-- Renaming and Substitution as Semantics</a>
+<a id="2871" class="Keyword">import</a> <a id="2878" href="Generic.Semantics.Syntactic.html" class="Module">Generic.Semantics.Syntactic</a>
 
-<a id="2826" class="Comment">-- Generic Elaboration of Let-binders (single &amp; parallel ones)</a>
-<a id="2889" class="Keyword">import</a> <a id="2896" href="Generic.Semantics.Elaboration.LetBinder.html" class="Module">Generic.Semantics.Elaboration.LetBinder</a>
-<a id="2936" class="Keyword">import</a> <a id="2943" href="Generic.Semantics.Elaboration.LetBinders.html" class="Module">Generic.Semantics.Elaboration.LetBinders</a>
+<a id="2907" class="Comment">-- Generic Unsafe Normalization by Evaluation and Printing as Semantics</a>
+<a id="2979" class="Keyword">import</a> <a id="2986" href="Generic.Semantics.NbyE.html" class="Module">Generic.Semantics.NbyE</a>
+<a id="3009" class="Keyword">import</a> <a id="3016" href="Generic.Semantics.Printing.html" class="Module">Generic.Semantics.Printing</a>
+<a id="3043" class="Comment">-- use cases:</a>
+<a id="3057" class="Keyword">import</a> <a id="3064" href="Generic.Examples.NbyE.html" class="Module">Generic.Examples.NbyE</a>
+<a id="3086" class="Keyword">import</a> <a id="3093" href="Generic.Examples.Printing.html" class="Module">Generic.Examples.Printing</a>
 
-<a id="2985" class="Comment">-- Specific Semantics relating various examples of Syntaxes</a>
-<a id="3045" class="Keyword">import</a> <a id="3052" href="Generic.Semantics.TypeChecking.html" class="Module">Generic.Semantics.TypeChecking</a>
-<a id="3083" class="Keyword">import</a> <a id="3090" href="Generic.Semantics.Elaboration.State.html" class="Module">Generic.Semantics.Elaboration.State</a>
+<a id="3120" class="Comment">-- Generic Elaboration of Let-binders (single &amp; parallel ones)</a>
+<a id="3183" class="Keyword">import</a> <a id="3190" href="Generic.Semantics.Elaboration.LetBinder.html" class="Module">Generic.Semantics.Elaboration.LetBinder</a>
+<a id="3230" class="Keyword">import</a> <a id="3237" href="Generic.Semantics.Elaboration.LetBinders.html" class="Module">Generic.Semantics.Elaboration.LetBinders</a>
 
-
-<a id="3128" class="Comment">-- PROPERTIES</a>
-<a id="3142" class="Comment">--------------------------------------------------------------------------------</a>
-
-<a id="3224" class="Comment">-- Zip: Head Constructors with Related Subterms</a>
-<a id="3272" class="Keyword">import</a> <a id="3279" href="Generic.Zip.html" class="Module">Generic.Zip</a>
-
-<a id="3292" class="Comment">-- Fundamental Lemma of Logical Predicates</a>
-<a id="3335" class="Keyword">import</a> <a id="3342" href="pred.html" class="Module">pred</a> <a id="3347" class="Symbol">as</a> <a id="3350" class="Module">P</a>
-<a id="3352" class="Keyword">import</a> <a id="3359" href="Generic.Fundamental.html" class="Module">Generic.Fundamental</a>
-
-<a id="3380" class="Comment">-- Generic Notion of Simulation Between Two Semantics</a>
-<a id="3434" class="Keyword">import</a> <a id="3441" href="rel.html" class="Module">rel</a> <a id="3445" class="Symbol">as</a> <a id="3448" class="Module">R</a>
-<a id="3450" class="Keyword">import</a> <a id="3457" href="Generic.Simulation.html" class="Module">Generic.Simulation</a>
-<a id="3476" class="Keyword">import</a> <a id="3483" href="Generic.Simulation.Syntactic.html" class="Module">Generic.Simulation.Syntactic</a>
-
-<a id="3513" class="Comment">-- Applying the Identity Substitution is the Identity</a>
-<a id="3567" class="Keyword">import</a> <a id="3574" href="Generic.Identity.html" class="Module">Generic.Identity</a>
-
-<a id="3592" class="Comment">-- FUSION</a>
-
-<a id="3603" class="Comment">-- Generic Notion of Fusible Semantics</a>
-<a id="3642" class="Keyword">import</a> <a id="3649" href="Generic.Fusion.html" class="Module">Generic.Fusion</a>
-
-<a id="3665" class="Comment">-- Renaming and Substitution interact well with each other and let-elaboration</a>
-<a id="3744" class="Keyword">import</a> <a id="3751" href="Generic.Fusion.Syntactic.html" class="Module">Generic.Fusion.Syntactic</a>
-<a id="3776" class="Keyword">import</a> <a id="3783" href="Generic.Fusion.Elaboration.LetBinder.html" class="Module">Generic.Fusion.Elaboration.LetBinder</a>
-
-<a id="3821" class="Comment">-- Based on Kaiser, Schäfer, and Stark&#39;s remark, we can concoct an axiom-free</a>
-<a id="3899" class="Comment">-- specialised version of fusion for renaming-semantics interactions (it makes</a>
-<a id="3978" class="Comment">-- some of the previous proofs shorter).</a>
-<a id="4019" class="Comment">-- We can also use it to replicate their result assuming functional extensionality</a>
-<a id="4102" class="Keyword">import</a> <a id="4109" href="Generic.Fusion.Specialised.Propositional.html" class="Module">Generic.Fusion.Specialised.Propositional</a>
-<a id="4150" class="Keyword">import</a> <a id="4157" href="Generic.Fusion.Specialised.Replication.html" class="Module">Generic.Fusion.Specialised.Replication</a>
+<a id="3279" class="Comment">-- Specific Semantics relating various examples of Syntaxes</a>
+<a id="3339" class="Keyword">import</a> <a id="3346" href="Generic.Semantics.TypeChecking.html" class="Module">Generic.Semantics.TypeChecking</a>
+<a id="3377" class="Keyword">import</a> <a id="3384" href="Generic.Semantics.Elaboration.State.html" class="Module">Generic.Semantics.Elaboration.State</a>
 
 
+<a id="3422" class="Comment">-- PROPERTIES</a>
+<a id="3436" class="Comment">--------------------------------------------------------------------------------</a>
 
-<a id="4199" class="Comment">-- SYNTAX AS A FINITE REPRESENTATION OF CYCLIC STRUCTURES</a>
-<a id="4257" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="3518" class="Comment">-- Zip: Head Constructors with Related Subterms</a>
+<a id="3566" class="Keyword">import</a> <a id="3573" href="Generic.Zip.html" class="Module">Generic.Zip</a>
 
-<a id="4339" class="Keyword">import</a> <a id="4346" href="Generic.Cofinite.html" class="Module">Generic.Cofinite</a>
-<a id="4363" class="Keyword">import</a> <a id="4370" href="Generic.Examples.Colist.html" class="Module">Generic.Examples.Colist</a>
-<a id="4394" class="Keyword">import</a> <a id="4401" href="Generic.Bisimilar.html" class="Module">Generic.Bisimilar</a>
+<a id="3586" class="Comment">-- Fundamental Lemma of Logical Predicates</a>
+<a id="3629" class="Keyword">import</a> <a id="3636" href="pred.html" class="Module">pred</a> <a id="3641" class="Symbol">as</a> <a id="3644" class="Module">P</a>
+<a id="3646" class="Keyword">import</a> <a id="3653" href="Generic.Fundamental.html" class="Module">Generic.Fundamental</a>
+
+<a id="3674" class="Comment">-- Generic Notion of Simulation Between Two Semantics</a>
+<a id="3728" class="Keyword">import</a> <a id="3735" href="rel.html" class="Module">rel</a> <a id="3739" class="Symbol">as</a> <a id="3742" class="Module">R</a>
+<a id="3744" class="Keyword">import</a> <a id="3751" href="Generic.Simulation.html" class="Module">Generic.Simulation</a>
+<a id="3770" class="Keyword">import</a> <a id="3777" href="Generic.Simulation.Syntactic.html" class="Module">Generic.Simulation.Syntactic</a>
+
+<a id="3807" class="Comment">-- Applying the Identity Substitution is the Identity</a>
+<a id="3861" class="Keyword">import</a> <a id="3868" href="Generic.Identity.html" class="Module">Generic.Identity</a>
+
+<a id="3886" class="Comment">-- FUSION</a>
+
+<a id="3897" class="Comment">-- Generic Notion of Fusible Semantics</a>
+<a id="3936" class="Keyword">import</a> <a id="3943" href="Generic.Fusion.html" class="Module">Generic.Fusion</a>
+
+<a id="3959" class="Comment">-- Renaming and Substitution interact well with each other and let-elaboration</a>
+<a id="4038" class="Keyword">import</a> <a id="4045" href="Generic.Fusion.Syntactic.html" class="Module">Generic.Fusion.Syntactic</a>
+<a id="4070" class="Keyword">import</a> <a id="4077" href="Generic.Fusion.Elaboration.LetBinder.html" class="Module">Generic.Fusion.Elaboration.LetBinder</a>
+
+<a id="4115" class="Comment">-- Based on Kaiser, Schäfer, and Stark&#39;s remark, we can concoct an axiom-free</a>
+<a id="4193" class="Comment">-- specialised version of fusion for renaming-semantics interactions (it makes</a>
+<a id="4272" class="Comment">-- some of the previous proofs shorter).</a>
+<a id="4313" class="Comment">-- We can also use it to replicate their result assuming functional extensionality</a>
+<a id="4396" class="Keyword">import</a> <a id="4403" href="Generic.Fusion.Specialised.Propositional.html" class="Module">Generic.Fusion.Specialised.Propositional</a>
+<a id="4444" class="Keyword">import</a> <a id="4451" href="Generic.Fusion.Specialised.Replication.html" class="Module">Generic.Fusion.Specialised.Replication</a>
 
 
 
+<a id="4493" class="Comment">-- SYNTAX AS A FINITE REPRESENTATION OF CYCLIC STRUCTURES</a>
+<a id="4551" class="Comment">--------------------------------------------------------------------------------</a>
 
-<a id="4423" class="Comment">-- Offering users convenient short names</a>
-<a id="4464" class="Keyword">open</a> <a id="4469" class="Keyword">module</a> <a id="idx"></a><a id="4476" href="Generic.html#4476" class="Module">idx</a> <a id="4480" class="Symbol">=</a> <a id="4482" href="indexed.html" class="Module">indexed</a> <a id="4490" class="Keyword">public</a>
-<a id="4497" class="Keyword">open</a> <a id="4502" class="Keyword">module</a> <a id="var"></a><a id="4509" href="Generic.html#4509" class="Module">var</a> <a id="4513" class="Symbol">=</a> <a id="4515" href="var.html" class="Module">V</a> <a id="4517" class="Keyword">public</a> <a id="4524" class="Keyword">hiding</a> <a id="4531" class="Symbol">(</a><a id="4532" href="var.html#895" class="Function Operator">_&lt;$&gt;_</a><a id="4537" class="Symbol">)</a>
-<a id="4539" class="Keyword">open</a> <a id="4544" class="Keyword">module</a> <a id="pred"></a><a id="4551" href="Generic.html#4551" class="Module">pred</a> <a id="4556" class="Symbol">=</a> <a id="4558" href="pred.html" class="Module">P</a> <a id="4560" class="Keyword">public</a> <a id="4567" class="Keyword">hiding</a> <a id="4574" class="Symbol">(</a><a id="4575" href="pred.html#307" class="Record Operator">∀[_]</a><a id="4579" class="Symbol">)</a>
-<a id="4581" class="Keyword">open</a> <a id="4586" class="Keyword">module</a> <a id="rel"></a><a id="4593" href="Generic.html#4593" class="Module">rel</a> <a id="4597" class="Symbol">=</a> <a id="4599" href="rel.html" class="Module">R</a> <a id="4601" class="Keyword">public</a> <a id="4608" class="Keyword">hiding</a> <a id="4615" class="Symbol">(</a><a id="4616" href="rel.html#431" class="Record Operator">∀[_]</a><a id="4620" class="Symbol">)</a>
-<a id="4622" class="Keyword">open</a> <a id="4627" class="Keyword">module</a> <a id="vlk"></a><a id="4634" href="Generic.html#4634" class="Module">vlk</a> <a id="4638" class="Symbol">=</a> <a id="4640" href="varlike.html" class="Module">varlike</a> <a id="4648" class="Keyword">public</a>
-<a id="4655" class="Keyword">open</a> <a id="4660" class="Keyword">module</a> <a id="env"></a><a id="4667" href="Generic.html#4667" class="Module">env</a> <a id="4671" class="Symbol">=</a> <a id="4673" href="environment.html" class="Module">environment</a> <a id="4685" class="Keyword">public</a> <a id="4692" class="Keyword">hiding</a> <a id="4699" class="Symbol">(</a><a id="4700" href="environment.html#4324" class="Function">traverse</a><a id="4708" class="Symbol">)</a>
-<a id="4710" class="Keyword">open</a> <a id="4715" class="Keyword">module</a> <a id="syn"></a><a id="4722" href="Generic.html#4722" class="Module">syn</a> <a id="4726" class="Symbol">=</a> <a id="4728" href="Generic.Syntax.html" class="Module">Generic.Syntax</a> <a id="4743" class="Keyword">public</a>
-<a id="4750" class="Keyword">open</a> <a id="4755" class="Keyword">module</a> <a id="sem"></a><a id="4762" href="Generic.html#4762" class="Module">sem</a> <a id="4766" class="Symbol">=</a> <a id="4768" href="Generic.Semantics.html" class="Module">Generic.Semantics</a> <a id="4786" class="Keyword">public</a>
-<a id="4793" class="Keyword">open</a> <a id="4798" class="Keyword">module</a> <a id="zip"></a><a id="4805" href="Generic.html#4805" class="Module">zip</a> <a id="4809" class="Symbol">=</a> <a id="4811" href="Generic.Zip.html" class="Module">Generic.Zip</a> <a id="4823" class="Keyword">public</a>
-<a id="4830" class="Keyword">open</a> <a id="4835" class="Keyword">module</a> <a id="sim"></a><a id="4842" href="Generic.html#4842" class="Module">sim</a> <a id="4846" class="Symbol">=</a> <a id="4848" href="Generic.Simulation.html" class="Module">Generic.Simulation</a> <a id="4867" class="Keyword">public</a>
-<a id="4874" class="Keyword">open</a> <a id="4879" class="Keyword">module</a> <a id="fdm"></a><a id="4886" href="Generic.html#4886" class="Module">fdm</a> <a id="4890" class="Symbol">=</a> <a id="4892" href="Generic.Fundamental.html" class="Module">Generic.Fundamental</a> <a id="4912" class="Keyword">public</a>
-<a id="4919" class="Keyword">open</a> <a id="4924" class="Keyword">module</a> <a id="fus"></a><a id="4931" href="Generic.html#4931" class="Module">fus</a> <a id="4935" class="Symbol">=</a> <a id="4937" href="Generic.Fusion.html" class="Module">Generic.Fusion</a> <a id="4952" class="Keyword">public</a>
-<a id="4959" class="Keyword">open</a> <a id="4964" class="Keyword">module</a> <a id="idt"></a><a id="4971" href="Generic.html#4971" class="Module">idt</a> <a id="4975" class="Symbol">=</a> <a id="4977" href="Generic.Identity.html" class="Module">Generic.Identity</a> <a id="4994" class="Keyword">public</a>
+<a id="4633" class="Keyword">import</a> <a id="4640" href="Generic.Cofinite.html" class="Module">Generic.Cofinite</a>
+<a id="4657" class="Keyword">import</a> <a id="4664" href="Generic.Examples.Colist.html" class="Module">Generic.Examples.Colist</a>
+<a id="4688" class="Keyword">import</a> <a id="4695" href="Generic.Bisimilar.html" class="Module">Generic.Bisimilar</a>
 
-<a id="5002" class="Keyword">open</a> <a id="5007" class="Keyword">module</a> <a id="uni"></a><a id="5014" href="Generic.html#5014" class="Module">uni</a> <a id="5018" class="Symbol">=</a> <a id="5020" href="Generic.Semantics.Unit.html" class="Module">Generic.Semantics.Unit</a> <a id="5043" class="Keyword">public</a>
-<a id="5050" class="Keyword">open</a> <a id="5055" class="Keyword">module</a> <a id="nbe"></a><a id="5062" href="Generic.html#5062" class="Module">nbe</a> <a id="5066" class="Symbol">=</a> <a id="5068" href="Generic.Semantics.NbyE.html" class="Module">Generic.Semantics.NbyE</a> <a id="5091" class="Keyword">public</a>
-<a id="5098" class="Keyword">open</a> <a id="5103" class="Keyword">module</a> <a id="prt"></a><a id="5110" href="Generic.html#5110" class="Module">prt</a> <a id="5114" class="Symbol">=</a> <a id="5116" href="Generic.Semantics.Printing.html" class="Module">Generic.Semantics.Printing</a> <a id="5143" class="Keyword">public</a>
+
+
+
+<a id="4717" class="Comment">-- Offering users convenient short names</a>
+<a id="4758" class="Keyword">open</a> <a id="4763" class="Keyword">module</a> <a id="idx"></a><a id="4770" href="Generic.html#4770" class="Module">idx</a> <a id="4774" class="Symbol">=</a> <a id="4776" href="indexed.html" class="Module">indexed</a> <a id="4784" class="Keyword">public</a>
+<a id="4791" class="Keyword">open</a> <a id="4796" class="Keyword">module</a> <a id="var"></a><a id="4803" href="Generic.html#4803" class="Module">var</a> <a id="4807" class="Symbol">=</a> <a id="4809" href="var.html" class="Module">V</a> <a id="4811" class="Keyword">public</a> <a id="4818" class="Keyword">hiding</a> <a id="4825" class="Symbol">(</a><a id="4826" href="var.html#895" class="Function Operator">_&lt;$&gt;_</a><a id="4831" class="Symbol">)</a>
+<a id="4833" class="Keyword">open</a> <a id="4838" class="Keyword">module</a> <a id="pred"></a><a id="4845" href="Generic.html#4845" class="Module">pred</a> <a id="4850" class="Symbol">=</a> <a id="4852" href="pred.html" class="Module">P</a> <a id="4854" class="Keyword">public</a> <a id="4861" class="Keyword">hiding</a> <a id="4868" class="Symbol">(</a><a id="4869" href="pred.html#307" class="Record Operator">∀[_]</a><a id="4873" class="Symbol">)</a>
+<a id="4875" class="Keyword">open</a> <a id="4880" class="Keyword">module</a> <a id="rel"></a><a id="4887" href="Generic.html#4887" class="Module">rel</a> <a id="4891" class="Symbol">=</a> <a id="4893" href="rel.html" class="Module">R</a> <a id="4895" class="Keyword">public</a> <a id="4902" class="Keyword">hiding</a> <a id="4909" class="Symbol">(</a><a id="4910" href="rel.html#431" class="Record Operator">∀[_]</a><a id="4914" class="Symbol">)</a>
+<a id="4916" class="Keyword">open</a> <a id="4921" class="Keyword">module</a> <a id="vlk"></a><a id="4928" href="Generic.html#4928" class="Module">vlk</a> <a id="4932" class="Symbol">=</a> <a id="4934" href="varlike.html" class="Module">varlike</a> <a id="4942" class="Keyword">public</a>
+<a id="4949" class="Keyword">open</a> <a id="4954" class="Keyword">module</a> <a id="env"></a><a id="4961" href="Generic.html#4961" class="Module">env</a> <a id="4965" class="Symbol">=</a> <a id="4967" href="environment.html" class="Module">environment</a> <a id="4979" class="Keyword">public</a> <a id="4986" class="Keyword">hiding</a> <a id="4993" class="Symbol">(</a><a id="4994" href="environment.html#4324" class="Function">traverse</a><a id="5002" class="Symbol">)</a>
+<a id="5004" class="Keyword">open</a> <a id="5009" class="Keyword">module</a> <a id="syn"></a><a id="5016" href="Generic.html#5016" class="Module">syn</a> <a id="5020" class="Symbol">=</a> <a id="5022" href="Generic.Syntax.html" class="Module">Generic.Syntax</a> <a id="5037" class="Keyword">public</a>
+<a id="5044" class="Keyword">open</a> <a id="5049" class="Keyword">module</a> <a id="sem"></a><a id="5056" href="Generic.html#5056" class="Module">sem</a> <a id="5060" class="Symbol">=</a> <a id="5062" href="Generic.Semantics.html" class="Module">Generic.Semantics</a> <a id="5080" class="Keyword">public</a>
+<a id="5087" class="Keyword">open</a> <a id="5092" class="Keyword">module</a> <a id="zip"></a><a id="5099" href="Generic.html#5099" class="Module">zip</a> <a id="5103" class="Symbol">=</a> <a id="5105" href="Generic.Zip.html" class="Module">Generic.Zip</a> <a id="5117" class="Keyword">public</a>
+<a id="5124" class="Keyword">open</a> <a id="5129" class="Keyword">module</a> <a id="sim"></a><a id="5136" href="Generic.html#5136" class="Module">sim</a> <a id="5140" class="Symbol">=</a> <a id="5142" href="Generic.Simulation.html" class="Module">Generic.Simulation</a> <a id="5161" class="Keyword">public</a>
+<a id="5168" class="Keyword">open</a> <a id="5173" class="Keyword">module</a> <a id="fdm"></a><a id="5180" href="Generic.html#5180" class="Module">fdm</a> <a id="5184" class="Symbol">=</a> <a id="5186" href="Generic.Fundamental.html" class="Module">Generic.Fundamental</a> <a id="5206" class="Keyword">public</a>
+<a id="5213" class="Keyword">open</a> <a id="5218" class="Keyword">module</a> <a id="fus"></a><a id="5225" href="Generic.html#5225" class="Module">fus</a> <a id="5229" class="Symbol">=</a> <a id="5231" href="Generic.Fusion.html" class="Module">Generic.Fusion</a> <a id="5246" class="Keyword">public</a>
+<a id="5253" class="Keyword">open</a> <a id="5258" class="Keyword">module</a> <a id="idt"></a><a id="5265" href="Generic.html#5265" class="Module">idt</a> <a id="5269" class="Symbol">=</a> <a id="5271" href="Generic.Identity.html" class="Module">Generic.Identity</a> <a id="5288" class="Keyword">public</a>
+
+<a id="5296" class="Keyword">open</a> <a id="5301" class="Keyword">module</a> <a id="uni"></a><a id="5308" href="Generic.html#5308" class="Module">uni</a> <a id="5312" class="Symbol">=</a> <a id="5314" href="Generic.Semantics.Unit.html" class="Module">Generic.Semantics.Unit</a> <a id="5337" class="Keyword">public</a>
+<a id="5344" class="Keyword">open</a> <a id="5349" class="Keyword">module</a> <a id="nbe"></a><a id="5356" href="Generic.html#5356" class="Module">nbe</a> <a id="5360" class="Symbol">=</a> <a id="5362" href="Generic.Semantics.NbyE.html" class="Module">Generic.Semantics.NbyE</a> <a id="5385" class="Keyword">public</a>
+<a id="5392" class="Keyword">open</a> <a id="5397" class="Keyword">module</a> <a id="prt"></a><a id="5404" href="Generic.html#5404" class="Module">prt</a> <a id="5408" class="Symbol">=</a> <a id="5410" href="Generic.Semantics.Printing.html" class="Module">Generic.Semantics.Printing</a> <a id="5437" class="Keyword">public</a>
 </pre></body></html>
