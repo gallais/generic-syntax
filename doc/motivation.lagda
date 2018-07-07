@@ -21,22 +21,19 @@ data Type : Set where
 %<*tm>
 \begin{code}
 data Lam : Type ─Scoped where
-  V : {σ : Type} →    [ Var σ                ⟶ Lam σ        ]
-  A : {σ τ : Type} →  [ Lam (σ ⇒ τ) ⟶ Lam σ  ⟶ Lam τ        ]
-  L : {σ τ : Type} →  [ (σ ∷_) ⊢ Lam τ       ⟶ Lam (σ ⇒ τ)  ]
+  V : {σ : Type} →    [ Var σ ⟶ Lam σ                 ]
+  A : {σ τ : Type} →  [ Lam (σ ⇒ τ) ⟶ Lam σ ⟶ Lam τ   ]
+  L : {σ τ : Type} →  [ (σ ∷_) ⊢ Lam τ ⟶ Lam (σ ⇒ τ)  ]
 \end{code}
 %</tm>
 \begin{code}
+module Renaming where
 
-module _ where
+ ⟦V⟧‿ren : ∀ {n} → [ Var n ⟶ Lam n ]
+ ⟦V⟧‿ren = V
 
- private
-
-   ⟦V⟧‿ren : ∀ {n} → [ Var n ⟶ Lam n ]
-   ⟦V⟧‿ren = V
-
-   extend‿ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
-   extend‿ren ρ = s <$> ρ ∙ z
+ extend‿ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
+ extend‿ren ρ = s <$> ρ ∙ z
 \end{code}
 %<*ren>
 \begin{code}
@@ -47,15 +44,12 @@ module _ where
 \end{code}
 %</ren>
 \begin{code}
-module _ where
+module Substitution where
+ extend‿sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
+ extend‿sub ρ = Renaming.ren E.extend <$> ρ ∙ V z
 
- private
-
-   extend‿sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
-   extend‿sub ρ = ren E.extend <$> ρ ∙ V z
-
-   ⟦V⟧‿sub : ∀ {n} → [ Lam n ⟶ Lam n ]
-   ⟦V⟧‿sub x = x
+ ⟦V⟧‿sub : ∀ {n} → [ Lam n ⟶ Lam n ]
+ ⟦V⟧‿sub x = x
 \end{code}
 %<*sub>
 \begin{code}
@@ -74,7 +68,7 @@ module _ where
    Val (σ ⇒ τ) = □ (Val σ ⟶ Val τ)
 
    th^Val : (σ : Type) → Thinnable (Val σ)
-   th^Val α       = λ ρ t → ren t ρ
+   th^Val α       = λ ρ t → Renaming.ren t ρ
    th^Val (σ ⇒ τ) = th^□
 
    reify   : (σ : Type) → [ Val σ ⟶ Lam σ ]
@@ -84,7 +78,7 @@ module _ where
    reify   (σ ⇒ τ) = λ b → L (reify τ (b E.extend (reflect σ (V z))))
 
    reflect α = id
-   reflect (σ ⇒ τ) = λ b ρ v → reflect τ (A (ren ρ b) (reify σ v))
+   reflect (σ ⇒ τ) = λ b ρ v → reflect τ (A (Renaming.ren ρ b) (reify σ v))
 
    extend : {Γ Δ Θ : List Type} {σ : Type} → Thinning Δ Θ → (Γ ─Env) Val Δ → Val σ Θ → (σ ∷ Γ ─Env) Val Θ
    extend r ρ v = (λ {σ} v → th^Val σ v r) <$> ρ ∙ v
@@ -140,21 +134,33 @@ module _ {𝓥 𝓒} (𝓢 : Sem 𝓥 𝓒) where
 Renaming : Sem Var Lam
 Renaming = record
   { th^𝓥  = th^Var
-  ; ⟦V⟧    = V
-  ; ⟦A⟧    = A
-  ; ⟦L⟧    = λ σ b → L (b (pack s) z) }
+  ; ⟦V⟧   = V
+  ; ⟦A⟧   = A
+  ; ⟦L⟧   = λ σ b → L (b (pack s) z) }
 \end{code}
 %</semren>
+%<*semrenfun>
+\begin{code}
+ren : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
+ren = sem Renaming
+\end{code}
+%</semrenfun>
 %<*semsub>
 \begin{code}
 Substitution : Sem Lam Lam
 Substitution = record
-   { th^𝓥  = λ t ρ → sem Renaming ρ t
-   ; ⟦V⟧    = id
-   ; ⟦A⟧    = A
-   ; ⟦L⟧    = λ σ b → L (b (pack s) (V z)) }
+   { th^𝓥  = λ t ρ → ren ρ t
+   ; ⟦V⟧   = id
+   ; ⟦A⟧   = A
+   ; ⟦L⟧   = λ σ b → L (b (pack s) (V z)) }
 \end{code}
 %</semsub>
+%<*semsubfun>
+\begin{code}
+sub : {Γ Δ : List Type} {σ : Type} → (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
+sub = sem Substitution
+\end{code}
+%</semsubfun>
 
 \begin{code}
 open import Category.Monad.State
@@ -197,12 +203,12 @@ module Printer where
  Printing : Sem (Wrap String) (Wrap (State ℕ String))
  Printing = record
    { th^𝓥  =  th^Wrap
-   ; ⟦V⟧    =  map^Wrap return
-   ; ⟦A⟧    =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
-               return $ f ++ "(" ++ t ++ ")"
-   ; ⟦L⟧    =  λ σ mb → MkW $ fresh σ >>= λ x →
-               getW (mb extend x) >>= λ b →
-               return $ "λ" ++ getW x ++ "." ++ b }
+   ; ⟦V⟧   =  map^Wrap return
+   ; ⟦A⟧   =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
+              return $ f ++ "(" ++ t ++ ")"
+   ; ⟦L⟧   =  λ σ mb → MkW $ fresh σ >>= λ x →
+              getW (mb extend x) >>= λ b →
+              return $ "λ" ++ getW x ++ "." ++ b }
 \end{code}
 %</semprint>
 \begin{code}

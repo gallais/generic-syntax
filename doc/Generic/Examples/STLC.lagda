@@ -17,7 +17,7 @@ data `STLC : Set where
   App Lam : Type → Type → `STLC
 
 STLC : Desc Type
-STLC =  `σ `STLC $ λ where
+STLC = `σ `STLC $ λ where
   (App σ τ) → `X [] (σ ⇒ τ) (`X [] σ (`∎ τ))
   (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
 \end{code}

@@ -15,9 +15,9 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 %<*desc>
 \begin{code}
 data Desc (I J : Set) : Set₁ where
-  `σ : (A : Set) → (A → Desc I J)  →  Desc I J
-  `X : J → Desc I J                →  Desc I J
-  `∎ : I                           →  Desc I J
+  `σ : (A : Set) → (A → Desc I J) → Desc I J
+  `X : J → Desc I J → Desc I J
+  `∎ : I → Desc I J
 \end{code}
 %</desc>
 \begin{code}

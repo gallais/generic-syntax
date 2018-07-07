@@ -180,19 +180,19 @@ to build indexed types.
 % (called \AB{A} in Figure~\ref{figure:indexed}).
 
 \begin{center}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \ExecuteMetaData[indexed.tex]{arrow}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[indexed.tex]{product}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
+\ExecuteMetaData[indexed.tex]{adjust}
 \end{minipage}
 
 \begin{minipage}{0.40\textwidth}
-\ExecuteMetaData[indexed.tex]{adjust}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.20\textwidth}
+\ExecuteMetaData[indexed.tex]{product}
+\end{minipage}\hfill
+\begin{minipage}{0.25\textwidth}
 \ExecuteMetaData[indexed.tex]{constant}
-\end{minipage}\hspace{1em}
+\end{minipage}\hfill
 \begin{minipage}{0.25\textwidth}
 \ExecuteMetaData[indexed.tex]{forall}
 \end{minipage}
@@ -223,10 +223,10 @@ can readily use these combinators to thread, modify, or quantify over the
 scope when defining such families:
 
 %\begin{center}
-\begin{minipage}[t]{0.4\textwidth}
+\begin{minipage}[t]{0.35\textwidth}
 \ExecuteMetaData[var.tex]{var}
-\end{minipage}
-\begin{minipage}[t]{0.5\textwidth}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.55\textwidth}
 \ExecuteMetaData[motivation.tex]{tm}
 \end{minipage}
 %\caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
@@ -263,14 +263,13 @@ Renaming and substitution are the two most typical examples
 of such traversals. Now that well-typedness and well-scopedness are enforced
 statically, all of these traversals have to be implemented
 in a type and scope safe manner.
-
-These constraints show up in the types of renaming and substitution defined as follows:
+These constraints show up in the types of renaming and substitution: % defined as follows:
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[motivation.tex]{ren}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[motivation.tex]{sub}
 \end{minipage}
 \caption{Type and Scope Preserving Renaming and Substitution}
@@ -292,10 +291,12 @@ to every entry in \AB{Γ}. Environments are defined as the following record
 structure (using a record helps Agda's type inference reconstruct the type of
 values \AB{𝓥} for us):
 
-\begin{figure}[h]
+%\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[environment.tex]{env}
-\caption{Well Typed and Scoped Environments of Values}
-\end{figure}
+\end{center}
+%\caption{Well Typed and Scoped Environments of Values}
+%\end{figure}
 
 As we have already observed, the definitions of renaming and substitution have very
 similar structure. Abstracting away this shared structure would allow for these
@@ -318,10 +319,12 @@ between indexed types, to crisply encapsulate the additional quantification
 over environment extensions which is typical of Kripke semantics.
 %%%
 \label{def:thinning}
-\begin{figure}[h]
+%\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[environment.tex]{thinning}
-\caption{Thinnings: A Special Case of Environments}
-\end{figure}
+\end{center}
+%\caption{Thinnings: A Special Case of Environments}
+%\end{figure}
 
 \AF{Thinning}s subsume more structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
@@ -351,7 +354,7 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[environment.tex]{box}
 \ExecuteMetaData[environment.tex]{comonad}
-\end{minipage}\hspace{2em}
+\end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[environment.tex]{thinnable}
 \ExecuteMetaData[environment.tex]{freeth}
@@ -415,11 +418,13 @@ the definition of renaming: to be able to push terms under binder, we need to
 have already proven that they are thinnable.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \ExecuteMetaData[motivation.tex]{semren}
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[motivation.tex]{semrenfun}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
 \ExecuteMetaData[motivation.tex]{semsub}
+\ExecuteMetaData[motivation.tex]{semsubfun}
 \end{minipage}
 \caption{Renaming and Substitution as Instances of \AR{Sem}}
 \end{figure}
@@ -508,10 +513,10 @@ descriptions formal. Interpretation of descriptions give rise right-nested tuple
 terminated by equality constraints.
 
 \begin{figure}[h]
-\hspace{-1em}\begin{minipage}{0.50\textwidth}
+\begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Generic/Data.tex]{desc}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.40\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Generic/Data.tex]{interp}
 \end{minipage}
 \caption{Datatype Descriptions and their Meaning as Functors}\label{figure:desc}
@@ -520,9 +525,9 @@ terminated by equality constraints.
 These constructors give the programmer the ability to build up the data
 types they are used to. For instance, the functor corresponding
 to lists of elements in $A$ stores a \AD{Bool}ean which stands for whether
-the current node is the empty list or not. Depending on that value, the
+the current node is the empty list or not. Depending on its value, the
 rest of the description is either the ``stop'' token or a pair of an element
-in $A$ and a recursive substructure i.e. the tail of the list. The List type
+in $A$ and a recursive substructure i.e. the tail of the list. The \AD{List} type
 is unindexed, we represent the lack of an index with the unit type \AD{$\top$}.
 
 \begin{figure}[h]
@@ -686,10 +691,10 @@ and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression 
 % which allows us to immediately inspect the tag bound in the \AIC{`$\sigma$} node.
 
 \begin{figure}[h]
-\begin{minipage}{0.40\textwidth}
+\begin{minipage}{0.4\textwidth}
   \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{ULC}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.50\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
 \end{minipage}
 \caption{Examples: The Untyped and Simply Typed Lambda Calculi}
@@ -739,7 +744,7 @@ picks the one corresponding to the chosen branch.
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{sumcomb}
-\end{minipage}\hspace{2em}
+\end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
@@ -757,10 +762,10 @@ in Agda's standard library and makes sure that the predicate \AB{P}
 holds true of all the elements in the list \AB{xs}).
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{paircomb}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{pairunpair}
 \end{minipage}
 \caption{Descriptions are closed under Finite Products of Recursive Positions}
@@ -830,10 +835,12 @@ to an evaluation function. We introduce a notion of computation
 \AF{\_─Comp} analogous to that of environments: instead of associating
 values to variables, it associates computations to terms.
 
-\begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics.tex]{comp}
-\caption{\AF{\_─Comp}: Associating Computations to Terms}
-\end{figure}
+%\begin{figure}[h]
+\begin{center}
+  \ExecuteMetaData[Generic/Semantics.tex]{comp}
+\end{center}
+%\caption{\AF{\_─Comp}: Associating Computations to Terms}
+%\end{figure}
 
 \subsection{Fundamental Lemma of Semantics}
 
@@ -898,17 +905,17 @@ the extra variables introduced by that context. This is reminiscent both of what
 did in Section~\ref{section:primer-program} and the definition of reification in
 the setting of normalisation by evaluation (see e.g. Coquand's work~\citeyear{coquand2002formalised}).
 
-Substitution can be defined in a similar manner with \AD{Tm} as both
+Substitution is defined in a similar manner with \AD{Tm} as both
 values and computations. Of the two constraints applying to terms as
-values, the first one corresponds precisely to renaming and the second
-one is trivial. The algebra can once more be defined by using \AF{fmap}
+values, the first one corresponds to renaming and the second
+one is trivial. The algebra is once more defined by using \AF{fmap}
 and reifying the bodies of binders.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Semantics.tex]{renaming}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.45\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Semantics.tex]{substitution}
 \end{minipage}
 \caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding}
@@ -998,7 +1005,7 @@ placeholder environment associating each variable to itself.
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unletcode}
-\end{minipage}\hspace{2em}
+\end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unlet}
 \end{minipage}
@@ -1090,8 +1097,8 @@ applications.
 \end{figure}
 
 We have not used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
-(by disabling totality checking we have lost all guarantees with respect to
-termination) we know we will get a term in normal form.
+(by disabling totality checking we have lost all guarantees of the sort) we know
+we will get a term in normal form.
 
 \subsection{An Algebraic Approach to Typechecking}\label{section:typechecking}
 
@@ -1110,10 +1117,10 @@ term with its type thus making it \AIC{Infer}rable whilst \AIC{Emb} embeds \AIC{
 into \AIC{Check}ables.
 
 \begin{figure}[h]
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.3\textwidth}
   \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{constructors}
-\end{minipage}
-\begin{minipage}{0.55\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{0.6\textwidth}
   \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{bidirectional}
 \end{minipage}
 \caption{A Bidirectional Simply Typed Language}
@@ -1128,7 +1135,7 @@ computations are always potentially failing so we use the \AD{Maybe} monad.
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
 \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{varmode}
-\end{minipage}
+\end{minipage}\hfill
 \begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{typemode}
 \end{minipage}
@@ -1136,18 +1143,20 @@ computations are always potentially failing so we use the \AD{Maybe} monad.
 \end{figure}
 
 We can now define typechecking as a \AR{Sem}antics. The algebra describes the
-algorithm:
+algorithm (\AF{\_<\$\_} takes an \AB{A} and a {\AD{Maybe} \AB{B}} and returns
+a {\AD{Maybe} \AB{A}} which has the same structure as its second argument):
 \begin{itemize}
   \item when facing an application: infer the type of the function, make sure
     it is an arrow type, check the argument at the domain's type and return the
     codomain
   \item for a $\lambda$-abstraction: check the input type is an arrow type and
     check the body at the codomain type in the extended environment where the
-    newly-bound variable as the domain's type
+    newly-bound variable has the domain's type
   \item a cut always comes with a type candidate against which to check the term
     and to be returned in case of success
-  \item finally, the change of direction from Inferrable to Checkable is successful
-    when the inferred term is equal to the expected one.
+  \item finally, the change of direction from \AIC{Infer}rable to \AIC{Check}able
+    is successful
+    when the inferred type is equal to the expected one.
 \end{itemize}
 
 \begin{figure}[h]
@@ -1191,7 +1200,7 @@ represented here by the de Bruijn variable 1 (i.e. \AIC{s} \AIC{z}).
 \begin{minipage}{0.55\textwidth}
   \ExecuteMetaData[Generic/Examples/Colist.tex]{clistD}
   \ExecuteMetaData[Generic/Examples/Colist.tex]{clistpat}
-\end{minipage}\hspace{2em}
+\end{minipage}\hfill
 \begin{minipage}{0.35\textwidth}
   \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones}
 \end{minipage}
@@ -1221,20 +1230,20 @@ implement it by re-using the \AF{Substitution} semantics we already have.
 
 However, one thing still out of our reach with our current tools
 is the underlying co-finite trees these finite objects are meant
-to represent. We can start by defining the coinductive type
+to represent. We start by defining the coinductive type
 corresponding to them as the greatest fixpoint of a notion of
 layer. One layer of a co-finite tree is precisely given by the
 meaning of its description where we completely ignore the binding
-structure. We show with \AF{01⋯} the infinite list that to
-correspond to the cyclic example \AF{01↺} given above. The definition
+structure. We show with \AF{01⋯} the infinite list that
+corresponds to the example \AF{01↺} given above. The definition
 proceeds by copattern-matching as introduced in \cite{abel2013copatterns}
 and showcased in \cite{thibodeau2016case}.
 
 \begin{figure}[h]
-\begin{minipage}{0.55\textwidth}
+\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Cofinite.tex]{cotm}
-\end{minipage}\hspace{2em}
-\begin{minipage}{0.35\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{0.4\textwidth}
   \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones2}
 \end{minipage}
 \caption{Co-finite Trees: Definition and Example}
@@ -1343,7 +1352,9 @@ theorem is once more mutually proven with a statement about \AF{Scope}s,
 and \AD{Size}s play a crucial role in ensuring that the function is indeed total.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Simulation.tex]{simbody}
+\begin{minipage}{\textwidth}
+  \ExecuteMetaData[Generic/Simulation.tex]{simbody}
+\end{minipage}\hfill
 \caption{Fundamental Lemma of \AF{Sim}ulations}
 \end{figure}
 
@@ -1405,7 +1416,7 @@ As all of these statements have precisely the same structure, we can
 once more devise a framework which will, provided that its constraints are
 satisfied, prove a generic fusion lemma.
 
-Fusion is quite a bit more involved than simulation so we will step through
+Fusion is more involved than simulation so we will step through
 each one of the constraints individually, trying to give the reader an intuition
 for why they are shaped the way they are.
 

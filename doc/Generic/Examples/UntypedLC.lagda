@@ -17,9 +17,9 @@ open import Generic.Syntax
 %<*ULC>
 \begin{code}
 UTLC : Desc ⊤
-UTLC =  `σ Bool $ λ isApp → if isApp
-        then `X [] tt (`X [] tt (`∎ tt))
-        else `X (tt ∷ []) tt (`∎ tt)
+UTLC = `σ Bool $ λ isApp → if isApp
+  then  `X [] tt (`X [] tt (`∎ tt))
+  else  `X (tt ∷ []) tt (`∎ tt)
 \end{code}
 %</ULC>
 %<*LCpat>

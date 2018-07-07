@@ -12,6 +12,7 @@ s/‿\([^\}]*\)/\\textsubscript\{\\AgdaFontStyle\{\\scriptsize \1\}\}/g
 s/\\AgdaSymbol{(}[^:]*\\AgdaSymbol{:} \\AgdaPostulate{Level}\\AgdaSymbol{)} \\AgdaSymbol{→} //g
 s/[ ]*\\AgdaBound{ℓ}//g
 s/[ ]*\\AgdaBound{ℓ′}//g
+s/[ ]*\\AgdaBound{ℓ′′}//g
 s/\\AgdaPrimitive{L.suc}//g
 s/[ ]*\\AgdaPrimitive{⊔}[ ]*//g
 s/ \?\\AgdaBound{{ℓ}{[^{]*{[^{]*{}[^}]*}}}//g

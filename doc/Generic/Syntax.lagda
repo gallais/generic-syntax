@@ -87,9 +87,9 @@ module _ {I : Set} {d e : Desc I} {X : List I → I ─Scoped}
 \end{code}
 %<*case>
 \begin{code}
- case :  (⟦ d       ⟧ X i Γ → A) →
-         (⟦ e       ⟧ X i Γ → A) →
-         (⟦ d `+ e  ⟧ X i Γ → A)
+ case :  (⟦ d ⟧ X i Γ → A) →
+         (⟦ e ⟧ X i Γ → A) →
+         (⟦ d `+ e ⟧ X i Γ → A)
 \end{code}
 %</case>
 \begin{code}

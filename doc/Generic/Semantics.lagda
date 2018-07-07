@@ -37,8 +37,8 @@ record Sem {I : Set} (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
 \end{code}
 %</semantics>
 \begin{code}
- sem   :  {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
- body  :  {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
+ sem   : {Γ Δ : List I} → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
+ body  : {Γ Δ : List I} {s : Size} → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
 
  sem ρ (`var k) = var (lookup ρ k)
  sem ρ (`con t) = alg (fmap d (body ρ) t)
@@ -54,8 +54,8 @@ module OnlyforShow {I : Set} {d : Desc I} {𝓥 𝓒 : I ─Scoped} where
 \end{code}
 %<*semtype>
 \begin{code}
- sem   :  {Γ Δ : List I} → Sem d 𝓥 𝓒 → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
- body  :  {Γ Δ : List I} {s : Size} → Sem d 𝓥 𝓒 → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
+ sem   : {Γ Δ : List I} → Sem d 𝓥 𝓒 → (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
+ body  : {Γ Δ : List I} {s : Size} → Sem d 𝓥 𝓒 → (Γ ─Env) 𝓥 Δ → ∀ Θ i → Scope (Tm d s) Θ i Γ → Kripke 𝓥 𝓒 Θ i Δ
 \end{code}
 %</semtype>
 %<*sem>
@@ -119,9 +119,9 @@ module OnlyForDisplayRenaming {I : Set} {d : Desc I} where
    ; var   = `var
    ; alg   = `con ∘ fmap d (reify vl^Var) }
 
- ren :  {Γ Δ : List I} → (Γ ─Env) Var Δ →
-        (Γ ─Comp) (Tm d ∞) Δ
- ren = Sem.sem Renaming
+ ren  :  {Γ Δ : List I} {σ : I} → (Γ ─Env) Var Δ →
+         Tm d ∞ σ Γ → Tm d ∞ σ Δ
+ ren ρ t = Sem.sem Renaming ρ t
 \end{code}
 %</renaming>
 \begin{code}
@@ -171,9 +171,9 @@ module OnlyForDisplaySubstitution {I : Set} {d : Desc I} where
    ; var   = id
    ; alg   = `con ∘ fmap d (reify vl^Tm) }
 
- sub :  {Γ Δ : List I} → (Γ ─Env) (Tm d ∞) Δ →
-        (Γ ─Comp) (Tm d ∞) Δ
- sub = Sem.sem Substitution
+ sub :  {Γ Δ : List I} {σ : I} → (Γ ─Env) (Tm d ∞) Δ →
+         Tm d ∞ σ Γ → Tm d ∞ σ Δ
+ sub ρ t = Sem.sem Substitution ρ t
 \end{code}
 %</substitution>
 \begin{code}
