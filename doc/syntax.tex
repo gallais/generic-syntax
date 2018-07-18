@@ -72,7 +72,7 @@ we are able to solve this repetition problem \emph{once and for all}.
 % generically prove the required renaming, substitution and
 % transformation fusion lemmas (\ref{section:fusion}.
 
-\paragraph{Content and Contributions}
+\paragraph{Content and Contributions.}
 We start with primers on scoped and sorted terms
 (Section~\ref{section:primer-term}), scope and sort safe programs
 acting on them (Section~\ref{section:primer-program}), and
@@ -145,7 +145,7 @@ monad laws correspond to well known properties from the equational
 theories of renaming and substitution. We will revisit these properties
 below in Section~\ref{section:fusion}.
 
-\subsection{A Mechanized Typed Variant of Altenkirch and Reus' Calculus}\label{section:mech-reus}
+\paragraph{A Mechanized Typed Variant of Altenkirch and Reus' Calculus.}\label{section:mech-reus}
 
 There is no reason to restrict this technique to fixpoints of endofunctors
 on $\Set{}^{\Set{}}$. The more general
@@ -732,7 +732,7 @@ the next section introduces combinators demonstrating that
 descriptions are closed under finite sums and finite products
 of recursive positions.
 
-\subsection{Common Combinators and Their Properties}\label{desccomb}
+\paragraph{Common Combinators and Their Properties.}\label{desccomb}
 
 As seen previously, we can use a dependent pair whose first component
 is a \AF{Bool}ean to take the coproduct of two descriptions: depending
@@ -1420,7 +1420,7 @@ Fusion is more involved than simulation so we will step through
 each one of the constraints individually, trying to give the reader an intuition
 for why they are shaped the way they are.
 
-\subsubsection{The Fusion constraints}
+\subsubsection{The Fusion Constraints}
 
 The notion of fusion is defined for a triple of \AR{Sem}antics; each \AB{$\mathcal{S}_i$}
 being defined for values in \AB{$\mathcal{V}_i$} and computations in \AB{$\mathcal{C}_i$}. The
@@ -1534,7 +1534,7 @@ when an axiom-free alternative is provable.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BISIMILARITY
 
-\subsection{Definition of Bisimilarity for co-finite objects}
+\subsection{Definition of Bisimilarity for Co-finite Objects}
 
 Although we were able to use propositional equality when studying
 syntactic traversals working on terms, it is not the appropriate
@@ -1778,4 +1778,3 @@ well behaved semantics, we can start asking what it means to define
 well behaved judgments. Why stop at helping the user write their specific
 language's meta-theory when we could study meta-meta-theory?
 
-\newpage
