@@ -1,8 +1,9 @@
 SED=sed
 PAPER=icfp18
-AGDA=agda
+SLIDES=icfp18-slides
+AGDA=agda-2.5.2
 
-all: latex/$(PAPER).pdf
+all: latex/$(SLIDES).pdf
 
 AGDA_FILES:=\
   environment.lagda \
@@ -40,6 +41,13 @@ PAPER_DEPENDENCIES:=\
   latex/ACM-Reference-Format.bst \
   $(AGDA_OUTPUT_PROCESSED)
 
+SLIDES_DEPENDENCIES:=\
+  latex/$(SLIDES).tex\
+  $(PAPER_DEPENDENCIES)
+
+latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
+	cd latex; latexmk -pdf $(SLIDES).tex
+
 latex/$(PAPER).pdf: $(PAPER_DEPENDENCIES)
 	cd latex; latexmk -pdf -bibtex $(PAPER).tex
 
@@ -64,6 +72,10 @@ latex/acmart.cls: acmart.cls
 	cp $< $@
 
 latex/$(PAPER).tex: $(PAPER).tex rules.sed
+	@mkdir -p $(dir $@)
+	${SED} -f rules.sed $< > $@
+
+latex/$(SLIDES).tex: $(SLIDES).tex rules.sed
 	@mkdir -p $(dir $@)
 	${SED} -f rules.sed $< > $@
 

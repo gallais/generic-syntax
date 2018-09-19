@@ -1,0 +1,150 @@
+\documentclass{beamer}
+\input{commands.tex}
+
+\newcommand<>\highlight[1]{%
+  \alt#2{\makebox[\dimexpr\width-2\fboxsep]{\colorbox{yellow}{\ensuremath{#1}}}}{#1}%
+}
+
+\usepackage{agda}
+\usepackage{amsmath}
+\usepackage{stmaryrd}
+
+\newcommand\sem[2]{\AF{\ensuremath{\llbracket}}~#1~\AF{\ensuremath{\rrbracket}}~#2}
+
+\title{A Scope-and-Type Safe Universe of Syntaxes with Binding, Their Semantics and Proofs}
+\author{G.A., Robert Atkey, James Chapman, Conor McBride, James McKinna}
+\institute{ICFP'18, St Louis, MO}
+\date{September 24, 2018}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Roadmap}
+  \tableofcontents
+\end{frame}
+
+\section{Motivation}
+
+\subsection{A Program Transformation}
+
+\begin{frame}{Problem Statement}
+\begin{align*}
+  \uncover<5->{\AD{S} &::= \highlight<6>{x
+    \mid \AD{S}~\AD{S}
+    \mid \lambda x. \AD{S}}
+    \mid {\highlight<7>{\textrm{let }x=\AD{S}\textrm{ in }\AD{S}}}
+  }
+  \\
+  \AD{T} &::= \highlight<6>{\highlight<2>{x}
+            \mid \highlight<3>{\AD{T}~\AD{T}}
+            \mid \highlight<4>{\lambda x. \AD{T}}}
+\end{align*}
+
+\bigskip{}
+
+\uncover<8->{\begin{problem}
+  Write a program transformation from \AD{S} to \AD{T} which elaborates away
+  \textrm{let..in..} and prove it is ``sensible''.
+\end{problem}}
+
+\end{frame}
+
+\begin{frame}{Let-elaboration: from \AD{S} to \AD{T}}
+%  We can write a program transformation elaborating away the extra language construct.
+
+  \begin{align*}
+   \sem{\cdot}{\cdot}       &: \AD{S} \rightarrow (\AD{Var} \Rightarrow \AD{T})
+                               \rightarrow \AD{T} \\
+    \uncover<2->{
+      \sem{x}{\rho}            &= \rho{}(x) \\
+    }
+    \uncover<3->{
+      \sem{f~t}{\rho      }    &= (\sem{f}{\rho})~(\sem{t}{\rho}) \\
+    }
+    \uncover<4->{
+      \sem{\lambda x. b}{\rho} &= \lambda \highlight<6>{x}. (\sem{b}{(\highlight<6>{\rho{}}\cdot{}x)}) \\
+    }
+    \uncover<5->{
+      \sem{\textrm{let }x = e \textrm{ in } b}{\rho} &= \sem{b}{(\rho{}\cdot{}\sem{e}{\rho})}
+    }
+  \end{align*}
+
+  \uncover<6->{Honesty tax (\L{}1): \AD{T} admits weakening}
+\end{frame}
+
+\subsection{A Soundness Lemma}
+
+\begin{frame}{A Soundness Lemma}
+  \begin{lemma}[Simulation] Given:
+    \begin{itemize}
+      \item<2-> \AB{s} and \AB{s'} s.t. \AB{s} $\leadsto_S$ \AB{s'}
+      \item<3-> \AB{$\rho$} and \AB{$\rho{}$'} s.t. $\forall x. \rho(x) \leadsto^{\star}_T \rho{}'(x)$
+    \end{itemize}
+  We can prove that: \uncover<4->{$\sem{s}{\rho} \leadsto^{\star}_T \sem{s'}{\rho'}$}
+  \end{lemma}
+
+  \bigskip
+
+  \uncover<5->{Honesty tax \uncover<10->{(\L{}12+)}:
+    \begin{itemize}
+      \item Statement
+        \begin{itemize}
+          \item<5-> $\leadsto_X$ means \AD{X} is stable under substitution
+          \item<6-> To define substitution we need to define weakening
+        \end{itemize}
+      \item Proof
+        \begin{itemize}
+          \item<7-> Fusion lemmas
+          \item<8-> Extensionality lemmas
+          \item<9-> Identity lemmas
+        \end{itemize}
+    \end{itemize}
+   }
+\end{frame}
+
+\begin{frame}{Grand Total}
+  Summary:
+  \begin{enumerate}
+    \item<2-> Simple languages
+    \item<3-> Problem easy to state
+    \item<4-> 4 lemmas before we can state the problem
+    \item<5-> 12+ lemmas before we can start proving
+  \end{enumerate}
+\bigskip
+
+  Shortcomings:
+  \begin{enumerate}
+    \item<6-> Everything is ad-hoc (change the language, re-do the proofs!)
+    \item<7-> Quite noisy ($\sem{\cdot}{\cdot}$ is painfully explicit about the structural cases)
+  \end{enumerate}
+\end{frame}
+
+\section{A Universe of Syntaxes with Binding}
+
+\subsection{Anatomy of a Language's Syntax}
+
+\begin{frame}
+\end{frame}
+
+\subsection{Codes for Syntaxes}
+
+\begin{frame}
+\end{frame}
+
+\section{Scope-and-Kind Aware Traversals}
+
+\subsection{A Generic Notion of Semantics}
+
+\begin{frame}
+\end{frame}
+
+\subsection{A Catalogue of Generic Programs}
+
+\section{Proof Frameworks}
+
+\begin{frame}
+\end{frame}
+
+
+\end{document}
