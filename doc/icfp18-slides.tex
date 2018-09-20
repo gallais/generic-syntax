@@ -2,12 +2,14 @@
 \input{commands.tex}
 
 \newcommand<>\highlight[1]{%
-  \alt#2{\makebox[\dimexpr\width-2\fboxsep]{\colorbox{yellow}{\ensuremath{#1}}}}{#1}%
+  \alt#2{\makebox[\dimexpr\width]{\colorbox{yellow}{\ensuremath{#1}}}}{#1}%
 }
 
-\usepackage{agda}
+\usepackage{agda}\AgdaNoSpaceAroundCode{}
 \usepackage{amsmath}
 \usepackage{stmaryrd}
+\usepackage{catchfilebetweentags}
+\setlength\mathindent{0em}
 
 \newcommand\sem[2]{\AF{\ensuremath{\llbracket}}~#1~\AF{\ensuremath{\rrbracket}}~#2}
 
@@ -44,8 +46,11 @@
 \bigskip{}
 
 \uncover<8->{\begin{problem}
-  Write a program transformation from \AD{S} to \AD{T} which elaborates away
-  \textrm{let..in..} and prove it is ``sensible''.
+  \begin{itemize}
+    \item  Write a program transformation from \AD{S} to \AD{T} which elaborates away
+      \textrm{let..in..}
+    \item Prove this program transformation is ``sensible''.
+  \end{itemize}
 \end{problem}}
 
 \end{frame}
@@ -54,23 +59,24 @@
 %  We can write a program transformation elaborating away the extra language construct.
 
   \begin{align*}
-   \sem{\cdot}{\cdot}       &: \AD{S} \rightarrow (\AD{Var} \Rightarrow \AD{T})
-                               \rightarrow \AD{T} \\
-    \uncover<2->{
+    \sem{\cdot}{\cdot}          &: \highlight<2>{\AD{S}}
+                                \rightarrow \highlight<3>{(\AD{Var} \Rightarrow \AD{T})}
+                                \rightarrow \highlight<4>{\AD{T}} \\
+    \uncover<5->{
       \sem{x}{\rho}            &= \rho{}(x) \\
     }
-    \uncover<3->{
-      \sem{f~t}{\rho      }    &= (\sem{f}{\rho})~(\sem{t}{\rho}) \\
+    \uncover<6->{
+      \sem{f~t}{\rho}          &= (\sem{f}{\rho})~(\sem{t}{\rho}) \\
     }
-    \uncover<4->{
-      \sem{\lambda x. b}{\rho} &= \lambda \highlight<6>{x}. (\sem{b}{(\highlight<6>{\rho{}}\cdot{}x)}) \\
+    \uncover<7->{
+      \sem{\lambda x. b}{\rho} &= \lambda \highlight<10>{x}. (\sem{b}{\highlight<8>{(\highlight<10>{\rho{}}\cdot{}x)})} \\
     }
-    \uncover<5->{
+    \uncover<9->{
       \sem{\textrm{let }x = e \textrm{ in } b}{\rho} &= \sem{b}{(\rho{}\cdot{}\sem{e}{\rho})}
     }
   \end{align*}
 
-  \uncover<6->{Honesty tax (\L{}1): \AD{T} admits weakening}
+  \uncover<10->{Honesty tax (\L{}1): \AD{T} admits weakening}
 \end{frame}
 
 \subsection{A Soundness Lemma}
@@ -124,12 +130,82 @@
 
 \subsection{Anatomy of a Language's Syntax}
 
-\begin{frame}
+\begin{frame}{Anatomy of a Language's Syntax}
+  \begin{align*}
+    \AIC{lam} &: \forall{} \highlight<2>{\lbrace{} \sigma~ \tau~ \Gamma\rbrace}
+               \rightarrow \highlight<3-4>{\AD{Tm}} ~\tau ~(\highlight<4>{\sigma ~\AIC{\ensuremath{::}}}~ \Gamma)
+               \rightarrow \AD{Tm} ~\highlight<5>{(\sigma \AIC{~\ensuremath{\Rightarrow}}~ \tau)}~ \Gamma
+               \\
+    \AIC{app} &: \forall{} \highlight<2>{\lbrace{} \sigma~ \tau~ \Gamma\rbrace}
+               \rightarrow \highlight<3>{\AD{Tm}} ~(\sigma \AIC{~\ensuremath{\Rightarrow}}~ \tau)~ \Gamma
+               \rightarrow \highlight<3>{\AD{Tm}} ~\sigma~ \Gamma
+               \rightarrow \AD{Tm} ~\tau~ \Gamma
+  \end{align*}
+
+  A constructor needs to be able to:
+  \begin{enumerate}
+    \item<2-> Store values (and the rest of the constructor's telescope may depend on them)
+    \item<3-> Have recursive substructures \uncover<4->{(sometimes with extra variables in scope)}
+    \item<5-> Constraint the shape of the branche's indices
+  \end{enumerate}
 \end{frame}
 
 \subsection{Codes for Syntaxes}
 
-\begin{frame}
+\begin{frame}{Codes for Syntaxes}
+  Requirements:
+  \begin{enumerate}
+    \item \highlight<2>{\text{Store values}}
+    \item \highlight<3>{\text{Have recursive substructures}}
+    \item \highlight<4>{\text{Constraint the shape of the indices}}
+  \end{enumerate}
+
+  \bigskip{}
+
+  \begin{align*}
+    \only<1>{
+      & \AD{D} : \AD{Set} \\
+      & \ensuremath{\llbracket\cdot\rrbracket}
+         : \AD{D}
+         \rightarrow (\AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set})
+         \rightarrow (\AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set})
+    }
+    \only<2>{
+      & \AIC{\ensuremath{\sigma}}
+         : (\AB{A} : \AD{Set})
+         \rightarrow (\AB{A} \rightarrow \AD{D})
+         \rightarrow \AD{D} \\
+      & \sem{\AIC{\ensuremath{\sigma}}~\AB{A}~\AB{d}}
+            {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
+        = \Sigma_{\AB{a}:\AB{A}} \sem{\AB{d}~\AB{a}}
+                                   {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
+    }
+    \only<3>{
+      & \AIC{X}
+         : \AB{I}
+         \rightarrow \AD{List}~\AB{I}
+         \rightarrow \AD{D}
+         \rightarrow \AD{D} \\
+      & \sem{\AIC{X}~\AB{\AB{j}~\ensuremath{\Delta}}~\AB{d}}
+            {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
+         = X~\AB{j}~(\AB{\ensuremath{\Delta +\!\!+ \Gamma}})
+           ~\AD{\ensuremath{\times}}~
+           \sem{\AB{d}}
+               {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
+    }
+    \only<4>{
+      & \AIC{\ensuremath{\blacksquare}}
+         : \AB{\ensuremath{\kappa}}
+         \rightarrow \AD{D} \\
+      & \sem{\AIC{\ensuremath{\blacksquare}}~\AB{j}}
+            {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
+         = \AB{i} \ensuremath{\equiv} \AB{j}
+    }
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Terms as Free Relative Monads}
+
 \end{frame}
 
 \section{Scope-and-Kind Aware Traversals}
@@ -139,12 +215,37 @@
 \begin{frame}
 \end{frame}
 
-\subsection{A Catalogue of Generic Programs}
+\subsection{A Catalogue of Scope-and-Kind Preserving Programs}
+
+\begin{frame}{A Catalogue of Scope-and-Kind Preserving Programs}
+  \begin{itemize}
+    \item Generic:
+    \begin{itemize}
+      \item Renaming
+      \item Substitution
+      \item Let-elaboration
+      \item Printing
+      \item Scope-checking
+      \item (Unsafe) Normalization by Evaluation
+    \end{itemize}
+    \item Specific to a given language:
+    \begin{itemize}
+      \item CPS translation
+      \item Typechecking
+      \item Elaboration to a typed language
+      \item (Safe) Normalization by Evaluation
+    \end{itemize}
+  \end{itemize}
+\end{frame}
 
 \section{Proof Frameworks}
 
 \begin{frame}
 \end{frame}
 
+
+\begin{frame}{Summary}
+  \tableofcontents
+\end{frame}
 
 \end{document}
