@@ -204,7 +204,22 @@
 \end{frame}
 
 \begin{frame}{Example: Code for STLC}
-  \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
+  \begin{align*}
+    \AK{data} & ~\AD{`STLC} : \AD{Set}~\AK{where} \\
+    & \AIC{`app} : (\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}} : \AD{Type})
+                 \rightarrow \AD{`STLC} \\
+    & \AIC{`lam} : (\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}} : \AD{Type})
+                 \rightarrow \AD{`STLC} \\ &\\
+    \AF{STLC} &: \AD{Desc}~\AD{Type}\\
+    \AF{STLC} &= \AIC{`\ensuremath{\sigma}}~\AD{`STLC}~\AF{\$}~\lambda~\AK{where}\\
+              & (\AIC{`app}~\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}})
+                \rightarrow \AIC{`X}~\AIC{[]}~(\AB{\ensuremath{\sigma}}
+                ~\AIC{\ensuremath{\Rightarrow}}~ \AB{\ensuremath{\tau}})~
+                (\AIC{`X}~\AIC{[]}~\AB{\ensuremath{\sigma}}~
+                (\AIC{`\ensuremath{\blacksquare}}~\AB{\ensuremath{\tau}})) \\
+              & (\AIC{`lam}~\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}})
+                \rightarrow \AIC{`X}~(\AB{\ensuremath{\sigma}} ~\AIC{::}~ \AIC{[]})~\AB{\ensuremath{\tau}}~ (\AIC{`\ensuremath{\blacksquare}}~(\AB{\ensuremath{\sigma}} \AIC{\ensuremath{\Rightarrow}} \AB{\ensuremath{\tau}})) \\
+  \end{align*}
 \end{frame}
 
 \begin{frame}{Terms as Free Relative Monads}
