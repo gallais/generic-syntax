@@ -47,9 +47,8 @@
 
 \uncover<8->{\begin{problem}
   \begin{itemize}
-    \item  Write a program transformation from \AD{S} to \AD{T} which elaborates away
-      \textrm{let..in..}
-    \item Prove this program transformation is ``sensible''.
+    \item Write a program transformation from \AD{S} to \AD{T} inlining \textrm{let..in..}
+    \item Prove a simulation lemma for this transformation
   \end{itemize}
 \end{problem}}
 
@@ -156,56 +155,69 @@
   Requirements:
   \begin{enumerate}
     \item \highlight<2>{\text{Store values}}
-    \item \highlight<3>{\text{Have recursive substructures}}
-    \item \highlight<4>{\text{Constraint the shape of the indices}}
+    \item \highlight<3-4>{\text{Have recursive substructures}}
+    \item \highlight<5>{\text{Constraint the shape of the indices}}
   \end{enumerate}
 
   \bigskip{}
 
   \begin{align*}
     \only<1>{
-      & \AD{D} : \AD{Set} \\
-      & \ensuremath{\llbracket\cdot\rrbracket}
-         : \AD{D}
+      & \AK{data}~ \AD{Desc} ~(\AB{I} : \AD{Set}) : \AD{Set} \\
+      & \AF{\ensuremath{\llbracket\cdot\rrbracket}}
+         : \AD{Desc}~\AB{I}
          \rightarrow (\AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set})
          \rightarrow (\AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set})
     }
     \only<2>{
-      & \AIC{\ensuremath{\sigma}}
+      & \AIC{`\ensuremath{\sigma}}
          : (\AB{A} : \AD{Set})
-         \rightarrow (\AB{A} \rightarrow \AD{D})
-         \rightarrow \AD{D} \\
-      & \sem{\AIC{\ensuremath{\sigma}}~\AB{A}~\AB{d}}
+         \rightarrow (\AB{A} \rightarrow \AD{Desc}~\AB{I})
+         \rightarrow \AD{Desc}~\AB{I} \\
+      & \sem{\AIC{`\ensuremath{\sigma}}~\AB{A}~\AB{d}}
             {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
         = \Sigma_{\AB{a}:\AB{A}} \sem{\AB{d}~\AB{a}}
                                    {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
     }
-    \only<3>{
-      & \AIC{X}
+    \only<3-4>{
+      & \AIC{`X}
          : \AB{I}
          \rightarrow \AD{List}~\AB{I}
-         \rightarrow \AD{D}
-         \rightarrow \AD{D} \\
-      & \sem{\AIC{X}~\AB{\AB{j}~\ensuremath{\Delta}}~\AB{d}}
+         \rightarrow \AD{Desc}~\AB{I}
+         \rightarrow \AD{Desc}~\AB{I} \\
+      & \sem{\AIC{`X}~\AB{\AB{j}~\highlight<4>{\AB{\ensuremath{\Delta}}}}~\AB{d}}
             {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
-         = X~\AB{j}~(\AB{\ensuremath{\Delta +\!\!+ \Gamma}})
+         = X~\AB{j}~\highlight<4>{(\AB{\ensuremath{\Delta +\!\!+ \Gamma}})}
            ~\AD{\ensuremath{\times}}~
            \sem{\AB{d}}
                {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
     }
-    \only<4>{
-      & \AIC{\ensuremath{\blacksquare}}
+    \only<5>{
+      & \AIC{`\ensuremath{\blacksquare}}
          : \AB{\ensuremath{\kappa}}
-         \rightarrow \AD{D} \\
-      & \sem{\AIC{\ensuremath{\blacksquare}}~\AB{j}}
+         \rightarrow \AD{Desc}~\AB{I} \\
+      & \sem{\AIC{`\ensuremath{\blacksquare}}~\AB{j}}
             {\AB{X}~\AB{i}~\AB{\ensuremath{\Gamma}}}
          = \AB{i} \ensuremath{\equiv} \AB{j}
     }
   \end{align*}
 \end{frame}
 
-\begin{frame}{Terms as Free Relative Monads}
+\begin{frame}{Example: Code for STLC}
+  \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
+\end{frame}
 
+\begin{frame}{Terms as Free Relative Monads}
+\begin{align*}
+  \AK{data} & ~\AD{Tm} ~(\AB{d} : \AD{Desc}~ \AB{I})
+     : \AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set} ~\AK{where} \\
+  & \AIC{`var} : \forall \lbrace\AB{i}~\AB{\ensuremath{\Gamma}}\rbrace
+                  \rightarrow \AD{Var}~\AB{i}~\AB{\ensuremath{\Gamma}}
+                  \rightarrow \AD{Tm}~\AB{d}~\AB{i}~\AB{\ensuremath{\Gamma}} \\
+  & \AIC{`con} : \forall \lbrace\AB{i}~\AB{\ensuremath{\Gamma}}\rbrace
+                  \rightarrow \sem{\AB{d}}{(\AD{Tm}~ \AB{d})~\AB{i}~\AB{\ensuremath{\Gamma}}}
+                  \rightarrow \AD{Tm}~\AB{d}~\AB{i}~\AB{\ensuremath{\Gamma}}
+\end{align*}
 \end{frame}
 
 \section{Scope-and-Kind Aware Traversals}
