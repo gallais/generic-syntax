@@ -250,8 +250,10 @@
   \end{align*}
 
   \begin{align*}
-    \AF{sem} :~ & \ensuremath{\forall \lbrace \Gamma~\Delta \rbrace} \rightarrow
-               \highlight<5>{(\ensuremath{\forall \lbrace i \rbrace}
+    \AF{sem} :~ & \AR{Sem}~\AB{d}~\AB{\ensuremath{\mathcal{V}}}
+              ~\AB{\ensuremath{\mathcal{C}}} \rightarrow
+              \ensuremath{\forall \lbrace \Gamma~\Delta \rbrace} \rightarrow \\
+    & \highlight<5>{(\ensuremath{\forall \lbrace i \rbrace}
              \rightarrow \AD{Var}~\AB{i}~\AB{\ensuremath{\Gamma}}
              \rightarrow \AB{\ensuremath{\mathcal{V}}}~\AB{i}~ \AB{\ensuremath{\Delta}})}
              \rightarrow  \\
@@ -286,12 +288,32 @@
 
 \section{Proof Frameworks}
 
-\begin{frame}{}
-\end{frame}
+\begin{frame}{Proof Frameworks}
 
+  Observations:
+  \begin{itemize}
+    \item Traversals defined using \AD{Sem} have a constrained shape
+    \item We should get something for free out of it!
+  \end{itemize}
+
+  \bigskip
+
+  \uncover<2->{Results:}
+  \begin{itemize}
+    \item<2-> Simulation lemma between two Semantics
+    \item<3-> Fusion lemma between three Semantics
+    \item<4-> Instances for common traversals defined generically
+  \end{itemize}
+\end{frame}
 
 \begin{frame}{Summary}
   \tableofcontents
+\end{frame}
+
+\begin{frame}{Thank you for your attention}
+  You can find all of this (and more) at
+
+  \url{https://github.com/gallais/generic-syntax}
 \end{frame}
 
 \end{document}
