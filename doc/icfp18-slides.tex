@@ -12,6 +12,7 @@
 \setlength\mathindent{0em}
 
 \newcommand\sem[2]{\AF{\ensuremath{\llbracket}}~#1~\AF{\ensuremath{\rrbracket}}~#2}
+\newcommand\scoped[1]{\AB{#1} \rightarrow \AD{List}~\AB{#1} \rightarrow \AD{Set}}
 
 \title{A Scope-and-Type Safe Universe of Syntaxes with Binding, Their Semantics and Proofs}
 \author{G.A., Robert Atkey, James Chapman, Conor McBride, James McKinna}
@@ -166,8 +167,8 @@
       & \AK{data}~ \AD{Desc} ~(\AB{I} : \AD{Set}) : \AD{Set} \\
       & \AF{\ensuremath{\llbracket\cdot\rrbracket}}
          : \AD{Desc}~\AB{I}
-         \rightarrow (\AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set})
-         \rightarrow (\AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set})
+         \rightarrow (\scoped{I})
+         \rightarrow (\scoped{I})
     }
     \only<2>{
       & \AIC{`\ensuremath{\sigma}}
@@ -205,32 +206,31 @@
 
 \begin{frame}{Example: Code for STLC}
   \begin{align*}
-    \AK{data} & ~\AD{`STLC} : \AD{Set}~\AK{where} \\
-    & \AIC{`app} : (\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}} : \AD{Type})
+    \AK{data} & ~\highlight<2>{\AD{`STLC}} : \AD{Set}~\AK{where} \\
+    & \AIC{`app} : \highlight<3>{(\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}} : \AD{Type})}
                  \rightarrow \AD{`STLC} \\
     & \AIC{`lam} : (\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}} : \AD{Type})
                  \rightarrow \AD{`STLC} \\ &\\
     \AF{STLC} &: \AD{Desc}~\AD{Type}\\
-    \AF{STLC} &= \AIC{`\ensuremath{\sigma}}~\AD{`STLC}~\AF{\$}~\lambda~\AK{where}\\
+    \AF{STLC} &= \highlight<4>{\AIC{`\ensuremath{\sigma}}~\AD{`STLC}}~\AF{\$}~\lambda~\AK{where}\\
               & (\AIC{`app}~\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}})
-                \rightarrow \AIC{`X}~\AIC{[]}~(\AB{\ensuremath{\sigma}}
-                ~\AIC{\ensuremath{\Rightarrow}}~ \AB{\ensuremath{\tau}})~
-                (\AIC{`X}~\AIC{[]}~\AB{\ensuremath{\sigma}}~
-                (\AIC{`\ensuremath{\blacksquare}}~\AB{\ensuremath{\tau}})) \\
+                \rightarrow \highlight<5>{\AIC{`X}~\AIC{[]}~(\AB{\ensuremath{\sigma}}
+                ~\AIC{\ensuremath{\Rightarrow}}~ \AB{\ensuremath{\tau}})}~
+                (\highlight<6>{\AIC{`X}~\AIC{[]}~\AB{\ensuremath{\sigma}}}~
+                (\AIC{`\ensuremath{\blacksquare}}~\highlight<7>{\AB{\ensuremath{\tau}}})) \\
               & (\AIC{`lam}~\AB{\ensuremath{\sigma}}~\AB{\ensuremath{\tau}})
-                \rightarrow \AIC{`X}~(\AB{\ensuremath{\sigma}} ~\AIC{::}~ \AIC{[]})~\AB{\ensuremath{\tau}}~ (\AIC{`\ensuremath{\blacksquare}}~(\AB{\ensuremath{\sigma}} \AIC{\ensuremath{\Rightarrow}} \AB{\ensuremath{\tau}})) \\
+                \rightarrow \highlight<8>{\AIC{`X}~(\AB{\ensuremath{\sigma}} ~\AIC{::}~ \AIC{[]})~\AB{\ensuremath{\tau}}}~ (\AIC{`\ensuremath{\blacksquare}}~\highlight<9>{(\AB{\ensuremath{\sigma}} \AIC{\ensuremath{\Rightarrow}} \AB{\ensuremath{\tau}})}) \\
   \end{align*}
 \end{frame}
 
 \begin{frame}{Terms as Free Relative Monads}
 \begin{align*}
-  \AK{data} & ~\AD{Tm} ~(\AB{d} : \AD{Desc}~ \AB{I})
-     : \AB{I} \rightarrow \AD{List}~\AB{I} \rightarrow \AD{Set} ~\AK{where} \\
-  & \AIC{`var} : \forall \lbrace\AB{i}~\AB{\ensuremath{\Gamma}}\rbrace
-                  \rightarrow \AD{Var}~\AB{i}~\AB{\ensuremath{\Gamma}}
+  \AK{data} & ~\AD{Tm} ~\highlight<2>{(\AB{d} : \AD{Desc}~ \AB{I})}~
+        (\AB{i} : \AB{I}) ~(\AB{\ensuremath{\Gamma}} : \AD{List}~\AB{I})
+        : \AD{Set} ~\AK{where} \\
+  & \AIC{`var} : \highlight<3>{\AD{Var}~\AB{i}~\AB{\ensuremath{\Gamma}}}
                   \rightarrow \AD{Tm}~\AB{d}~\AB{i}~\AB{\ensuremath{\Gamma}} \\
-  & \AIC{`con} : \forall \lbrace\AB{i}~\AB{\ensuremath{\Gamma}}\rbrace
-                  \rightarrow \sem{\AB{d}}{(\AD{Tm}~ \AB{d})~\AB{i}~\AB{\ensuremath{\Gamma}}}
+  & \AIC{`con} :  \sem{\highlight<4>{\AB{d}}}{\highlight<5>{(\AD{Tm}~ \AB{d})}~\AB{i}~\AB{\ensuremath{\Gamma}}}
                   \rightarrow \AD{Tm}~\AB{d}~\AB{i}~\AB{\ensuremath{\Gamma}}
 \end{align*}
 \end{frame}
@@ -240,6 +240,25 @@
 \subsection{A Generic Notion of Semantics}
 
 \begin{frame}
+  \begin{align*}
+  \AK{record}~\AR{Sem}
+         ~(\highlight<2>{\AB{d} : \AD{Desc}~ \AB{I}})&
+         ~(\highlight<3>{\AB{\ensuremath{\mathcal{V}}}}
+         ~\highlight<4>{\AB{\ensuremath{\mathcal{C}}}} : \scoped{I})
+         : \AD{Set}~ \AK{where} \\
+  & \vdots
+  \end{align*}
+
+  \begin{align*}
+    \AF{sem} :~ & \ensuremath{\forall \lbrace \Gamma~\Delta \rbrace} \rightarrow
+               \highlight<5>{(\ensuremath{\forall \lbrace i \rbrace}
+             \rightarrow \AD{Var}~\AB{i}~\AB{\ensuremath{\Gamma}}
+             \rightarrow \AB{\ensuremath{\mathcal{V}}}~\AB{i}~ \AB{\ensuremath{\Delta}})}
+             \rightarrow  \\
+    & \ensuremath{\forall \lbrace} i \rbrace
+             \rightarrow \highlight<6>{\AD{Tm}~\AB{d}~\AB{i}~\AB{\ensuremath{\Gamma}}}
+             \rightarrow \highlight<7>{\AB{\ensuremath{\mathcal{C}}}~\AB{i}~\AB{\ensuremath{\Delta}}}
+  \end{align*}
 \end{frame}
 
 \subsection{A Catalogue of Scope-and-Kind Preserving Programs}
@@ -267,7 +286,7 @@
 
 \section{Proof Frameworks}
 
-\begin{frame}
+\begin{frame}{}
 \end{frame}
 
 
