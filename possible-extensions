@@ -1,0 +1,6 @@
+* resource annotations
+* scope checker / printer
+* EGTBS + back & forth
+* erasure (stringly-de Bruijn) + scope-check
+* pattern unification
+* congruence closure of a relation
