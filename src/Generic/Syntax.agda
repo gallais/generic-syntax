@@ -37,11 +37,14 @@ data Tm {I : Set} (d : Desc I) : Size → I ─Scoped where
   `var : {s : Size} {i : I} →  [ Var i                     ⟶ Tm d (↑ s) i ]
   `con : {s : Size} {i : I} →  [ ⟦ d ⟧ (Scope (Tm d s)) i  ⟶ Tm d (↑ s) i ]
 
-`var-inj : ∀ {I i Γ} {d : Desc I} {t u : Var i Γ} → (Tm d ∞ i Γ ∋ `var t) ≡ `var u → t ≡ u
-`var-inj refl = refl
 
-`con-inj : ∀ {I i Γ} {d : Desc I} {t u : ⟦ d ⟧ (Scope (Tm d ∞)) i Γ} → (Tm d ∞ i Γ ∋ `con t) ≡ `con u → t ≡ u
-`con-inj refl = refl
+module _ {I i Γ} {d : Desc I} where
+
+  `var-inj : ∀ {t u} → (Tm d ∞ i Γ ∋ `var t) ≡ `var u → t ≡ u
+  `var-inj refl = refl
+
+  `con-inj : ∀ {t u} → (Tm d ∞ i Γ ∋ `con t) ≡ `con u → t ≡ u
+  `con-inj refl = refl
 
 -- Closed terms
 
