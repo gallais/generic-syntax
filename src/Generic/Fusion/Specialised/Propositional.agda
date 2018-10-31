@@ -25,7 +25,7 @@ open import Generic.Identity
 open import Size
 open import Function
 open import Data.Sum
-open import Data.Product hiding (,_)
+open import Data.Product
 open import Data.List.Base hiding (lookup)
 open import Relation.Binary.PropositionalEquality hiding ([_])
 open ≡-Reasoning

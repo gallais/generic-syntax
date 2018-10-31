@@ -51,9 +51,9 @@ module _ {I : Set} {d : Desc I} where
  ≅⇒≡ (`var eq) = cong `var eq
  ≅⇒≡ (`con eq) = cong `con (⟨ d ⟩≅⇒≡ eq)
 
- ⟨ `σ A d   ⟩≅⇒≡ (refl , eq) = cong ,_ (⟨ d _ ⟩≅⇒≡ eq)
+ ⟨ `σ A d   ⟩≅⇒≡ (refl , eq) = cong -,_ (⟨ d _ ⟩≅⇒≡ eq)
  ⟨ `X Δ j d ⟩≅⇒≡ (≅-pr , eq) = cong₂ _,_ (≅⇒≡ ≅-pr) (⟨ d ⟩≅⇒≡ eq)
- ⟨ `∎ i     ⟩≅⇒≡ eq          = proof-irrelevance _ _
+ ⟨ `∎ i     ⟩≅⇒≡ eq          = ≡-irrelevance _ _
 
 -- We can now prove a lemma stating that t[id] ≅ t and we will obtain t[id] ≡ t as
 -- a corrolary.

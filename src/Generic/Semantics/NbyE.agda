@@ -1,10 +1,14 @@
 module Generic.Semantics.NbyE where
 
+import Level
 open import Size
+import Category.Monad as CM
 open import Data.Unit
 open import Data.Bool
-open import Data.Product hiding (,_)
+open import Data.Product
 open import Data.List.Base hiding ([_])
+open import Data.Maybe.Base
+open import Data.Maybe.Categorical as MC
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
@@ -32,11 +36,7 @@ module _ {I : Set} {d : Desc I} where
  vl^Dm : {s : Size} → VarLike (Dm d s)
  vl^Dm = record { new = V z ; th^𝓥 = th^Dm }
 
-
-open import Data.Maybe as Maybe
-import Category.Monad as CM
-import Level
-module M = CM.RawMonad (Maybe.monad {Level.zero})
+module M = CM.RawMonad (MC.monad {Level.zero})
 open M
 
 module _ {I : Set} {d : Desc I} where
@@ -48,7 +48,7 @@ module _ {I : Set} {d : Desc I} where
  norm alg  = reify^Dm ∘ Sem.sem (nbe alg) (base vl^Dm)
 
  reify^Dm (V k) = just (`var k)
- reify^Dm (C v) = `con M.<$> traverse (CM.RawMonad.rawIApplicative Maybe.monad) d
+ reify^Dm (C v) = `con M.<$> traverse (CM.RawMonad.rawIApplicative MC.monad) d
                             (fmap d (λ Θ i → reify^Dm ∘ reify vl^Dm Θ i) v)
  reify^Dm ⊥     = nothing
 

@@ -20,7 +20,7 @@ open import Size
 open import Data.Sum as Sum
 open import Data.Product as Prod
 open import Agda.Builtin.List
-open import Data.Product hiding (,_)
+open import Data.Product
 open import Data.Star as S using (Star)
 open import Function hiding (_∋_)
 open import Relation.Binary.PropositionalEquality hiding ([_]); open ≡-Reasoning

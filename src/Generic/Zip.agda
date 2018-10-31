@@ -3,7 +3,7 @@ module Generic.Zip where
 open import Size
 open import Data.Unit
 open import Data.List hiding ([_] ; zip)
-open import Data.Product hiding (zip ; ,_)
+open import Data.Product hiding (zip)
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import indexed

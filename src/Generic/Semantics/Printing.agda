@@ -1,15 +1,17 @@
 module Generic.Semantics.Printing where
 
-open import Coinduction
+open import Codata.Thunk
+open import Codata.Stream as Stream using (Stream; _∷_)
+
 open import Data.Unit
 open import Data.Bool
 open import Data.Product
 open import Data.Nat.Base
 open import Data.Nat.Show as Nat
-open import Data.List.Base as L hiding ([_] ; _++_ ; lookup)
+open import Data.List.Base using (List; []; _∷_)
+open import Data.List.NonEmpty as List⁺ using (List⁺; _∷_)
 open import Data.Char
 open import Data.String using (String ; _++_ ; fromList ; toList)
-open import Data.Stream as Str hiding (_++_ ; lookup)
 open import Category.Monad
 open import Category.Monad.State
 open import Function
@@ -17,8 +19,8 @@ open import Function
 
 -- The Printing Monad we are working with: a state containing a stream
 -- of *distinct* Strings.
-open module ST = RawMonadState (StateMonadState (Stream String))
-M = State (Stream String)
+open module ST = RawMonadState (StateMonadState (Stream String _))
+M = State (Stream String _)
 
 open import var hiding (get)
 open import environment as E
@@ -45,15 +47,15 @@ module _ {I : Set} where
 module _ {I : Set} where
 
   fresh : {i : I} {Γ : List I} → M (Name i Γ)
-  fresh =  get             >>=  λ nms  →
-           put (tail nms)  >>=  λ _    →
-           return $ mkN $ head nms
+  fresh =  get                    >>=  λ nms  →
+           put (Stream.tail nms)  >>=  λ _    →
+           return $ mkN $ Stream.head nms
 
 -- Names are varlike in the monad M: we use the state to generate fresh
 -- ones. Closure under thinning is a matter of wrapping / unwrapping the
 -- name.
 
-  vl^StName : VarLike (λ i Γ → State (Stream String) (Name i Γ))
+  vl^StName : VarLike (λ i Γ → M (Name i Γ))
   new   vl^StName = fresh
   th^𝓥 vl^StName = λ st _ → mkN ∘ getN ST.<$> st
 
@@ -104,23 +106,16 @@ module _ {I : Set} {d : Desc I} where
   print : Display d → {i : I} → TM d i → String
   print dis t = proj₁ $ getP (Sem.closed (printing dis) t) names where
 
-   flatten : {A : Set} → Stream (A × List A) → Stream A
-   flatten ((a , as) Str.∷ aass) = go a as (♭ aass) where
-     go : {A : Set} → A → List A → Stream (A × List A) → Stream A
-     go a []        aass = a ∷ ♯ flatten aass
-     go a (b ∷ as)  aass = a ∷ ♯ go b as aass
+    alphabetWithSuffix : String → List⁺ String
+    alphabetWithSuffix suffix = List⁺.map (λ c → fromList (c ∷ []) ++ suffix)
+                              $′ 'a' ∷ toList "bcdefghijklmnopqrstuvwxyz"
 
-   names : Stream String
-   names = flatten $ Str.zipWith cons letters
-                  $ "" ∷ ♯ Str.map Nat.show (allNatsFrom 0)
-    where
+    allNats : Stream ℕ _
+    allNats = cofix (λ i → ℕ → Stream ℕ i) step 0 where
+      step : ∀ {i} → Thunk _ i → ℕ → Stream ℕ i
+      step rec k = k ∷ λ where .force → rec .force (suc k)
 
-      cons : (Char × List Char) → String → (String × List String)
-      cons (c , cs) suffix = appendSuffix c , L.map appendSuffix cs where
-        appendSuffix : Char → String
-        appendSuffix c  = fromList (c ∷ []) ++ suffix
-
-      letters = Str.repeat $ 'a' , toList "bcdefghijklmnopqrstuvwxyz"
-
-      allNatsFrom : ℕ → Stream ℕ
-      allNatsFrom k = k ∷ ♯ allNatsFrom (1 + k)
+    names : Stream String _
+    names = Stream.concat
+          $′ Stream.map alphabetWithSuffix
+          $′ "" ∷ λ where .force → Stream.map Nat.show allNats

@@ -2,11 +2,18 @@ module Generic.AltSyntax where
 
 open import Level
 open import Size
+open import Category.Monad
+
 open import Data.Bool
 open import Data.List.All
 open import Data.List.All.Properties
 open import Data.List.Base as L hiding ([_])
-open import Data.Product as P hiding (,_)
+open import Data.Maybe.Base hiding (All)
+import Data.Maybe.Categorical as MC
+open import Data.Product
+open import Data.String
+open import Data.String.Unsafe as String using (_≟_)
+
 open import Function hiding (case_of_)
 open import Function.Equality
 open import Function.Inverse
@@ -39,8 +46,6 @@ module ToPHOAS {I : Set} {V : I → Set} where
     binders []        i kr = kr
     binders Δ@(_ ∷ _) i kr = λ vs → kr (base vl^Var) ((λ v → v) E.<$> vs)
 
-open import Data.String as String
-
 Names : {I : Set} → (I → Set) → List I → I ─Scoped
 Names T [] j Γ = T j
 Names T Δ  j Γ = All (κ String) Δ × T j
@@ -49,12 +54,9 @@ data Raw {I : Set} (d : Desc I) : Size → I → Set where
   `var : ∀ {s σ} → String → Raw d (↑ s) σ
   `con : ∀ {s σ} → ⟦ d ⟧ (Names (Raw d s)) σ [] → Raw d (↑ s) σ
 
-open import Data.Maybe hiding (All)
-open import Category.Monad
-
 module ScopeCheck {I : Set} {d : Desc I} (I-dec : (i j : I) → Dec (i ≡ j)) where
 
- open RawMonad (monad {zero})
+ open RawMonad (MC.monad {zero})
 
  varCheck : String → ∀ σ Γ → All (κ String) Γ → Maybe (Var σ Γ)
  varCheck str σ []       []         = nothing

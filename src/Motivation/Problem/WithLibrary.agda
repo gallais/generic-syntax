@@ -19,7 +19,7 @@ open import Generic.Identity
 
 open import Data.Bool hiding (T)
 open import Data.Sum
-open import Data.Product hiding (,_)
+open import Data.Product
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 open ≡-Reasoning

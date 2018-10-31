@@ -1,10 +1,13 @@
 module Generic.Semantics.TypeChecking where
 
+import Level
+import Category.Monad as CM
 open import Data.Unit
 open import Data.Bool
-open import Data.Product as P hiding (,_)
+open import Data.Product
 open import Data.List hiding ([_])
-open import Data.Maybe as Maybe hiding (All)
+open import Data.Maybe.Base
+open import Data.Maybe.Categorical as MC
 open import Function
 
 open import indexed
@@ -15,9 +18,7 @@ open import Generic.Semantics
 
 open import Generic.Syntax.Bidirectional
 
-import Category.Monad as CM
-import Level
-module M = CM.RawMonad (Maybe.monad {Level.zero})
+module M = CM.RawMonad (MC.monad {Level.zero})
 open M
 
 open import Relation.Binary.PropositionalEquality hiding ([_])

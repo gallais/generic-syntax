@@ -3,7 +3,7 @@ module Generic.Syntax where
 open import Size
 open import Data.Bool
 open import Data.List.Base as L hiding ([_])
-open import Data.Product as P hiding (,_)
+open import Data.Product as Prod
 open import Function hiding (case_of_)
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
@@ -83,7 +83,7 @@ module _ {I : Set} {d : Desc I} {X : List I → I ─Scoped} {i : I} {Γ : List 
          (Δ ─Env) (X []) Γ × ⟦ d ⟧ X i Γ
 
  unXs []       v       = ε , v
- unXs (σ ∷ Δ)  (r , v) = P.map (_∙ r) id (unXs Δ v)
+ unXs (σ ∷ Δ)  (r , v) = Prod.map₁ (_∙ r) (unXs Δ v)
 
 -- Descriptions give rise to traversable functors
 
@@ -91,8 +91,8 @@ module _ {I : Set} {X Y : List I → I ─Scoped} where
 
  fmap : (d : Desc I) {Γ Δ : List I} {i : I} →
         (∀ Θ i → X Θ i Γ → Y Θ i Δ) → ⟦ d ⟧ X i Γ → ⟦ d ⟧ Y i Δ
- fmap (`σ A d)   f = P.map id (fmap (d _) f)
- fmap (`X Δ j d) f = P.map (f Δ j) (fmap d f)
+ fmap (`σ A d)   f = Prod.map₂ (fmap (d _) f)
+ fmap (`X Δ j d) f = Prod.map (f Δ j) (fmap d f)
  fmap (`∎ i)     f = id
 
  fmap-ext : (d : Desc I) {Γ Δ : List I} {i : I} {f g : ∀ Θ i → X Θ i Γ → Y Θ i Δ} →

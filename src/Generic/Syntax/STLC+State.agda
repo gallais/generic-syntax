@@ -40,7 +40,7 @@ STLCSt = `σ `STLCSt $ λ where
 
 module PATTERNS where
 
-  infixr 0 _>>=_
+  infixr -1 _>>=_
   pattern APP f t   = `con (App _ _ , f , t , refl)
   pattern LAM b     = `con (Lam _ _ , b , refl)
   pattern ONE       = `con (One , refl)
