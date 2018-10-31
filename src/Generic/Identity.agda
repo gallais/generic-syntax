@@ -19,18 +19,32 @@ open import Function
 open import Relation.Binary.PropositionalEquality as PEq
 open ≡-Reasoning
 
+-- If we directly try to prove that t[id] ≡ t we run into size-related issues.
+-- So we start by definining a size-heterogeneous notion of pointwise equality
+-- and then prove it equivalent to propositional equality when all sizes are ∞.
+
 module _ {I : Set} {d : Desc I} where
+
+-- We mutually define pointwise equality on terms and pointwise equality on
+-- constructor telescopes
 
  data _≅_ {σ : I} {Γ : List I} : {s : Size} → Tm d s σ Γ → {t : Size} → Tm d t σ Γ → Set
  ⟨_⟩_≅_ : (e : Desc I) {σ : I} {Γ : List I} {s : Size} → ⟦ e ⟧ (Scope (Tm d s)) σ Γ → {t : Size} → ⟦ e ⟧ (Scope (Tm d t)) σ Γ → Set
 
+-- Equality of constructors is boring; except for the size mismatch on both sides
+-- and the requirement that the telescopes match up in the `con case.
  data _≅_ {σ} {Γ} where
    `var : {s t : Size} {k l : Var σ Γ} → k ≡ l → `var {s = s} k ≅ `var {s = t} l
    `con : {s t : Size} {b : ⟦ d ⟧ (Scope (Tm d s)) σ Γ} {c : ⟦ d ⟧ (Scope (Tm d t)) σ Γ} →
           ⟨ d ⟩ b ≅ c → `con {s = s} b ≅ `con {s = t} c
 
+-- Equality of constructor telescopes is given to use by `Zip` together with the
+-- mutually defined notion of equality
  ⟨ e ⟩ b ≅ c = Zip e (λ _ _  t u → t ≅ u) b c
 
+
+-- Proof that size-heterogeneous pointwise equality coincides with propositional
+-- equality when sizes are ∞
  ≅⇒≡   : ∀ {σ Γ} {t u : Tm d ∞ σ Γ} → t ≅ u → t ≡ u
  ⟨_⟩≅⇒≡ : ∀ {σ Γ} e {t u : ⟦ e ⟧ (Scope (Tm d ∞)) σ Γ} → ⟨ e ⟩ t ≅ u → t ≡ u
 
@@ -40,6 +54,9 @@ module _ {I : Set} {d : Desc I} where
  ⟨ `σ A d   ⟩≅⇒≡ (refl , eq) = cong ,_ (⟨ d _ ⟩≅⇒≡ eq)
  ⟨ `X Δ j d ⟩≅⇒≡ (≅-pr , eq) = cong₂ _,_ (≅⇒≡ ≅-pr) (⟨ d ⟩≅⇒≡ eq)
  ⟨ `∎ i     ⟩≅⇒≡ eq          = proof-irrelevance _ _
+
+-- We can now prove a lemma stating that t[id] ≅ t and we will obtain t[id] ≡ t as
+-- a corrolary.
 
 module RenId {I : Set} {d : Desc I} where
 
