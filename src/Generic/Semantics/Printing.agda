@@ -111,9 +111,7 @@ module _ {I : Set} {d : Desc I} where
                               $′ 'a' ∷ toList "bcdefghijklmnopqrstuvwxyz"
 
     allNats : Stream ℕ _
-    allNats = cofix (λ i → ℕ → Stream ℕ i) step 0 where
-      step : ∀ {i} → Thunk _ i → ℕ → Stream ℕ i
-      step rec k = k ∷ λ where .force → rec .force (suc k)
+    allNats = Stream.unfold < id , suc > 0
 
     names : Stream String _
     names = Stream.concat
