@@ -1,5 +1,5 @@
 # generic-syntax
-A Scope-and-Type Safe Universe of Syntaxes with Binding, Their Semantics and Proofs
+A self-contained repository for the paper [A Scope-and-Type Safe Universe of Syntaxes with Binding, Their Semantics and Proofs](https://gallais.github.io/pdf/icfp18.pdf)
 
 # Typechecking
 
