@@ -111,7 +111,7 @@ module _ {I : Set} {d : Desc I} where
                               $′ 'a' ∷ toList "bcdefghijklmnopqrstuvwxyz"
 
     allNats : Stream ℕ _
-    allNats = Stream.unfold < id , suc > 0
+    allNats = Stream.iterate suc 0
 
     names : Stream String _
     names = Stream.concat
