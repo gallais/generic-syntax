@@ -131,3 +131,15 @@ module _ {I : Set} {X : List I → I ─Scoped} {A : Set → Set} (app : RawAppl
  traverse (`σ A d)    (a , t)  = (λ b → a , b) A.<$> traverse (d a) t
  traverse (`X Δ j d)  (r , t)  = _,_ A.<$> r ⊛ traverse d t
  traverse (`∎ i)      t        = pure t
+
+-- Desc Morphisms
+
+record DescMorphism {I : Set} (d e : Desc I) : Set₁ where
+  constructor MkDescMorphism
+  field apply : ∀ {X i Δ} → ⟦ d ⟧ X i Δ → ⟦ e ⟧ X i Δ
+
+module _ {I : Set} {d e : Desc I} where
+
+  map^Tm : DescMorphism d e → ∀ {i σ Γ} → Tm d i σ Γ → Tm e i σ Γ
+  map^Tm f (`var v) = `var v
+  map^Tm f (`con t) = `con (DescMorphism.apply f (fmap d (λ _ _ → map^Tm f) t))

@@ -23,11 +23,6 @@ module _ {I : Set} where
    z : {i : I} →    [          (i ∷_) ⊢ Var i ]
    s : {i j : I} →  [ Var i ⟶  (j ∷_) ⊢ Var i ]
 
- infixl 3 _─_
- _─_ : {i : I} (Γ : List I) → Var i Γ → List I
- _ ∷ Γ ─ z   = Γ
- σ ∷ Γ ─ s v = σ ∷ (Γ ─ v)
-
  get : {B : I → Set} {i : I} → [ Var i ⟶ All B ⟶ κ (B i) ]
  get z     (b  ∷ _)  = b
  get (s v) (_  ∷ bs) = get v bs

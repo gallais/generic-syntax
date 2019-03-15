@@ -17,6 +17,7 @@ open import Generic.Simulation.Syntactic
 
 open import Function
 open import Relation.Binary.PropositionalEquality as PEq
+open import Relation.Binary.PropositionalEquality.WithK
 open ≡-Reasoning
 
 -- If we directly try to prove that t[id] ≡ t we run into size-related issues.
@@ -53,7 +54,7 @@ module _ {I : Set} {d : Desc I} where
 
  ⟨ `σ A d   ⟩≅⇒≡ (refl , eq) = cong -,_ (⟨ d _ ⟩≅⇒≡ eq)
  ⟨ `X Δ j d ⟩≅⇒≡ (≅-pr , eq) = cong₂ _,_ (≅⇒≡ ≅-pr) (⟨ d ⟩≅⇒≡ eq)
- ⟨ `∎ i     ⟩≅⇒≡ eq          = ≡-irrelevance _ _
+ ⟨ `∎ i     ⟩≅⇒≡ eq          = ≡-irrelevant _ _
 
 -- We can now prove a lemma stating that t[id] ≅ t and we will obtain t[id] ≡ t as
 -- a corrolary.

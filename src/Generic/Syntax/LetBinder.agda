@@ -1,10 +1,12 @@
 module Generic.Syntax.LetBinder where
 
+open import Data.Bool
 open import Data.Product
 open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Function
 
+open import indexed
 open import var
 open import Generic.Syntax
 
