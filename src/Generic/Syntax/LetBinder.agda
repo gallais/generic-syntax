@@ -18,3 +18,8 @@ module _ {I : Set} where
 
 pattern `IN' e t = (_ , e , t , refl)
 pattern `IN  e t = `con (`IN' e t)
+
+module _ {I : Set} {d : Desc I} where
+
+  embed : ∀ {i σ} → [ Tm d i σ ⟶ Tm (d `+ Let) i σ ]
+  embed = map^Tm (MkDescMorphism (true ,_))
