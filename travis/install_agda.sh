@@ -10,7 +10,7 @@ fi
 mkdir -p $HOME/.agda
 cp libraries-"$AGDA_VERSION" $HOME/.agda/
 cd $HOME/.agda/
-git clone git@github.com:agda/agda-stdlib/ agda-stdlib-0.18
+git clone https://github.com/agda/agda-stdlib/ agda-stdlib-0.18
 cd agda-stdlib-0.18
 git checkout a0bfe7422d2aa0f0f49c9647659ce34e6e741375
 cd -
