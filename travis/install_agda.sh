@@ -8,7 +8,8 @@ if ! type "agda" > /dev/null || [ ! `agda -V | sed "s/[^2]*//"` = "$AGDA_VERSION
   mkdir -p $HOME/.agda
   cp libraries-"$AGDA_VERSION" $HOME/.agda/
   cd $HOME/.agda/
-  wget https://github.com/agda/agda-stdlib/archive/v0.17.tar.gz
-  tar -xvzf v0.17.tar.gz
+  git clone git@github.com:agda/agda-stdlib/ agda-stdlib-0.18
+  cd agda-stdlib-0.18
+  git checkout a0bfe7422d2aa0f0f49c9647659ce34e6e741375
   cd -
 fi
