@@ -52,41 +52,33 @@ Names : {I : Set} → (I → Set) → List I → I ─Scoped
 Names T [] j Γ = T j
 Names T Δ  j Γ = All (κ String) Δ × T j
 
-data Raw {I : Set} (d : Desc I) : Size → I → Set where
-  `var : ∀ {s σ} → String → Raw d (↑ s) σ
-  `con : ∀ {s σ} → ⟦ d ⟧ (Names (Raw d s)) σ [] → Raw d (↑ s) σ
+data Raw (A : Set) {I : Set} (d : Desc I) : Size → I → Set where
+  `var : ∀ {s σ} → A → String → Raw A d (↑ s) σ
+  `con : ∀ {s σ} → ⟦ d ⟧ (Names (Raw A d s)) σ [] → Raw A d (↑ s) σ
 
-module ScopeCheck
-       {I : Set} {d : Desc I} (I-dec : (i j : I) → Dec (i ≡ j))
-       {E : Set} (err : ∀ σ → Raw d ∞ σ → Maybe E)
-       where
+module ScopeCheck {E I : Set} {d : Desc I} (I-dec : (i j : I) → Dec (i ≡ j)) where
 
  M : Set → Set
- M = (String × Maybe E) ⊎_
- open RawMonad (SC.monad (String × Maybe E) zero)
+ M = (E × String) ⊎_
+ open RawMonad (SC.monad (E × String) zero)
 
- varCheck : String → ∀ σ Γ → All (κ String) Γ → M (Var σ Γ)
- varCheck str σ []       []         = inj₁ (str , nothing)
- varCheck str σ (τ ∷ Γ)  (nm ∷ scp) with nm String.≟ str
- ... | no ¬p = s <$> varCheck str σ Γ scp
+ varCheck : E × String → ∀ σ Γ → All (κ String) Γ → M (Var σ Γ)
+ varCheck v           σ []       []         = inj₁ v
+ varCheck v@(e , str) σ (τ ∷ Γ)  (nm ∷ scp) with nm String.≟ str
+ ... | no ¬p = s <$> varCheck v σ Γ scp
  ... | yes p with I-dec σ τ
- ... | no ¬eq = inj₁ (str , nothing)
+ ... | no ¬eq = inj₁ v
  ... | yes eq = inj₂ (subst (Var _ ∘′ (_∷ Γ)) eq z)
 
- scopeCheck     : ∀ {s} σ Γ → All (κ String) Γ → Raw d s σ → M (Tm d s σ Γ)
- scopeCheck'    : ∀ {s} σ Γ → All (κ String) Γ → Raw d s σ → M (Tm d s σ Γ)
+ scopeCheck    : ∀ {s} σ Γ → All (κ String) Γ → Raw E d s σ → M (Tm d s σ Γ)
 
  scopeCheckBody : ∀ Γ → All (κ String) Γ →
-                  ∀ {s} Δ σ → Names (Raw d s) Δ σ [] → M (Scope (Tm d s) Δ σ Γ)
+                  ∀ {s} Δ σ → Names (Raw E d s) Δ σ [] → M (Scope (Tm d s) Δ σ Γ)
 
- scopeCheck σ Γ scp t = case scopeCheck' σ Γ scp t of λ where
-   (inj₁ (str , nothing)) → inj₁ (str , err σ t)
-   v                      → v
+ scopeCheck σ Γ scp (`var e v) = `var <$> varCheck (e , v) σ Γ scp
+ scopeCheck σ Γ scp (`con b)   = `con <$> traverse rawIApplicative d
+                                          (fmap d (scopeCheckBody Γ scp) b)
 
- scopeCheck' σ Γ scp (`var v) = `var <$> varCheck v σ Γ scp
- scopeCheck' σ Γ scp (`con b) = `con <$> traverse rawIApplicative d
-                                        (fmap d (scopeCheckBody Γ scp) b)
-
- scopeCheckBody Γ scp []        σ b         = scopeCheck' σ Γ scp b
+ scopeCheckBody Γ scp []        σ b         = scopeCheck σ Γ scp b
  scopeCheckBody Γ scp Δ@(_ ∷ _) σ (nms , b) =
    scopeCheck σ (Δ L.++ Γ) (Inverse.to ++↔ ⟨$⟩ (nms , scp)) b
