@@ -17,6 +17,7 @@ cache:
   directories:
     - $HOME/.cabal/
     - $HOME/.ghc/
+    - $HOME/.agda/
 
 install:
   - export PATH=$HOME/.cabal/bin:/opt/ghc/8.2.2/bin:/opt/cabal/2.0/bin:$PATH
