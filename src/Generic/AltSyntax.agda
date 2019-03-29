@@ -8,7 +8,7 @@ open import Data.Bool
 open import Data.List.All
 open import Data.List.All.Properties
 open import Data.List.Base as L hiding ([_])
-open import Data.Maybe.Base
+open import Data.Maybe.Base hiding (All)
 open import Data.Sum.Base
 import Data.Sum.Categorical.Left as SC
 open import Data.Product
