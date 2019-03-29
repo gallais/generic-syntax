@@ -58,8 +58,9 @@ data Raw (A : Set) {I : Set} (d : Desc I) : Size → I → Set where
 
 module ScopeCheck {E I : Set} {d : Desc I} (I-dec : (i j : I) → Dec (i ≡ j)) where
 
- M : Set → Set
- M = (E × String) ⊎_
+ private
+   M : Set → Set
+   M = (E × String) ⊎_
  open RawMonad (SC.monad (E × String) zero)
 
  varCheck : E × String → ∀ σ Γ → All (κ String) Γ → M (Var σ Γ)
