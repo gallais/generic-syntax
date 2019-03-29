@@ -7,4 +7,4 @@ A self-contained repository for the paper [A Scope-and-Type Safe Universe of Syn
 
 To check this development, you'll need:
 * Agda 2.5.4.2
-* Agda's Standard Library 0.18
+* Agda's Standard Library 0.17
