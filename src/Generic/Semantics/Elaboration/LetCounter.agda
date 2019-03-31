@@ -7,8 +7,8 @@ open import Agda.Builtin.Bool
 open import Data.Product
 import Data.Product.Categorical.Right as PC
 open import Data.List.Base
-open import Data.List.Relation.Unary.All as All
-open import Data.List.Relation.Unary.All.Properties
+open import Data.List.All as All
+open import Data.List.All.Properties
 open import Function
 
 open import var

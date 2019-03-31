@@ -3,7 +3,7 @@ module Generic.Syntax.LetCounter where
 open import Algebra
 open import Data.Bool
 open import Data.Product
-open import Data.List.Relation.Unary.All
+open import Data.List.All
 open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Function
@@ -37,7 +37,8 @@ module _ {I : Set} where
   fromVar (s v) = zero ∷ fromVar v
 
   merge : [ Count ⟶ Count ⟶ Count ]
-  merge = curry (zipWith (uncurry _+_))
+  merge []       []       = []
+  merge (m ∷ cs) (n ∷ ds) = m + n ∷ merge cs ds
 
   rawMonoid : List I → RawMonoid _ _
   rawMonoid Γ = record
