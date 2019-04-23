@@ -165,7 +165,7 @@ summed up by the large type \AB{I}
 \AF{─Scoped}:% = $I$ $\to$ \AD{List} $I$ $\to$ \AF{Set}.
 
 \begin{center}
-\ExecuteMetaData[var.tex]{scoped}
+\ExecuteMetaData[Data/Var.tex]{scoped}
 %\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
 \end{center}
 
@@ -181,20 +181,20 @@ to build indexed types.
 
 \begin{center}
 \begin{minipage}{0.4\textwidth}
-\ExecuteMetaData[indexed.tex]{arrow}
+% \ExecuteMetaData[indexed.tex]{arrow}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
-\ExecuteMetaData[indexed.tex]{adjust}
+% \ExecuteMetaData[indexed.tex]{adjust}
 \end{minipage}
 
 \begin{minipage}{0.40\textwidth}
-\ExecuteMetaData[indexed.tex]{product}
+% \ExecuteMetaData[indexed.tex]{product}
 \end{minipage}\hfill
 \begin{minipage}{0.25\textwidth}
-\ExecuteMetaData[indexed.tex]{constant}
+% \ExecuteMetaData[indexed.tex]{constant}
 \end{minipage}\hfill
 \begin{minipage}{0.25\textwidth}
-\ExecuteMetaData[indexed.tex]{forall}
+% \ExecuteMetaData[indexed.tex]{forall}
 \end{minipage}
 %\caption{Combinators to build indexed Sets}\label{figure:indexed}
 \end{center}
@@ -203,7 +203,7 @@ We lift the function space and the product type pointwise with
 \AF{\_⟶\_} and \AF{\_∙×\_} respectively, silently threading the
 underlying scope. The \AF{\_⊢\_} makes explicit the \emph{adjustment} made to the index
 by a function, conforming to the convention (see e.g.~\cite{martin1982constructive}) of mentioning only
-context \emph{extensions} when presenting judgements 
+context \emph{extensions} when presenting judgements
 and write \AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed
 Set it operates on. Although it may seem surprising at first to define binary
 infix operators as having arity three, they are meant to be used partially applied,
@@ -224,7 +224,7 @@ scope when defining such families:
 
 %\begin{center}
 \begin{minipage}[t]{0.35\textwidth}
-\ExecuteMetaData[var.tex]{var}
+\ExecuteMetaData[Data/Var.tex]{var}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.55\textwidth}
 \ExecuteMetaData[motivation.tex]{tm}
@@ -246,7 +246,7 @@ They respectively normalise to:
 \end{center}
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch
-and Reus' simply typed $\lambda$-calculus representation. 
+and Reus' simply typed $\lambda$-calculus representation.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -293,7 +293,7 @@ values \AB{𝓥} for us):
 
 %\begin{figure}[h]
 \begin{center}
-\ExecuteMetaData[environment.tex]{env}
+\ExecuteMetaData[Data/Environment.tex]{env}
 \end{center}
 %\caption{Well Typed and Scoped Environments of Values}
 %\end{figure}
@@ -321,7 +321,7 @@ over environment extensions which is typical of Kripke semantics.
 \label{def:thinning}
 %\begin{figure}[h]
 \begin{center}
-\ExecuteMetaData[environment.tex]{thinning}
+\ExecuteMetaData[Data/Environment.tex]{thinning}
 \end{center}
 %\caption{Thinnings: A Special Case of Environments}
 %\end{figure}
@@ -352,12 +352,12 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[environment.tex]{box}
-\ExecuteMetaData[environment.tex]{comonad}
+\ExecuteMetaData[Data/Environment.tex]{box}
+\ExecuteMetaData[Data/Environment.tex]{comonad}
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[environment.tex]{thinnable}
-\ExecuteMetaData[environment.tex]{freeth}
+\ExecuteMetaData[Data/Environment.tex]{thinnable}
+\ExecuteMetaData[Data/Environment.tex]{freeth}
 \end{minipage}
 \caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable.}
 \end{figure}
@@ -824,7 +824,7 @@ each one of the fresh variables.
 \end{itemize}
 
 \begin{figure}[h]
-\ExecuteMetaData[environment.tex]{kripke}
+\ExecuteMetaData[Data/Environment.tex]{kripke}
 \caption{Substructures as either Computations or Kripke Function Spaces}
 \end{figure}
 
@@ -929,7 +929,7 @@ values which are thinnable and such that we can craft placeholder values
 in non-empty contexts.
 
 \begin{figure}[h]
-\ExecuteMetaData[varlike.tex]{varlike}
+\ExecuteMetaData[Data/Var/VarLike.tex]{varlike}
 \caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values}
 \end{figure}
 
@@ -971,7 +971,7 @@ language description \AB{d} to \AB{d} \AF{`+} \AF{Let} (where \AF{`+}
 is the disjoint of sum of two descriptions defined in Figure~\ref{figure:descsum}):
 
 \begin{figure}[h]
-  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{letcode}
+  \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letcode}
 \caption{Description of a Single Let Binding}
 \end{figure}
 
@@ -1004,10 +1004,10 @@ placeholder environment associating each variable to itself.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unletcode}
+%  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unletcode}
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unlet}
+%  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unlet}
 \end{minipage}
 \caption{Inlining Let Binding}
 \end{figure}
@@ -1301,7 +1301,7 @@ layers which are meant to be equal:
 \end{itemize}
 
 \begin{figure}[h]
- \ExecuteMetaData[Generic/Zip.tex]{ziptype}
+ \ExecuteMetaData[Generic/Relator.tex]{ziptype}
 \caption{Zip: Characterising Structurally Equal Values with Related Substructures}
 \end{figure}
 
@@ -1326,7 +1326,7 @@ the relation transformer \AF{∀[\_]} which lifts a relation on values
 to one on environments in a pointwise manner.
 
 \begin{figure}[h]
- \ExecuteMetaData[varlike.tex]{kripkeR}
+ \ExecuteMetaData[Data/Var/VarLike.tex]{kripkeR}
 \caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
 \end{figure}
 

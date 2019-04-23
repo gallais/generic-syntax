@@ -1,7 +1,8 @@
 \begin{code}
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Data where
 
-open import indexed
 open import Size
 open import Data.Empty
 open import Data.Bool
@@ -9,6 +10,7 @@ open import Data.Nat using (ℕ ; suc)
 open import Data.Unit
 open import Data.Product as Prod
 open import Function
+open import Relation.Unary
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 \end{code}
@@ -21,47 +23,56 @@ data Desc (I J : Set) : Set₁ where
 \end{code}
 %</desc>
 \begin{code}
-module _ {I J : Set} where
- infixr 5 _`+_
+private
+  variable
+    I J : Set
+    i : I
+    j : J
+    d : Desc I J
+    X Y : J → Set
+    s : Size
+    A B : Set
 
- `K : Set → I → Desc I J
- `K A i = `σ A (λ _ → `∎ i)
+`K : Set → I → Desc I J
+`K A i = `σ A (λ _ → `∎ i)
+
+infixr 5 _`+_
 \end{code}
 
 %<*sum>
 \begin{code}
- _`+_ : Desc I J → Desc I J → Desc I J
- d `+ e = `σ Bool $ λ { true  → d ; false → e }
+_`+_ : Desc I J → Desc I J → Desc I J
+d `+ e = `σ Bool $ λ { true  → d ; false → e }
 \end{code}
 %</sum>
 
 %<*interp>
 \begin{code}
- ⟦_⟧ : Desc I J → (J → Set) → (I → Set)
- ⟦ `σ A d  ⟧ X i = Σ[ a ∈ A ] (⟦ d a ⟧ X i)
- ⟦ `X j d  ⟧ X i = X j × ⟦ d ⟧ X i
- ⟦ `∎ i′   ⟧ X i = i ≡ i′
+⟦_⟧ : Desc I J → (J → Set) → (I → Set)
+⟦ `σ A d  ⟧ X i = Σ[ a ∈ A ] (⟦ d a ⟧ X i)
+⟦ `X j d  ⟧ X i = X j × ⟦ d ⟧ X i
+⟦ `∎ i′   ⟧ X i = i ≡ i′
 \end{code}
 %</interp>
 %<*fmap>
 \begin{code}
- fmap : {X Y : J → Set} → (d : Desc I J) → [ X ⟶ Y ] → [ ⟦ d ⟧ X ⟶ ⟦ d ⟧ Y ]
- fmap (`σ A d)  f (a , v)  = (a , fmap (d a) f v)
- fmap (`X j d)  f (r , v)  = (f r , fmap d f v)
- fmap (`∎ i)    f t        = t
+fmap : (d : Desc I J) → ∀[ X ⇒ Y ] → ∀[ ⟦ d ⟧ X ⇒ ⟦ d ⟧ Y ]
+fmap (`σ A d)  f (a , v)  = (a , fmap (d a) f v)
+fmap (`X j d)  f (r , v)  = (f r , fmap d f v)
+fmap (`∎ i)    f t        = t
 \end{code}
 %</fmap>
 
 %<*mu>
 \begin{code}
-data μ {I : Set} (d : Desc I I) : Size → I → Set where
-  `con : {i : I} {s : Size} → ⟦ d ⟧ (μ d s) i → μ d (↑ s) i
+data μ (d : Desc I I) : Size → I → Set where
+  `con : ⟦ d ⟧ (μ d s) i → μ d (↑ s) i
 \end{code}
 %</mu>
 
 %<*fold>
 \begin{code}
-fold : {I : Set} {X : I → Set} {s : Size} → (d : Desc I I) → [ ⟦ d ⟧ X ⟶ X ] → [ μ d s ⟶ X ]
+fold : (d : Desc I I) → ∀[ ⟦ d ⟧ X ⇒ X ] → ∀[ μ d s ⇒ X ]
 fold d alg (`con t) = alg (fmap d (fold d alg) t)
 \end{code}
 %</fold>
@@ -124,7 +135,7 @@ List A = μ (listD A) ∞ tt
 
 %<*nil>
 \begin{code}
-[] : {A : Set} → μ (listD A) ∞ tt
+[] : μ (listD A) ∞ tt
 [] = `con (true , refl)
 \end{code}
 %</nil>
@@ -132,10 +143,9 @@ List A = μ (listD A) ∞ tt
 \begin{code}
 infixr 10 _∷_
 \end{code}
-
 %<*cons>
 \begin{code}
-_∷_ : {A : Set} → A → List A → List A
+_∷_ : A → List A → List A
 x ∷ xs = `con (false , x , xs , refl)
 \end{code}
 %</cons>
@@ -143,7 +153,7 @@ x ∷ xs = `con (false , x , xs , refl)
 %<*example>
 \begin{code}
 example : List (List Bool)
-example  = (false ∷ []) ∷ (true ∷ []) ∷ []
+example = (false ∷ []) ∷ (true ∷ []) ∷ []
 \end{code}
 %</example>
 
@@ -165,7 +175,7 @@ Vec A = μ (vecD A) ∞
 
 %<*foldr>
 \begin{code}
-foldr : {A B : Set} → (A → B → B) → B → List A → B
+foldr : (A → B → B) → B → List A → B
 foldr {A} {B} c n = fold (listD A) alg where
 
   alg : ⟦ listD A ⟧ (const B) tt → B
@@ -176,14 +186,14 @@ foldr {A} {B} c n = fold (listD A) alg where
 
 %<*append>
 \begin{code}
-_++_ : {A : Set} → List A  → List A → List A
+_++_ : List A  → List A → List A
 _++_ = foldr (λ hd rec → hd ∷_ ∘ rec) id
 \end{code}
 %</append>
 
 %<*append>
 \begin{code}
-flatten : {A : Set} → List (List A) → List A
+flatten : List (List A) → List A
 flatten = foldr _++_ []
 \end{code}
 %</append>

@@ -1,15 +1,21 @@
 \begin{code}
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Semantics.Unit where
 
 open import Data.Unit
-open import var
+open import Data.Var
+open import Generic.Syntax
 open import Generic.Semantics
 
-module _ {I : Set} where
+private
+  variable
+    I : Set
+    d : Desc I
 
- Unit : I ─Scoped
- Unit = λ _ _ → ⊤
+Unit : I ─Scoped
+Unit = λ _ _ → ⊤
 
- SemUnit : ∀ {d} → Sem d Unit Unit
- SemUnit = _
+SemUnit : Semantics d Unit Unit
+SemUnit = _
 \end{code}
