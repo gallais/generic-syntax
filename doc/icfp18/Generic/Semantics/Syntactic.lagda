@@ -29,21 +29,19 @@ private
 \end{code}
 %<*renaming>
 \begin{code}
-Renaming : Semantics d Var (Tm d ∞)
-Renaming  .th^𝓥  = th^Var
-Renaming  .var   = `var
-Renaming  .alg   = `con ∘ fmap d (reify vl^Var)
+Ren : Semantics d Var (Tm d ∞)
+Ren .th^𝓥  = th^Var
+Ren .var   = `var
+Ren .alg   = `con ∘ fmap d (reify vl^Var)
 \end{code}
 %</renaming>
 %<*thTm>
 \begin{code}
 th^Tm : Thinnable (Tm d ∞ σ)
-th^Tm t ρ = Semantics.semantics Renaming ρ t
+th^Tm t ρ = Semantics.semantics Ren ρ t
 \end{code}
 %</thTm>
 \begin{code}
-ren : Thinning Γ Δ → (Γ ─Comp) (Tm d ∞) Δ
-ren = Semantics.semantics Renaming
 
 vl^Tm : VarLike (Tm d ∞)
 new   vl^Tm = `var z
@@ -51,24 +49,35 @@ th^𝓥  vl^Tm = th^Tm
 \end{code}
 %<*substitution>
 \begin{code}
-Substitution : Semantics d (Tm d ∞) (Tm d ∞)
-Substitution .th^𝓥  = th^Tm
-Substitution .var   = id
-Substitution .alg   = `con ∘ fmap d (reify vl^Tm)
+Sub : Semantics d (Tm d ∞) (Tm d ∞)
+Sub .th^𝓥  = th^Tm
+Sub .var   = id
+Sub .alg   = `con ∘ fmap d (reify vl^Tm)
 \end{code}
 %</substitution>
 \begin{code}
 module PAPERONLY where
 \end{code}
+%<*ren>
+\begin{code}
+ ren : (Γ ─Env) Var Δ →
+       Tm d ∞ σ Γ → Tm d ∞ σ Δ
+ ren ρ t = Semantics.semantics Ren ρ t
+\end{code}
+%</ren>
 %<*sub>
 \begin{code}
- sub : (Γ ─Env) (Tm d ∞) Δ → Tm d ∞ σ Γ → Tm d ∞ σ Δ
- sub ρ t = Semantics.semantics Substitution ρ t
+ sub : (Γ ─Env) (Tm d ∞) Δ →
+       Tm d ∞ σ Γ → Tm d ∞ σ Δ
+ sub ρ t = Semantics.semantics Sub ρ t
 \end{code}
 %</sub>
 \begin{code}
+ren : Thinning Γ Δ → (Γ ─Comp) (Tm d ∞) Δ
+ren = Semantics.semantics Ren
+
 sub : ∀ {s} → (Γ ─Env) (Tm d ∞) Δ → Tm d s σ Γ → Tm d ∞ σ Δ
-sub ρ t = Semantics.semantics Substitution ρ t
+sub ρ t = Semantics.semantics Sub ρ t
 
 vl^VarTm : VarLikeᴿ VarTmᴿ vl^Var vl^Tm
 VarLikeᴿ.newᴿ  vl^VarTm = refl

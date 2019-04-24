@@ -39,34 +39,34 @@ data Lam : Type ─Scoped where
 \begin{code}
 module Renaming where
 
- ⟦V⟧‿ren : ∀[ Var σ ⇒ Lam σ ]
- ⟦V⟧‿ren = `var
+ ⟦var⟧ᵣ : ∀[ Var σ ⇒ Lam σ ]
+ ⟦var⟧ᵣ = `var
 
- extend‿ren : (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
- extend‿ren ρ = s <$> ρ ∙ z
+ extendᵣ : (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
+ extendᵣ ρ = s <$> ρ ∙ z
 \end{code}
 %<*ren>
 \begin{code}
  ren : (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
- ren ρ (`var k)    = ⟦V⟧‿ren (lookup ρ k)
+ ren ρ (`var k)    = ⟦var⟧ᵣ (lookup ρ k)
  ren ρ (`app f t)  = `app (ren ρ f) (ren ρ t)
- ren ρ (`lam b)    = `lam (ren (extend‿ren ρ) b)
+ ren ρ (`lam b)    = `lam (ren (extendᵣ ρ) b)
 \end{code}
 %</ren>
 \begin{code}
 module Substitution where
- extend‿sub : (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
- extend‿sub ρ = Renaming.ren E.extend <$> ρ ∙ `var z
+ extendₛ : (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
+ extendₛ ρ = Renaming.ren E.extend <$> ρ ∙ `var z
 
- ⟦V⟧‿sub : ∀[ Lam σ ⇒ Lam σ ]
- ⟦V⟧‿sub x = x
+ ⟦var⟧ₛ : ∀[ Lam σ ⇒ Lam σ ]
+ ⟦var⟧ₛ x = x
 \end{code}
 %<*sub>
 \begin{code}
  sub : (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
- sub ρ (`var k)    = ⟦V⟧‿sub (lookup ρ k)
+ sub ρ (`var k)    = ⟦var⟧ₛ (lookup ρ k)
  sub ρ (`app f t)  = `app (sub ρ f) (sub ρ t)
- sub ρ (`lam b)    = `lam (sub (extend‿sub ρ) b)
+ sub ρ (`lam b)    = `lam (sub (extendₛ ρ) b)
 \end{code}
 %</sub>
 \begin{code}
@@ -90,40 +90,40 @@ module _ where
    reflect α = id
    reflect (σ `→ τ) = λ b ρ v → reflect τ (`app (Renaming.ren ρ b) (reify σ v))
 
-   extend : Thinning Δ Θ → (Γ ─Env) Val Δ → Val σ Θ → (σ ∷ Γ ─Env) Val Θ
-   extend r ρ v = (λ {σ} v → th^Val σ v r) <$> ρ ∙ v
+   extendₙ : Thinning Δ Θ → (Γ ─Env) Val Δ → Val σ Θ → (σ ∷ Γ ─Env) Val Θ
+   extendₙ r ρ v = (λ {σ} v → th^Val σ v r) <$> ρ ∙ v
 
-   ⟦V⟧ : Var σ Γ → ∀[ Val σ ⇒ Val σ ]
-   ⟦V⟧ _ x = x
+   ⟦var⟧ₙ : Var σ Γ → ∀[ Val σ ⇒ Val σ ]
+   ⟦var⟧ₙ _ x = x
 
-   ⟦A⟧ : Lam (σ `→ τ) Γ → ∀[ Val (σ `→ τ) ⇒ Val σ ⇒ Val τ ]
-   ⟦A⟧ _ f t = f (pack id) t
+   ⟦app⟧ₙ : Lam (σ `→ τ) Γ → ∀[ Val (σ `→ τ) ⇒ Val σ ⇒ Val τ ]
+   ⟦app⟧ₙ _ f t = f (pack id) t
 \end{code}
 %<*nbe>
 \begin{code}
  nbe : (Γ ─Env) Val Δ → Lam σ Γ → Val σ Δ
- nbe ρ (`var k)    = ⟦V⟧ k (lookup ρ k)
- nbe ρ (`app f t)  = ⟦A⟧ f (nbe ρ f) (nbe ρ t)
- nbe ρ (`lam b)    = λ σ v → nbe (extend σ ρ v) b
+ nbe ρ (`var k)    = ⟦var⟧ₙ k (lookup ρ k)
+ nbe ρ (`app f t)  = ⟦app⟧ₙ f (nbe ρ f) (nbe ρ t)
+ nbe ρ (`lam b)    = λ σ v → nbe (extendₙ σ ρ v) b
 \end{code}
 %</nbe>
 
 %<*rsem>
 \begin{code}
-record Sem (𝓥 𝓒 : Type ─Scoped) : Set where
+record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
   field  th^𝓥  : Thinnable (𝓥 σ)
-         ⟦V⟧   : ∀[ 𝓥 σ ⇒ 𝓒 σ ]
-         ⟦A⟧   : ∀[ 𝓒 (σ `→ τ) ⇒ 𝓒 σ ⇒ 𝓒 τ ]
-         ⟦L⟧   : ∀[ □ (𝓥 σ ⇒ 𝓒 τ) ⇒ 𝓒 (σ `→ τ) ]
+         ⟦var⟧ : ∀[ 𝓥 σ ⇒ 𝓒 σ ]
+         ⟦app⟧ : ∀[ 𝓒 (σ `→ τ) ⇒ 𝓒 σ ⇒ 𝓒 τ ]
+         ⟦lam⟧ : ∀[ □ (𝓥 σ ⇒ 𝓒 τ) ⇒ 𝓒 (σ `→ τ) ]
 \end{code}
 %</rsem>
 
 %<*sem>
 \begin{code}
   sem : (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
-  sem ρ (`var k)    = ⟦V⟧ (lookup ρ k)
-  sem ρ (`app f t)  = ⟦A⟧ (sem ρ f) (sem ρ t)
-  sem ρ (`lam b)    = ⟦L⟧ (λ σ v → sem (extend σ ρ v) b)
+  sem ρ (`var k)    = ⟦var⟧ (lookup ρ k)
+  sem ρ (`app f t)  = ⟦app⟧ (sem ρ f) (sem ρ t)
+  sem ρ (`lam b)    = ⟦lam⟧ (λ σ v → sem (extend σ ρ v) b)
 \end{code}
 %</sem>
 \begin{code}
@@ -135,34 +135,34 @@ record Sem (𝓥 𝓒 : Type ─Scoped) : Set where
 
 %<*semren>
 \begin{code}
-Renaming : Sem Var Lam
+Renaming : Semantics Var Lam
 Renaming = record
   { th^𝓥  = th^Var
-  ; ⟦V⟧   = `var
-  ; ⟦A⟧   = `app
-  ; ⟦L⟧   = λ b → `lam (b (pack s) z) }
+  ; ⟦var⟧ = `var
+  ; ⟦app⟧ = `app
+  ; ⟦lam⟧ = λ b → `lam (b (pack s) z) }
 \end{code}
 %</semren>
 %<*semrenfun>
 \begin{code}
 ren : (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
-ren = Sem.sem Renaming
+ren = Semantics.sem Renaming
 \end{code}
 %</semrenfun>
 %<*semsub>
 \begin{code}
-Substitution : Sem Lam Lam
+Substitution : Semantics Lam Lam
 Substitution = record
    { th^𝓥  = λ t ρ → ren ρ t
-   ; ⟦V⟧   = id
-   ; ⟦A⟧   = `app
-   ; ⟦L⟧   = λ b → `lam (b (pack s) (`var z)) }
+   ; ⟦var⟧ = id
+   ; ⟦app⟧ = `app
+   ; ⟦lam⟧ = λ b → `lam (b (pack s) (`var z)) }
 \end{code}
 %</semsub>
 %<*semsubfun>
 \begin{code}
 sub : (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
-sub = Sem.sem Substitution
+sub = Semantics.sem Substitution
 \end{code}
 %</semsubfun>
 
@@ -204,13 +204,13 @@ module Printer where
 %</freshprint>
 %<*semprint>
 \begin{code}
- Printing : Sem (Wrap String) (Wrap (State ℕ String))
+ Printing : Semantics (Wrap String) (Wrap (State ℕ String))
  Printing = record
    { th^𝓥  =  th^Wrap
-   ; ⟦V⟧   =  map^Wrap return
-   ; ⟦A⟧   =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
+   ; ⟦var⟧ =  map^Wrap return
+   ; ⟦app⟧ =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
               return $ f ++ "(" ++ t ++ ")"
-   ; ⟦L⟧   =  λ {σ} mb → MkW $ fresh σ >>= λ x →
+   ; ⟦lam⟧ =  λ {σ} mb → MkW $ fresh σ >>= λ x →
               getW (mb extend x) >>= λ b →
               return $ "λ" ++ getW x ++ "." ++ b }
 \end{code}
@@ -222,7 +222,7 @@ open Printer using (Printing)
 
 \begin{code}
 print : (σ : Type) → Lam σ [] → String
-print _ t = proj₁ $ Printer.getW (Sem.sem Printing {Δ = []} (pack λ ()) t) 0
+print _ t = proj₁ $ Printer.getW (Semantics.sem Printing {Δ = []} (pack λ ()) t) 0
 
 _ : print (α `→ α) (`lam (`var z)) ≡ "λ0.0"
 _ = refl

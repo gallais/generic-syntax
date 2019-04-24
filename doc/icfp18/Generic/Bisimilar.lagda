@@ -17,11 +17,15 @@ open import Generic.Relator
 open import Generic.Simulation
 
 open import Relation.Binary.PropositionalEquality using (_≡_ ; subst)
+
+private
+  variable
+    I : Set
 \end{code}
 
 %<*bisim>
 \begin{code}
-record ≈^∞Tm {I : Set} (d : Desc I) (s : Size) (i : I) (t u : ∞Tm d s i) : Set where
+record ≈^∞Tm (d : Desc I) (s : Size) (i : I) (t u : ∞Tm d s i) : Set where
   coinductive
   field force : {s′ : Size< s} → ⟦ d ⟧ᴿ (λ _ i → ≈^∞Tm d s′ i) (t .force) (u .force)
 \end{code}

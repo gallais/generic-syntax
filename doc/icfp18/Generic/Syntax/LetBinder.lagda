@@ -31,11 +31,14 @@ module _ {I : Set} where
         `X [] σ (`X (σ ∷ []) τ (`∎ τ))
 \end{code}
 %</letcode>
+%<*letpattern>
 \begin{code}
-
 pattern `IN' e t = (_ , e , t , refl)
 pattern `IN  e t = `con (`IN' e t)
+\end{code}
+%</letpattern>
 
+\begin{code}
 embed : ∀[ Tm d s σ ⇒ Tm (d `+ Let) s σ ]
 embed = map^Tm (MkDescMorphism (true ,_))
 \end{code}

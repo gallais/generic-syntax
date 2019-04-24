@@ -33,3 +33,14 @@ module PATTERNS where
 _ : TM STLC ((α ⇒ α) ⇒ (α ⇒ α))
 _ = let open PATTERNS in
     LAM (LAM (APP (VAR (s z)) (VAR z)))
+
+open PATTERNS
+open import Generic.Semantics
+open import Generic.Semantics.Syntactic
+open import Generic.Semantics.Development
+open import Relation.Unary renaming (_⇒_ to _⟶_)
+
+dev : ∀ {i} → ∀[ Tm STLC _ i ⟶ Tm STLC _ i ]
+dev = development STLC λ σ → λ where
+  (App _ _ , (LAM f) , t , refl) → f [ t /0]
+  t                              → Sem.alg Substitution t

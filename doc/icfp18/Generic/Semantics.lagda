@@ -29,6 +29,17 @@ module _  {d : Desc I} where
   (Γ ─Comp) 𝓒 Δ = ∀ {s σ} → Tm d s σ Γ → 𝓒 σ Δ
 \end{code}
 %</comp>
+\begin{code}
+  module DISPLAYONLY where
+\end{code}
+%<*semantics>
+\begin{code}
+   record Semantics (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
+     field th^𝓥  : Thinnable (𝓥 σ)
+           var   : ∀[ 𝓥 σ ⇒ 𝓒 σ ]
+           alg   : ∀[ ⟦ d ⟧ (Kripke 𝓥 𝓒) σ ⇒ 𝓒 σ ]
+\end{code}
+%</semantics>
 %<*semrec>
 \begin{code}
 record Semantics (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
@@ -54,9 +65,9 @@ record Semantics (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
 %</alg>
 %<*semtype>
 \begin{code}
- semantics  : (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
- body       : (Γ ─Env) 𝓥 Δ → ∀ Θ σ →
-              Scope (Tm d s) Θ σ Γ → Kripke 𝓥 𝓒 Θ σ Δ
+ semantics : (Γ ─Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
+ body      : (Γ ─Env) 𝓥 Δ → ∀ Θ σ →
+             Scope (Tm d s) Θ σ Γ → Kripke 𝓥 𝓒 Θ σ Δ
 \end{code}
 %</semtype>
 %<*semproof>

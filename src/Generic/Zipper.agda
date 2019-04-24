@@ -2,7 +2,7 @@ module Generic.Zipper where
 
 open import Size
 open import Data.Empty
-open import Data.Product as P hiding (,_)
+open import Data.Product as P
 open import Data.Bool
 open import Data.Sum
 open import Data.List.Base as List

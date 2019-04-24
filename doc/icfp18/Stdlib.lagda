@@ -11,7 +11,7 @@ private
 
 %<*constant>
 \begin{code}
-const : Set → (A  → Set)
+const : Set → (A → Set)
 const P x = P
 \end{code}
 %</constant>

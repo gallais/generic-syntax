@@ -200,21 +200,21 @@ to build indexed types.
 \end{center}
 
 We lift the function space and the product type pointwise with
-\AF{\_⟶\_} and \AF{\_∙×\_} respectively, silently threading the
+\AF{\_⇒\_} and \AF{\_∙×\_} respectively, silently threading the
 underlying scope. The \AF{\_⊢\_} makes explicit the \emph{adjustment} made to the index
 by a function, conforming to the convention (see e.g.~\cite{martin1982constructive}) of mentioning only
 context \emph{extensions} when presenting judgements
 and write \AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed
 Set it operates on. Although it may seem surprising at first to define binary
 infix operators as having arity three, they are meant to be used partially applied,
-surrounded by \AF{[\_]} which turns an indexed Set into a Set by implicitly
+surrounded by \AF{∀[\_]} which turns an indexed Set into a Set by implicitly
 quantifying over the index.
-Lastly, \AF{κ} is the constant combinator, ignoring the index.
+Lastly, \AF{const} is the constant combinator, ignoring the index.
 
-We make \AF{⟶} associate to the right as one would expect and give it the
+We make \AF{⇒} associate to the right as one would expect and give it the
 highest precedence level as it is the most used combinator. These combinators
 lead to more readable type declarations.  For instance, the compact expression
-\AF{[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⟶} \AB{R} \AF{]}
+\AF{∀[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⇒} \AB{R} \AF{]}
 desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
@@ -240,9 +240,9 @@ a variable in a given scope to the extended scope where
 an extra variable has been bound. Both of the constructors' types have been written using the combinators defined above.
 They respectively normalise to:
 \begin{center}
-  \AIC{z} : {\AS{∀} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{i} \AIC{:\!:} \AB{xs})}
+  \AIC{z} : {\AS{∀} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{i} \AIC{::} \AB{xs})}
   \qquad
-  \AIC{s} : {\AS{∀} \AB{i} \AB{j} \AB{xs} → \AD{Var} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{j} \AIC{:\!:} \AB{xs})}
+  \AIC{s} : {\AS{∀} \AB{i} \AB{j} \AB{xs} → \AD{Var} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{j} \AIC{::} \AB{xs})}
 \end{center}
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch
@@ -374,12 +374,12 @@ for this shallow embedding.
 
 Semantics, 
    specified in terms of a record \AR{Sem}, 
-are defined in Figure~\ref{figure:lamsem} in terms of a choice of values \AB{$\mathcal{V}$} and
-computations \AB{$\mathcal{C}$}. Realisation of a semantics will produce a
-computation in \AB{$\mathcal{C}$} for every term whose variables are assigned
-values in \AB{$\mathcal{V}$} as demonstrated in Figure~\ref{figure:fdmlamsem}.
+are defined in Figure~\ref{figure:lamsem} in terms of a choice of values \AB{𝓥} and
+computations \AB{𝓒}. Realisation of a semantics will produce a
+computation in \AB{𝓒} for every term whose variables are assigned
+values in \AB{𝓥} as demonstrated in Figure~\ref{figure:fdmlamsem}.
 A semantics must satisfy constraints on the notions of
-values \AB{$\mathcal{V}$} and computations \AB{$\mathcal{C}$} at hand. First of all,
+values \AB{𝓥} and computations \AB{𝓒} at hand. First of all,
 values should be thinnable so that \AF{sem} may push the environment
 under binders. Second, the set of computations needs to be closed
 under various combinators which are the semantical counterparts of
@@ -392,7 +392,7 @@ the Kripke function space one can find in normalisation by evaluation.
 In all possible thinnings of the scope at hand, it promises to deliver
 a computation whenever it is provided with a value for its newly
 bound variable. This is concisely expressed by the type
-(\AF{□} (\AB{$\mathcal{V}$} \AB{$\sigma$} \AF{→} \AB{$\mathcal{C}$} \AB{$\tau$})).
+(\AF{□} (\AB{𝓥} \AB{$\sigma$} \AF{→} \AB{𝓒} \AB{$\tau$})).
 
 \begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{rsem}
@@ -402,14 +402,14 @@ bound variable. This is concisely expressed by the type
 Agda allows us to package, together with the fields of the record
 \AR{Sem}, the generic traversal function \AF{sem}, which is brought
 into scope for any instance of \AR{Sem}. We thus realise the promise
-made earlier, namely that any given {\AR{Sem} \AB{$\mathcal{V}$}
-  \AB{$\mathcal{C}$}} induces a function which, given a value in
-\AB{$\mathcal{V}$} for each variable in scope, transforms a  \AD{Lam} term into a
-computation \AB{$\mathcal{C}$}.
+made earlier, namely that any given {\AR{Sem} \AB{𝓥}
+  \AB{𝓒}} induces a function which, given a value in
+\AB{𝓥} for each variable in scope, transforms a  \AD{Lam} term into a
+computation \AB{𝓒}.
 
 \begin{figure}[h]
 \ExecuteMetaData[motivation.tex]{sem}
-\caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \AR{Sem}\;\AB{$\mathcal{V}$}\;\AB{$\mathcal{C}$}}\label{figure:fdmlamsem}
+\caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \AR{Sem}\;\AB{𝓥}\;\AB{𝓒}}\label{figure:fdmlamsem}
 \end{figure}
 
 Coming back to renaming and substitution, we see that they both fit in the
@@ -742,36 +742,36 @@ with an appropriate eliminator \AF{case} which, given two continuations,
 picks the one corresponding to the chosen branch.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Syntax.tex]{sumcomb}
+\begin{minipage}{0.35\textwidth}
+  \ExecuteMetaData[Generic/Syntax.tex]{descsum}
 \end{minipage}\hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.55\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
 \caption{Descriptions are closed under Sum}\label{figure:descsum}
 \end{figure}
 
-Closure under product does not hold in general. Indeed, the
-equality constraints introduced by the two end tokens of two
-descriptions may be incompatible. So far, a limited form of
-closure (closure under finite product of recursive positions)
-has been sufficient for all of our use cases. As with coproducts,
-the appropriate eliminator \AF{unXs} takes a value in the encoding
-and extracts its constituents ({\AF{All} \AB{P} \AB{xs}} is defined
-in Agda's standard library and makes sure that the predicate \AB{P}
-holds true of all the elements in the list \AB{xs}).
+% Closure under product does not hold in general. Indeed, the
+% equality constraints introduced by the two end tokens of two
+% descriptions may be incompatible. So far, a limited form of
+% closure (closure under finite product of recursive positions)
+% has been sufficient for all of our use cases. As with coproducts,
+% the appropriate eliminator \AF{unXs} takes a value in the encoding
+% and extracts its constituents ({\AF{All} \AB{P} \AB{xs}} is defined
+% in Agda's standard library and makes sure that the predicate \AB{P}
+% holds true of all the elements in the list \AB{xs}).
 
-\begin{figure}[h]
-\begin{minipage}{0.4\textwidth}
-  \ExecuteMetaData[Generic/Syntax.tex]{paircomb}
-\end{minipage}\hfill
-\begin{minipage}{0.5\textwidth}
-  \ExecuteMetaData[Generic/Syntax.tex]{pairunpair}
-\end{minipage}
-\caption{Descriptions are closed under Finite Products of Recursive Positions}
-\end{figure}
+% \begin{figure}[h]
+% \begin{minipage}{0.4\textwidth}
+%   \ExecuteMetaData[Generic/Syntax.tex]{paircomb}
+% \end{minipage}\hfill
+% \begin{minipage}{0.5\textwidth}
+%   \ExecuteMetaData[Generic/Syntax.tex]{pairunpair}
+% \end{minipage}
+% \caption{Descriptions are closed under Finite Products of Recursive Positions}
+% \end{figure}
 
-A concrete use case for both of these combinators will be given in section~\ref{section:letbinding}
+A concrete use case for this combinator will be given in section~\ref{section:letbinding}
 where we explain how to seamlessly enrich an existing syntax with let-bindings
 and how to use the \AR{Sem} framework to elaborate them away.
 
@@ -868,7 +868,7 @@ substructures using \AF{body} and then call the \ARF{alg}ebra to combine
 these results.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics.tex]{sem}
+\ExecuteMetaData[Generic/Semantics.tex]{semproof}
 \caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{sem}}
 \end{figure}
 
@@ -882,7 +882,7 @@ substructure in the thinned and extended evaluation environment
 produces an environment {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics.tex]{body}
+\ExecuteMetaData[Generic/Semantics.tex]{bodyproof}
 \caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}\label{def:body}
 \end{figure}
 
@@ -913,10 +913,12 @@ and reifying the bodies of binders.
 
 \begin{figure}[h]
 \begin{minipage}{0.5\textwidth}
-  \ExecuteMetaData[Generic/Semantics.tex]{renaming}
+  \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{renaming}
+  \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{ren}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
-  \ExecuteMetaData[Generic/Semantics.tex]{substitution}
+  \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{substitution}
+  \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{sub}
 \end{minipage}
 \caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding}
 \end{figure}
@@ -940,7 +942,7 @@ of placeholder values and thinnings, and it is almost immediate that variables
 are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics.tex]{reify}
+\ExecuteMetaData[Data/Var/Varlike.tex]{reify}
 \caption{Generic Reification thanks to \AR{VarLike} Values}
 \end{figure}
 
@@ -1003,12 +1005,8 @@ environment. The process of removing let binders is kickstarted with a
 placeholder environment associating each variable to itself.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-%  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unletcode}
-\end{minipage}\hfill
-\begin{minipage}{0.45\textwidth}
-%  \ExecuteMetaData[Generic/Examples/ElaborationLet.tex]{unlet}
-\end{minipage}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unletcode}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unlet}
 \caption{Inlining Let Binding}
 \end{figure}
 
@@ -1281,11 +1279,11 @@ traversals, it also allows them to give abstract proof frameworks for
 simulation or fusion lemmas. Their idea naturally extends to our generic
 presentation of semantics for all syntaxes.
 
-The most important concept in this section is (\AF{Zip} \AB{d}), a relation
-transformer which characterises structurally equal layers such that their
+The most important concept in this section is the \emph{relator} (\AF{⟦} \AB{d} \AF{⟧ᴿ}),
+a relation transformer which characterises structurally equal layers such that their
 substructures are themselves related by the relation it is passed as an
 argument. It inherits a lot of its relational arguments' properties: whenever
-\AB{R} is reflexive (respectively symmetric or transitive) so is {\AF{Zip} \AB{d} \AB{R}}.\label{lem:zipstable}
+\AB{R} is reflexive (respectively symmetric or transitive) so is {(\AF{⟦} \AB{d} \AF{⟧ᴿ} \AB{R})}.\label{lem:zipstable}
 
 It is defined by induction on the description and case analysis on the two
 layers which are meant to be equal:
@@ -1294,10 +1292,10 @@ layers which are meant to be equal:
     be trivially equal (i.e. the constraint generated is the unit type)
   \item When facing a recursive position {\AIC{`X} \AB{$\Delta$} \AB{j} \AB{d}}, we
     demand that the two substructures are related by {\AB{R} \AB{$\Delta$} \AB{j}}
-    and that the rest of the layers are related by \AF{Zip} \AB{d} \AB{R}
+    and that the rest of the layers are related by (\AF{⟦} \AB{d} \AF{⟧ᴿ} \AB{R})
   \item Two nodes of type {\AIC{`$\sigma$} \AB{A} \AB{d}} will
     be related if they both carry the same payload \AB{a} of type \AB{A} and if
-    the rest of the layers are related by {\AF{Zip} (\AB{d} \AB{a}) \AB{R}}.
+    the rest of the layers are related by (\AF{⟦} \AB{d} \AB{a} \AF{⟧ᴿ} \AB{R})
 \end{itemize}
 
 \begin{figure}[h]
@@ -1305,7 +1303,7 @@ layers which are meant to be equal:
 \caption{Zip: Characterising Structurally Equal Values with Related Substructures}
 \end{figure}
 
-If we were to take a fixpoint of \AF{Zip}, we could obtain a structural
+If we were to take a fixpoint of \AF{⟦\_⟧ᴿ}, we could obtain a structural
 notion of equality for terms which we could prove equivalent to propositional
 equality. Although interesting in its own right, this section will focus
 on more advanced use-cases.
@@ -1316,7 +1314,7 @@ on more advanced use-cases.
 
 \subsection{Simulation Lemma}\label{section:simulation}
 
-A \AF{Zip} constraint appears naturally when we want to say that a
+A constraint mentioning the relator appears naturally when we want to say that a
 semantics can simulate another one. Given a relation \AB{$\mathcal{R}^{\mathcal{V}}$} connecting values
 in \AB{$\mathcal{V}_1$} and \AB{$\mathcal{V}_2$}, and a relation \AB{$\mathcal{R}^{\mathcal{C}}$} connecting computations in
 \AB{$\mathcal{C}_1$} and \AB{$\mathcal{C}_2$}, we can define \AF{Kripke\textsuperscript{R}} relating values
@@ -1330,14 +1328,14 @@ to one on environments in a pointwise manner.
 \caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
 \end{figure}
 
-We can then combine \AF{Zip} and \AF{Kripke\textsuperscript{R}} to express the idea
+We can then combine \AF{⟦\_⟧ᴿ} and \AF{Kripke\textsuperscript{R}} to express the idea
 that two semantic objects of respective types
 \AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_1$} \AB{$\mathcal{C}_1$}) and
 \AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_2$} \AB{$\mathcal{C}_2$}) are
 synchronised. The simulation constraint on the algebras for two \AF{Sem}antics 
 then becomes: given synchronized objects, the algebras should yield
 related computations. Together with self-explanatory constraints on
-\ARF{var} and \ARF{th\textsuperscript{$\mathcal{V}$}}, this constitutes the whole \AF{Sim}ulation
+\ARF{var} and \ARF{th\textsuperscript{𝓥}}, this constitutes the whole \AF{Sim}ulation
 constraint:
 
 \begin{figure}[h]
@@ -1367,7 +1365,8 @@ is convenient; which we have experienced first hand when tackling the
 POPLMark Reloaded challenge where \AF{rensub} was actually needed.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Simulation.tex]{rensub}
+\ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensub}
+\ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensubfun}
 \caption{Renaming as a Substitution via Simulation}
 \end{figure}
 
@@ -1422,90 +1421,91 @@ for why they are shaped the way they are.
 
 \subsubsection{The Fusion Constraints}
 
-The notion of fusion is defined for a triple of \AR{Sem}antics; each \AB{$\mathcal{S}_i$}
-being defined for values in \AB{$\mathcal{V}_i$} and computations in \AB{$\mathcal{C}_i$}. The
+The notion of fusion is defined for a triple of \AR{Semantics}; each \AB{𝓢ⁱ}
+being defined for values in \AB{𝓥ⁱ} and computations in \AB{𝓒ⁱ}. The
 fundamental lemma associated to such a set of constraints will state that
-running \AB{$\mathcal{S}_2$} after \AB{$\mathcal{S}_1$} is equivalent to running \AB{$\mathcal{S}_3$} only.
+running \AB{𝓢ᴮ} after \AB{𝓢ᴬ} is equivalent to running \AB{𝓢ᴬᴮ} only.
 
-The definition of fusion is parametrised by three relations: \AB{𝓡\textsuperscript{E}} relates
-triples of environments of values in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_1$} \AB{$\Delta$}},
-{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥$_2$} \AB{$\Theta$}} and {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_3$} \AB{$\Theta$}}
-respectively; \AB{$\mathcal{R}^{\mathcal{V}}$} relates pairs of values \AB{𝓥$_2$} and \AB{𝓥$_3$};
-and \AB{$\mathcal{R}^{\mathcal{C}}$}, our notion of equivalence for evaluation results, relates pairs
-of computation in \AB{𝓒$_2$} and \AB{𝓒$_3$}.
+The definition of fusion is parametrised by three relations: \AB{𝓔ᴿ} relates
+triples of environments of values in {(\AB{Γ} \AR{─Env}) \AB{𝓥ᴬ} \AB{Δ}},
+{(\AB{Δ} \AR{─Env}) \AB{𝓥ᴮ} \AB{Θ}} and {(\AB{Γ} \AR{─Env}) \AB{𝓥ᴬᴮ} \AB{Θ}}
+respectively; \AB{𝓥ᴿ} relates pairs of values \AB{𝓥ᴮ} and \AB{𝓥ᴬᴮ};
+and \AB{𝓒ᴿ}, our notion of equivalence for evaluation results, relates pairs
+of computation in \AB{𝓒ᴮ} and \AB{𝓒ᴬᴮ}.
 
-% \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
+\ExecuteMetaData[Generic/Fusion.tex]{fusionrec}
 
-The first obstacle we face is the formal definition of ``running \AB{$\mathcal{S}_2$}
-after \AB{$\mathcal{S}_1$}'': for this statement to make sense, the result of running
-\AB{$\mathcal{S}_1$} ought to be a term. Or rather, we ought to be able to extract a
-term from a \AB{𝓒$_1$}. Hence the first constraint: the existence of a \ARF{quote\textsubscript{1}}
-function, which we supply as a field of the record \AR{Fusion}. When dealing with syntactic semantics such as renaming or substitution
+The first obstacle we face is the formal definition of ``running \AB{𝓢ᴮ}
+after \AB{𝓢ᴬ}'': for this statement to make sense, the result of running
+\AB{𝓢ᴬ} ought to be a term. Or rather, we ought to be able to extract a
+term from a \AB{𝓒ᴬ}. Hence the first constraint: the existence of a \ARF{reifyᴬ}
+function, which we supply as a field of the record \AR{Fusion}. When dealing with
+syntactic semantics such as renaming or substitution
 this function will be the identity. However nothing prevents to try to prove for
 instance that normalisation by evaluation is idempotent in which case a bona fide
 reification function extracting terms from model values will be used.
 
-\ExecuteMetaData[Generic/Fusion.tex]{fusionquote}
+\ExecuteMetaData[Generic/Fusion.tex]{reify}
 
-Then, we have to think about what happens when going under a binder: \AB{$\mathcal{S}_1$}
+Then, we have to think about what happens when going under a binder: \AB{𝓢ᴬ}
 will produce a \AF{Kripke} function space where a syntactic
-value is required. Provided that \AB{$\mathcal{V}_1$} is \AR{VarLike}, we can make use of \AF{reify}
+value is required. Provided that \AB{𝓥ᴬ} is \AR{VarLike}, we can make use of \AF{reify}
 to get a \AF{Scope} back. Hence the second constraint.
 
-\ExecuteMetaData[Generic/Fusion.tex]{fusionvarlike}
+\ExecuteMetaData[Generic/Fusion.tex]{vlV}
 
 Still thinking about going under binders: if three evaluation environments
-\AB{$\rho_1$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_1$} \AB{$\Delta$}}, \AB{$\rho_2$} in
-{(\AB{$\Delta$} \AR{─Env}) \AB{𝓥$_2$} \AB{$\Theta$}}, and \AB{$\rho_3$} in {(\AB{$\Gamma$} \AR{─Env}) \AB{𝓥$_3$} \AB{$\Theta$}}
-are related by \AB{𝓡\textsuperscript{E}} and we are given a thinning \AB{$\sigma$} from \AB{$\Theta$} to \AB{$\Omega$}
-then \AB{$\rho_1$}, the thinned \AB{$\rho_2$} and the thinned \AB{$\rho_3$} should still be related.
+\AB{ρᴬ} in {(\AB{Γ} \AR{─Env}) \AB{𝓥ᴬ} \AB{Δ}}, \AB{ρᴮ} in
+{(\AB{Δ} \AR{─Env}) \AB{𝓥ᴮ} \AB{Θ}}, and \AB{ρᴬᴮ} in {(\AB{Γ} \AR{─Env}) \AB{𝓥ᴬᴮ} \AB{Θ}}
+are related by \AB{𝓔ᴿ} and we are given a thinning \AB{σ} from \AB{Θ} to \AB{Ω}
+then \AB{ρᴬ}, the thinned \AB{ρᴮ} and the thinned \AB{ρᴬᴮ} should still be related.
 
-\ExecuteMetaData[Generic/Fusion.tex]{fusionthinnable}
+\ExecuteMetaData[Generic/Fusion.tex]{thV}
 
 Remembering that \AF{\_>>\_} is used in the definition of \AF{body} (Figure~\ref{def:body}) to
 combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
 {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}} into one of type
 {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}, we mechanically need a
-constraint stating that \AF{\_>>\_} is compatible with \AB{𝓡\textsuperscript{E}}. We demand
-as an extra precondition that the values \AB{$\rho_2$} and \AB{$\rho_3$} are extended
-with are related according to \AB{$\mathcal{R}^{\mathcal{V}}$}. Lastly, for all the types to match up,
-\AB{$\rho_1$} has to be extended with placeholder variables.
+constraint stating that \AF{\_>>\_} is compatible with \AB{𝓔ᴿ}. We demand
+as an extra precondition that the values \AB{ρᴮ} and \AB{ρᴬᴮ} are extended
+with are related according to \AB{𝓥ᴿ}. Lastly, for all the types to match up,
+\AB{ρᴬ} has to be extended with placeholder variables.
 
-\ExecuteMetaData[Generic/Fusion.tex]{fusionappend}
+\ExecuteMetaData[Generic/Fusion.tex]{appendR}
 
 We finally arrive at the constraints focusing on the semantical counterparts
-of the terms' constructors. When evaluating a variable, on the one hand \AB{$\mathcal{S}_1$}
+of the terms' constructors. When evaluating a variable, on the one hand \AB{𝓢ᴬ}
 will look up its meaning in the evaluation environment, turn the resulting value into
-a computation which will get quoted and then the result will be evaluated with \AB{$\mathcal{S}_2$}.
-Provided that all three evaluation environments are related by \AB{𝓡\textsuperscript{E}} this should
-be equivalent to looking up the value in \AB{$\mathcal{S}_3$}'s environment and turning it into a
-computation. Hence the constraint \ARF{var\textsuperscript{R}}:
+a computation which will get quoted and then the result will be evaluated with \AB{𝓢ᴮ}.
+Provided that all three evaluation environments are related by \AB{𝓔ᴿ} this should
+be equivalent to looking up the value in \AB{𝓢ᴬᴮ}'s environment and turning it into a
+computation. Hence the constraint \ARF{varᴿ}:
 
-\ExecuteMetaData[Generic/Fusion.tex]{fusionvar}
+\ExecuteMetaData[Generic/Fusion.tex]{varR}
 
 The case of the algebra follows a similar idea albeit being more complex:
-a term gets evaluated using \AB{$\mathcal{S}_1$} and to be able to run \AB{$\mathcal{S}_2$}
+a term gets evaluated using \AB{𝓢ᴬ} and to be able to run \AB{𝓢ᴮ}
 afterwards we need to recover a piece of syntax. This is possible if the
-\AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥$_1$} arguments
-(which can be manufactured thanks to the \ARF{vl\textsuperscript{𝓥$_1$}} we mentioned before) and
-then quoted. Provided that the result of running \AB{$\mathcal{S}_2$} on that term is
-related via {\AF{Zip} \AB{d} (\AF{Kripke\textsuperscript{R}} \AB{$\mathcal{R}^{\mathcal{V}}$} \AB{$\mathcal{R}^{\mathcal{C}}$}} to the result
-of running \AB{$\mathcal{S}_3$} on the original term, the \ARF{alg\textsuperscript{R}} constraint states
+\AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥ᴬ} arguments
+(which can be manufactured thanks to the \ARF{vl\^{𝓥ᴬ}} we mentioned before) and
+then quoted. Provided that the result of running \AB{𝓢ᴮ} on that term is
+related via {\AF{⟦} \AB{d} \AF{⟧ᴿ} (\AF{Kripkeᴿ} \AB{𝓥ᴿ} \AB{𝓒ᴿ} to the result
+of running \AB{𝓢ᴬᴮ} on the original term, the \ARF{alg\textsuperscript{R}} constraint states
 that the two evaluations yield related computations.
 
-\ExecuteMetaData[Generic/Fusion.tex]{fusionalg}
+\ExecuteMetaData[Generic/Fusion.tex]{algR}
 
 \subsubsection{The Fundamental Lemma of Fusion}
 
 This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
 stating that from a triple of related environments, one gets a pair of related
-computations: the composition of \AB{$\mathcal{S}_1$} and \AB{$\mathcal{S}_2$} on one hand and
-\AB{$\mathcal{S}_3$} on the other. This lemma is once again proven mutually with its
+computations: the composition of \AB{𝓢ᴬ} and \AB{𝓢ᴮ} on one hand and
+\AB{𝓢ᴬᴮ} on the other. This lemma is once again proven mutually with its
 counterpart for \AR{Sem}'s \AF{body}'s action on \AR{Scope}s.
 % and the \AD{Size} indices make the proof modular.
 
 \begin{figure}[h]
- \ExecuteMetaData[Generic/Fusion.tex]{fusbody}
+ \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
 \caption{Fundamental Lemma of \AR{Fus}ion}
 \end{figure}
 
@@ -1542,7 +1542,7 @@ notion of equality for co-finite trees. What we want is a generic
 coinductive notion of bisimilarity for all co-finite tree types
 obtained as the unfolding of a description. Two trees are bisimilar
 if their top layers have the same shape and their substructures are
-themselves bisimilar. This is precisely the type of relation \AF{Zip}
+themselves bisimilar. This is precisely the type of relation \AF{⟦\_⟧ᴿ}
 was defined to express. Hence the following coinductive relation.
 
 \begin{figure}[h]
@@ -1551,8 +1551,8 @@ was defined to express. Hence the following coinductive relation.
 \end{figure}
 
 We can then prove by coinduction that this generic definition always gives
-rise to an equivalence relation by using \AF{Zip}'s stability properties
-(if \AB{R} is reflexive / symmetric / transitive then so is {\AF{Zip} \AB{d} \AB{R}})
+rise to an equivalence relation by using the relator's stability properties
+(if \AB{R} is reflexive / symmetric / transitive then so is {(\AF{⟦} \AB{d} \AF{⟧ᴿ} \AB{R})}
 mentioned in Section~\ref{lem:zipstable}.
 
 \begin{center}

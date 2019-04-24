@@ -21,7 +21,8 @@ private
 \begin{code}
 record ∞Tm (d : Desc I) (s : Size) (i : I) : Set where
   coinductive; constructor `con
-  field force :  {s' : Size< s} → ⟦ d ⟧ (λ _ i _ → ∞Tm d s' i) i []
+  field force :  {s' : Size< s} →
+                 ⟦ d ⟧ (λ _ i _ → ∞Tm d s' i) i []
 \end{code}
 %</cotm>
 \begin{code}
@@ -32,7 +33,7 @@ module _ {d : Desc ⊤} where
 %<*plug>
 \begin{code}
   plug : TM d tt → ∀ Δ i → Scope (Tm d ∞) Δ i [] → TM d i
-  plug t Δ i = Semantics.semantics Substitution (pack (λ _ → t))
+  plug t Δ i = Semantics.semantics Sub (pack (λ _ → t))
 \end{code}
 %</plug>
 %<*unroll>

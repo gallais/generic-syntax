@@ -35,8 +35,8 @@ private
 %<*var>
 \begin{code}
 data Var : I ─Scoped where
-  z : ∀[          (σ  ∷_) ⊢ Var σ ]
-  s : ∀[ Var σ ⇒  (τ  ∷_) ⊢ Var σ ]
+  z : ∀[ (σ ∷_) ⊢ Var σ ]
+  s : ∀[ Var σ ⇒ (τ ∷_) ⊢ Var σ ]
 \end{code}
 %</var>
 \begin{code}

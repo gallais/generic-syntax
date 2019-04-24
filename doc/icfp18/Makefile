@@ -19,7 +19,10 @@ AGDA_FILES:=\
   Generic/Examples/UntypedLC.lagda \
   Generic/Fusion.lagda \
   Generic/Semantics.lagda \
+  Generic/Semantics/Syntactic.lagda \
+  Generic/Semantics/Elaboration/LetBinder.lagda \
   Generic/Simulation.lagda \
+  Generic/Simulation/Syntactic.lagda \
   Generic/Syntax.lagda \
   Generic/Relator.lagda \
   motivation.lagda \
@@ -78,21 +81,19 @@ latex/acmart.cls: acmart.cls
 
 latex/$(PAPER).tex: $(PAPER).tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
+	cp $< $@
 
 latex/$(SLIDES).tex: $(SLIDES).tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
+	cp $< $@
 
 latex/syntax.tex: syntax.tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
+	cp $< $@
 
 latex/%.tex: latex-agda-output/%.tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
-	${SED} -f rules.sed -i $@
-	${SED} -f rules.sed -i $@
+	cp $< $@
 
 latex-agda-output/%.tex: %.lagda
 	@mkdir -p $(dir $@)

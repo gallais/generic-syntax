@@ -97,7 +97,8 @@ module _ {I : Set} where
 %<*descsum>
 \begin{code}
  _`+_ : Desc I → Desc I → Desc I
- d `+ e = `σ Bool $ λ isLeft → if isLeft then d else e
+ d `+ e = `σ Bool $ λ isLeft →
+          if isLeft then d else e
 \end{code}
 %</descsum>
 \begin{code}
@@ -106,7 +107,8 @@ module _ {I : Set} {d e : Desc I} {X : List I → I ─Scoped}
 \end{code}
 %<*case>
 \begin{code}
- case :  (⟦ d ⟧ X i Γ → A) → (⟦ e ⟧ X i Γ → A) → (⟦ d `+ e  ⟧ X i Γ → A)
+ case : (⟦ d ⟧ X i Γ → A) → (⟦ e ⟧ X i Γ → A) →
+        (⟦ d `+ e  ⟧ X i Γ → A)
  case l r (true   , t) = l t
  case l r (false  , t) = r t
 \end{code}

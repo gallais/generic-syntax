@@ -28,6 +28,7 @@ reindex f (`∎ i)     = `∎ (f i)
 ⟦ `X Δ j d  ⟧ X i Γ = X Δ j Γ × ⟦ d ⟧ X i Γ
 ⟦ `∎ i′     ⟧ X i Γ = i ≡ i′
 
+
 -- Syntaxes: Free Relative Monad of a Description's Interpretation
 
 Scope : {I : Set} → I ─Scoped → List I → I ─Scoped
@@ -37,6 +38,10 @@ data Tm {I : Set} (d : Desc I) : Size → I ─Scoped where
   `var : {s : Size} {i : I} →  [ Var i                     ⟶ Tm d (↑ s) i ]
   `con : {s : Size} {i : I} →  [ ⟦ d ⟧ (Scope (Tm d s)) i  ⟶ Tm d (↑ s) i ]
 
+data Tm' {I : Set} (d : Desc I) (A : I) (Γ : List I) : Size → I ─Scoped where
+  `var : {s : Size} {i : I} →  [ Var i                          ⟶ Tm' d A Γ (↑ s) i ]
+  `con : {s : Size} {i : I} →  [ ⟦ d ⟧ (Scope (Tm' d A Γ s)) i  ⟶ Tm' d A Γ (↑ s) i ]
+  `«»  : {s : Size} →          [ (Γ ─Env) (Tm d _)              ⟶ Tm' d A Γ (↑ s) A ]
 
 module _ {I i Γ} {d : Desc I} where
 
