@@ -19,7 +19,6 @@ open import Generic.Simulation
 open import Relation.Binary.PropositionalEquality using (_≡_ ; subst)
 \end{code}
 
-
 %<*bisim>
 \begin{code}
 record ≈^∞Tm {I : Set} (d : Desc I) (s : Size) (i : I) (t u : ∞Tm d s i) : Set where
@@ -31,13 +30,19 @@ record ≈^∞Tm {I : Set} (d : Desc I) (s : Size) (i : I) (t u : ∞Tm d s i) :
 \begin{code}
 open ≈^∞Tm public
 module _ {I : Set} (d : Desc I) where
+
+ private
+  variable
+    s : Size
+    i : I
+    t u v : ∞Tm d s i
 \end{code}
 
 %<*eqrel>
 \begin{code}
- refl  : {s : Size} {i : I} {t : ∞Tm d s i} → ≈^∞Tm d s i t t
- sym   : {s : Size} {i : I} {t u : ∞Tm d s i} → ≈^∞Tm d s i t u → ≈^∞Tm d s i u t
- trans : {s : Size} {i : I} {t u v : ∞Tm d s i} → ≈^∞Tm d s i t u → ≈^∞Tm d s i u v → ≈^∞Tm d s i t v
+ refl  : ≈^∞Tm d s i t t
+ sym   : ≈^∞Tm d s i t u → ≈^∞Tm d s i u t
+ trans : ≈^∞Tm d s i t u → ≈^∞Tm d s i u v → ≈^∞Tm d s i t v
 \end{code}
 %</eqrel>
 \begin{code}

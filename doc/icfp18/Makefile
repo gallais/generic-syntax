@@ -6,6 +6,7 @@ AGDA=agda-2.6.0
 all: latex/$(PAPER).pdf
 
 AGDA_FILES:=\
+  Stdlib.lagda \
   Data/Environment.lagda \
   Generic/Bisimilar.lagda \
   Generic/Cofinite.lagda \

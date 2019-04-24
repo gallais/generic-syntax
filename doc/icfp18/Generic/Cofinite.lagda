@@ -6,7 +6,6 @@ open import Size
 open import Data.Unit
 open import Data.List.Base hiding (unfold)
 
--- open import Data.Var
 open import Data.Environment
 open import Generic.Syntax
 open import Generic.Semantics
