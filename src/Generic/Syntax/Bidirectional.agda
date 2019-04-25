@@ -40,3 +40,4 @@ module PATTERNS where
   pattern LAM b    = `con (Lam , b , refl)
   pattern CUT σ t  = `con (Cut σ , t , refl)
   pattern EMB t    = `con (Emb , t , refl)
+
