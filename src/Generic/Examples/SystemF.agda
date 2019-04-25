@@ -1,31 +1,21 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Examples.SystemF where
 
-import Level
 open import Size
-import Category.Monad as CM
-
-open import Codata.Thunk
-open import Codata.Colist
-
 open import Data.Unit
 open import Data.Bool
 open import Data.Product
-open import Data.List.Base hiding ([_]; lookup)
-open import Data.Maybe.Base using (Maybe; just; nothing)
-import Data.Maybe.Categorical as MC
+open import Data.List.Base hiding ([_])
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
-open import indexed
-open import var hiding (_<$>_)
-open import varlike
-open import environment hiding (_<$>_)
+open import Data.Var hiding (_<$>_)
+open import Data.Var.Varlike
+open import Data.Environment hiding (_<$>_)
 open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Semantics.Syntactic
-
---------------------------------------------------------------------------------
--- Syntax
 
 data Kind : Set where
   Term Type : Kind
@@ -50,13 +40,6 @@ pattern Lam b   = `con (false , false , false , false , false , b , refl)
 SF : Kind → List Kind → Set
 SF = Tm system-F ∞
 
-`id : SF Term []
-`id = Lam (lam (`var z))
-
---------------------------------------------------------------------------------
--- Small step evaluator
-
--- Path to a redex
 data Redex {Γ : List Kind} : SF Term Γ → Set where
   applam   : (b : SF Term (Term ∷ Γ)) (u : SF Term Γ) → Redex (app (lam b) u)
   AppLam   : (b : SF Term (Type ∷ Γ)) (u : SF Type Γ) → Redex (App (Lam b) u)
@@ -67,9 +50,12 @@ data Redex {Γ : List Kind} : SF Term Γ → Set where
   [App]    : {f : SF Term Γ} → Redex f → (t : SF Type Γ) → Redex (App f t)
   [Lam]    : {b : SF Term (Type ∷ Γ)} → Redex b → Redex (Lam b)
 
-open CM.RawMonadPlus (MC.monadPlus {Level.zero})
+open import Category.Monad
+open import Data.Maybe
+open import Data.Maybe.Categorical
+import Level
+open RawMonadPlus (monadPlus {Level.zero})
 
--- Finding the leftmost redex
 redex : {Γ : List Kind} (t : SF Term Γ) → Maybe (Redex t)
 redex (app (lam b) u) = just (applam b u)
 redex (App (Lam b) u) = just (AppLam b u)
@@ -79,7 +65,6 @@ redex (App f t)       = flip [App] t <$> redex f
 redex (Lam b)         = [Lam] <$> redex b
 redex _ = nothing
 
--- Reducing a redex
 fire : {Γ : List Kind} {t : SF Term Γ} → Redex t → SF Term Γ
 fire (applam b u)  = sub (base vl^Tm ∙ u) b
 fire (AppLam b u)  = sub (base vl^Tm ∙ u) b
@@ -89,8 +74,19 @@ fire ([lam] b)     = lam (fire b)
 fire ([App] f t)   = App (fire f) t
 fire ([Lam] b)     = Lam (fire b)
 
--- Evaluation as repeated evaluation of the leftmost redex
+open import Codata.Thunk
+open import Codata.Colist
+open import Codata.Colist.Bisimilarity using (_⊢_≈_; _∷_; [])
+
+
 eval : ∀ {i} (Γ : List Kind) (t : SF Term Γ) → Colist (SF Term Γ) i
 eval Γ t with redex t
 ... | just r  = t ∷ λ where .force → eval Γ (fire r)
 ... | nothing = t ∷ λ where .force → []
+
+`id : SF Term []
+`id = Lam (lam (`var z))
+
+_ : _ ⊢ eval [] (lam (lam (app (lam (app (`var z) (`var z))) (lam (`var z)))))
+  ≈ fromList (_ ∷ _ ∷ lam (lam (lam (`var z))) ∷ [])
+_ = refl ∷ λ where .force → refl ∷ λ where .force → refl ∷ λ where .force → []

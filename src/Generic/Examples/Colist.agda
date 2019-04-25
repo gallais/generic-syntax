@@ -1,3 +1,4 @@
+{-# OPTIONS --safe --sized-types #-}
 module Generic.Examples.Colist where
 
 open import Size
@@ -7,15 +8,15 @@ open import Data.Nat
 open import Data.Product
 open import Agda.Builtin.Equality
 
-open import var
-open import environment
+open import Data.Var
+open import Data.Environment
 open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Semantics.Syntactic
 open import Generic.Cofinite
 open import Generic.Bisimilar hiding (refl)
 
-module _ where
+module _  where
  open import Data.List.Base
 
  CListD : Set → Desc ⊤
@@ -34,8 +35,8 @@ pattern ↶_ k      = `var k
 [0,1]  =  0 ∷ 1 ∷ []
 01↺    =  0 ∷ 1 ∷ ↶ s z
 
-01⋯ : ∞Tm (CListD ℕ) ∞ tt
-10⋯ : ∞Tm (CListD ℕ) ∞ tt
+01⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
+10⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
 01⋯ .force = false , 0 , 10⋯ , refl
 10⋯ .force = false , 1 , 01⋯ , refl
 
@@ -45,9 +46,8 @@ pattern ↶_ k      = `var k
 `1∷2⇖1 : TM (CListD ℕ) tt
 `1∷2⇖1 = 1 ∷ 2 ∷ ↶ s z
 
-∞1∷2 : ∞Tm (CListD ℕ) ∞ tt
-∞2∷1 : ∞Tm (CListD ℕ) ∞ tt
-
+∞1∷2 : ∀ {s} → ∞Tm (CListD ℕ) s tt
+∞2∷1 : ∀ {s} → ∞Tm (CListD ℕ) s tt
 ∞Tm.force ∞1∷2 = (false , 1 , ∞2∷1 , refl)
 ∞Tm.force ∞2∷1 = (false , 2 , ∞1∷2 , refl)
 

@@ -1,3 +1,5 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Fusion.Elaboration.LetBinder where
 
 open import Size
@@ -8,22 +10,22 @@ open import Function
 open import Relation.Binary.PropositionalEquality
 open ≡-Reasoning
 
-open import var hiding (_<$>_)
-open import varlike
-open import rel
-open import environment
-
+open import Data.Var hiding (_<$>_)
+open import Data.Var.Varlike
+open import Data.Relation
+open import Data.Environment
 
 open import Generic.Syntax
 open import Generic.Syntax.LetBinder
 open import Generic.Semantics
 open import Generic.Semantics.Syntactic
 open import Generic.Semantics.Elaboration.LetBinder
-open import Generic.Zip
-open import Generic.Simulation
+open import Generic.Relator as Relator
+open import Generic.Simulation as Simulation
 open import Generic.Simulation.Syntactic
 open import Generic.Identity
 open import Generic.Fusion
+open import Generic.Fusion.Utils
 open import Generic.Fusion.Syntactic as F
 import Generic.Fusion.Specialised.Propositional as FusProp
 
@@ -33,49 +35,49 @@ module _ {I : Set} {d : Desc I} where
             (Σ A B ∋ x , b₁) ≡ (x , b₂) → b₁ ≡ b₂
  proj₂-eq refl = refl
 
- RenUnLet : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (select ρ₁ ρ₂)) Eq^R Eq^R
-            (d `+ Let) Renaming UnLet UnLet
+ RenUnLet : Fusion (d `+ Let) Ren UnLet UnLet
+            (λ Γ Δ ρ₁ ρ₂ → All Eqᴿ Γ (select ρ₁ ρ₂)) Eqᴿ Eqᴿ
  RenUnLet = FusProp.ren-sem (d `+ Let) UnLet $ λ where
-   (false , `IN' e t) ρ^R (refl , refl , eq^e , eq^t , _) → eq^t (pack id) (ε^R ∙^R eq^e)
-   (true , t)         ρ^R zp → cong `con $ proj₂-eq $
-     zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) (d `+ Let) zp
+   (false , `IN' e t) ρᴿ (refl , refl , eq^e , eq^t , _) → eq^t (pack id) (εᴿ ∙ᴿ eq^e)
+   (true , t)         ρᴿ zp → cong `con $ proj₂-eq $
+     Relator.reifyᴿ Eqᴿ (d `+ Let) (Simulation.reifyᴿ Eqᴿ Eqᴿ (vl^Refl vl^Tm)) zp
 
  unLetRen : ∀ {Γ Δ Θ σ s} (t : Tm (d `+ Let) s σ Γ) {ρ₁ ρ₃} {ρ₂ : Thinning Δ Θ} →
-            ∀[ Eq^R ] (ren ρ₂ <$> ρ₁) ρ₃ → ren ρ₂ (unLet ρ₁ t) ≡ unLet ρ₃ t
+            All Eqᴿ _ (ren ρ₂ <$> ρ₁) ρ₃ → ren ρ₂ (unLet ρ₁ t) ≡ unLet ρ₃ t
  unLetRen-body :
    ∀ Ξ σ {Γ Δ Θ s} (t : Scope (Tm (d `+ Let) s) Ξ σ Γ) {ρ₁ ρ₃} {ρ₂ : Thinning Δ Θ} →
-   ∀[ Eq^R ] (ren ρ₂ <$> ρ₁) ρ₃ →
-   reify vl^Var Ξ σ (Sem.body Renaming ρ₂ Ξ σ (reify vl^Tm Ξ σ (Sem.body UnLet ρ₁ Ξ σ t)))
-   ≡ reify vl^Tm Ξ σ (Sem.body UnLet ρ₃ Ξ σ t)
+   All Eqᴿ _ (ren ρ₂ <$> ρ₁) ρ₃ →
+   reify vl^Var Ξ σ (Semantics.body Ren ρ₂ Ξ σ (reify vl^Tm Ξ σ (Semantics.body UnLet ρ₁ Ξ σ t)))
+   ≡ reify vl^Tm Ξ σ (Semantics.body UnLet ρ₃ Ξ σ t)
 
- unLetRen (`var v) ρ^R = lookup^R ρ^R v
- unLetRen (`con (false , (σ , τ) , e , t , refl)) {ρ₁} {ρ₃} {ρ₂} ρ^R = unLetRen t $ pack^R $ λ where
-   z     → unLetRen e ρ^R
+ unLetRen (`var v) ρᴿ = lookupᴿ ρᴿ v
+ unLetRen (`con (false , (σ , τ) , e , t , refl)) {ρ₁} {ρ₃} {ρ₂} ρᴿ = unLetRen t $ packᴿ $ λ where
+   z     → unLetRen e ρᴿ
    (s v) → begin
      ren ρ₂ (ren (pack id) (lookup ρ₁ v))
        ≡⟨ cong (ren ρ₂) (ren-id′ (lookup ρ₁ v)) ⟩
      ren ρ₂ (lookup ρ₁ v)
-       ≡⟨ lookup^R ρ^R v ⟩
+       ≡⟨ lookupᴿ ρᴿ v ⟩
      lookup ρ₃ v
        ≡⟨ sym (ren-id′ (lookup ρ₃ v)) ⟩
      ren (pack id) (lookup ρ₃ v)
        ∎
- unLetRen (`con (true  , r)) {ρ₁} {ρ₃} {ρ₂} ρ^R = cong `con $ begin
-   fmap d (reify vl^Var) (fmap d (Sem.body Renaming ρ₂) (fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₁) r)))
-     ≡⟨ fmap² d (Sem.body Renaming ρ₂) (reify vl^Var) (fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₁) r)) ⟩
-   fmap d _ (fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₁) r))
+ unLetRen (`con (true  , r)) {ρ₁} {ρ₃} {ρ₂} ρᴿ = cong `con $ begin
+   fmap d (reify vl^Var) (fmap d (Semantics.body Ren ρ₂) (fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₁) r)))
+     ≡⟨ fmap² d (Semantics.body Ren ρ₂) (reify vl^Var) (fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₁) r)) ⟩
+   fmap d _ (fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₁) r))
      ≡⟨ fmap² d (reify vl^Tm) _ _ ⟩
-   fmap d _ (fmap d (Sem.body UnLet ρ₁) r)
-     ≡⟨ fmap² d (Sem.body UnLet ρ₁) _ _ ⟩
+   fmap d _ (fmap d (Semantics.body UnLet ρ₁) r)
+     ≡⟨ fmap² d (Semantics.body UnLet ρ₁) _ _ ⟩
    fmap d _ r
-     ≡⟨ fmap-ext d (λ Ξ i b → unLetRen-body Ξ i b ρ^R) r ⟩
-   fmap d (λ Φ i → reify vl^Tm Φ i ∘ Sem.body UnLet ρ₃ Φ i) r
-     ≡⟨ sym (fmap² d (Sem.body UnLet ρ₃) (reify vl^Tm) r) ⟩
-   fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₃) r)
+     ≡⟨ fmap-ext d (λ Ξ i b → unLetRen-body Ξ i b ρᴿ) r ⟩
+   fmap d (λ Φ i → reify vl^Tm Φ i ∘ Semantics.body UnLet ρ₃ Φ i) r
+     ≡⟨ sym (fmap² d (Semantics.body UnLet ρ₃) (reify vl^Tm) r) ⟩
+   fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₃) r)
      ∎
 
- unLetRen-body [] σ t ρ^R = unLetRen t ρ^R
- unLetRen-body Ξ@(x ∷ xs) σ {Γ} {Δ} {Θ} t {ρ₁} {ρ₃} {ρ₂} ρ^R = unLetRen t ρ′^R where
+ unLetRen-body [] σ t ρᴿ = unLetRen t ρᴿ
+ unLetRen-body Ξ@(x ∷ xs) σ {Γ} {Δ} {Θ} t {ρ₁} {ρ₃} {ρ₂} ρᴿ = unLetRen t ρ′ᴿ where
 
   ρ₁₁ : Thinning Ξ (Ξ ++ Θ)
   ρ₁₁ = th^Env th^Var (base vl^Var) (pack (injectˡ Θ))
@@ -83,119 +85,119 @@ module _ {I : Set} {d : Desc I} where
 
   ρ₁₃ = pack (injectˡ Θ {Ξ}) >> th^Env th^Var ρ₂ (pack (injectʳ Ξ))
 
-  eq₁₁^R : ∀[ Eq^R ] ρ₁₁ (pack (injectˡ Θ))
-  lookup^R eq₁₁^R k = cong (injectˡ Θ) (lookup-base^Var k)
+  eq₁₁ᴿ : All Eqᴿ _ ρ₁₁ (pack (injectˡ Θ))
+  lookupᴿ eq₁₁ᴿ k = cong (injectˡ Θ) (lookup-base^Var k)
 
-  eq₁₂^R : ∀[ Eq^R ] ρ₁₂ (th^Env th^Var ρ₂ (pack (injectʳ Ξ)))
-  lookup^R eq₁₂^R k = cong (injectʳ Ξ) (lookup-base^Var (lookup ρ₂ k))
+  eq₁₂ᴿ : All Eqᴿ _ ρ₁₂ (th^Env th^Var ρ₂ (pack (injectʳ Ξ)))
+  lookupᴿ eq₁₂ᴿ k = cong (injectʳ Ξ) (lookup-base^Var (lookup ρ₂ k))
 
-  eq₁^R : ∀[ Eq^R ] (ρ₁₁ >> ρ₁₂) ρ₁₃
-  eq₁^R = eq₁₁^R >>^R eq₁₂^R
+  eq₁ᴿ : All Eqᴿ _ (ρ₁₁ >> ρ₁₂) ρ₁₃
+  eq₁ᴿ = eq₁₁ᴿ >>ᴿ eq₁₂ᴿ
 
 
-  ρ′^R : ∀[ Eq^R ] (ren (freshˡ vl^Var Θ {Ξ} >> th^Env th^Var ρ₂ (freshʳ vl^Var Ξ))
-                    <$> (freshˡ vl^Tm Δ  {Ξ} >> th^Env th^Tm  ρ₁ (freshʳ vl^Var Ξ)))
-                  (freshˡ vl^Tm Θ {Ξ} >> th^Env th^Tm ρ₃ (freshʳ vl^Var Ξ))
-  lookup^R ρ′^R k with split Ξ k
+  ρ′ᴿ : All Eqᴿ _ (ren (freshˡ vl^Var Θ >> th^Env th^Var ρ₂ (freshʳ vl^Var Ξ))
+                    <$> (freshˡ vl^Tm Δ >> th^Env th^Tm  ρ₁ (freshʳ vl^Var Ξ)))
+                  (freshˡ vl^Tm Θ >> th^Env th^Tm ρ₃ (freshʳ vl^Var Ξ))
+  lookupᴿ ρ′ᴿ k with split Ξ k
   ... | inj₁ kˡ = begin
     ren (ρ₁₁ >> ρ₁₂) (ren (pack (injectˡ Δ)) (lookup (base vl^Tm) kˡ))
       ≡⟨ cong (ren (ρ₁₁ >> ρ₁₂) ∘ ren (pack (injectˡ Δ))) (lookup-base^Tm kˡ) ⟩
     `var (lookup (ρ₁₁ >> ρ₁₂) (injectˡ Δ kˡ))
       ≡⟨ cong `var (injectˡ->> ρ₁₁ ρ₁₂ kˡ) ⟩
     `var (lookup ρ₁₁ kˡ)
-      ≡⟨ cong `var (lookup^R eq₁₁^R kˡ) ⟩
+      ≡⟨ cong `var (lookupᴿ eq₁₁ᴿ kˡ) ⟩
     `var (injectˡ Θ kˡ)
       ≡⟨ cong (ren (pack (injectˡ Θ))) (sym (lookup-base^Tm kˡ)) ⟩
     ren (pack (injectˡ Θ)) (lookup (base vl^Tm) kˡ)
       ∎
   ... | inj₂ kʳ = begin
     ren (ρ₁₁ >> ρ₁₂) (ren ρ₂₁ (lookup ρ₁ kʳ))
-      ≡⟨ Sim.sim RenExt eq₁^R (ren ρ₂₁ (lookup ρ₁ kʳ)) ⟩
+      ≡⟨ Simulation.sim RenExt eq₁ᴿ (ren ρ₂₁ (lookup ρ₁ kʳ)) ⟩
     ren ρ₁₃ (ren ρ₂₁ (lookup ρ₁ kʳ))
-      ≡⟨ cong (ren ρ₁₃) (Sim.sim RenExt eq₂^R  (lookup ρ₁ kʳ)) ⟩
+      ≡⟨ cong (ren ρ₁₃) (Simulation.sim RenExt eq₂ᴿ  (lookup ρ₁ kʳ)) ⟩
     ren ρ₁₃ (ren (pack (injectʳ Ξ)) (lookup ρ₁ kʳ))
-      ≡⟨ Fus.fus (Ren² d) eq^R (lookup ρ₁ kʳ) ⟩
+      ≡⟨ Fusion.fusion (Ren² d) eqᴿ (lookup ρ₁ kʳ) ⟩
     ren (select ρ₂ (pack (injectʳ Ξ))) (lookup ρ₁ kʳ)
-      ≡⟨ sym (Fus.fus (Ren² d) eq₃^R (lookup ρ₁ kʳ)) ⟩
+      ≡⟨ sym (Fusion.fusion (Ren² d) eq₃ᴿ (lookup ρ₁ kʳ)) ⟩
     ren ρ₃₁ (ren ρ₂ (lookup ρ₁ kʳ))
-      ≡⟨ cong (ren ρ₃₁) (lookup^R ρ^R kʳ) ⟩
+      ≡⟨ cong (ren ρ₃₁) (lookupᴿ ρᴿ kʳ) ⟩
     ren ρ₃₁ (lookup ρ₃ kʳ)
       ∎ where
 
     ρ₂₁ = th^Env th^Var (base vl^Var) (pack (injectʳ Ξ))
 
-    eq₂^R : ∀[ Eq^R ] ρ₂₁ (pack (injectʳ Ξ))
-    lookup^R eq₂^R k = cong (injectʳ Ξ) (lookup-base^Var k)
+    eq₂ᴿ : All Eqᴿ _ ρ₂₁ (pack (injectʳ Ξ))
+    lookupᴿ eq₂ᴿ k = cong (injectʳ Ξ) (lookup-base^Var k)
 
     ρ₃₁ = th^Env th^Var (base vl^Var) (pack (injectʳ Ξ))
 
-    eq₃^R : ∀[ Eq^R ] (select ρ₂ ρ₃₁) (select ρ₂ (pack (injectʳ Ξ)))
-    lookup^R eq₃^R k = cong (injectʳ Ξ) (lookup-base^Var (lookup ρ₂ k))
+    eq₃ᴿ : All Eqᴿ _ (select ρ₂ ρ₃₁) (select ρ₂ (pack (injectʳ Ξ)))
+    lookupᴿ eq₃ᴿ k = cong (injectʳ Ξ) (lookup-base^Var (lookup ρ₂ k))
 
-    eq^R : ∀[ Eq^R ] (select (pack (injectʳ Ξ)) ρ₁₃) (select ρ₂ (pack (injectʳ Ξ)))
-    lookup^R eq^R k with split Ξ (injectʳ Ξ k) | split-injectʳ Ξ k
-    lookup^R eq^R k | .(inj₂ k) | refl = refl
+    eqᴿ : All Eqᴿ _ (select (pack (injectʳ Ξ)) ρ₁₃) (select ρ₂ (pack (injectʳ Ξ)))
+    lookupᴿ eqᴿ k with split Ξ (injectʳ Ξ k) | split-injectʳ Ξ k
+    lookupᴿ eqᴿ k | .(inj₂ k) | refl = refl
 
- SubUnLet : Fus (λ ρ₁ ρ₂ → ∀[ Eq^R ] (unLet ρ₂ <$> ρ₁)) Eq^R Eq^R
-            (d `+ Let) Substitution UnLet UnLet
- Fus.quote₁ SubUnLet = λ σ t → t
- Fus.vl^𝓥₁ SubUnLet = vl^Tm
- Fus.th^R   SubUnLet {ρ₁ = ρ₁} {ρ₂} {ρ₃} = λ σ ρ^R → pack^R λ v → begin
-   Sem.sem UnLet (th^Env th^Tm ρ₂ σ) (lookup ρ₁ v)
-     ≡⟨ sym (unLetRen (lookup ρ₁ v) (pack^R λ v → refl)) ⟩
+ SubUnLet : Fusion (d `+ Let) Sub UnLet UnLet
+            (λ Γ Δ ρ₁ ρ₂ → All Eqᴿ Γ (unLet ρ₂ <$> ρ₁)) Eqᴿ Eqᴿ
+ Fusion.reifyᴬ SubUnLet = λ σ t → t
+ Fusion.vl^𝓥ᴬ SubUnLet = vl^Tm
+ Fusion.th^𝓔ᴿ   SubUnLet {ρᴬ = ρ₁} {ρᴮ = ρ₂} {ρᴬᴮ = ρ₃} = λ ρᴿ σ → packᴿ λ v → begin
+   Semantics.semantics UnLet (th^Env th^Tm ρ₂ σ) (lookup ρ₁ v)
+     ≡⟨ sym (unLetRen (lookup ρ₁ v) (packᴿ λ v → refl)) ⟩
    ren σ (unLet ρ₂ (lookup ρ₁ v))
-     ≡⟨ cong (ren σ) (lookup^R ρ^R v) ⟩
+     ≡⟨ cong (ren σ) (lookupᴿ ρᴿ v) ⟩
    ren σ (lookup ρ₃ v)
     ∎
- Fus.>>^R   SubUnLet {ρ₁ = ρ₁} = subBodyEnv UnLet RenUnLet (λ σ t → refl) ρ₁
- Fus.var^R  SubUnLet = λ ρ^R → lookup^R ρ^R
- Fus.alg^R  SubUnLet (false , `IN' e t) ρ^R (refl , refl , eq^e , eq^t , _)
-   = eq^t (pack id) (ε^R ∙^R eq^e)
- Fus.alg^R  SubUnLet {ρ₁ = ρ₁} {ρ₂} {ρ₃} (true , t) ρ^R eq^t
+ Fusion._>>ᴿ_   SubUnLet {ρᴬ = ρ₁} = subBodyEnv UnLet RenUnLet (λ σ t → refl) ρ₁
+ Fusion.varᴿ  SubUnLet = λ ρᴿ → lookupᴿ ρᴿ
+ Fusion.algᴿ  SubUnLet ρᴿ (false , `IN' e t) (refl , refl , eq^e , eq^t , _)
+   = eq^t (pack id) (εᴿ ∙ᴿ eq^e)
+ Fusion.algᴿ  SubUnLet {ρᴬ = ρ₁} {ρᴮ = ρ₂} {ρᴬᴮ = ρ₃} ρᴿ (true , t) eq^t
    = cong `con $ begin
-     let t′ = fmap d (Sem.body Substitution ρ₁) t in
-     fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₂) (fmap d (reify vl^Tm) t′))
-       ≡⟨ cong (fmap d (reify vl^Tm)) (fmap² d (reify vl^Tm) (Sem.body UnLet ρ₂) t′) ⟩
-     fmap d (reify vl^Tm) (fmap d (λ Δ i → Sem.body UnLet ρ₂ Δ i ∘ reify vl^Tm Δ i) t′)
-       ≡⟨ proj₂-eq $ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) (d `+ Let) eq^t ⟩
-     fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₃) t)
+     let t′ = fmap d (Semantics.body Sub ρ₁) t in
+     fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₂) (fmap d (reify vl^Tm) t′))
+       ≡⟨ cong (fmap d (reify vl^Tm)) (fmap² d (reify vl^Tm) (Semantics.body UnLet ρ₂) t′) ⟩
+     fmap d (reify vl^Tm) (fmap d (λ Δ i → Semantics.body UnLet ρ₂ Δ i ∘ reify vl^Tm Δ i) t′)
+       ≡⟨ proj₂-eq $ Relator.reifyᴿ Eqᴿ (d `+ Let) (Simulation.reifyᴿ Eqᴿ Eqᴿ (vl^Refl vl^Tm)) eq^t ⟩
+     fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₃) t)
        ∎
 
  unLetSub : ∀ {Γ Δ Θ σ s} (t : Tm (d `+ Let) s σ Γ) {ρ₁ ρ₃} {ρ₂ : (Δ ─Env) (Tm d ∞) Θ} →
-            ∀[ Eq^R ] (sub ρ₂ <$> ρ₁) ρ₃ → sub ρ₂ (unLet ρ₁ t) ≡ unLet ρ₃ t
+            All Eqᴿ _ (sub ρ₂ <$> ρ₁) ρ₃ → sub ρ₂ (unLet ρ₁ t) ≡ unLet ρ₃ t
  unLetSub-body :
    ∀ Ξ σ {Γ Δ Θ s} (t : Scope (Tm (d `+ Let) s) Ξ σ Γ) {ρ₁ ρ₃} {ρ₂ : (Δ ─Env) (Tm d ∞) Θ} →
-   ∀[ Eq^R ] (sub ρ₂ <$> ρ₁) ρ₃ →
-   reify vl^Tm Ξ σ (Sem.body Substitution ρ₂ Ξ σ (reify vl^Tm Ξ σ (Sem.body UnLet ρ₁ Ξ σ t)))
-   ≡ reify vl^Tm Ξ σ (Sem.body UnLet ρ₃ Ξ σ t)
+   All Eqᴿ _ (sub ρ₂ <$> ρ₁) ρ₃ →
+   reify vl^Tm Ξ σ (Semantics.body Sub ρ₂ Ξ σ (reify vl^Tm Ξ σ (Semantics.body UnLet ρ₁ Ξ σ t)))
+   ≡ reify vl^Tm Ξ σ (Semantics.body UnLet ρ₃ Ξ σ t)
 
- unLetSub (`var v) ρ^R = lookup^R ρ^R v
- unLetSub (`con (false , (σ , τ) , e , t , refl)) {ρ₁} {ρ₃} {ρ₂} ρ^R = unLetSub t $ pack^R $ λ where
-   z     → unLetSub e ρ^R
+ unLetSub (`var v) ρᴿ = lookupᴿ ρᴿ v
+ unLetSub (`con (false , (σ , τ) , e , t , refl)) {ρ₁} {ρ₃} {ρ₂} ρᴿ = unLetSub t $ packᴿ $ λ where
+   z     → unLetSub e ρᴿ
    (s v) → begin
      sub ρ₂ (ren (pack id) (lookup ρ₁ v))
        ≡⟨ cong (sub ρ₂) (ren-id′ (lookup ρ₁ v)) ⟩
      sub ρ₂ (lookup ρ₁ v)
-       ≡⟨ lookup^R ρ^R v ⟩
+       ≡⟨ lookupᴿ ρᴿ v ⟩
      lookup ρ₃ v
        ≡⟨ sym (ren-id′ (lookup ρ₃ v)) ⟩
      ren (pack id) (lookup ρ₃ v)
        ∎
- unLetSub (`con (true  , r)) {ρ₁} {ρ₃} {ρ₂} ρ^R = cong `con $ begin
-   fmap d (reify vl^Tm) (fmap d (Sem.body Substitution ρ₂) (fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₁) r)))
-     ≡⟨ fmap² d (Sem.body Substitution ρ₂) (reify vl^Tm) (fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₁) r)) ⟩
-   fmap d _ (fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₁) r))
+ unLetSub (`con (true  , r)) {ρ₁} {ρ₃} {ρ₂} ρᴿ = cong `con $ begin
+   fmap d (reify vl^Tm) (fmap d (Semantics.body Sub ρ₂) (fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₁) r)))
+     ≡⟨ fmap² d (Semantics.body Sub ρ₂) (reify vl^Tm) (fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₁) r)) ⟩
+   fmap d _ (fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₁) r))
      ≡⟨ fmap² d (reify vl^Tm) _ _ ⟩
-   fmap d _ (fmap d (Sem.body UnLet ρ₁) r)
-     ≡⟨ fmap² d (Sem.body UnLet ρ₁) _ _ ⟩
+   fmap d _ (fmap d (Semantics.body UnLet ρ₁) r)
+     ≡⟨ fmap² d (Semantics.body UnLet ρ₁) _ _ ⟩
    fmap d _ r
-     ≡⟨ fmap-ext d (λ Ξ i b → unLetSub-body Ξ i b ρ^R) r ⟩
-   fmap d (λ Φ i → reify vl^Tm Φ i ∘ Sem.body UnLet ρ₃ Φ i) r
-     ≡⟨ sym (fmap² d (Sem.body UnLet ρ₃) (reify vl^Tm) r) ⟩
-   fmap d (reify vl^Tm) (fmap d (Sem.body UnLet ρ₃) r)
+     ≡⟨ fmap-ext d (λ Ξ i b → unLetSub-body Ξ i b ρᴿ) r ⟩
+   fmap d (λ Φ i → reify vl^Tm Φ i ∘ Semantics.body UnLet ρ₃ Φ i) r
+     ≡⟨ sym (fmap² d (Semantics.body UnLet ρ₃) (reify vl^Tm) r) ⟩
+   fmap d (reify vl^Tm) (fmap d (Semantics.body UnLet ρ₃) r)
      ∎
- unLetSub-body [] σ t ρ^R = unLetSub t ρ^R
- unLetSub-body Ξ@(x ∷ xs) σ {Γ} {Δ} {Θ} t {ρ₁} {ρ₃} {ρ₂} ρ^R = unLetSub t ρ′^R where
+ unLetSub-body [] σ t ρᴿ = unLetSub t ρᴿ
+ unLetSub-body Ξ@(x ∷ xs) σ {Γ} {Δ} {Θ} t {ρ₁} {ρ₃} {ρ₂} ρᴿ = unLetSub t ρ′ᴿ where
 
   ρ₁₁ : (Ξ ─Env) (Tm d ∞) (Ξ ++ Θ)
   ρ₁₁ = th^Env th^Tm (base vl^Tm) (pack (injectˡ Θ))
@@ -203,22 +205,22 @@ module _ {I : Set} {d : Desc I} where
 
   ρ₁₃ = pack (`var ∘ injectˡ Θ {Ξ}) >> th^Env th^Tm ρ₂ (pack (injectʳ Ξ))
 
-  eq₁₁^R : ∀[ Eq^R ] ρ₁₁ (pack (`var ∘ injectˡ Θ))
-  lookup^R eq₁₁^R k = cong (ren (pack (injectˡ Θ))) (lookup-base^Tm k)
+  eq₁₁ᴿ : All Eqᴿ _ ρ₁₁ (pack (`var ∘ injectˡ Θ))
+  lookupᴿ eq₁₁ᴿ k = cong (ren (pack (injectˡ Θ))) (lookup-base^Tm k)
 
-  eq₁₂^R : ∀[ Eq^R ] ρ₁₂ (th^Env th^Tm ρ₂ (pack (injectʳ Ξ)))
-  lookup^R eq₁₂^R k =
-    Sim.sim RenExt (pack^R (cong (injectʳ Ξ) ∘ lookup-base^Var)) (lookup ρ₂ k)
+  eq₁₂ᴿ : All Eqᴿ _ ρ₁₂ (th^Env th^Tm ρ₂ (pack (injectʳ Ξ)))
+  lookupᴿ eq₁₂ᴿ k =
+    Simulation.sim RenExt (packᴿ (cong (injectʳ Ξ) ∘ lookup-base^Var)) (lookup ρ₂ k)
 
-  eq₁^R : ∀[ Eq^R ] (ρ₁₁ >> ρ₁₂) ρ₁₃
-  eq₁^R = eq₁₁^R >>^R eq₁₂^R
+  eq₁ᴿ : All Eqᴿ _ (ρ₁₁ >> ρ₁₂) ρ₁₃
+  eq₁ᴿ = eq₁₁ᴿ >>ᴿ eq₁₂ᴿ
 
   ρ₂₁ = th^Env th^Var (base vl^Var) (pack (injectʳ Ξ))
 
-  ρ′^R : ∀[ Eq^R ] (sub (freshˡ vl^Tm Θ {Ξ} >> th^Env th^Tm ρ₂ (freshʳ vl^Var Ξ))
-                    <$> (freshˡ vl^Tm Δ  {Ξ} >> th^Env th^Tm  ρ₁ (freshʳ vl^Var Ξ)))
-                  (freshˡ vl^Tm Θ {Ξ} >> th^Env th^Tm ρ₃ (freshʳ vl^Var Ξ))
-  lookup^R ρ′^R k with split Ξ k
+  ρ′ᴿ : All Eqᴿ _ (sub (freshˡ vl^Tm Θ  >> th^Env th^Tm ρ₂ (freshʳ vl^Var Ξ))
+                    <$> (freshˡ vl^Tm Δ >> th^Env th^Tm  ρ₁ (freshʳ vl^Var Ξ)))
+                  (freshˡ vl^Tm Θ >> th^Env th^Tm ρ₃ (freshʳ vl^Var Ξ))
+  lookupᴿ ρ′ᴿ k with split Ξ k
   ... | inj₁ kˡ = begin
     sub (ρ₁₁ >> ρ₁₂) (ren (pack (injectˡ Δ))(lookup (base vl^Tm) kˡ))
       ≡⟨ cong (sub (ρ₁₁ >> ρ₁₂) ∘ ren (pack (injectˡ Δ))) (lookup-base^Tm kˡ) ⟩
@@ -232,27 +234,27 @@ module _ {I : Set} {d : Desc I} where
       ∎
   ... | inj₂ kʳ = begin
     sub (ρ₁₁ >> ρ₁₂) (ren ρ₂₁ (lookup ρ₁ kʳ))
-      ≡⟨ Sim.sim SubExt eq₁^R (ren ρ₂₁ (lookup ρ₁ kʳ)) ⟩
+      ≡⟨ Simulation.sim SubExt eq₁ᴿ (ren ρ₂₁ (lookup ρ₁ kʳ)) ⟩
     sub ρ₁₃ (ren ρ₂₁ (lookup ρ₁ kʳ))
-      ≡⟨ cong (sub ρ₁₃) (Sim.sim RenExt eq₂^R  (lookup ρ₁ kʳ)) ⟩
+      ≡⟨ cong (sub ρ₁₃) (Simulation.sim RenExt eq₂ᴿ  (lookup ρ₁ kʳ)) ⟩
     sub ρ₁₃ (ren (pack (injectʳ Ξ)) (lookup ρ₁ kʳ))
-      ≡⟨ Fus.fus (F.RenSub d) eq^R (lookup ρ₁ kʳ) ⟩
+      ≡⟨ Fusion.fusion (F.RenSub d) eqᴿ (lookup ρ₁ kʳ) ⟩
     sub (th^Env th^Tm ρ₂ (pack (injectʳ Ξ))) (lookup ρ₁ kʳ)
-      ≡⟨ sym (Fus.fus (SubRen d) eq₃^R (lookup ρ₁ kʳ)) ⟩
+      ≡⟨ sym (Fusion.fusion (SubRen d) eq₃ᴿ (lookup ρ₁ kʳ)) ⟩
     ren ρ₃₁ (sub ρ₂ (lookup ρ₁ kʳ))
-      ≡⟨ cong (ren ρ₃₁) (lookup^R ρ^R kʳ) ⟩
+      ≡⟨ cong (ren ρ₃₁) (lookupᴿ ρᴿ kʳ) ⟩
     ren ρ₃₁ (lookup ρ₃ kʳ)
       ∎ where
 
-    eq₂^R : ∀[ Eq^R ] ρ₂₁ (pack (injectʳ Ξ))
-    lookup^R eq₂^R k = cong (injectʳ Ξ) (lookup-base^Var k)
+    eq₂ᴿ : All Eqᴿ _ ρ₂₁ (pack (injectʳ Ξ))
+    lookupᴿ eq₂ᴿ k = cong (injectʳ Ξ) (lookup-base^Var k)
 
     ρ₃₁ = th^Env th^Var (base vl^Var) (pack (injectʳ Ξ))
 
-    eq₃^R : ∀[ Eq^R ] (ren ρ₃₁ <$> ρ₂) (th^Env th^Tm ρ₂ (pack (injectʳ Ξ)))
-    lookup^R eq₃^R k =
-      Sim.sim RenExt (pack^R (cong (injectʳ Ξ) ∘ lookup-base^Var)) (lookup ρ₂ k)
+    eq₃ᴿ : All Eqᴿ _ (ren ρ₃₁ <$> ρ₂) (th^Env th^Tm ρ₂ (pack (injectʳ Ξ)))
+    lookupᴿ eq₃ᴿ k =
+      Simulation.sim RenExt (packᴿ (cong (injectʳ Ξ) ∘ lookup-base^Var)) (lookup ρ₂ k)
 
-    eq^R : ∀[ Eq^R ] (select (pack (injectʳ Ξ)) ρ₁₃) (th^Env th^Tm ρ₂ (pack (injectʳ Ξ)))
-    lookup^R eq^R k with split Ξ (injectʳ Ξ k) | split-injectʳ Ξ k
-    lookup^R eq^R k | .(inj₂ k) | refl = refl
+    eqᴿ : All Eqᴿ _ (select (pack (injectʳ Ξ)) ρ₁₃) (th^Env th^Tm ρ₂ (pack (injectʳ Ξ)))
+    lookupᴿ eqᴿ k with split Ξ (injectʳ Ξ k) | split-injectʳ Ξ k
+    lookupᴿ eqᴿ k | .(inj₂ k) | refl = refl

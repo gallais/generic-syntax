@@ -1,52 +1,49 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Examples.Printing where
 
-open import Data.Nat.Show as Nat
-open import Data.String
-open import Data.Bool
 open import Data.Product
-open import Agda.Builtin.Equality
+open import Data.String
 open import Function
+open import Relation.Binary.PropositionalEquality
 
-open import var
-open import environment
+open import Data.Var
+open import Data.Environment
 open import Generic.Syntax
 open import Generic.Semantics.Printing
 
--- First example: Untyped Lambda Calculus
+-- UTLC
+open import Generic.Syntax.UTLC
 
-open import Generic.Syntax.UTLC as UTLC
+printLC : Display UTLC
+getD printLC = case (λ { (f , t , _)    → f ++ "(" ++ t ++ ")" })
+                    (λ { ((x , b) , _)  → "λ" ++ lookup x z ++ ". " ++ b })
 
-disUTLC : Display UTLC
-getD disUTLC (App  , f , t , _)  = f ++ "(" ++ t ++ ")"
-getD disUTLC (Lam , (x , b) , _) = "λ" ++ lookup x z ++ ". " ++ b
+open import Agda.Builtin.Equality
 
-_ : print disUTLC UTLC.`id ≡ "λa. a"
+_ : print printLC `id ≡ "λa. a"
 _ = refl
-
--- Second example: Hutton's Razor
 
 open import Generic.Examples.HuttonsRazor
 
-disHR : Display HuttRaz
-getD disHR = λ where
-  (Lit , n , _)     → Nat.show n
-  (Add , m , n , _) → m ++ " + " ++ n
+open import Data.Nat.Show as Nat
 
-_ : print disHR ((lit 2 [+] lit 6) [+] lit 0) ≡ "2 + 6 + 0"
+printHR : Display HuttRaz
+getD printHR = case (Nat.show ∘ proj₁)
+                    (λ { (m , n , _) → m ++ " + " ++ n })
+
+_ : print printHR ((lit 2 [+] lit 6) [+] lit 0) ≡ "2 + 6 + 0"
 _ = refl
-
--- Third example: System F
 
 open import Generic.Examples.SystemF as SystemF
 
 printSF : Display system-F
-getD printSF  =
-    case  (λ { (σ , τ , _)    → σ ++ " → " ++ τ })
-  $ case  (λ { ((x , b) , _)  → "∀" ++ lookup x z ++ ". " ++ b })
-  $ case  (λ { (f , t , _)    → f ++ "(" ++ t ++ ")" })
-  $ case  (λ { ((x , b) , _)  → "λ" ++ lookup x z ++ ". " ++ b })
-  $ case  (λ { (f , T , _)    → f ++ "(" ++ T ++ ")" })
-  $       (λ { ((x , b) , _)  → "Λ" ++ lookup x z ++ ". " ++ b })
+getD printSF  = case  (λ { (σ , τ , _)    → σ ++ " → " ++ τ })
+              $ case  (λ { ((x , b) , _)  → "∀" ++ lookup x z ++ ". " ++ b })
+              $ case  (λ { (f , t , _)    → f ++ "(" ++ t ++ ")" })
+              $ case  (λ { ((x , b) , _)  → "λ" ++ lookup x z ++ ". " ++ b })
+              $ case  (λ { (f , T , _)    → f ++ "(" ++ T ++ ")" })
+                      (λ { ((x , b) , _)  → "Λ" ++ lookup x z ++ ". " ++ b })
 
 _ : print printSF SystemF.`id ≡ "Λa. λb. b"
 _ = refl

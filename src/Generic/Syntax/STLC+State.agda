@@ -1,3 +1,5 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Syntax.STLC+State where
 
 open import Data.Product
@@ -5,14 +7,14 @@ open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Function
 
-open import var
+open import Data.Var
 open import Generic.Syntax
 
-infixr 5 _⇒_
+infixr 5 _`→_
 data MType : Set where
   α   : MType
   𝟙   : MType
-  _⇒_ : MType → MType → MType
+  _`→_ : MType → MType → MType
   M   : MType → MType
 
 data `STLCSt : Set where
@@ -30,13 +32,13 @@ data `STLCSt : Set where
 
 STLCSt : Desc MType
 STLCSt = `σ `STLCSt $ λ where
-  (App σ τ) → `X [] (σ ⇒ τ) (`X [] σ (`∎ τ))
-  (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ ⇒ τ))
+  (App σ τ) → `X [] (σ `→ τ) (`X [] σ (`∎ τ))
+  (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ `→ τ))
   One       → `∎ 𝟙
   Get       → `∎ (M α)
   Put       → `X [] α (`∎ (M 𝟙))
   (Ret σ)   → `X [] σ (`∎ (M σ))
-  (Bnd σ τ) → `X [] (M σ) (`X [] (σ ⇒ M τ) (`∎ (M τ)))
+  (Bnd σ τ) → `X [] (M σ) (`X [] (σ `→ M τ) (`∎ (M τ)))
 
 module PATTERNS where
 

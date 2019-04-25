@@ -1,11 +1,14 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Semantics.Elaboration.LetBinders where
 
+open import Size
 open import Data.Product
-open import Relation.Binary.PropositionalEquality hiding ([_])
 open import Function
+open import Relation.Unary
+open import Relation.Binary.PropositionalEquality
 
-open import indexed
-open import environment
+open import Data.Environment
 open import Generic.Syntax
 open import Generic.Syntax.LetBinders
 open import Generic.Semantics
@@ -13,12 +16,17 @@ open import Generic.Semantics.Syntactic
 
 module _ {I : Set} {d : Desc I} where
 
-  UnLets : Sem (d `+ Lets) (Tm d _) (Tm d _)
-  Sem.th^𝓥  UnLets = th^Tm
-  Sem.var   UnLets = id
-  Sem.alg   UnLets = case (Sem.alg Substitution) $ λ where
+  private
+    variable
+      σ : I
+      i : Size
+
+  UnLets : Semantics (d `+ Lets) (Tm d _) (Tm d _)
+  Semantics.th^𝓥  UnLets = th^Tm
+  Semantics.var   UnLets = id
+  Semantics.alg   UnLets = case (Semantics.alg Sub) $ λ where
     ((Δ , σ) , est) → case unXs Δ est of λ where
        (es , t , refl) → t $$ es
 
-  unLets : {i : I} → [ Tm (d `+ Lets) _ i ⟶ Tm d _ i ]
-  unLets = Sem.sem UnLets (pack `var)
+  unLets : ∀[ Tm (d `+ Lets) i σ ⇒ Tm d _ σ ]
+  unLets = Semantics.semantics UnLets (pack `var)

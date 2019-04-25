@@ -1,10 +1,11 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Motivation.Problem.WithLibrary where
 
-open import indexed
-open import var hiding (_<$>_)
-open import varlike
-open import environment as E
-open import rel
+open import Data.Var hiding (_<$>_)
+open import Data.Var.Varlike
+open import Data.Environment as E
+open import Data.Relation
 
 open import Generic.Syntax
 open import Generic.Syntax.LetBinder
@@ -82,8 +83,8 @@ data _⊢_∋_↝T_ : ∀ Γ σ → T σ Γ → T σ Γ → Set where
 _⊢_∋_↝⋆T_ : ∀ Γ σ → T σ Γ → T σ Γ → Set
 Γ ⊢ σ ∋ t ↝⋆T u = Star (Γ ⊢ σ ∋_↝T_) t u
 
-↝⋆T^R : Rel T T
-rel ↝⋆T^R = _ ⊢ _ ∋_↝⋆T_
+↝⋆Tᴿ : Rel T T
+rel ↝⋆Tᴿ σ = _ ⊢ σ ∋_↝⋆T_
 
 th^↝T : ∀ {Γ Δ σ t u} (ρ : Thinning Γ Δ) →
         Γ ⊢ σ ∋ t ↝T u → Δ ⊢ σ ∋ th^Tm t ρ ↝T th^Tm u ρ
@@ -98,36 +99,36 @@ th^↝⋆T : ∀ {Γ Δ σ t u} (ρ : Thinning Γ Δ) →
 th^↝⋆T ρ Star.ε   = Star.ε
 th^↝⋆T ρ (r ◅ rs) = th^↝T ρ r ◅ th^↝⋆T ρ rs
 
-UnLet^↝⋆T : Sim ↝⋆T^R ↝⋆T^R Source UnLet UnLet
-Sim.th^R  UnLet^↝⋆T = th^↝⋆T
-Sim.var^R UnLet^↝⋆T = id
-Sim.alg^R UnLet^↝⋆T = λ where
-  (appS' f t) ρ^R (refl , refl , f^r , t^r , _) →
+UnLet^↝⋆T : Simulation Source UnLet UnLet ↝⋆Tᴿ ↝⋆Tᴿ
+Simulation.thᴿ  UnLet^↝⋆T = th^↝⋆T
+Simulation.varᴿ UnLet^↝⋆T = id
+Simulation.algᴿ UnLet^↝⋆T = λ where
+  (appS' f t) ρᴿ (refl , refl , f^r , t^r , _) →
     gmap (λ f → appT f _) (λ r → `appl r _) f^r
    ◅◅ gmap (appT _) (`appr _) t^r
-  (lamS' b)   ρ^R (refl , refl , b^r , _)       →
-    gmap lamT `lam (b^r _ (pack^R (λ v → Star.ε)))
-  (defS' e t) ρ^R (refl , refl , e^r , t^r , _) →
-    t^r _ (ε^R ∙^R e^r)
+  (lamS' b)   ρᴿ (refl , refl , b^r , _)       →
+    gmap lamT `lam (b^r _ (packᴿ (λ v → Star.ε)))
+  (defS' e t) ρᴿ (refl , refl , e^r , t^r , _) →
+    t^r _ (εᴿ ∙ᴿ e^r)
 
-simulation : ∀ {Γ Δ σ t u ρ ρ′} → ∀[ ↝⋆T^R ] ρ ρ′ → Γ ⊢ σ ∋ t ↝S u →
+simulation : ∀ {Γ Δ σ t u ρ ρ′} → All ↝⋆Tᴿ Γ ρ ρ′ → Γ ⊢ σ ∋ t ↝S u →
              Δ ⊢ σ ∋ unLet ρ t ↝⋆T unLet ρ′ u
-simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρ^R (`β b u)    =
-    subst (Δ ⊢ _ ∋ _ ↝⋆T_) (sym (Fus.fus SubUnLet refl^R b))
+simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρᴿ (`β b u)    =
+    subst (Δ ⊢ _ ∋ _ ↝⋆T_) (sym (Fusion.fusion SubUnLet reflᴿ b))
   $ `β (unLet _ b) (unLet _ u)
-  ◅_ $  subst (Δ ⊢ _ ∋_↝⋆T _) (sym (unLetSub b eq^R))
-  $ Sim.sim UnLet^↝⋆T ρ∙u^R b where
+  ◅_ $  subst (Δ ⊢ _ ∋_↝⋆T _) (sym (unLetSub b eqᴿ))
+  $ Simulation.sim UnLet^↝⋆T ρ∙uᴿ b where
 
-  eq′^R : ∀[ Eq^R ] (select (th^Env th^Var (base vl^Var) extend) (unLet ρ u /0])) (base vl^Tm)
-  lookup^R eq′^R z     = refl
-  lookup^R eq′^R (s v) = cong (ren extend ∘ lookup (base vl^Tm)) (lookup-base^Var v)
+  eq′ᴿ : All Eqᴿ _ (select (th^Env th^Var (base vl^Var) extend) (unLet ρ u /0])) (base vl^Tm)
+  lookupᴿ eq′ᴿ z     = refl
+  lookupᴿ eq′ᴿ (s v) = cong (ren extend ∘ lookup (base vl^Tm)) (lookup-base^Var v)
 
-  eq^R : ∀[ Eq^R ] (sub (unLet ρ u /0]) <$> (freshˡ vl^Tm Δ {_ ∷ []} >> _))
-                   (unLet ρ <$> (u /0]))
-  lookup^R eq^R z     = refl
-  lookup^R eq^R (s v) = begin
+  eqᴿ : All Eqᴿ _ (sub (unLet ρ u /0]) <$> (freshˡ vl^Tm Δ >> _))
+                  (unLet ρ <$> (u /0]))
+  lookupᴿ eqᴿ z     = refl
+  lookupᴿ eqᴿ (s v) = begin
     sub (unLet ρ u /0]) (ren (th^Env th^Var (base vl^Var) extend) (lookup ρ v))
-      ≡⟨ Fus.fus (F.RenSub Target) eq′^R (lookup ρ v) ⟩
+      ≡⟨ Fusion.fusion (F.RenSub Target) eq′ᴿ (lookup ρ v) ⟩
     sub (base vl^Tm) (lookup ρ v)
       ≡⟨ sub-id (lookup ρ v) ⟩
     lookup ρ v
@@ -135,35 +136,35 @@ simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρ^R (`β b u)    =
     unLet ρ (lookup (base vl^Tm) v)
       ∎
 
-  ρ∙u^R : ∀[ ↝⋆T^R ] (unLet ρ <$> (u /0])) (unLet ρ′ <$> (u /0]))
-  lookup^R ρ∙u^R z     = Sim.sim UnLet^↝⋆T ρ^R u
-  lookup^R ρ∙u^R (s v) = cast $ lookup^R ρ^R v where
+  ρ∙uᴿ : All ↝⋆Tᴿ _ (unLet ρ <$> (u /0])) (unLet ρ′ <$> (u /0]))
+  lookupᴿ ρ∙uᴿ z     = Simulation.sim UnLet^↝⋆T ρᴿ u
+  lookupᴿ ρ∙uᴿ (s v) = cast $ lookupᴿ ρᴿ v where
     cast = subst (λ v → Δ ⊢ _ ∋ unLet ρ v ↝⋆T unLet ρ′ v) (sym (lookup-base^Tm v))
 
-simulation {ρ = ρ} {ρ′} ρ^R (`ζ e t) =
-  subst (_ ⊢ _ ∋ _ ↝⋆T_) (sym (Fus.fus SubUnLet refl^R t))
-  $ Sim.sim UnLet^↝⋆T ρ′^R t where
+simulation {ρ = ρ} {ρ′} ρᴿ (`ζ e t) =
+  subst (_ ⊢ _ ∋ _ ↝⋆T_) (sym (Fusion.fusion SubUnLet reflᴿ t))
+  $ Simulation.sim UnLet^↝⋆T ρ′ᴿ t where
 
-  ρ′^R : ∀[ ↝⋆T^R ] ((E.ε ∙ unLet ρ e) >> th^Env th^Tm ρ (pack id)) (unLet ρ′ <$> (e /0]))
-  lookup^R ρ′^R k with split (_ ∷ []) k
-  ... | inj₁ z  = Sim.sim UnLet^↝⋆T ρ^R e
+  ρ′ᴿ : All ↝⋆Tᴿ _ ((E.ε ∙ unLet ρ e) >> th^Env th^Tm ρ (pack id)) (unLet ρ′ <$> (e /0]))
+  lookupᴿ ρ′ᴿ k with split (_ ∷ []) k
+  ... | inj₁ z  = Simulation.sim UnLet^↝⋆T ρᴿ e
   ... | inj₁ (s ())
-  ... | inj₂ kʳ = cast $ lookup^R ρ^R kʳ where
+  ... | inj₂ kʳ = cast $ lookupᴿ ρᴿ kʳ where
     cast = subst₂ (λ v w → _ ⊢ _ ∋ v ↝⋆T unLet ρ′ w)
              (sym (ren-id′ (lookup ρ kʳ)))
              (sym (lookup-base^Tm kʳ))
 
-simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρ^R (`lam r) = gmap lamT `lam (simulation ρ′^R r) where
+simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρᴿ (`lam r) = gmap lamT `lam (simulation ρ′ᴿ r) where
 
-  ρ′^R : ∀[ ↝⋆T^R ] (freshˡ vl^Tm Δ {_ ∷ []} >> th^Env th^Tm ρ (freshʳ vl^Var (_ ∷ [])))
-                    (freshˡ vl^Tm Δ {_ ∷ []} >> th^Env th^Tm ρ′ (freshʳ vl^Var (_ ∷ [])))
-  lookup^R ρ′^R k with split (_ ∷ []) k
+  ρ′ᴿ : All ↝⋆Tᴿ _ (freshˡ vl^Tm Δ >> th^Env th^Tm ρ (freshʳ vl^Var (_ ∷ [])))
+                   (freshˡ vl^Tm Δ >> th^Env th^Tm ρ′ (freshʳ vl^Var (_ ∷ [])))
+  lookupᴿ ρ′ᴿ k with split (_ ∷ []) k
   ... | inj₁ kˡ = Star.ε
-  ... | inj₂ kʳ = th^↝⋆T (th^Env th^Var (base vl^Var) extend) (lookup^R ρ^R kʳ)
+  ... | inj₂ kʳ = th^↝⋆T (th^Env th^Var (base vl^Var) extend) (lookupᴿ ρᴿ kʳ)
 
-simulation ρ^R (`appl r t) =
-     gmap (λ f → appT f _) (λ r → `appl r _) (simulation ρ^R r)
-  ◅◅ gmap (appT _) (`appr _) (Sim.sim UnLet^↝⋆T ρ^R t)
-simulation ρ^R (`appr f r) =
-    gmap (appT _) (`appr _) (simulation ρ^R r)
- ◅◅ gmap (λ f → appT f _) (λ r → `appl r _) (Sim.sim UnLet^↝⋆T ρ^R f)
+simulation ρᴿ (`appl r t) =
+     gmap (λ f → appT f _) (λ r → `appl r _) (simulation ρᴿ r)
+  ◅◅ gmap (appT _) (`appr _) (Simulation.sim UnLet^↝⋆T ρᴿ t)
+simulation ρᴿ (`appr f r) =
+    gmap (appT _) (`appr _) (simulation ρᴿ r)
+ ◅◅ gmap (λ f → appT f _) (λ r → `appl r _) (Simulation.sim UnLet^↝⋆T ρᴿ f)

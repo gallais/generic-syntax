@@ -1,16 +1,27 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Syntax.LetBinder where
 
+open import Size
 open import Data.Bool
 open import Data.Product
 open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Function
+open import Relation.Unary
 
-open import indexed
-open import var
 open import Generic.Syntax
 
+private
+  variable
+    I : Set
+    σ τ : I
+    d : Desc I
+    s : Size
+
+
 module _ {I : Set} where
+
 
   Let : Desc I
   Let = `σ (I × I) $ uncurry $ λ σ τ →
@@ -19,7 +30,5 @@ module _ {I : Set} where
 pattern `IN' e t = (_ , e , t , refl)
 pattern `IN  e t = `con (`IN' e t)
 
-module _ {I : Set} {d : Desc I} where
-
-  embed : ∀ {i σ} → [ Tm d i σ ⟶ Tm (d `+ Let) i σ ]
-  embed = map^Tm (MkDescMorphism (true ,_))
+embed : ∀[ Tm d s σ ⇒ Tm (d `+ Let) s σ ]
+embed = map^Tm (MkDescMorphism (true ,_))

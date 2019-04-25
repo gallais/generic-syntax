@@ -1,29 +1,33 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Semantics.TypeChecking where
 
-import Level
-import Category.Monad as CM
+open import Size
+open import Function
 open import Data.Unit
 open import Data.Bool
 open import Data.Product
 open import Data.List hiding ([_])
-open import Data.Maybe.Base
-open import Data.Maybe.Categorical as MC
-open import Function
+open import Data.Maybe
+import Data.Maybe.Categorical as MC
 
-open import indexed
-open import var hiding (_<$>_)
-open import environment hiding (_<$>_ ; _>>_)
+
+open import Data.Var hiding (_<$>_)
+open import Data.Environment hiding (_<$>_ ; _>>_)
 open import Generic.Syntax
 open import Generic.Semantics
 
-open import Generic.Syntax.Bidirectional
-
+import Category.Monad as CM
+import Level
 module M = CM.RawMonad (MC.monad {Level.zero})
 open M
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
--- Equality testing for types
+infixr 5 _⇒_
+data Type : Set where
+  α    : Type
+  _⇒_  : Type → Type → Type
 
 infix 3 _==_
 _==_ : (σ τ : Type) → Maybe ⊤
@@ -31,16 +35,35 @@ _==_ : (σ τ : Type) → Maybe ⊤
 σ ⇒ τ == σ' ⇒ τ' = (σ == σ') >> (τ == τ')
 _     == _       = nothing
 
--- Trying to break down a putative arrow type into its constituents
 isArrow : (σ⇒τ : Type) → Maybe (Type × Type)
 isArrow (σ ⇒ τ) = just (σ , τ)
 isArrow _       = nothing
 
-----------------------------------------------------------------------
--- Type- Checking/Inference
+data LangC : Set where
+  App Lam Emb : LangC
+  Cut : Type → LangC
 
--- The output of the semantics is the Type-(Check/Infer) process itself.
--- Hence the following definition
+data Mode : Set where
+  Check Infer : Mode
+
+
+private
+  variable
+    i : Mode
+    Γ : List Mode
+
+
+Lang : Desc Mode
+Lang  =  `σ LangC $ λ where
+  App      → `X [] Infer (`X [] Check (`∎ Infer))
+  Lam      → `X (Infer ∷ []) Check (`∎ Check)
+  (Cut σ)  → `X [] Check (`∎ Infer)
+  Emb      → `X [] Infer (`∎ Check)
+
+pattern `app f t  = `con (App , f , t , refl)
+pattern `lam b    = `con (Lam , b , refl)
+pattern `cut σ t  = `con (Cut σ , t , refl)
+pattern `emb t    = `con (Emb , t , refl)
 
 Type- : Mode → Set
 Type- Check  = Type →  Maybe ⊤
@@ -49,47 +72,27 @@ Type- Infer  =         Maybe Type
 Var- : Mode → Set
 Var- _ = Type
 
-Typecheck : Sem Lang (const ∘ Var-) (const ∘ Type-)
+Typecheck : Semantics Lang (const ∘ Var-) (const ∘ Type-)
 Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
 
    var : (i : Mode) → Var- i → Type- i
    var Infer  = just
    var Check  = _==_
 
-   alg : {i : Mode} {Γ : List Mode} →
-         ⟦ Lang ⟧ (Kripke (κ ∘ Var-) (κ ∘ Type-)) i Γ → Type- i
-   -- Application:
-   --  * Infer the type of the function
-   --  * Make sure it is an arrow type
-   --  * Check the argument belongs to the domain
-   --  * Return the codomain
+   alg : ⟦ Lang ⟧ (Kripke (const ∘ Var-) (const ∘ Type-)) i Γ → Type- i
    alg (App , f , t , refl)  =  f            >>= λ σ⇒τ →
                                 isArrow σ⇒τ  >>= uncurry λ σ τ →
                                 τ <$ t σ
-   -- Lambda-Abstraction:
-   --  * Make sure the candidate is an arrow type
-   --  * Push a fresh variable of type the domain in the context
-   --  * Check the body has type the codomain in the extended context
    alg (Lam , b , refl)      =  λ σ⇒τ → isArrow σ⇒τ >>= uncurry λ σ τ →
                                 b (extend {σ = Infer}) (ε ∙ σ) τ
-   -- Cut aka Type Annotation:
-   --  * Check the term as the ascribed type
-   --  * Return that type
    alg (Cut σ , t , refl)    =  σ <$ t σ
-   -- Embedding:
-   --  * Infer the type of the term
-   --  * Check it is equal to the candidate
    alg (Emb , t , refl)      =  λ σ → t >>= λ τ → σ == τ
 
-type- : (p : Mode) → TM Lang p → Type- p
-type- p t = Sem.sem Typecheck {Δ = []} ε t
+type- : (p : Mode) → Tm Lang ∞ p [] → Type- p
+type- p t = Semantics.semantics Typecheck {Δ = []} ε t
 
-----------------------------------------------------------------------
--- Example
-
-_ : let open PATTERNS
-        id  : TM Lang Check
-        id  = LAM (EMB (`var z))
-    in type- Infer (APP (CUT ((α ⇒ α) ⇒ (α ⇒ α)) id) id)
+_ : let  id  : Tm Lang ∞ Check []
+         id  = `lam (`emb (`var z))
+    in type- Infer (`app (`cut ((α ⇒ α) ⇒ (α ⇒ α)) id) id)
      ≡ just (α ⇒ α)
 _ = refl
