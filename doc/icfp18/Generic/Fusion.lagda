@@ -1,4 +1,6 @@
 \begin{code}
+{-# OPTIONS --safe --sized-types #-}
+
 open import Data.Var hiding (z; s; _<$>_)
 
 module Generic.Fusion {I : Set} {𝓥ᴬ 𝓥ᴮ 𝓥ᴬᴮ 𝓒ᴬ 𝓒ᴮ 𝓒ᴬᴮ : I ─Scoped} where

@@ -23,7 +23,7 @@ lemmas about those functions. To reduce the burden of such repeated
 work and boilerplate, we apply the methodology of datatype-genericity to
 programming and proving with syntaxes with binding.
 
-To motivate our approach, let us look at the formalisation of an 
+To motivate our approach, let us look at the formalisation of an
 apparently straightforward program transformation: the inlining of
 let-bound variables by substitution. You have two languages: the source
 (\AD{S}), which has let-bindings, and the target (\AD{T}), which only
@@ -1474,7 +1474,14 @@ with are related according to \AB{𝓥ᴿ}. Lastly, for all the types to match u
 \ExecuteMetaData[Generic/Fusion.tex]{appendR}
 
 We finally arrive at the constraints focusing on the semantical counterparts
-of the terms' constructors. When evaluating a variable, on the one hand \AB{𝓢ᴬ}
+of the terms' constructors. Each constraint essentially states that evaluating
+a term with \AB{𝓢ᴬ}, reifying the result and running \AB{𝓢ᴮ} is equivalent to
+using \AB{𝓢ᴬᴮ} straight away. This can be made formal by defining the following
+relation \AF{𝓡}.
+
+\ExecuteMetaData[Generic/Fusion.tex]{crel}
+
+When evaluating a variable, on the one hand \AB{𝓢ᴬ}
 will look up its meaning in the evaluation environment, turn the resulting value into
 a computation which will get quoted and then the result will be evaluated with \AB{𝓢ᴮ}.
 Provided that all three evaluation environments are related by \AB{𝓔ᴿ} this should
@@ -1519,7 +1526,7 @@ substitution followed by renaming into a single substitution where the
 renaming has been applied to the environment.
 
 \begin{figure}[h]
- \ExecuteMetaData[Generic/Fusion.tex]{subren}
+ \ExecuteMetaData[Generic/Fusion/Syntactic.tex]{subren}
 \caption{A Corollary: Substitution-Renaming Fusion}
 \end{figure}
 

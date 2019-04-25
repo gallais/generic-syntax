@@ -18,6 +18,7 @@ AGDA_FILES:=\
   Generic/Examples/TypeChecking.lagda \
   Generic/Examples/UntypedLC.lagda \
   Generic/Fusion.lagda \
+  Generic/Fusion/Syntactic.lagda \
   Generic/Semantics.lagda \
   Generic/Semantics/Syntactic.lagda \
   Generic/Semantics/Elaboration/LetBinder.lagda \

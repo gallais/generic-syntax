@@ -2,7 +2,8 @@
 *~
 *.log
 *.hash
-doc/latex/
-doc/latex-agda-output/
+latex/
+latex-agda-output/
+src/
 *.o
 *.hi
