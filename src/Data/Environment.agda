@@ -159,8 +159,8 @@ module _ {A : Set → Set} {{app : RawApplicative A}} where
  private module A = RawApplicative app
  open A
 
- sequenceA : ∀ {Γ Δ} → (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
- sequenceA {Γ = Γ} = go Γ where
+ sequenceA : (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
+ sequenceA = go _ where
 
    go : ∀ Γ → (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
    go []       ρ = pure ε
