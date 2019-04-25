@@ -1,5 +1,5 @@
 \begin{code}
-module Generic.Examples.POPLMark2+ where
+module Motivationx.POPLMark2+ where
 
 open import Generic
 
