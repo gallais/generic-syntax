@@ -1,4 +1,6 @@
 \begin{code}
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Examples.SystemF where
 
 open import Size
@@ -9,12 +11,12 @@ open import Data.List.Base hiding ([_])
 open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
-open import indexed
-open import var hiding (_<$>_)
-open import varlike
-open import environment hiding (_<$>_)
+open import Data.Var hiding (_<$>_)
+open import Data.Var.Varlike
+open import Data.Environment hiding (_<$>_)
 open import Generic.Syntax
 open import Generic.Semantics
+open import Generic.Semantics.Syntactic
 
 data Kind : Set where
   Term Type : Kind
@@ -51,6 +53,7 @@ data Redex {Γ : List Kind} : SF Term Γ → Set where
 
 open import Category.Monad
 open import Data.Maybe
+open import Data.Maybe.Categorical
 import Level
 open RawMonadPlus (monadPlus {Level.zero})
 
@@ -72,18 +75,20 @@ fire ([lam] b)     = lam (fire b)
 fire ([App] f t)   = App (fire f) t
 fire ([Lam] b)     = Lam (fire b)
 
-open import Coinduction
-open import Data.Colist
+open import Codata.Thunk
+open import Codata.Colist
+open import Codata.Colist.Bisimilarity using (_⊢_≈_; _∷_; [])
 
-eval : (Γ : List Kind) (t : SF Term Γ) → Colist (SF Term Γ)
+
+eval : ∀ {i} (Γ : List Kind) (t : SF Term Γ) → Colist (SF Term Γ) i
 eval Γ t with redex t
-... | just r  = t ∷ ♯ eval Γ (fire r)
-... | nothing = t ∷ ♯ []
+... | just r  = t ∷ λ where .force → eval Γ (fire r)
+... | nothing = t ∷ λ where .force → []
 
 `id : SF Term []
 `id = Lam (lam (`var z))
 
-_ : eval [] (lam (lam (app (lam (app (`var z) (`var z))) (lam (`var z)))))
-  ≈ (_ ∷ ♯ (_ ∷ ♯ (lam (lam (lam (`var z))) ∷ ♯ [])))
-_ = _ ∷ ♯ (_ ∷ ♯ (_ ∷ ♯ []))
+_ : _ ⊢ eval [] (lam (lam (app (lam (app (`var z) (`var z))) (lam (`var z)))))
+  ≈ fromList (_ ∷ _ ∷ lam (lam (lam (`var z))) ∷ [])
+_ = refl ∷ λ where .force → refl ∷ λ where .force → refl ∷ λ where .force → []
 \end{code}

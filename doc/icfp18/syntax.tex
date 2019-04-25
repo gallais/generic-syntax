@@ -227,7 +227,7 @@ scope when defining such families:
 \ExecuteMetaData[Data/Var.tex]{var}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.55\textwidth}
-\ExecuteMetaData[motivation.tex]{tm}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{tm}
 \end{minipage}
 %\caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
 %\end{center}
@@ -267,10 +267,10 @@ These constraints show up in the types of renaming and substitution: % defined a
 
 \begin{figure}[h]
 \begin{minipage}{0.50\textwidth}
-\ExecuteMetaData[motivation.tex]{ren}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{ren}
 \end{minipage}\hfill
 \begin{minipage}{0.50\textwidth}
-\ExecuteMetaData[motivation.tex]{sub}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{sub}
 \end{minipage}
 \caption{Type and Scope Preserving Renaming and Substitution}
 \end{figure}
@@ -395,7 +395,7 @@ bound variable. This is concisely expressed by the type
 (\AF{□} (\AB{𝓥} \AB{$\sigma$} \AF{→} \AB{𝓒} \AB{$\tau$})).
 
 \begin{figure}[h]
-\ExecuteMetaData[motivation.tex]{rsem}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsem}
 \caption{Semantics for \AD{Lam}}\label{figure:lamsem}
 \end{figure}
 
@@ -408,7 +408,7 @@ made earlier, namely that any given {\AR{Sem} \AB{𝓥}
 computation \AB{𝓒}.
 
 \begin{figure}[h]
-\ExecuteMetaData[motivation.tex]{sem}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{sem}
 \caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \AR{Sem}\;\AB{𝓥}\;\AB{𝓒}}\label{figure:fdmlamsem}
 \end{figure}
 
@@ -419,12 +419,12 @@ have already proven that they are thinnable.
 
 \begin{figure}[h]
 \begin{minipage}{0.5\textwidth}
-\ExecuteMetaData[motivation.tex]{semren}
-\ExecuteMetaData[motivation.tex]{semrenfun}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semren}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semrenfun}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
-\ExecuteMetaData[motivation.tex]{semsub}
-\ExecuteMetaData[motivation.tex]{semsubfun}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsub}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsubfun}
 \end{minipage}
 \caption{Renaming and Substitution as Instances of \AR{Sem}}
 \end{figure}
@@ -445,8 +445,8 @@ We define a function \AF{fresh} that generates new concrete names using a
 \AD{State} monad.
 
 \begin{figure}[h]
-  \ExecuteMetaData[motivation.tex]{valprint}
-  \ExecuteMetaData[motivation.tex]{freshprint}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{valprint}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{freshprint}
 \caption{Wrapper and fresh name generation}
 \end{figure}
 
@@ -460,7 +460,7 @@ name to generate a string representing the body of the function to which we
 prepend a ``$\lambda$'' binding the fresh name.
 
 \begin{figure}[h]
-\ExecuteMetaData[motivation.tex]{semprint}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}
 \caption{Printing as an instance of \AR{Sem}}
 \end{figure}
 
@@ -514,10 +514,10 @@ terminated by equality constraints.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[Generic/Data.tex]{desc}
+\ExecuteMetaData[StateOfTheArt/CDMM.tex]{desc}
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[Generic/Data.tex]{interp}
+\ExecuteMetaData[StateOfTheArt/CDMM.tex]{interp}
 \end{minipage}
 \caption{Datatype Descriptions and their Meaning as Functors}\label{figure:desc}
 \end{figure}
@@ -531,7 +531,7 @@ in $A$ and a recursive substructure i.e. the tail of the list. The \AD{List} typ
 is unindexed, we represent the lack of an index with the unit type \AD{$\top$}.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Data.tex]{listD}
+\ExecuteMetaData[StateOfTheArt/CDMM.tex]{listD}
 \caption{The Description of the base functor for \AD{List} \AB{A}}\label{figure:listD}
 \end{figure}
 
@@ -544,7 +544,7 @@ non-empty one in which case we store a natural number \AB{n}, the head of type
 \AIC{suc} \AB{n}).
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Data.tex]{vecD}
+\ExecuteMetaData[StateOfTheArt/CDMM.tex]{vecD}
 \caption{The Description of the base functor for \AD{Vec} \AB{A} \AB{n}}\label{figure:vecD}
 \end{figure}
 
@@ -556,7 +556,7 @@ to \AB{d} over morphisms in $\Set{}^J$. This is the first example of generic
 programming over all the functors one can obtain as the meaning of a description.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Data.tex]{fmap}
+\ExecuteMetaData[StateOfTheArt/CDMM.tex]{fmap}
 \caption{Action on Morphisms of the Functor corresponding to a \AF{Desc}ription}
 \end{figure}
 
@@ -574,8 +574,8 @@ termination checker to see that \AF{fold} is a total function.
 .
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Data.tex]{mu}
-\ExecuteMetaData[Generic/Data.tex]{fold}
+\ExecuteMetaData[StateOfTheArt/CDMM.tex]{mu}
+\ExecuteMetaData[StateOfTheArt/CDMM.tex]{fold}
 \caption{Least Fixpoint of an Endofunctor and Corresponding Generic Fold}\label{figure:datamu}
 \end{figure}
 
@@ -692,10 +692,10 @@ and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression 
 
 \begin{figure}[h]
 \begin{minipage}{0.4\textwidth}
-  \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{ULC}
+  \ExecuteMetaData[Generic/Syntax/UTLC.tex]{ULC}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
-  \ExecuteMetaData[Generic/Examples/STLC.tex]{stlc}
+  \ExecuteMetaData[Generic/Syntax/STLC.tex]{stlc}
 \end{minipage}
 \caption{Examples: The Untyped and Simply Typed Lambda Calculi}
 \end{figure}
@@ -716,10 +716,10 @@ for pattern synonyms.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
- \ExecuteMetaData[Generic/Examples/UntypedLC.tex]{LCpat}
+ \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCpat}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.50\textwidth}
-\ExecuteMetaData[Generic/Examples/STLC.tex]{patST}
+\ExecuteMetaData[Generic/Syntax/STLC.tex]{patST}
 \end{minipage}
 \caption{Respective Pattern Synonyms for the Untyped and Simply Typed Lambda Calculus}
 \end{figure}
@@ -1048,7 +1048,7 @@ scopes have become \AF{Kripke} functional spaces on \AD{Dm} and
 an error token because the evaluation of untyped programs may go wrong.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Examples/NbyE.tex]{domain}
+\ExecuteMetaData[Generic/Semantics/NbyE.tex]{domain}
 \caption{Generic Reflexive Domain}
 \end{figure}
 
@@ -1074,7 +1074,7 @@ anything else.
 
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Examples/NbyE.tex]{nbe-setup}
+\ExecuteMetaData[Generic/Semantics/NbyE.tex]{nbe-setup}
 \caption{Generic Normalisation by Evaluation Framework}
 \end{figure}
 
@@ -1116,10 +1116,10 @@ into \AIC{Check}ables.
 
 \begin{figure}[h]
 \begin{minipage}{0.3\textwidth}
-  \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{constructors}
+  \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{constructors}
 \end{minipage}\hfill
 \begin{minipage}{0.6\textwidth}
-  \ExecuteMetaData[Generic/Examples/TypeChecking.tex]{bidirectional}
+  \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{bidirectional}
 \end{minipage}
 \caption{A Bidirectional Simply Typed Language}
 \end{figure}
@@ -1132,10 +1132,10 @@ computations are always potentially failing so we use the \AD{Maybe} monad.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
-\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{varmode}
+\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{varmode}
 \end{minipage}\hfill
 \begin{minipage}{0.50\textwidth}
-\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{typemode}
+\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typemode}
 \end{minipage}
 \caption{Var- and Type- Relations indexed by the Mode}
 \end{figure}
@@ -1158,7 +1158,7 @@ a {\AD{Maybe} \AB{A}} which has the same structure as its second argument):
 \end{itemize}
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Examples/TypeChecking.tex]{typecheck}
+\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typecheck}
 \caption{Type- Inference / Checking as a Semantics}
 \end{figure}
 

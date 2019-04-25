@@ -1,7 +1,7 @@
 \begin{code}
 {-# OPTIONS --safe --sized-types #-}
 
-module Generic.Examples.STLC where
+module Generic.Syntax.STLC where
 
 open import Size
 open import Data.Bool
@@ -10,7 +10,7 @@ open import Agda.Builtin.Equality
 open import Agda.Builtin.List
 open import Generic.Syntax
 open import Data.Var
-open import motivation using (Type ; α ; _`→_)
+open import StateOfTheArt.ACMM using (Type ; α ; _`→_)
 open import Function
 
 \end{code}

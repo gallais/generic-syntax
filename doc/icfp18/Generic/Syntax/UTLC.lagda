@@ -1,7 +1,7 @@
 \begin{code}
 {-# OPTIONS --safe --sized-types #-}
 
-module Generic.Examples.UntypedLC where
+module Generic.Syntax.UTLC where
 
 open import Size
 open import Data.Unit

@@ -67,7 +67,7 @@ module _ (vl^𝓥 : VarLike 𝓥) where
   lift : ∀ Θ → (Γ ─Env) 𝓥 Δ → ((Θ ++ Γ) ─Env) 𝓥 (Θ ++ Δ)
   lift Θ ρ = freshˡ vl^𝓥 _ >> th^Env (th^𝓥 vl^𝓥) ρ (freshʳ vl^Var Θ)
 
-  extend-is-fresh : All Eqᴿ Γ (Thinning Γ (σ ∷ Γ) ∋ extend) (freshʳ vl^Var (σ ∷ []))
+  extend-is-fresh : All Eqᴿ Γ extend (freshʳ vl^Var (σ ∷ []))
   lookupᴿ extend-is-fresh k = cong s (sym (lookup-base^Var k))
 
 module _ {I : Set} {𝓥 : I ─Scoped} where
@@ -109,11 +109,11 @@ module _ (vl^𝓥  : VarLike 𝓥) where
  VarLikeᴿ.thᴿ   vl^Refl = λ σ → cong (λ v → th^𝓥 vl^𝓥 v σ)
 
 
-module _ (𝓥^P : Pred {I} 𝓥) (𝓒^P : Pred {I} 𝓒) where
+module _ (𝓥ᴾ : Pred {I} 𝓥) (𝓒ᴾ : Pred {I} 𝓒) where
 
- Kripke^P : ∀ Δ τ → ∀[ Kripke 𝓥 𝓒 Δ τ ⇒ const Set ]
- Kripke^P []         τ k = pred 𝓒^P k
- Kripke^P Δ@(_ ∷ _)  τ k = ∀ {Θ} th {ρ : (Δ ─Env) 𝓥 Θ} → Pred.All Δ 𝓥^P ρ → pred 𝓒^P (k th ρ)
+ Kripkeᴾ : ∀ Δ τ → ∀[ Kripke 𝓥 𝓒 Δ τ ⇒ const Set ]
+ Kripkeᴾ []         τ k = pred 𝓒ᴾ τ k
+ Kripkeᴾ Δ@(_ ∷ _)  τ k = ∀ {Θ} th {ρ : (Δ ─Env) 𝓥 Θ} → Pred.All 𝓥ᴾ Δ ρ → pred 𝓒ᴾ τ (k th ρ)
 
 module _ (𝓥ᴿ : Rel {I} 𝓥ᴬ 𝓥ᴮ) (𝓒ᴿ : Rel {I} 𝓒ᴬ 𝓒ᴮ) where
 \end{code}

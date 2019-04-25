@@ -1,7 +1,7 @@
 \begin{code}
 {-# OPTIONS --safe --sized-types #-}
 
-module Generic.Data where
+module StateOfTheArt.CDMM where
 
 open import Size
 open import Data.Empty

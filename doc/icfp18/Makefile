@@ -10,13 +10,13 @@ AGDA_FILES:=\
   Data/Environment.lagda \
   Generic/Bisimilar.lagda \
   Generic/Cofinite.lagda \
-  Generic/Data.lagda \
   Generic/Examples/Colist.lagda \
   Generic/Syntax/LetBinder.lagda \
+  Generic/Semantics/NbyE.lagda \
   Generic/Examples/NbyE.lagda \
-  Generic/Examples/STLC.lagda \
-  Generic/Examples/TypeChecking.lagda \
-  Generic/Examples/UntypedLC.lagda \
+  Generic/Syntax/STLC.lagda \
+  Generic/Semantics/TypeChecking.lagda \
+  Generic/Syntax/UTLC.lagda \
   Generic/Fusion.lagda \
   Generic/Fusion/Syntactic.lagda \
   Generic/Semantics.lagda \
@@ -26,7 +26,8 @@ AGDA_FILES:=\
   Generic/Simulation/Syntactic.lagda \
   Generic/Syntax.lagda \
   Generic/Relator.lagda \
-  motivation.lagda \
+  StateOfTheArt/ACMM.lagda \
+  StateOfTheArt/CDMM.lagda \
   Data/Var/Varlike.lagda \
   Data/Var.lagda
 

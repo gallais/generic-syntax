@@ -5,91 +5,84 @@ module Generic.AltSyntax where
 
 open import Level
 open import Size
+open import Category.Monad
+
 open import Data.Bool
-open import Data.List.Relation.Unary.All using (All; []; _∷_)
-open import Data.List.All.Properties
-open import Data.List.Base as List hiding ([_])
-open import Data.Product as Prod
+open import Data.List.Relation.Unary.All hiding (sequenceA)
+open import Data.List.Relation.Unary.All.Properties
+open import Data.List.Base as L hiding ([_])
+open import Data.Maybe.Base
+open import Data.Sum.Base
+import Data.Sum.Categorical.Left as SC
+open import Data.Product
+open import Data.String as String
+
 open import Function hiding (case_of_)
 import Function.Equality as FEq
 import Function.Inverse as FInv
 open import Relation.Binary.PropositionalEquality hiding ([_])
-
-open import Relation.Unary
 open import Relation.Nullary
+open import Function
 
-open import Data.Var as Var using (Var; _─Scoped)
+open import Data.Var hiding (_<$>_)
 open import Data.Var.Varlike
-open import Data.Environment as E hiding (_<$>_; sequenceA)
+open import Data.Environment as E hiding (sequenceA ; _<$>_)
 open import Generic.Syntax
 open import Generic.Semantics
 
-private
-  variable
-    I : Set
-    σ : I
-    s : Size
-    V : I → Set
-    Γ : List I
+LAMBS : {I : Set} → (I → Set) → (I → Set) → List I → I ─Scoped
+LAMBS V T [] j Γ = T j
+LAMBS V T Δ  j Γ = (Δ ─Env) (const ∘′ V) [] → T j
 
-module PHOAS (d : Desc I) (V : I → Set) where
+data PHOAS {I : Set} (d : Desc I) (V : I → Set) : Size → I → Set where
+  V[_] : ∀ {s σ} → V σ → PHOAS d V (↑ s) σ
+  T[_] : ∀ {s σ} → ⟦ d ⟧ (LAMBS V (PHOAS d V s)) σ [] → PHOAS d V (↑ s) σ
 
-  PHOVar : I ─Scoped
-  PHOVar i _ = V i
+module ToPHOAS {I : Set} {V : I → Set} where
 
-  LAMBS : (I → Set) → List I → I ─Scoped
-  LAMBS T [] j Γ = T j
-  LAMBS T Δ  j Γ = (Δ ─Env) PHOVar [] → T j
+  toPHOAS : ∀ d → Semantics d (const ∘′ V) (const ∘′ PHOAS d V ∞)
+  Semantics.th^𝓥  (toPHOAS d) = λ v _ → v
+  Semantics.var    (toPHOAS d) = V[_]
+  Semantics.alg    (toPHOAS d) = T[_] ∘′ fmap d (λ Δ → binders Δ) where
 
-  data PHOAS : Size → I → Set where
-    V[_] : V σ → PHOAS (↑ s) σ
-    T[_] : ⟦ d ⟧ (LAMBS (PHOAS s)) σ [] → PHOAS (↑ s) σ
-
-  PHOTm : Size → I ─Scoped
-  PHOTm s i _ = PHOAS s i
-
-  toPHOAS : Semantics d PHOVar (PHOTm ∞)
-  Semantics.th^𝓥  toPHOAS = λ v _ → v
-  Semantics.var   toPHOAS = V[_]
-  Semantics.alg   toPHOAS = T[_] ∘′ fmap d binders where
-
-    binders : ∀ Δ i → Kripke PHOVar (PHOTm ∞) Δ i Γ → LAMBS (PHOAS ∞) Δ i []
+    binders : ∀ {Γ} Δ i → Kripke (const ∘′ V) (const ∘′ PHOAS d V ∞) Δ i Γ → LAMBS V (PHOAS d V ∞) Δ i []
     binders []        i kr = kr
-    binders Δ@(_ ∷ _) i kr = λ vs → kr (base vl^Var) (id E.<$> vs)
+    binders Δ@(_ ∷ _) i kr = λ vs → kr (base vl^Var) ((λ v → v) E.<$> vs)
 
-open import Data.String as String
+Names : {I : Set} → (I → Set) → List I → I ─Scoped
+Names T [] j Γ = T j
+Names T Δ  j Γ = All (const String) Δ × T j
 
-Names : (I → Set) → List I → I ─Scoped
-Names T Δ j Γ = All (const String) Δ × T j
+data Raw (A : Set) {I : Set} (d : Desc I) : Size → I → Set where
+  `var : ∀ {s σ} → A → String → Raw A d (↑ s) σ
+  `con : ∀ {s σ} → ⟦ d ⟧ (Names (Raw A d s)) σ [] → Raw A d (↑ s) σ
 
-data Raw {I : Set} (d : Desc I) : Size → I → Set where
-  V[_] : ∀ {s σ} → String → Raw d (↑ s) σ
-  T[_] : ∀ {s σ} → ⟦ d ⟧ (Names (Raw d s)) σ [] → Raw d (↑ s) σ
+module ScopeCheck {E I : Set} {d : Desc I} (I-dec : (i j : I) → Dec (i ≡ j)) where
 
-open import Data.Maybe.Base
-open import Data.Maybe.Categorical using (monad)
-open import Category.Monad
+ private
+   M : Set → Set
+   M = (E × String) ⊎_
+ open RawMonad (SC.monad (E × String) zero)
 
-module SCOPE {I : Set} {d : Desc I} (I-dec : (i j : I) → Dec (i ≡ j)) where
+ instance _ =  rawIApplicative
 
- open RawMonad (monad {zero})
- instance _ = rawIApplicative
-
- varCheck : String → ∀ σ Γ → All (const String) Γ → Maybe (Var σ Γ)
- varCheck str σ []       []         = nothing
- varCheck str σ (τ ∷ Γ)  (nm ∷ scp) with nm String.≟ str
- ... | no ¬p = Var.s <$> varCheck str σ Γ scp
+ varCheck : E × String → ∀ σ Γ → All (const String) Γ → M (Var σ Γ)
+ varCheck v           σ []       []         = inj₁ v
+ varCheck v@(e , str) σ (τ ∷ Γ)  (nm ∷ scp) with nm String.≟ str
+ ... | no ¬p = s <$> varCheck v σ Γ scp
  ... | yes p with I-dec σ τ
- ... | no ¬eq = nothing
- ... | yes eq = just (subst (Var _ ∘′ (_∷ Γ)) eq Var.z)
+ ... | no ¬eq = inj₁ v
+ ... | yes eq = inj₂ (subst (Var _ ∘′ (_∷ Γ)) eq z)
 
+ scopeCheck    : ∀ {s} σ Γ → All (const String) Γ → Raw E d s σ → M (Tm d s σ Γ)
 
- scopeCheck     : ∀ {s} σ Γ → All (const String) Γ → Raw d s σ → Maybe (Tm d s σ Γ)
- scopeCheckBody : ∀ Γ → All (const String) Γ → ∀ {s} Δ σ → Names (Raw d s) Δ σ Γ → Maybe (Scope (Tm d s) Δ σ Γ)
+ scopeCheckBody : ∀ Γ → All (const String) Γ →
+                  ∀ {s} Δ σ → Names (Raw E d s) Δ σ [] → M (Scope (Tm d s) Δ σ Γ)
 
- scopeCheck σ Γ scp V[ v ] = `var <$> varCheck v σ Γ scp
- scopeCheck σ Γ scp T[ t ] = `con <$> sequenceA d (fmap d (scopeCheckBody Γ scp) t)
+ scopeCheck σ Γ scp (`var e v) = `var <$> varCheck (e , v) σ Γ scp
+ scopeCheck σ Γ scp (`con b)   = `con <$> sequenceA d (fmap d (scopeCheckBody Γ scp) b)
 
- scopeCheckBody Γ scp Δ σ (nms , b) =
-   scopeCheck σ (Δ List.++ Γ) (FInv.Inverse.to ++↔ FEq.⟨$⟩ (nms , scp)) b
+ scopeCheckBody Γ scp []        σ b         = scopeCheck σ Γ scp b
+ scopeCheckBody Γ scp Δ@(_ ∷ _) σ (nms , b) =
+   scopeCheck σ (Δ L.++ Γ) (FInv.Inverse.to ++↔ FEq.⟨$⟩ (nms , scp)) b
 \end{code}

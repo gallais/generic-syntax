@@ -1,7 +1,7 @@
 \begin{code}
 {-# OPTIONS --safe --sized-types #-}
 
-module motivation where
+module StateOfTheArt.ACMM where
 
 open import Data.Var hiding (_<$>_; get)
 open import Data.Environment as E hiding (_>>_ ; extend)

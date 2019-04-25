@@ -1,7 +1,7 @@
 \begin{code}
 {-# OPTIONS --safe --sized-types #-}
 
-module Generic.Examples.TypeChecking where
+module Generic.Semantics.TypeChecking where
 
 open import Size
 open import Function
@@ -53,6 +53,14 @@ data Mode : Set where
   Check Infer : Mode
 \end{code}
 %</phase>
+\begin{code}
+
+private
+  variable
+    i : Mode
+    Γ : List Mode
+
+\end{code}
 %<*bidirectional>
 \begin{code}
 Lang : Desc Mode
@@ -93,7 +101,7 @@ Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
    var Infer  = just
    var Check  = _==_
 
-   alg : {i : Mode} {Γ : List Mode} → ⟦ Lang ⟧ (Kripke (const ∘ Var-) (const ∘ Type-)) i Γ → Type- i
+   alg : ⟦ Lang ⟧ (Kripke (const ∘ Var-) (const ∘ Type-)) i Γ → Type- i
    alg (App , f , t , refl)  =  f            >>= λ σ⇒τ →
                                 isArrow σ⇒τ  >>= uncurry λ σ τ →
                                 τ <$ t σ
