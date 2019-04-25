@@ -1,32 +1,34 @@
+{-# OPTIONS --sized-types #-}
+
 module Generic.Examples.NbyE where
 
 open import Size
+open import Data.Bool.Base
+open import Data.List.Base
 open import Data.Maybe
 open import Data.Product
-open import Agda.Builtin.List
-open import Agda.Builtin.Equality
+open import Data.Unit
 open import Function
+open import Relation.Unary
+open import Relation.Binary.PropositionalEquality
 
-open import indexed
-open import varlike
-open import environment
+open import Data.Var.Varlike
+open import Data.Environment
 open import Generic.Syntax
+open import Generic.Syntax.UTLC
 open import Generic.Semantics.NbyE
 
-open import Generic.Syntax.UTLC
 
--- Normalization by Evaluation for the Untyped Lambda Calculus
+norm^LC : ∀[ Tm UTLC ∞ tt ⇒ Maybe ∘ Tm UTLC ∞ tt ]
+norm^LC = norm $ case app (C ∘ (false ,_)) where
 
--- * A Lambda is Already a Value
--- * An Application can behave in two different ways:
---   1. if the function is a lambda then it reduces
---   2. Otherwise the spine of eliminators grows
+  Model = Dm UTLC ∞
 
-normUTLC : [ Tm UTLC ∞ _ ⟶ Maybe ∘ Tm UTLC ∞ _ ]
-normUTLC = norm $ λ where
-  (Lam , b)                       → C (Lam , b)
-  (App , C (Lam , b , _) , t , _) → b (base vl^Var) (ε ∙ t)
-  (App , ft)                      → C (App , ft)
+  app : ∀[ ⟦ `X [] tt (`X [] tt (`∎ tt)) ⟧ (Kripke Model Model) tt ⇒ Model tt ]
+  app (C (false , f , _)  , t  , _) = f (base vl^Var) (ε ∙ t)  -- redex
+  app (f                  , t  , _) = C (true , f , t , refl)  -- stuck application
 
-_ : let open PATTERNS in normUTLC (APP `id (APP `id `id)) ≡ just `id
+open import Relation.Binary.PropositionalEquality hiding ([_] ; refl)
+
+_ : norm^LC (`app `id (`app `id `id)) ≡ just `id
 _ = refl

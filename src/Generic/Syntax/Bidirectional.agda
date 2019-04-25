@@ -1,3 +1,5 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Syntax.Bidirectional where
 
 open import Data.Product
@@ -7,10 +9,7 @@ open import Function
 
 open import Generic.Syntax
 
-infixr 5 _⇒_
-data Type : Set where
-  α    : Type
-  _⇒_  : Type → Type → Type
+open import StateOfTheArt.ACMM using (Type; α; _`→_) public
 
 -- We have an *untyped* language presented in a bidirectional manner
 -- where phases are statically checked
@@ -41,3 +40,4 @@ module PATTERNS where
   pattern LAM b    = `con (Lam , b , refl)
   pattern CUT σ t  = `con (Cut σ , t , refl)
   pattern EMB t    = `con (Emb , t , refl)
+

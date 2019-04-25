@@ -12,7 +12,7 @@ module TableOfContent where
 -- * Once by writing a lot of boilerplate
 -- * Once by using the library, thus skipping directly to the interesting parts
 
-import Motivation.Problem.Naïve
+import Motivation.Problem.Naive
 import Motivation.Problem.WithLibrary
 
 --------------------------------------------------------------------------------
@@ -20,10 +20,10 @@ import Motivation.Problem.WithLibrary
 --------------------------------------------------------------------------------
 
 -- The combinators to build indexed types are introduced in
-import indexed
+import Stdlib
 
 -- The generic notion of well scoped-and-sorted variable is defined in
-import var
+import Data.Var
 
 -- The well scoped-and-typed STLC is defined in
 import StateOfTheArt.ACMM
@@ -37,7 +37,7 @@ import StateOfTheArt.ACMM
 import StateOfTheArt.ACMM
 
 -- Environments and Thinnings are available in
-import environment
+import Data.Environment
 
 -- The generic notion of Semantics and its fundamental lemma as well as the
 -- various instances (renaming, substitution, printing) are in
@@ -73,14 +73,14 @@ import Generic.Syntax
 import Generic.Semantics
 
 -- The Kripke function space is defined in
-import environment using (Kripke)
+import Data.Environment using (Kripke)
 
 -- The generic definition of Renaming and Substitution as instances of Sem can
 -- be found in
 import Generic.Semantics.Syntactic
 
 -- For the reification of the Kripke Spaces back to Scopes they rely on
-import varlike
+import Data.Var.Varlike
 
 --------------------------------------------------------------------------------
 -- 7. A Catalogue of Generic Programs for Syntax with Binding
@@ -124,13 +124,13 @@ import Generic.Cofinite
 -- 8. Building Generic Proofs about Generic Programs
 --------------------------------------------------------------------------------
 
--- The Zip relation transformer is in:
-import Generic.Zip
+-- The relation transformer is in:
+import Generic.Relator
 
 -- 8.1 Simulation Lemma
 
 -- The relational version of the Kripke function space is in
-import varlike using (Kripke^R)
+import Data.Var.Varlike using (Kripkeᴿ)
 
 -- The simulation framework and its fundamental lemma are in
 import Generic.Simulation

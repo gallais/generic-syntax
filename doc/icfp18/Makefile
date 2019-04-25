@@ -1,30 +1,35 @@
 SED=sed
 PAPER=icfp18
 SLIDES=icfp18-slides
-AGDA=agda-2.5.2
+AGDA=agda-2.6.0
 
-all: latex/$(SLIDES).pdf
+all: latex/$(PAPER).pdf
 
 AGDA_FILES:=\
-  environment.lagda \
+  Stdlib.lagda \
+  Data/Environment.lagda \
   Generic/Bisimilar.lagda \
   Generic/Cofinite.lagda \
-  Generic/Data.lagda \
   Generic/Examples/Colist.lagda \
-  Generic/Examples/ElaborationLet.lagda \
+  Generic/Syntax/LetBinder.lagda \
+  Generic/Semantics/NbyE.lagda \
   Generic/Examples/NbyE.lagda \
-  Generic/Examples/STLC.lagda \
-  Generic/Examples/TypeChecking.lagda \
-  Generic/Examples/UntypedLC.lagda \
+  Generic/Syntax/STLC.lagda \
+  Generic/Semantics/TypeChecking.lagda \
+  Generic/Syntax/UTLC.lagda \
   Generic/Fusion.lagda \
+  Generic/Fusion/Syntactic.lagda \
   Generic/Semantics.lagda \
+  Generic/Semantics/Syntactic.lagda \
+  Generic/Semantics/Elaboration/LetBinder.lagda \
   Generic/Simulation.lagda \
+  Generic/Simulation/Syntactic.lagda \
   Generic/Syntax.lagda \
-  Generic/Zip.lagda \
-  indexed.lagda \
-  motivation.lagda \
-  varlike.lagda \
-  var.lagda
+  Generic/Relator.lagda \
+  StateOfTheArt/ACMM.lagda \
+  StateOfTheArt/CDMM.lagda \
+  Data/Var/Varlike.lagda \
+  Data/Var.lagda
 
 AGDA_OUTPUT:=$(patsubst %.lagda,latex-agda-output/%.tex,$(AGDA_FILES))
 AGDA_OUTPUT_PROCESSED:=$(patsubst %.lagda,latex/%.tex,$(AGDA_FILES))
@@ -36,6 +41,7 @@ PAPER_DEPENDENCIES:=\
   latex/syntax.tex \
   latex/acmart.cls \
   latex/commands.tex \
+  latex/unicode.tex \
   latex/agda.sty \
   latex/main.bib \
   latex/ACM-Reference-Format.bst \
@@ -59,6 +65,10 @@ latex/agda.sty: $(AGDA_OUTPUT)
 	@mkdir -p $(dir $@)
 	cp latex-agda-output/agda.sty $@
 
+latex/unicode.tex: unicode.tex
+	@mkdir -p $(dir $@)
+	cp $< $@
+
 latex/commands.tex: commands.tex
 	@mkdir -p $(dir $@)
 	cp $< $@
@@ -73,25 +83,23 @@ latex/acmart.cls: acmart.cls
 
 latex/$(PAPER).tex: $(PAPER).tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
+	cp $< $@
 
 latex/$(SLIDES).tex: $(SLIDES).tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
+	cp $< $@
 
 latex/syntax.tex: syntax.tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
+	cp $< $@
 
 latex/%.tex: latex-agda-output/%.tex rules.sed
 	@mkdir -p $(dir $@)
-	${SED} -f rules.sed $< > $@
-	${SED} -f rules.sed -i $@
-	${SED} -f rules.sed -i $@
+	cp $< $@
 
 latex-agda-output/%.tex: %.lagda
 	@mkdir -p $(dir $@)
-	${AGDA} -i . --allow-unsolved-metas --latex $< --latex-dir=latex-agda-output > $(basename $@).log
+	${AGDA} -i . --latex $< --latex-dir=latex-agda-output > $(basename $@).log
 
 clean:
 	find . -name '*.agdai' | xargs rm

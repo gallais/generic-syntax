@@ -1,12 +1,7 @@
---------------------------------------------------------------------------------
--- This module implements a Universe of Data Types à la
--- The Gentle Art of Levitation
--- (Chapman, Dagand, McBride, and Morris, ICFP 10)
---------------------------------------------------------------------------------
+{-# OPTIONS --safe --sized-types #-}
 
 module StateOfTheArt.CDMM where
 
-open import indexed
 open import Size
 open import Data.Empty
 open import Data.Bool
@@ -14,54 +9,48 @@ open import Data.Nat using (ℕ ; suc)
 open import Data.Unit
 open import Data.Product as Prod
 open import Function
+open import Relation.Unary
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
---------------------------------------------------------------------------------
--- The universe of Descriptions of Base Functors Data Types
 
 data Desc (I J : Set) : Set₁ where
-  `σ : (A : Set) → (A → Desc I J)  →  Desc I J
-  `X : J → Desc I J                →  Desc I J
-  `∎ : I                           →  Desc I J
+  `σ : (A : Set) → (A → Desc I J) → Desc I J
+  `X : J → Desc I J → Desc I J
+  `∎ : I → Desc I J
 
-module _ {I J : Set} where
+private
+  variable
+    I J : Set
+    i : I
+    j : J
+    d : Desc I J
+    X Y : J → Set
+    s : Size
+    A B : Set
 
--- handy shortcuts
- `K : Set → I → Desc I J
- `K A i = `σ A (λ _ → `∎ i)
+`K : Set → I → Desc I J
+`K A i = `σ A (λ _ → `∎ i)
 
- infixr 5 _`+_
- _`+_ : Desc I J → Desc I J → Desc I J
- d `+ e = `σ Bool $ λ { true  → d ; false → e }
+infixr 5 _`+_
 
--- Desc's interpretation as a positive functor:
--- * Action on indexed Sets: ⟦_⟧
--- * Action on morphisms: fmap
- ⟦_⟧ : Desc I J → (J → Set) → (I → Set)
- ⟦ `σ A d  ⟧ X i = Σ[ a ∈ A ] (⟦ d a ⟧ X i)
- ⟦ `X j d  ⟧ X i = X j × ⟦ d ⟧ X i
- ⟦ `∎ i′   ⟧ X i = i ≡ i′
+_`+_ : Desc I J → Desc I J → Desc I J
+d `+ e = `σ Bool $ λ { true  → d ; false → e }
 
- fmap : {X Y : J → Set} → (d : Desc I J) → [ X ⟶ Y ] → [ ⟦ d ⟧ X ⟶ ⟦ d ⟧ Y ]
- fmap (`σ A d)  f (a , v)  = (a , fmap (d a) f v)
- fmap (`X j d)  f (r , v)  = (f r , fmap d f v)
- fmap (`∎ i)    f t        = t
+⟦_⟧ : Desc I J → (J → Set) → (I → Set)
+⟦ `σ A d  ⟧ X i = Σ[ a ∈ A ] (⟦ d a ⟧ X i)
+⟦ `X j d  ⟧ X i = X j × ⟦ d ⟧ X i
+⟦ `∎ i′   ⟧ X i = i ≡ i′
 
---------------------------------------------------------------------------------
--- Taking the fixpoint of strictly positive endofunctors
+fmap : (d : Desc I J) → ∀[ X ⇒ Y ] → ∀[ ⟦ d ⟧ X ⇒ ⟦ d ⟧ Y ]
+fmap (`σ A d)  f (a , v)  = (a , fmap (d a) f v)
+fmap (`X j d)  f (r , v)  = (f r , fmap d f v)
+fmap (`∎ i)    f t        = t
 
-data μ {I : Set} (d : Desc I I) : Size → I → Set where
-  `con : {i : I} {s : Size} → ⟦ d ⟧ (μ d s) i → μ d (↑ s) i
+data μ (d : Desc I I) : Size → I → Set where
+  `con : ⟦ d ⟧ (μ d s) i → μ d (↑ s) i
 
-fold : {I : Set} {X : I → Set} {s : Size} →
-       ∀ {d} → [ ⟦ d ⟧ X ⟶ X ] → [ μ d s ⟶ X ]
-fold alg (`con t) = alg (fmap _ (fold alg) t)
-
-
---------------------------------------------------------------------------------
--- Examples
-
--- Fin (indexed)
+fold : (d : Desc I I) → ∀[ ⟦ d ⟧ X ⇒ X ] → ∀[ μ d s ⇒ X ]
+fold d alg (`con t) = alg (fmap d (fold d alg) t)
 
 finD : Desc ℕ ℕ
 finD =  `σ ℕ $ λ index →
@@ -82,8 +71,6 @@ fz n = `con (n , true , refl)
 fs : ∀ n → fin n → fin (suc n)
 fs n k = `con (n , false , k , refl)
 
--- List (not indexed)
-
 listD : Set → Desc ⊤ ⊤
 listD A =  `σ Bool $ λ isNil →
            if isNil then `∎ tt
@@ -92,16 +79,16 @@ listD A =  `σ Bool $ λ isNil →
 List : Set → Set
 List A = μ (listD A) ∞ tt
 
-[] : {A : Set} → μ (listD A) ∞ tt
+[] : μ (listD A) ∞ tt
 [] = `con (true , refl)
 
 infixr 10 _∷_
 
-_∷_ : {A : Set} → A → List A → List A
+_∷_ : A → List A → List A
 x ∷ xs = `con (false , x , xs , refl)
 
 example : List (List Bool)
-example  = (false ∷ []) ∷ (true ∷ []) ∷ []
+example = (false ∷ []) ∷ (true ∷ []) ∷ []
 
 vecD : Set → Desc ℕ ℕ
 vecD A =  `σ Bool $ λ isNil →
@@ -111,17 +98,17 @@ vecD A =  `σ Bool $ λ isNil →
 Vec : Set → ℕ → Set
 Vec A = μ (vecD A) ∞
 
-foldr : {A B : Set} → (A → B → B) → B → List A → B
-foldr {A} {B} c n = fold alg where
+foldr : (A → B → B) → B → List A → B
+foldr {A} {B} c n = fold (listD A) alg where
 
   alg : ⟦ listD A ⟧ (const B) tt → B
   alg (true             , refl)  = n
   alg (false , hd , rec , refl)  = c hd rec
 
-_++_ : {A : Set} → List A  → List A → List A
+_++_ : List A  → List A → List A
 _++_ = foldr (λ hd rec → hd ∷_ ∘ rec) id
 
-flatten : {A : Set} → List (List A) → List A
+flatten : List (List A) → List A
 flatten = foldr _++_ []
 
 test : flatten example ≡ false ∷ true ∷ []

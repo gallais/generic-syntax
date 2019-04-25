@@ -1,3 +1,5 @@
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Simulation.Syntactic where
 
 open import Size
@@ -5,36 +7,43 @@ open import Data.List hiding (lookup)
 open import Function
 open import Relation.Binary.PropositionalEquality
 
-open import varlike
-open import environment
-open import rel
+open import Data.Var.Varlike
+open import Data.Environment
+open import Data.Relation as Relation
 open import Generic.Syntax
 open import Generic.Semantics
 open import Generic.Semantics.Syntactic
-open import Generic.Zip
-open import Generic.Simulation
+open import Generic.Relator as Relator
+open import Generic.Simulation as Simulation
+open Simulation.Simulation
 
 module _ {I : Set} {d : Desc I} where
 
- RenExt : Sim Eq^R Eq^R d Renaming Renaming
- Sim.th^R   RenExt = λ ρ → cong (lookup ρ)
- Sim.var^R  RenExt = cong `var
- Sim.alg^R  RenExt = λ _ _ →
-   cong `con ∘ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Var)) d
 
- SubExt : Sim Eq^R Eq^R d Substitution Substitution
- Sim.th^R   SubExt = λ ρ → cong (ren ρ)
- Sim.var^R  SubExt = id
- Sim.alg^R  SubExt = λ _ _ →
-   cong `con ∘ zip^reify Eq^R (reify^R Eq^R Eq^R (vl^Refl vl^Tm)) d
+ RenExt : Simulation d Ren Ren Eqᴿ Eqᴿ
+ RenExt .thᴿ   = λ ρ → cong (lookup ρ)
+ RenExt .varᴿ  = cong `var
+ RenExt .algᴿ  = λ _ _ →
+   cong `con ∘ Relator.reifyᴿ Eqᴿ d (Simulation.reifyᴿ Eqᴿ Eqᴿ (vl^Refl vl^Var))
 
-module _ {I : Set} {d : Desc I} where
+ SubExt : Simulation d Sub Sub Eqᴿ Eqᴿ
+ SubExt .thᴿ   = λ ρ → cong (ren ρ)
+ SubExt .varᴿ  = id
+ SubExt .algᴿ  = λ _ _ →
+   cong `con ∘ Relator.reifyᴿ Eqᴿ d (Simulation.reifyᴿ Eqᴿ Eqᴿ (vl^Refl vl^Tm))
 
- RenSub : Sim VarTm^R Eq^R d Renaming Substitution
- Sim.var^R  RenSub = id
- Sim.th^R   RenSub = λ { _ refl → refl }
- Sim.alg^R  RenSub = λ _ _ →
-   cong `con ∘ zip^reify (mkRel (_≡_ ∘ `var)) (reify^R VarTm^R Eq^R vl^VarTm) d
+ RenSub : Simulation d Ren Sub VarTmᴿ Eqᴿ
 
- rensub : {Γ Δ : List I} (ρ : Thinning Γ Δ) {i : I} (t : Tm d ∞ i Γ) → ren ρ t ≡ sub (`var <$> ρ) t
- rensub ρ = Sim.sim RenSub (pack^R (λ _ → refl))
+ RenSub .varᴿ  = id
+ RenSub .thᴿ   = λ ρ → cong (λ t → th^Tm t ρ)
+ RenSub .algᴿ  = λ _ _ →
+   cong `con ∘ Relator.reifyᴿ VarTmᴿ d (Simulation.reifyᴿ VarTmᴿ Eqᴿ vl^VarTm)
+
+ private
+   variable
+     Γ Δ : List I
+     σ : I
+
+
+ rensub : (ρ : Thinning Γ Δ) (t : Tm d ∞ σ Γ) → ren ρ t ≡ sub (`var <$> ρ) t
+ rensub ρ = Simulation.sim RenSub (packᴿ λ _ → refl)

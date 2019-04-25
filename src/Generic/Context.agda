@@ -59,10 +59,12 @@ module _ {I : Set} {X} {i : I} {Γ} where
 
 module _ {I X} {i : I} {Γ} where
 
-  Ftack : ∀ {A d} (a : A) → ∀ {Δ j Γ'} → Focus (d a) i Γ X Δ j Γ' → Focus (`σ A d) i Γ X Δ j Γ'
+  Ftack : ∀ {A d} (a : A) → ∀ {Δ j Γ'} →
+          Focus (d a) i Γ X Δ j Γ' → Focus (`σ A d) i Γ X Δ j Γ'
   Ftack a (c , e) = tack a c , e
 
-  Fbore : ∀ {Δ j d} x → ∀ {Δ' j' Γ'} → Focus d i Γ X Δ' j' Γ' → Focus (`X Δ j d) i Γ X Δ' j' Γ'
+  Fbore : ∀ {Δ j d} x → ∀ {Δ' j' Γ'} →
+          Focus d i Γ X Δ' j' Γ' → Focus (`X Δ j d) i Γ X Δ' j' Γ'
   Fbore x (c , e) = bore x c , e
 
 module _ {I : Set} {X Y : List I → I ─Scoped} where
@@ -79,3 +81,8 @@ module _ {I : Set} {X Y : List I → I ─Scoped} where
     let y = f ((here (refl , plug d (c , m)) , x) , refl) in
     Fbore y (cobind d (f ∘ Fbore x) ((c , m) , e))
   cobind (`∎ i)     f ()
+
+
+  relator : ∀ {d} (d' : Desc B I)
+            (pt pu : ⟦ d' ⟧ (Scope (Tm d)) → Tm d) →
+            Desc B (Tuple d)

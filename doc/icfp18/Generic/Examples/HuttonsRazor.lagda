@@ -1,4 +1,6 @@
 \begin{code}
+{-# OPTIONS --safe --sized-types #-}
+
 module Generic.Examples.HuttonsRazor where
 
 open import Size
@@ -10,7 +12,7 @@ open import Data.Nat
 open import Data.List
 open import Relation.Binary.PropositionalEquality
 
-open import environment
+open import Data.Environment
 open import Generic.Syntax
 open import Generic.Semantics
 
@@ -29,13 +31,13 @@ pattern _[+]_ e f  = `con (false , e , f , refl)
 -- language we can simply associated values of the empty to
 -- them. The computation itself will deliver a natural number.
 
-Eval : Sem HuttRaz (λ _ _ → ⊥) (λ _ _ → ℕ)
-Sem.th^𝓥  Eval = ⊥-elim
-Sem.var   Eval = ⊥-elim
-Sem.alg   Eval = case proj₁ (λ { (m , n , _) → m + n })
+Eval : Semantics HuttRaz (λ _ _ → ⊥) (λ _ _ → ℕ)
+Semantics.th^𝓥  Eval = ⊥-elim
+Semantics.var   Eval = ⊥-elim
+Semantics.alg   Eval = case proj₁ (λ { (m , n , _) → m + n })
 
 eval : Tm HuttRaz ∞ tt [] → ℕ
-eval = Sem.closed Eval
+eval = Semantics.closed Eval
 
 -- And, sure enough, we are able to run these expressions
 

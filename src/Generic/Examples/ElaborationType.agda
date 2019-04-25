@@ -1,15 +1,12 @@
 module Generic.Examples.ElaborationType where
 
-import Level
 open import Size
 open import Function
-import Category.Monad as CM
 open import Data.Bool
-open import Data.Product as Prod
-open import Data.List hiding ([_] ; lookup)
+open import Data.Product as P hiding (,_)
+open import Data.List hiding ([_])
 open import Data.List.All as All hiding (lookup)
 open import Data.Maybe as Maybe hiding (All)
-import Data.Maybe.Categorical as MC
 
 
 open import indexed
@@ -18,7 +15,9 @@ open import environment hiding (_<$>_)
 open import Generic.Syntax
 open import Generic.Semantics
 
-module M = CM.RawMonad (MC.monad {Level.zero})
+import Category.Monad as CM
+import Level
+module M = CM.RawMonad (Maybe.monad {Level.zero})
 open M
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
