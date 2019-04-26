@@ -5,11 +5,11 @@ open import Data.Bool
 open import Data.List.Base as L hiding ([_])
 open import Data.Product as Prod
 open import Function hiding (case_of_)
+open import Relation.Unary
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
-open import var
-open import indexed
-open import environment as E hiding (traverse)
+open import Data.Var
+open import Data.Environment as E
 
 open import Generic.Syntax
 open import Data.Empty
@@ -83,6 +83,8 @@ module _ {I : Set} {X Y : List I → I ─Scoped} where
   cobind (`∎ i)     f ()
 
 
+{-
   relator : ∀ {d} (d' : Desc B I)
             (pt pu : ⟦ d' ⟧ (Scope (Tm d)) → Tm d) →
             Desc B (Tuple d)
+-}

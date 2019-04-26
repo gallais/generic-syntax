@@ -23,9 +23,13 @@ install:
   - export PATH=$HOME/.cabal/bin:/opt/ghc/8.2.2/bin:/opt/cabal/2.0/bin:$PATH
   - cd travis/
   - travis_wait 50 ./install_agda.sh
+  - cd ../
 
 script:
-  - cd ../src/
+  - cp travis/Makefile src/
+  - cd src/
+  - make
+  - agda --html Data/Environment.agda	
   - agda --html Generic.agda
   - agda --html TableOfContent.agda
   - cd ../
