@@ -1,15 +1,21 @@
 <!DOCTYPE HTML>
-<html><head><meta charset="utf-8"><title>Generic.Semantics.Unit</title><link rel="stylesheet" href="Agda.css"></head><body><pre><a id="1" class="Keyword">module</a> <a id="8" href="Generic.Semantics.Unit.html" class="Module">Generic.Semantics.Unit</a> <a id="31" class="Keyword">where</a>
+<html><head><meta charset="utf-8"><title>Generic.Semantics.Unit</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Symbol">{-#</a> <a id="5" class="Keyword">OPTIONS</a> <a id="13" class="Pragma">--safe</a> <a id="20" class="Pragma">--sized-types</a> <a id="34" class="Symbol">#-}</a>
 
-<a id="38" class="Keyword">open</a> <a id="43" class="Keyword">import</a> <a id="50" href="Data.Unit.html" class="Module">Data.Unit</a>
-<a id="60" class="Keyword">open</a> <a id="65" class="Keyword">import</a> <a id="72" href="var.html" class="Module">var</a>
-<a id="76" class="Keyword">open</a> <a id="81" class="Keyword">import</a> <a id="88" href="Generic.Semantics.html" class="Module">Generic.Semantics</a>
+<a id="39" class="Keyword">module</a> <a id="46" href="Generic.Semantics.Unit.html" class="Module">Generic.Semantics.Unit</a> <a id="69" class="Keyword">where</a>
 
-<a id="107" class="Keyword">module</a> <a id="114" href="Generic.Semantics.Unit.html#114" class="Module">_</a> <a id="116" class="Symbol">{</a><a id="117" href="Generic.Semantics.Unit.html#117" class="Bound">I</a> <a id="119" class="Symbol">:</a> <a id="121" class="PrimitiveType">Set</a><a id="124" class="Symbol">}</a> <a id="126" class="Keyword">where</a>
+<a id="76" class="Keyword">open</a> <a id="81" class="Keyword">import</a> <a id="88" href="Data.Unit.html" class="Module">Data.Unit</a>
+<a id="98" class="Keyword">open</a> <a id="103" class="Keyword">import</a> <a id="110" href="Data.Var.html" class="Module">Data.Var</a>
+<a id="119" class="Keyword">open</a> <a id="124" class="Keyword">import</a> <a id="131" href="Generic.Syntax.html" class="Module">Generic.Syntax</a>
+<a id="146" class="Keyword">open</a> <a id="151" class="Keyword">import</a> <a id="158" href="Generic.Semantics.html" class="Module">Generic.Semantics</a>
 
- <a id="134" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a> <a id="139" class="Symbol">:</a> <a id="141" href="Generic.Semantics.Unit.html#117" class="Bound">I</a> <a id="143" href="var.html#469" class="Function Operator">─Scoped</a>
- <a id="152" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a> <a id="157" class="Symbol">=</a> <a id="159" class="Symbol">λ</a> <a id="161" href="Generic.Semantics.Unit.html#161" class="Bound">_</a> <a id="163" href="Generic.Semantics.Unit.html#163" class="Bound">_</a> <a id="165" class="Symbol">→</a> <a id="167" href="Agda.Builtin.Unit.html#69" class="Record">⊤</a>
+<a id="177" class="Keyword">private</a>
+  <a id="187" class="Keyword">variable</a>
+    <a id="200" href="Generic.Semantics.Unit.html#200" class="Generalizable">I</a> <a id="202" class="Symbol">:</a> <a id="204" class="PrimitiveType">Set</a>
+    <a id="212" href="Generic.Semantics.Unit.html#212" class="Generalizable">d</a> <a id="214" class="Symbol">:</a> <a id="216" href="Generic.Syntax.html#497" class="Datatype">Desc</a> <a id="221" href="Generic.Semantics.Unit.html#200" class="Generalizable">I</a>
 
- <a id="171" href="Generic.Semantics.Unit.html#171" class="Function">SemUnit</a> <a id="179" class="Symbol">:</a> <a id="181" class="Symbol">∀</a> <a id="183" class="Symbol">{</a><a id="184" href="Generic.Semantics.Unit.html#184" class="Bound">d</a><a id="185" class="Symbol">}</a> <a id="187" class="Symbol">→</a> <a id="189" href="Generic.Semantics.html#487" class="Record">Sem</a> <a id="193" href="Generic.Semantics.Unit.html#184" class="Bound">d</a> <a id="195" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a> <a id="200" href="Generic.Semantics.Unit.html#134" class="Function">Unit</a>
- <a id="206" href="Generic.Semantics.Unit.html#171" class="Function">SemUnit</a> <a id="214" class="Symbol">=</a> <a id="216" class="Symbol">_</a>
+<a id="Unit"></a><a id="224" href="Generic.Semantics.Unit.html#224" class="Function">Unit</a> <a id="229" class="Symbol">:</a> <a id="231" href="Generic.Semantics.Unit.html#200" class="Generalizable">I</a> <a id="233" href="Data.Var.html#511" class="Function Operator">─Scoped</a>
+<a id="241" href="Generic.Semantics.Unit.html#224" class="Function">Unit</a> <a id="246" class="Symbol">=</a> <a id="248" class="Symbol">λ</a> <a id="250" href="Generic.Semantics.Unit.html#250" class="Bound">_</a> <a id="252" href="Generic.Semantics.Unit.html#252" class="Bound">_</a> <a id="254" class="Symbol">→</a> <a id="256" href="Agda.Builtin.Unit.html#137" class="Record">⊤</a>
+
+<a id="SemUnit"></a><a id="259" href="Generic.Semantics.Unit.html#259" class="Function">SemUnit</a> <a id="267" class="Symbol">:</a> <a id="269" href="Generic.Semantics.html#718" class="Record">Semantics</a> <a id="279" href="Generic.Semantics.Unit.html#212" class="Generalizable">d</a> <a id="281" href="Generic.Semantics.Unit.html#224" class="Function">Unit</a> <a id="286" href="Generic.Semantics.Unit.html#224" class="Function">Unit</a>
+<a id="291" href="Generic.Semantics.Unit.html#259" class="Function">SemUnit</a> <a id="299" class="Symbol">=</a> <a id="301" class="Symbol">_</a>
 </pre></body></html>
