@@ -1,7 +1,6 @@
 SED=sed
 PAPER=icfp18
 SLIDES=icfp18-slides
-AGDA=agda-2.6.0
 
 all: latex/$(PAPER).pdf
 
@@ -31,12 +30,12 @@ AGDA_FILES:=\
   Data/Var/Varlike.lagda \
   Data/Var.lagda
 
-AGDA_OUTPUT:=$(patsubst %.lagda,latex-agda-output/%.tex,$(AGDA_FILES))
-AGDA_OUTPUT_PROCESSED:=$(patsubst %.lagda,latex/%.tex,$(AGDA_FILES))
+AGDA_OUTPUT:=$(patsubst %.lagda,latex/%.tex,$(AGDA_FILES))
 
 .SECONDARY: $(AGDA_OUTPUT)
 
 PAPER_DEPENDENCIES:=\
+  common\
   latex/$(PAPER).tex\
   latex/syntax.tex \
   latex/acmart.cls \
@@ -45,11 +44,13 @@ PAPER_DEPENDENCIES:=\
   latex/agda.sty \
   latex/main.bib \
   latex/ACM-Reference-Format.bst \
-  $(AGDA_OUTPUT_PROCESSED)
 
 SLIDES_DEPENDENCIES:=\
   latex/$(SLIDES).tex\
   $(PAPER_DEPENDENCIES)
+
+common:
+	make -C ../common
 
 latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 	cd latex; latexmk -pdf $(SLIDES).tex
@@ -63,7 +64,7 @@ latex/main.bib: main.bib
 
 latex/agda.sty: $(AGDA_OUTPUT)
 	@mkdir -p $(dir $@)
-	cp latex-agda-output/agda.sty $@
+	cp ../common/latex/agda.sty latex/
 
 latex/unicode.tex: unicode.tex
 	@mkdir -p $(dir $@)
@@ -93,15 +94,10 @@ latex/syntax.tex: syntax.tex rules.sed
 	@mkdir -p $(dir $@)
 	cp $< $@
 
-latex/%.tex: latex-agda-output/%.tex rules.sed
+latex/%.tex: ../common/latex/%.tex common
 	@mkdir -p $(dir $@)
 	cp $< $@
 
-latex-agda-output/%.tex: %.lagda
-	@mkdir -p $(dir $@)
-	${AGDA} -i . --latex $< --latex-dir=latex-agda-output > $(basename $@).log
-
 clean:
-	find . -name '*.agdai' | xargs rm
+	make clean -C ../common
 	rm -rf latex
-	rm -rf latex-agda-output
