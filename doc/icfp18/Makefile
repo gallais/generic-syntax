@@ -58,7 +58,7 @@ latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 latex/$(PAPER).pdf: $(PAPER_DEPENDENCIES)
 	cd latex; latexmk -pdf -bibtex $(PAPER).tex
 
-latex/main.bib: main.bib
+latex/main.bib: ../common/main.bib
 	@mkdir -p $(dir $@)
 	cp $< $@
 
@@ -66,11 +66,11 @@ latex/agda.sty: $(AGDA_OUTPUT)
 	@mkdir -p $(dir $@)
 	cp ../common/latex/agda.sty latex/
 
-latex/unicode.tex: unicode.tex
+latex/unicode.tex: ../common/unicode.tex
 	@mkdir -p $(dir $@)
 	cp $< $@
 
-latex/commands.tex: commands.tex
+latex/commands.tex: ../common/commands.tex
 	@mkdir -p $(dir $@)
 	cp $< $@
 
