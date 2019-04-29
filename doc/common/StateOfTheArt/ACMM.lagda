@@ -11,6 +11,10 @@ open import Data.List.Base hiding ([_] ; _++_; lookup)
 open import Function
 open import Relation.Unary
 
+private
+  variable
+    I : Set
+
 infixr 3 _`→_
 \end{code}
 %<*type>
@@ -23,8 +27,8 @@ data Type : Set where
 \begin{code}
 private
   variable
-    σ τ : Type
-    Γ Δ Θ : List Type
+    σ τ : I
+    Γ Δ Θ : List I
     A B : Set
 
 \end{code}
@@ -211,20 +215,21 @@ open import Data.Product
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 module Printer where
- open RawMonadState (StateMonadState ℕ)
-
+ open import Codata.Stream as Stream using (Stream; _∷_)
+ open RawMonadState (StateMonadState (Stream String _))
+ M = State (Stream String _)
 \end{code}
 
 %<*valprint>
 \begin{code}
- record Wrap (A : Set) (σ : Type) (Γ : List Type) : Set where
+ record Wrap (A : Set) (σ : I) (Γ : List I) : Set where
    constructor MkW; field getW : A
 \end{code}
 %</valprint>
 \begin{code}
  open Wrap public
 
- th^Wrap : Thinnable (Wrap A σ)
+ th^Wrap : Thinnable {I} (Wrap A σ)
  th^Wrap w ρ = MkW (getW w)
 
  map^Wrap : (A → B) → ∀[ Wrap A σ ⇒ Wrap B σ ]
@@ -234,13 +239,16 @@ module Printer where
 \end{code}
 %<*freshprint>
 \begin{code}
- fresh : ∀ σ → State ℕ (Wrap String σ (σ ∷ Γ))
- fresh σ = get >>= λ x → put (suc x) >> return (MkW (show x))
+ fresh : ∀ σ → M (Wrap String σ (σ ∷ Γ))
+ fresh σ = do
+   names ← get
+   put (Stream.tail names)
+   return (MkW (Stream.head names))
 \end{code}
 %</freshprint>
 %<*semprint>
 \begin{code}
- Printing : Semantics (Wrap String) (Wrap (State ℕ String))
+ Printing : Semantics (Wrap String) (Wrap (M String))
  Printing = record
    { th^𝓥  =  th^Wrap
    ; var   =  map^Wrap return
@@ -252,18 +260,34 @@ module Printer where
 \end{code}
 %</semprint>
 \begin{code}
+ open import Data.List.NonEmpty as List⁺ using (List⁺; _∷_)
+ open import Codata.Thunk using (force)
+ import Data.Nat.Show as NatShow
+
+ alphabetWithSuffix : String → List⁺ String
+ alphabetWithSuffix suffix = List⁺.map (λ c → fromList (c ∷ []) ++ suffix)
+                           $′ 'a' ∷ toList "bcdefghijklmnopqrstuvwxyz"
+
+ allNats : Stream ℕ _
+ allNats = Stream.iterate suc 0
+
+ names : Stream String _
+ names = Stream.concat
+       $′ Stream.map alphabetWithSuffix
+       $′ "" ∷ λ where .force → Stream.map NatShow.show allNats
+
 open Printer using (Printing)
 \end{code}
 
 
 \begin{code}
 print : (σ : Type) → Lam σ [] → String
-print _ t = proj₁ $ Printer.getW (Semantics.semantics Printing {Δ = []} (pack λ ()) t) 0
+print _ t = proj₁ $ Printer.getW (Semantics.semantics Printing {Δ = []} (pack λ ()) t) Printer.names
 
-_ : print (α `→ α) (`lam (`var z)) ≡ "λ0.0"
+_ : print (α `→ α) (`lam (`var z)) ≡ "λa.a"
 _ = refl
 
-_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λ0.λ1.0(0(1))"
+_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa.λb.a(a(b))"
 _ = refl
 \end{code}
 
