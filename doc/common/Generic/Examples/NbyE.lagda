@@ -20,16 +20,19 @@ open import Generic.Syntax.UTLC
 open import Generic.Semantics.NbyE
 
 \end{code}
+%<*nbepatterns>
+\begin{code}
+pattern LAM  f   = C (false , f , refl)
+pattern APP' f t = (true , f , t , refl)
+\end{code}
+%</nbepatterns>
+
 %<*nbelc>
 \begin{code}
 norm^LC : ∀[ Tm UTLC ∞ tt ⇒ Maybe ∘ Tm UTLC ∞ tt ]
-norm^LC = norm $ case app (C ∘ (false ,_)) where
-
-  Model = Dm UTLC ∞
-
-  app : ∀[ ⟦ `X [] tt (`X [] tt (`∎ tt)) ⟧ (Kripke Model Model) tt ⇒ Model tt ]
-  app (C (false , f , _)  , t  , _) = f (base vl^Var) (ε ∙ t)  -- redex
-  app (f                  , t  , _) = C (true , f , t , refl)  -- stuck application
+norm^LC = norm $ λ where
+  (APP' (LAM f) t)  → extract f (ε ∙ t)  -- redex
+  t                 → C t                -- value
 \end{code}
 %</nbelc>
 \begin{code}

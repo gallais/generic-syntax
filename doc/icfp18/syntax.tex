@@ -1,4 +1,7 @@
 
+\newcommand{\semrec}{\AR{Semantics}}
+\newcommand{\semfun}{\AF{semantics}}
+
 \section{Introduction}
 
 In modern typed programming languages, programmers writing embedded
@@ -240,9 +243,9 @@ a variable in a given scope to the extended scope where
 an extra variable has been bound. Both of the constructors' types have been written using the combinators defined above.
 They respectively normalise to:
 \begin{center}
-  \AIC{z} : {\AS{∀} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{i} \AIC{::} \AB{xs})}
+  \AIC{z} : {\AS{∀} \AB{σ} \AB{Γ} \AS{→} \AD{Var} \AB{σ} (\AB{σ} \AIC{::} \AB{Γ})}
   \qquad
-  \AIC{s} : {\AS{∀} \AB{i} \AB{j} \AB{xs} → \AD{Var} \AB{i} \AB{xs} \AS{→} \AD{Var} \AB{i} (\AB{j} \AIC{::} \AB{xs})}
+  \AIC{s} : {\AS{∀} \AB{σ} \AB{τ} \AB{Γ} → \AD{Var} \AB{σ} \AB{Γ} \AS{→} \AD{Var} \AB{σ} (\AB{τ} \AIC{::} \AB{Γ})}
 \end{center}
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch
@@ -276,8 +279,8 @@ These constraints show up in the types of renaming and substitution: % defined a
 \end{figure}
 
 We have voluntarily hidden technical details behind some auxiliary definitions
-left abstract here: \AF{⟦V⟧} and \AF{extend}. Their implementations are distinct
-for \AF{ren} and \AF{sub} but they serve the same purpose: \AF{⟦V⟧} is used to
+left abstract here: \AF{var} and \AF{extend}. Their implementations are distinct
+for \AF{ren} and \AF{sub} but they serve the same purpose: \AF{var} is used to
 turn a value looked up in the evaluation environment into a term and \AF{extend}
 is used to alter the environment when going under a binder. This presentation
 highlights the common structure between \AF{ren} and \AF{sub} which we will exploit
@@ -315,7 +318,7 @@ renaming; \AF{Thinnable}s which are types that permit thinning; and the
 \AF{□} functor, which freely adds Thinnability to any indexed type.
 %%%
 We use \AF{□}, and our compact notation for the indexed function space
-between indexed types, to crisply encapsulate the additional quantification 
+between indexed types, to crisply encapsulate the additional quantification
 over environment extensions which is typical of Kripke semantics.
 %%%
 \label{def:thinning}
@@ -353,12 +356,21 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{box}
-\ExecuteMetaData[Data/Environment.tex]{comonad}
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{thinnable}
-\ExecuteMetaData[Data/Environment.tex]{freeth}
 \end{minipage}
+
+\begin{minipage}{0.25\textwidth}
+\ExecuteMetaData[Data/Environment.tex]{extract}
+\end{minipage}\hfill
+\begin{minipage}{0.35\textwidth}
+\ExecuteMetaData[Data/Environment.tex]{duplicate}
+\end{minipage}\hfill
+\begin{minipage}{0.30\textwidth}
+\ExecuteMetaData[Data/Environment.tex]{thBox}
+\end{minipage}
+
 \caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable.}
 \end{figure}
 
@@ -372,15 +384,15 @@ parametrised higher order abstract syntax term. We get a choice of
 useful scope-and-sort safe traversals by using different `host languages'
 for this shallow embedding.
 
-Semantics, 
-   specified in terms of a record \AR{Sem}, 
+Semantics,
+   specified in terms of a record \semrec{},
 are defined in Figure~\ref{figure:lamsem} in terms of a choice of values \AB{𝓥} and
 computations \AB{𝓒}. Realisation of a semantics will produce a
 computation in \AB{𝓒} for every term whose variables are assigned
 values in \AB{𝓥} as demonstrated in Figure~\ref{figure:fdmlamsem}.
 A semantics must satisfy constraints on the notions of
 values \AB{𝓥} and computations \AB{𝓒} at hand. First of all,
-values should be thinnable so that \AF{sem} may push the environment
+values should be thinnable so that \semfun{} may push the environment
 under binders. Second, the set of computations needs to be closed
 under various combinators which are the semantical counterparts of
 the language's constructors. The semantical counterpart of application is an operation
@@ -400,20 +412,20 @@ bound variable. This is concisely expressed by the type
 \end{figure}
 
 Agda allows us to package, together with the fields of the record
-\AR{Sem}, the generic traversal function \AF{sem}, which is brought
-into scope for any instance of \AR{Sem}. We thus realise the promise
-made earlier, namely that any given {\AR{Sem} \AB{𝓥}
+\semrec{}, the generic traversal function \semfun{}, which is brought
+into scope for any instance of \semrec{}. We thus realise the promise
+made earlier, namely that any given {\semrec{} \AB{𝓥}
   \AB{𝓒}} induces a function which, given a value in
 \AB{𝓥} for each variable in scope, transforms a  \AD{Lam} term into a
 computation \AB{𝓒}.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{sem}
-\caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \AR{Sem}\;\AB{𝓥}\;\AB{𝓒}}\label{figure:fdmlamsem}
+\caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}}\label{figure:fdmlamsem}
 \end{figure}
 
 Coming back to renaming and substitution, we see that they both fit in the
-\AR{Sem} framework. We notice that the definition of substitution depends on
+\semrec{} framework. We notice that the definition of substitution depends on
 the definition of renaming: to be able to push terms under binder, we need to
 have already proven that they are thinnable.
 
@@ -426,7 +438,7 @@ have already proven that they are thinnable.
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsub}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsubfun}
 \end{minipage}
-\caption{Renaming and Substitution as Instances of \AR{Sem}}
+\caption{Renaming and Substitution as Instances of \semrec{}}
 \end{figure}
 
 In both cases we use (\AIC{pack} \AIC{s}) (where \AIC{pack} is the constructor
@@ -461,7 +473,7 @@ prepend a ``$\lambda$'' binding the fresh name.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}
-\caption{Printing as an instance of \AR{Sem}}
+\caption{Printing as an instance of \semrec{}}
 \end{figure}
 
 Both printing and renaming highlight the importance of distinguishing
@@ -472,15 +484,15 @@ All of these examples are already described at length by ACMM~\citeyear{allais20
 so we will not spend any
 more time on them. They have also obtained the simulation and fusion
 theorems demonstrating that these traversals are well behaved as
-corollaries of more general results expressed in terms of \AF{sem}.
+corollaries of more general results expressed in terms of \semfun{}.
 We will come back to this in Section~\ref{section:simulation}.
 
 One important observation to make is the tight connection between the constraints
-described in \AR{Sem} and the definition of \AD{Lam}: the semantical counterparts
+described in \semrec{} and the definition of \AD{Lam}: the semantical counterparts
 of the \AD{Lam} constructors are obtained by replacing the recursive occurences of
 the inductive family with either a computation or a Kripke function space depending
 on whether an extra variable was bound. This suggests that it ought to be possible
-to compute the definition of \AF{Sem} from the syntax description. Before doing this
+to compute the definition of \semrec{} from the syntax description. Before doing this
 in Section~\ref{section:universe}, we need to look at a generic descriptions of
 datatypes.
 
@@ -564,12 +576,12 @@ All the functors obtained as meanings of \AD{Desc}riptions are strictly
 positive. So we can build the least fixpoint of the ones that are endofunctors
 (i.e. the ones for which $I$ equals $J$). This fixpoint is called \AD{μ}
 and its iterator is given by the definition of \AF{fold} \AB{d}%%%
-\footnote{\textbf{NB} 
+\footnote{\textbf{NB}
 In Figure~\ref{figure:datamu} the \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
 to the inductive definition of \AD{μ} plays a crucial role in getting the
-termination checker to see that \AF{fold} is a total function. 
+termination checker to see that \AF{fold} is a total function.
 % Sized types are outside the scope of this paper; describing them in
-% detail would be a distraction.  
+% detail would be a distraction.
 }
 .
 
@@ -610,11 +622,11 @@ as CDMM's universe of datatypes, except that we are not building endofunctors on
 type \AB{I} as the sorts
 used to distinguish terms in our embedded language. The \AIC{`$\sigma$} and
 \AIC{`∎} constructors are as in the CDMM \AD{Desc} type, and are used to
-represent data and index constraints respectively. 
+represent data and index constraints respectively.
 %%%
-What distinguishes this new universe \AD{Desc} from that of Section~\ref{section:data} 
+What distinguishes this new universe \AD{Desc} from that of Section~\ref{section:data}
 is that the
-%%%     The 
+%%%     The
 \AIC{`X} constructor
 is now augmented with an additional {\AD{List} \AB{I}} argument that describes
 the new binders that are brought into scope at this recursive position. This
@@ -663,7 +675,7 @@ As we want to define the terms of a language with variables, instead of
 considering the initial algebra, this time we opt for the free relative
 monad~\cite{JFR4389} (with respect to the functor \AF{Var}): the \AIC{`var}
 constructor corresponds to return, and we will define bind (also known as
-the parallel substitution \AF{sub}) in the next section. 
+the parallel substitution \AF{sub}) in the next section.
 
 % We have once more a \AD{Size} index to get all the benefits of type
 % based termination checking.
@@ -683,7 +695,7 @@ which has exactly one substructure with precisely one extra bound variable.
 In the untyped case a single \AD{Bool}ean is enough to distinguish the two constructors
 whilst in the typed case, we need our tags to carry extra information about the
 %%% JHM version
-types involved so we use the ad-hoc \AD{`STLC} type, 
+types involved so we use the ad-hoc \AD{`STLC} type,
 and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression in Agda.
 %%% GALLAIS version
 % types involved so we use the ad-hoc \AD{`STLC} type. In the definition of
@@ -701,9 +713,7 @@ and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression 
 \end{figure}
 
 For convenience we use Agda's pattern synonyms corresponding to the
-original constructors in Section \ref{section:mech-reus}: \AIC{`V} for
-\AIC{V} the variable constructor, \AIC{`A} for \AIC{A} the application
-one and \AIC{`L} for \AIC{L} the $\lambda$-abstraction.  These
+original constructors in Section \ref{section:mech-reus}. These
 synonyms can be used when pattern-matching on a term and Agda resugars
 them when displaying a goal. This means that the end user can
 seamlessly work with encoded terms without dealing with the gnarly
@@ -773,7 +783,7 @@ picks the one corresponding to the chosen branch.
 
 A concrete use case for this combinator will be given in section~\ref{section:letbinding}
 where we explain how to seamlessly enrich an existing syntax with let-bindings
-and how to use the \AR{Sem} framework to elaborate them away.
+and how to use the \semrec{} framework to elaborate them away.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -782,7 +792,7 @@ and how to use the \AR{Sem} framework to elaborate them away.
 
 \section{Generic Scope Safe and Well Kinded Programs for Syntaxes}\label{section:semantics}
 
-Based on the \AR{Sem} type we defined for the specific example of the
+Based on the \semrec{} type we defined for the specific example of the
 simply typed $\lambda$-calculus in Section~\ref{section:primer-program},
 we can define a generic notion of
 semantics for all syntax descriptions. It is once more parametrised
@@ -791,7 +801,7 @@ respectively to values associated to bound variables and
 computations delivered by evaluating terms. These two families
 have to abide by three constraints:
 \begin{itemize}
-\item{\ARF{th$^{\mathcal{V}}$}} Values should be thinnable so that we can push the
+\item{\ARF{th\textasciicircum{}𝓥}} Values should be thinnable so that we can push the
       evaluation environment under binders;
 \item{\ARF{var}} Values should embed into computations for us to be able
       to return the value associated to a variable as the
@@ -844,7 +854,7 @@ values to variables, it associates computations to terms.
 
 \subsection{Fundamental Lemma of Semantics}
 
-We can now define the type of the fundamental lemma (called \AF{sem}) which
+We can now define the type of the fundamental lemma (called \semfun{}) which
 takes a semantics and returns a function from environments to computations.
 It is defined mutually with a
 function \AF{body} turning syntactic binders into semantics binders: to
@@ -854,13 +864,11 @@ value for each newly bound variable).
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{semtype}
-\caption{Statement of the Fundamental Lemma of \AR{Sem}antics}
+\caption{Statement of the Fundamental Lemma of \semrec{}}
 \end{figure}
 
-The proof of \AF{sem} is straightforward now that we have clearly
+The proof of \semfun{} is straightforward now that we have clearly
 identified the problem structure and the constraints we need to enforce.
-We use postfix projections (of the form \AS{.}\ARF{name}) to make use of
-the semantic combinators packaged in the \AR{Sem} parameter \AB{$\mathcal{S}$}.
 If the term considered is a variable, we lookup the associated value in
 the evaluation environment and turn it into a computation using \ARF{var}.
 If it is a non variable constructor then we call \AF{fmap} to evaluate the
@@ -869,12 +877,12 @@ these results.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{semproof}
-\caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{sem}}
+\caption{Proof of the Fundamental Lemma of \semrec{} -- \semfun{}}
 \end{figure}
 
 The auxiliary lemma \AF{body} distinguishes two cases. If no new
 variable has been bound in the recursive substructure, it is
-a matter of calling \AF{sem} recursively. Otherwise we are provided
+a matter of calling \semfun{} recursively. Otherwise we are provided
 with a \AF{Thinning}, some additional values and evaluate the
 substructure in the thinned and extended evaluation environment
 (thanks to a auxiliary function \AF{\_>>\_} which given two environments
@@ -883,7 +891,7 @@ produces an environment {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{�
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{bodyproof}
-\caption{Proof of the Fundamental Lemma of \AR{Sem}antics -- \AF{body}}\label{def:body}
+\caption{Proof of the Fundamental Lemma of \semrec{} -- \AF{body}}\label{def:body}
 \end{figure}
 
 Given that \AF{fmap} introduces one level of indirection between the
@@ -924,8 +932,8 @@ and reifying the bodies of binders.
 \end{figure}
 
 The reification process mentioned in the definition of renaming
-and substitution can be implemented generically for \AR{Sem}antics
-families which have \AR{VarLike} values (\AF{vl\textsuperscript{Var}} and \AF{vl\textsuperscript{Tm}}
+and substitution can be implemented generically for \semrec{}
+families which have \AR{VarLike} values (\AF{vl\textasciicircum{}Var} and \AF{vl\textasciicircum{}Tm}
 are proofs of \AR{VarLike} for \AD{Var} and \AD{Tm} respectively) i.e.
 values which are thinnable and such that we can craft placeholder values
 in non-empty contexts.
@@ -970,7 +978,7 @@ terms. Preprocessors adding these types of mechanisms to existing
 languages (from C to CSS) are rather popular. We introduce a
 description of \AD{Let}-bindings which can be used to extend any
 language description \AB{d} to \AB{d} \AF{`+} \AF{Let} (where \AF{`+}
-is the disjoint of sum of two descriptions defined in Figure~\ref{figure:descsum}):
+is the disjoint sum of two descriptions defined in Figure~\ref{figure:descsum}):
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letcode}
@@ -1078,16 +1086,16 @@ anything else.
 \caption{Generic Normalisation by Evaluation Framework}
 \end{figure}
 
-Using this setup, we can write a normaliser for the untyped
-$\lambda$-calculus: we use \AF{case} from section \ref{desccomb} to distinguish between
-the semantical counterpart of the application constructor on
-one hand and the $\lambda$-abstraction one on the other.
-The latter is trivial: functions are already
-values! The semantical counterpart of application proceeds by
-case analysis on the function: if it corresponds to a
-$\lambda$-abstraction, we can fire the redex by using the Kripke
-functional space; otherwise we grow the spine of stuck
-applications.
+Using this setup, we can write a normaliser for the untyped $\lambda$-calculus
+by simply providing an algebra. We start by defining two patterns for
+semantical values: one for application and the other for lambda abstraction.
+
+\ExecuteMetaData[Generic/Examples/NbyE.tex]{nbepatterns}
+
+We then define the algebra by case analysis: if the node at hand is an
+application and its first component evaluates to a lambda, we fire it.
+Otherwise we have either a stuck application or a lambda, in other words
+we already have a value and can simply return it using \AIC{C}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
@@ -1140,7 +1148,7 @@ computations are always potentially failing so we use the \AD{Maybe} monad.
 \caption{Var- and Type- Relations indexed by the Mode}
 \end{figure}
 
-We can now define typechecking as a \AR{Sem}antics. The algebra describes the
+We can now define typechecking as a \semrec{}. The algebra describes the
 algorithm (\AF{\_<\$\_} takes an \AB{A} and a {\AD{Maybe} \AB{B}} and returns
 a {\AD{Maybe} \AB{A}} which has the same structure as its second argument):
 \begin{itemize}
@@ -1163,7 +1171,7 @@ a {\AD{Maybe} \AB{A}} which has the same structure as its second argument):
 \end{figure}
 
 We have defined a bidirectional typechecker for
-this simple language by leveraging the \AF{Sem}antics framework. The code attached
+this simple language by leveraging the \semrec{}framework. The code attached
 to this paper also contains a variant with more informative types: instead of simply
 generating a type or checking that a candidate will do, we can use our \AD{Desc}riptions
 to describe a language of evidence and generate not only an expression's type but
@@ -1183,7 +1191,7 @@ the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
 
 A basic example of such a structure is a potentially cyclic list which
 offers a choice of two constructors: \AIC{[]} which ends the list and
-\AIC{\_:\!:\_} which combines a head and a tail but also acts as a binder
+\AIC{\_::\_} which combines a head and a tail but also acts as a binder
 for a self-reference; these pointers can be used by using the \AIC{var}
 constructor which we have renamed \AIC{↶} (pronounced ``backpointer'')
 to match the domain-specific meaning.
@@ -1315,10 +1323,10 @@ on more advanced use-cases.
 \subsection{Simulation Lemma}\label{section:simulation}
 
 A constraint mentioning the relator appears naturally when we want to say that a
-semantics can simulate another one. Given a relation \AB{$\mathcal{R}^{\mathcal{V}}$} connecting values
-in \AB{$\mathcal{V}_1$} and \AB{$\mathcal{V}_2$}, and a relation \AB{$\mathcal{R}^{\mathcal{C}}$} connecting computations in
-\AB{$\mathcal{C}_1$} and \AB{$\mathcal{C}_2$}, we can define \AF{Kripke\textsuperscript{R}} relating values
-\AF{Kripke} \AB{$\mathcal{V}_1$} \AB{$\mathcal{C}_1$} and \AF{Kripke} \AB{$\mathcal{V}_2$} \AB{$\mathcal{C}_2$}
+semantics can simulate another one. Given a relation \AB{𝓥ᴿ} connecting values
+in \AB{𝓥ᴬ} and \AB{𝓥ᴮ}, and a relation \AB{𝓒ᴿ} connecting computations in
+\AB{𝓒ᴬ} and \AB{𝓒ᴮ}, we can define \AF{Kripkeᴿ} relating values
+\AF{Kripke} \AB{𝓥ᴬ} \AB{𝓒ᴬ} and \AF{Kripke} \AB{𝓥ᴮ} \AB{𝓒ᴮ}
 by stating that they send related inputs to related outputs. We use
 the relation transformer \AF{∀[\_]} which lifts a relation on values
 to one on environments in a pointwise manner.
@@ -1328,31 +1336,29 @@ to one on environments in a pointwise manner.
 \caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
 \end{figure}
 
-We can then combine \AF{⟦\_⟧ᴿ} and \AF{Kripke\textsuperscript{R}} to express the idea
+We can then combine \AF{⟦\_⟧ᴿ} and \AF{Kripkeᴿ} to express the idea
 that two semantic objects of respective types
-\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_1$} \AB{$\mathcal{C}_1$}) and
-\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{$\mathcal{V}_2$} \AB{$\mathcal{C}_2$}) are
-synchronised. The simulation constraint on the algebras for two \AF{Sem}antics 
+\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥ᴬ} \AB{𝓒ᴬ}) and
+\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥ᴮ} \AB{𝓒ᴮ}) are
+synchronised. The simulation constraint on the algebras for two \semrec{}
 then becomes: given synchronized objects, the algebras should yield
 related computations. Together with self-explanatory constraints on
-\ARF{var} and \ARF{th\textsuperscript{𝓥}}, this constitutes the whole \AF{Sim}ulation
+\ARF{var} and \ARF{th\textasciicircum{}𝓥}, this constitutes the whole \AF{Sim}ulation
 constraint:
 
 \begin{figure}[h]
- \ExecuteMetaData[Generic/Simulation.tex]{recsim}
+\ExecuteMetaData[Generic/Simulation.tex]{recsim1}
 \caption{A Generic Notion of Simulation}
 \end{figure}
 
 The fundamental lemma of simulations is a generic theorem showing that for
-each pair of \AR{Sem}antics respecting the \AR{Sim}ulation constraint, we
+each pair of \semrec{} respecting the \AR{Sim}ulation constraint, we
 get related computations given environments of related input values. This
 theorem is once more mutually proven with a statement about \AF{Scope}s,
 and \AD{Size}s play a crucial role in ensuring that the function is indeed total.
 
 \begin{figure}[h]
-\begin{minipage}{\textwidth}
   \ExecuteMetaData[Generic/Simulation.tex]{simbody}
-\end{minipage}\hfill
 \caption{Fundamental Lemma of \AF{Sim}ulations}
 \end{figure}
 
@@ -1378,7 +1384,7 @@ reduces to {\AF{sub} \AB{$\rho$'} \AB{t}} whenever for all \AB{v},
 The main theorem (strong normalisation of STLC via a logical relation)
 is itself an instance of (the unary version of) the simulation lemma.
 
-The Simulation proof framework is the simplest examples of the abstract
+The Simulation proof framework is the simplest example of the abstract
 proof frameworks ACMM~\citeyear{allais2017type} introduce. They also
 explain how a similar framework can be defined
 for fusion lemmas and deploy it for the renaming-substitution interactions
@@ -1393,7 +1399,7 @@ this more complex example for all syntaxes definable in our framework.
 \subsection{Fusion Lemma}\label{section:fusion}
 
 Results which can be reformulated as the ability to fuse two traversals
-obtained as \AR{Sem}antics into one abound. When claiming that \AF{Tm} is
+obtained as \semrec{} into one abound. When claiming that \AF{Tm} is
 a Functor, we have to prove that two successive renamings can be fused into
 a single renaming where the \AF{Thinning}s have been composed. Similarly,
 demonstrating that \AF{Tm} is a relative Monad~\cite{JFR4389} implies proving
@@ -1483,7 +1489,7 @@ relation \AF{𝓡}.
 
 When evaluating a variable, on the one hand \AB{𝓢ᴬ}
 will look up its meaning in the evaluation environment, turn the resulting value into
-a computation which will get quoted and then the result will be evaluated with \AB{𝓢ᴮ}.
+a computation which will get reified and then the result will be evaluated with \AB{𝓢ᴮ}.
 Provided that all three evaluation environments are related by \AB{𝓔ᴿ} this should
 be equivalent to looking up the value in \AB{𝓢ᴬᴮ}'s environment and turning it into a
 computation. Hence the constraint \ARF{varᴿ}:
@@ -1497,7 +1503,7 @@ afterwards we need to recover a piece of syntax. This is possible if the
 (which can be manufactured thanks to the \ARF{vl\^{𝓥ᴬ}} we mentioned before) and
 then quoted. Provided that the result of running \AB{𝓢ᴮ} on that term is
 related via {\AF{⟦} \AB{d} \AF{⟧ᴿ} (\AF{Kripkeᴿ} \AB{𝓥ᴿ} \AB{𝓒ᴿ} to the result
-of running \AB{𝓢ᴬᴮ} on the original term, the \ARF{alg\textsuperscript{R}} constraint states
+of running \AB{𝓢ᴬᴮ} on the original term, the \ARF{algᴿ} constraint states
 that the two evaluations yield related computations.
 
 \ExecuteMetaData[Generic/Fusion.tex]{algR}
@@ -1508,7 +1514,7 @@ This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
 stating that from a triple of related environments, one gets a pair of related
 computations: the composition of \AB{𝓢ᴬ} and \AB{𝓢ᴮ} on one hand and
 \AB{𝓢ᴬᴮ} on the other. This lemma is once again proven mutually with its
-counterpart for \AR{Sem}'s \AF{body}'s action on \AR{Scope}s.
+counterpart for \semrec{}'s \AF{body}'s action on \AR{Scope}s.
 % and the \AD{Size} indices make the proof modular.
 
 \begin{figure}[h]
@@ -1776,7 +1782,7 @@ notions of congruence closure which would come with guarantees (if the original
 relation is stable under renaming and substitution so should the closure).
 Similarly, the ``evaluation contexts'' corresponding to a syntax could be
 derived automatically by building on the work of Huet~\citeyear{huet_1997}
-and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data}, 
+and Abbott, Altenkirch, McBride and Ghani~\citeyear{abbott2005data},
 allowing us to revisit previous work based on concrete instances of
 ACMM such as McLaughlin, McKinna and Stark~\citeyear{craig2018triangle}.
 

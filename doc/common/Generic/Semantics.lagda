@@ -30,7 +30,8 @@ module _  {d : Desc I} where
 \end{code}
 %</comp>
 \begin{code}
-  module DISPLAYONLY where
+  private
+   module DISPLAYONLY where
 \end{code}
 %<*semantics>
 \begin{code}

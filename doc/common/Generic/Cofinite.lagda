@@ -6,6 +6,7 @@ open import Size
 open import Data.Unit
 open import Data.List.Base hiding (unfold)
 
+open import Data.Var using (_─Scoped)
 open import Data.Environment
 open import Generic.Syntax
 open import Generic.Semantics
@@ -16,13 +17,20 @@ private
     I : Set
     s : Size
 
+
 \end{code}
+%<*const>
+\begin{code}
+Const : (I → Set) → List I → I ─Scoped
+Const T Δ j Γ = T j
+\end{code}
+%</const>
 %<*cotm>
 \begin{code}
 record ∞Tm (d : Desc I) (s : Size) (i : I) : Set where
   coinductive; constructor `con
   field force :  {s' : Size< s} →
-                 ⟦ d ⟧ (λ _ i _ → ∞Tm d s' i) i []
+                 ⟦ d ⟧ (Const (∞Tm d s')) i []
 \end{code}
 %</cotm>
 \begin{code}
@@ -38,7 +46,7 @@ module _ {d : Desc ⊤} where
 %</plug>
 %<*unroll>
 \begin{code}
-  unroll : TM d tt → ⟦ d ⟧ (λ _ i _ → TM d i) tt []
+  unroll : TM d tt → ⟦ d ⟧ (Const (TM d)) tt []
   unroll t′@(`con t) = fmap d (plug t′) t
 \end{code}
 %</unroll>
