@@ -19,7 +19,7 @@ open import Relation.Unary
 -- We reuse Name, Printer, M, fresh, and names from the STLC printing example
 
 open import StateOfTheArt.ACMM using (module Printer)
-open Printer using (M; Wrap; MkW; getW; map^Wrap; th^Wrap; fresh; names)
+open Printer using (M; Wrap; Name; Printer; MkW; getW; map^Wrap; th^Wrap; fresh; names)
 
 private
   variable
@@ -38,12 +38,9 @@ open import Data.Var.Varlike
 open import Generic.Syntax hiding (sequenceA)
 open import Generic.Semantics
 
-Name Printer : I ─Scoped
-Name    = Wrap String
-Printer = Wrap (M String)
 
 
-vl^MName : VarLike (λ σ Γ → M (Name σ Γ))
+vl^MName : VarLike {I} (λ σ Γ → M (Name σ Γ))
 th^𝓥  vl^MName = λ mn ρ → (λ n → th^Wrap n ρ) ST.<$> mn
 new   vl^MName = fresh _
 

@@ -19,6 +19,7 @@ AGDA_FILES:=\
   Generic/Fusion/Syntactic.lagda \
   Generic/Semantics.lagda \
   Generic/Semantics/Syntactic.lagda \
+  Generic/Semantics/Printing.lagda \
   Generic/Semantics/Elaboration/LetBinder.lagda \
   Generic/Simulation.lagda \
   Generic/Simulation/Syntactic.lagda \

@@ -7,7 +7,7 @@ open import Data.Var hiding (_<$>_; get)
 open import Data.Environment as E hiding (_>>_ ; extend)
 
 open import Data.Nat.Base
-open import Data.List.Base hiding ([_] ; _++_; lookup)
+open import Data.List.Base using (List; _∷_; [])
 open import Function
 open import Relation.Unary
 
@@ -215,7 +215,7 @@ open import Data.Product
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 module Printer where
- open import Codata.Stream as Stream using (Stream; _∷_)
+ open import Codata.Stream as Stream using (Stream; _∷_; head; tail)
  open RawMonadState (StateMonadState (Stream String _))
  M = State (Stream String _)
 \end{code}
@@ -228,6 +228,20 @@ module Printer where
 %</valprint>
 \begin{code}
  open Wrap public
+\end{code}
+%<*name>
+\begin{code}
+ Name : I ─Scoped
+ Name = Wrap String
+\end{code}
+%</name>
+%<*printer>
+\begin{code}
+ Printer : I ─Scoped
+ Printer = Wrap (M String)
+\end{code}
+%</printer>
+\begin{code}
 
  th^Wrap : Thinnable {I} (Wrap A σ)
  th^Wrap w ρ = MkW (getW w)
@@ -239,16 +253,16 @@ module Printer where
 \end{code}
 %<*freshprint>
 \begin{code}
- fresh : ∀ σ → M (Wrap String σ (σ ∷ Γ))
+ fresh : ∀ σ → M (Name σ (σ ∷ Γ))
  fresh σ = do
    names ← get
-   put (Stream.tail names)
-   return (MkW (Stream.head names))
+   put (tail names)
+   pure (MkW (head names))
 \end{code}
 %</freshprint>
 %<*semprint>
 \begin{code}
- Printing : Semantics (Wrap String) (Wrap (M String))
+ Printing : Semantics Name Printer
  Printing = record
    { th^𝓥  =  th^Wrap
    ; var   =  map^Wrap return

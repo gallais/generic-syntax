@@ -469,18 +469,24 @@ lifting an existing de Bruijn variable
 into an extended scope) as the definition of the thinning embedding \AB{$\Gamma$}
 into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
 
-We also include the definition of a basic printer relying on a
-name supply to highlight the fact that computations can very well be
-effectful. The \AF{Printing} semantics is defined by using \AD{String}s
-as values and {\AD{State} \AD{$\mathbb{N}$} \AD{String}} as computations. We use a
-\AR{Wrap}per with a type and a context as phantom types in order to
-help Agda's inference propagate the appropriate constraints.
-We define a function \AF{fresh} that generates new concrete names using a
-\AD{State} monad.
+\label{section:printing}
+We also include the definition of a basic printer relying on a name supply
+to highlight the fact that computations can very well be effectful.
+The \AF{Printing} semantics is defined by using \AF{Name}s (i.e. \AD{String}s)
+as values and \AF{Printer}s (i.e. {\AF{State} (\AD{Stream} \AD{String}) \AD{String}})
+as computations. We use a \AR{Wrap}per with a type and a context as phantom types
+in order to help Agda's inference propagate the appropriate constraints. We define
+a function \AF{fresh} that generates new concrete names using a \AD{State} monad.
 
 \begin{figure}[h]
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{valprint}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{name}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printer}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{freshprint}
+\end{minipage}
 \caption{Wrapper and fresh name generation}
 \end{figure}
 
@@ -495,7 +501,7 @@ prepend a ``λ'' binding the fresh name.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}
-\caption{Printing as an instance of \semrec{}}
+\caption{Printing as an instance of \semrec{}}\label{fig:printing}
 \end{figure}
 
 Both printing and renaming highlight the importance of distinguishing
@@ -1031,6 +1037,25 @@ are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
 
 \section{A Catalogue of Generic Programs for Syntax with Binding}
 
+\todo{introduction}
+
+\subsection{Printing with Names}\label{section:genericprinting}
+
+We have seen in Section~\ref{section:printing} that printing with names
+is an instance of ACMM's notion of \semrec{}. We will now show that this
+observation can be generalised to arbitrary syntaxes with binding. Unlike
+renaming or substitution, this generic program will require user guidance:
+there is no way for us to guess how an encoded term should be printed. We
+can however take care of the name generation and the traversal generically.
+
+Reusing the notions of \AF{Name} introduced in Section~\ref{section:printing},
+we can describe what it means for a substructure to have already been printed.
+
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{pieces}
+
+
+\subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}
+
 One of the advantages of having a universe of programming language
 descriptions is the ability to concisely define an \emph{extension}
 of an existing language by using \AD{Desc}ription transformers
@@ -1039,8 +1064,6 @@ This is made extremely simple by the
 disjoint sum combinator \AF{\_`+\_} which we defined in Section~\ref{desccomb}.
 An example of such an extension is the addition of let-bindings to
 an existing language.
-
-\subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}
 
 Let bindings allow the user to avoid repeating themselves by naming
 sub-expressions and then using these names to refer to the associated
