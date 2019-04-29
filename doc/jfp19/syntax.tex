@@ -372,50 +372,74 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 \caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable.}
 \end{figure}
 
-As Allais, Chapman, McBride and McKinna (ACMM)~\citeyear{allais2017type} shows,
-equipped with these new notions
-we can define an abstract concept of semantics for our scope-and-type safe language
-(cf. Figures~\ref{figure:lamsem} and \ref{figure:fdmlamsem}).
-Broadly speaking, a semantics turns our deeply embedded abstract
-syntax trees into the shallow embedding of the corresponding
-parametrised higher order abstract syntax term. We get a choice of
-useful scope-and-sort safe traversals by using different `host languages'
-for this shallow embedding.
+As Allais, Chapman, McBride and McKinna (ACMM)~\citeyear{allais2017type}
+shows, equipped with these new notions we can define an abstract concept
+of semantics for our scope-and-type safe language. Provided that a set of
+constraints on two ({\AF{Type} \AF{─Scoped}}) \AB{𝓥} and \AB{𝓒} is
+satisfied, we will obtain a traversal of the following type:
 
-Semantics,
-   specified in terms of a record \semrec{},
-are defined in Figure~\ref{figure:lamsem} in terms of a choice of values \AB{𝓥} and
-computations \AB{𝓒}. Realisation of a semantics will produce a
-computation in \AB{𝓒} for every term whose variables are assigned
-values in \AB{𝓥} as demonstrated in Figure~\ref{figure:fdmlamsem}.
-A semantics must satisfy constraints on the notions of
-values \AB{𝓥} and computations \AB{𝓒} at hand. First of all,
-values should be thinnable so that \semfun{} may push the environment
-under binders. Second, the set of computations needs to be closed
-under various combinators which are the semantical counterparts of
-the language's constructors. The semantical counterpart of application is an operation
-that takes a representation of a function and a representation of an
-argument and produces a representation of the result.
-The interpretation of the $\lambda$-abstraction is of particular interest:
-it is a variant on
-the Kripke function space one can find in normalisation by evaluation.
-In all possible thinnings of the scope at hand, it promises to deliver
-a computation whenever it is provided with a value for its newly
-bound variable. This is concisely expressed by the type
-(\AF{□} (\AB{𝓥} \AB{$\sigma$} \AF{→} \AB{𝓒} \AB{$\tau$})).
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semtype}
 
-\begin{figure}[h]
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsem}
-\caption{Semantics for \AD{Lam}}\label{figure:lamsem}
-\end{figure}
+Broadly speaking, a semantics turns our deeply embedded abstract syntax
+trees into the shallow embedding of the corresponding parametrised higher
+order abstract syntax term. We get a choice of useful scope-and-sort safe
+traversals by using different `host languages' for this shallow embedding.
+
+Semantics, specified in terms of a record \semrec{}, are defined in terms
+of a choice of values \AB{𝓥} and computations \AB{𝓒}. A semantics must
+satisfy constraints on the notions of values \AB{𝓥} and computations \AB{𝓒}
+at hand.
+
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsemtype}
+
+First of all, values should be thinnable so that \semfun{} may push the
+environment under binders. This constraint allows us to define \AF{extend}
+which takes a context extension from \AB{Δ} to \AB{Θ} in the form of a
+thinning, an existing evaluation environment mapping \AB{Γ} variables to
+\AB{Δ} values and a value living in the extended context \AB{Θ} and returns
+an evaluation environment mapping ({\AB{σ} \AIC{∷} \AB{Γ}}) variables to
+\AB{Θ} values.
+
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{thV}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{extend}
+
+
+Second, the set of computations needs to be closed under various
+combinators which are the semantical counterparts of the language's
+constructors.
+For instance in the variable case we obtain a value from the evaluation
+environment but we need to return a computation. This means that values
+should embed into computations.
+
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{var}
+
+The semantical counterpart of application is an operation that takes a
+representation of a function and a representation of an argument and
+produces a representation of the result.
+
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{app}
+
+
+The interpretation of the λ-abstraction is of particular interest:
+it is a variant on the Kripke function space one can find in normalisation
+by evaluation. In all possible thinnings of the scope at hand, it promises
+to deliver a computation whenever it is provided with a value for its newly
+bound variable. This is concisely expressed by the constraint's type:
+
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{lam}
+
+
+%\begin{figure}[h]
+%\ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsem}
+%\caption{Semantics for \AD{Lam}}\label{figure:lamsem}
+%\end{figure}
 
 Agda allows us to package, together with the fields of the record
 \semrec{}, the generic traversal function \semfun{}, which is brought
 into scope for any instance of \semrec{}. We thus realise the promise
-made earlier, namely that any given {\semrec{} \AB{𝓥}
-  \AB{𝓒}} induces a function which, given a value in
-\AB{𝓥} for each variable in scope, transforms a  \AD{Lam} term into a
-computation \AB{𝓒}.
+made earlier, namely that any given {\semrec{} \AB{𝓥} \AB{𝓒}} induces
+a function which, given a value in \AB{𝓥} for each variable in scope,
+transforms a  \AD{Lam} term into a computation \AB{𝓒}.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{sem}
@@ -464,10 +488,10 @@ The wrapper \AR{Wrap} does not depend on the scope \AB{$\Gamma$} so it is automa
 a Thinnable functor. We jump straight
 to the definition of the printer. To print an application, we produce
 a string representation of the term in function position, then of its argument and combine
-them by putting the argument between parentheses. To print a $\lambda$-abstraction,
+them by putting the argument between parentheses. To print a λ-abstraction,
 we start by generating a fresh name for the newly-bound variable, use that
 name to generate a string representing the body of the function to which we
-prepend a ``$\lambda$'' binding the fresh name.
+prepend a ``λ'' binding the fresh name.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}
