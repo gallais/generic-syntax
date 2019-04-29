@@ -613,6 +613,22 @@ termination checker to see that \AF{fold} is a total function.
 \caption{Least Fixpoint of an Endofunctor and Corresponding Generic Fold}\label{figure:datamu}
 \end{figure}
 
+We can see in Figure~\ref{fig:list} that we can recover the types we are
+used to thanks to this least fixpoint, that pattern synonyms let us hide
+away the encoding and have the constructors we want, and that we can get
+our hands on the types' eliminators by instantiating \AF{fold}.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[StateOfTheArt/CDMM.tex]{list}
+  \ExecuteMetaData[StateOfTheArt/CDMM.tex]{nilcons}
+  \ExecuteMetaData[StateOfTheArt/CDMM.tex]{cons}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[StateOfTheArt/CDMM.tex]{foldr}
+\end{minipage}
+\caption{List, its constructors, and eliminator\label{fig:list}}
+\end{figure}
 
 The CDMM approach therefore allows us to generically define iteration principles
 for all data types that can be described. These are exactly the features we desire
