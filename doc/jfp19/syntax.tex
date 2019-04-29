@@ -724,30 +724,62 @@ the parallel substitution \AF{sub}) in the next section.
 \end{figure}
 
 Coming back to our original examples, we now have the ability to give
-codes for the well scoped untyped $\lambda$-calculus and, just as well,
-the intrinsically typed simply typed $\lambda$-calculus.
-The variable case will be added by the free monad construction so we
-only have to describe two constructors: application where we have two
-substructures which do not bind any extra argument and $\lambda$-abstraction
-which has exactly one substructure with precisely one extra bound variable.
-In the untyped case a single \AD{Bool}ean is enough to distinguish the two constructors
-whilst in the typed case, we need our tags to carry extra information about the
-%%% JHM version
-types involved so we use the ad-hoc \AD{`STLC} type,
-and its decoding \AD{STLC} defined by a pattern-matching \(\lambda\)-expression in Agda.
-%%% GALLAIS version
-% types involved so we use the ad-hoc \AD{`STLC} type. In the definition of
-% \AF{STLC}, ``{\AS{$\lambda$} \AK{where}}'' introduces a pattern-matching lambda
-% which allows us to immediately inspect the tag bound in the \AIC{`$\sigma$} node.
+codes for the well scoped untyped λ-calculus and, just as well,
+the intrinsically typed simply typed λ-calculus. We add a third
+example to showcase the whole spectrum of syntaxes: a well scoped and
+well sorted but not well typed bidirectional language. In all examples,
+the variable case will be added by the free monad construction so we only
+have to describe the other constructors.
+
+
+\paragraph{Untyped λ-calculus} For the untyped case, the lack of
+type translates to picking unit as our notion of sort. We have two possible
+constructors: application where we have two substructures which do not bind
+any extra argument and λ-abstraction which has exactly one substructure
+with precisely one extra bound variable. A single \AD{Bool}ean is enough to
+distinguish the two constructors.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Syntax/UTLC.tex]{ULC}
+  \caption{Description for the Untyped λ-calculus}
+\end{figure}
+
+\paragraph{Bidirectional STLC} Our second example is a
+bidirectional~\cite{pierce2000local} language hence the introduction of a
+notion of \AD{Mode}: each term is either part of the \AIC{Infer} or
+\AIC{Check} fraction of the language. This language has four constructors
+which we list in the ad-hoc \AD{`Bidi} type of constructor tags, its
+decoding \AD{Bidi} is defined by a pattern-matching λ-expression in Agda.
+Application and λ-abstraction behave as expected, with the important
+observation that λ-abstraction binds an \AIC{Infer}rable term. The two
+remaining constructors correspond to changes of direction: one can freely
+\AIC{Emb}bed inferrable terms as checkable ones whereas we require a type
+annotation when forming a \AIC{Cut}.
 
 \begin{figure}[h]
 \begin{minipage}{0.4\textwidth}
-  \ExecuteMetaData[Generic/Syntax/UTLC.tex]{ULC}
+  \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{tagmode}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
-  \ExecuteMetaData[Generic/Syntax/STLC.tex]{stlc}
+  \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{desc}
 \end{minipage}
-\caption{Examples: The Untyped and Simply Typed Lambda Calculi}
+  \caption{Description for the bidirectional STLC}
+\end{figure}
+
+\paragraph{Intrinsically typed STLC} In the typed case, we are back to two
+constructors: the terms are fully annotated and therefore it is not necessary
+to distinguish between \AD{Mode}s anymore. We need our tags to carry extra
+information about the types involved so we use once more and ad-hoc datatype
+\AD{`STLC}, and define its decoding \AD{STLC} by a pattern-matching λ-expression.
+
+\begin{figure}[h]
+\begin{minipage}{0.4\textwidth}
+  \ExecuteMetaData[Generic/Syntax/STLC.tex]{tag}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
+  \ExecuteMetaData[Generic/Syntax/STLC.tex]{desc}
+\end{minipage}
+  \caption{Description for the intrinsically typed STLC}
 \end{figure}
 
 For convenience we use Agda's pattern synonyms corresponding to the
@@ -777,8 +809,7 @@ It is the third time (the first and second times being the definition of
 that we use a \AF{Bool} to distinguish between two constructors. In order
 to avoid re-encoding the same logic,
 the next section introduces combinators demonstrating that
-descriptions are closed under finite sums and finite products
-of recursive positions.
+descriptions are closed under finite sums.
 
 \paragraph{Common Combinators and Their Properties.}\label{desccomb}
 
