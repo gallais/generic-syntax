@@ -56,7 +56,7 @@ latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 latex/$(PAPER).pdf: $(PAPER_DEPENDENCIES)
 	cd latex; latexmk -pdf -bibtex $(PAPER).tex
 
-latex/main.bib: main.bib
+latex/main.bib: ../common/main.bib
 	@mkdir -p $(dir $@)
 	cp $< $@
 
