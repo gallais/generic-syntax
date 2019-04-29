@@ -850,7 +850,8 @@ picks the one corresponding to the chosen branch.
 % \caption{Descriptions are closed under Finite Products of Recursive Positions}
 % \end{figure}
 
-A concrete use case for this combinator will be given in section~\ref{section:letbinding}
+A concrete use case for this combinator will be given in
+section~\ref{section:letbinding}
 where we explain how to seamlessly enrich an existing syntax with let-bindings
 and how to use the \semrec{} framework to elaborate them away.
 
@@ -862,7 +863,7 @@ and how to use the \semrec{} framework to elaborate them away.
 \section{Generic Scope Safe and Well Kinded Programs for Syntaxes}\label{section:semantics}
 
 Based on the \semrec{} type we defined for the specific example of the
-simply typed $\lambda$-calculus in Section~\ref{section:primer-program},
+simply typed λ-calculus in Section~\ref{section:primer-program},
 we can define a generic notion of
 semantics for all syntax descriptions. It is once more parametrised
 by two \AB{I}\AF{─Scoped} families \AB{𝓥} and \AB{𝓒} corresponding
@@ -1109,7 +1110,7 @@ A key type of traversal we have not studied yet is a language's
 evaluator. Our universe of syntaxes with binding does not impose
 any typing discipline on the user-defined languages and as such
 cannot guarantee their totality. This is embodied by one of our running
-examples: the untyped $\lambda$-calculus. As a consequence there
+examples: the untyped λ-calculus. As a consequence there
 is no hope for a safe generic framework to define normalisation
 functions.
 
@@ -1146,7 +1147,7 @@ evaluation.
 The user still has to explicitly pass an interpretation of
 the various constructors because there is no way for us to
 know what the binders are supposed to represent: they may
-stand for $\lambda$-abstractions, $\Sigma$-types, fixpoints, or
+stand for λ-abstractions, $\Sigma$-types, fixpoints, or
 anything else.
 
 
@@ -1155,7 +1156,7 @@ anything else.
 \caption{Generic Normalisation by Evaluation Framework}
 \end{figure}
 
-Using this setup, we can write a normaliser for the untyped $\lambda$-calculus
+Using this setup, we can write a normaliser for the untyped λ-calculus
 by simply providing an algebra. We start by defining two patterns for
 semantical values: one for application and the other for lambda abstraction.
 
@@ -1168,7 +1169,7 @@ we already have a value and can simply return it using \AIC{C}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
-\caption{Normalisation by Evaluation for the Untyped $\lambda$-Calculus}
+\caption{Normalisation by Evaluation for the Untyped λ-Calculus}
 \end{figure}
 
 We have not used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
@@ -1224,7 +1225,7 @@ a {\AD{Maybe} \AB{A}} which has the same structure as its second argument):
   \item when facing an application: infer the type of the function, make sure
     it is an arrow type, check the argument at the domain's type and return the
     codomain
-  \item for a $\lambda$-abstraction: check the input type is an arrow type and
+  \item for a λ-abstraction: check the input type is an arrow type and
     check the body at the codomain type in the extended environment where the
     newly-bound variable has the domain's type
   \item a cut always comes with a type candidate against which to check the term
@@ -1350,7 +1351,7 @@ the definition of \AR{∞Tm} was made easy by reusing \AF{⟦\_⟧}.
 \section{Building Generic Proofs about Generic Programs}
 
 ACMM~\citeyear{allais2017type} have
-already shown that, for the simply typed $\lambda$-calculus, introducing an abstract
+already shown that, for the simply typed λ-calculus, introducing an abstract
 notion of Semantics not only reveals the shared structure of common
 traversals, it also allows them to give abstract proof frameworks for
 simulation or fusion lemmas. Their idea naturally extends to our generic
@@ -1795,7 +1796,7 @@ over a universe of regular trees with binders inspired by Morris'~\citeyear{morr
 
 Recalling Allais, Chapman, McBride and McKinna's earlier work~\citeyear{allais2017type}
 we have started from an example
-of a scope-and-type safe language (the simply typed $\lambda$-calculus), have studied
+of a scope-and-type safe language (the simply typed λ-calculus), have studied
 common invariant preserving traversals and noticed their similarity.
 After introducing a notion of semantics and refactoring these traversals as
 instances of the same fundamental lemma, we have observed the tight
@@ -1820,7 +1821,7 @@ by a single pass of a third one.
 
 We have put all of these results into practice by using them to solve the (to be
 published) POPLMark Reloaded challenge which consists of formalising strong
-normalisation for the simply typed $\lambda$-calculus via a logical-relation
+normalisation for the simply typed λ-calculus via a logical-relation
 argument. This also gave us the opportunity to try our framework on larger
 languages by tackling the challenge's extensions to sum types and G\"{o}del's
 System T.
