@@ -12,6 +12,7 @@ AGDA_FILES:=\
   Generic/Semantics/NbyE.lagda \
   Generic/Examples/NbyE.lagda \
   Generic/Syntax/STLC.lagda \
+  Generic/Syntax/Bidirectional.lagda \
   Generic/Semantics/TypeChecking.lagda \
   Generic/Syntax/UTLC.lagda \
   Generic/Fusion.lagda \

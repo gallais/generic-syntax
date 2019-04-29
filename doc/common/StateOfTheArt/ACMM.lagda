@@ -109,29 +109,65 @@ module _ where
 %</nbe>
 
 %<*rsem>
+\begin{AgdaAlign}
+\AgdaNoSpaceAroundCode
+\begin{AgdaSuppressSpace}
+%<*rsemtype>
 \begin{code}
 record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
-  field  th^𝓥  : Thinnable (𝓥 σ)
-         var   : ∀[ 𝓥 σ ⇒ 𝓒 σ ]
-         app   : ∀[ 𝓒 (σ `→ τ) ⇒ 𝓒 σ ⇒ 𝓒 τ ]
-         lam   : ∀[ □ (𝓥 σ ⇒ 𝓒 τ) ⇒ 𝓒 (σ `→ τ) ]
 \end{code}
+%</rsemtype>
+\begin{code}
+  field
+\end{code}
+%<*thV>
+\begin{code}
+    th^𝓥  : Thinnable (𝓥 σ)
+\end{code}
+%</thV>
+%<*var>
+\begin{code}
+    var   : ∀[ 𝓥 σ ⇒ 𝓒 σ ]
+\end{code}
+%</var>
+%<*app>
+\begin{code}
+    app   : ∀[ 𝓒 (σ `→ τ) ⇒ 𝓒 σ ⇒ 𝓒 τ ]
+\end{code}
+%</app>
+%<*lam>
+\begin{code}
+    lam   : ∀[ □ (𝓥 σ ⇒ 𝓒 τ) ⇒ 𝓒 (σ `→ τ) ]
+\end{code}
+%</lam>
+\end{AgdaSuppressSpace}
+\AgdaSpaceAroundCode
+\end{AgdaAlign}
 %</rsem>
-
+%<*extend>
+\begin{code}
+  extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
+  extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
+\end{code}
+%</extend>
 %<*sem>
+\begin{AgdaAlign}
+\AgdaNoSpaceAroundCode
+%<*semtype>
 \begin{code}
   semantics : (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
+\end{code}
+%</semtype>
+\begin{AgdaSuppressSpace}
+\begin{code}
   semantics ρ (`var k)    = var (lookup ρ k)
   semantics ρ (`app f t)  = app (semantics ρ f) (semantics ρ t)
   semantics ρ (`lam b)    = lam (λ σ v → semantics (extend σ ρ v) b)
 \end{code}
+\end{AgdaSuppressSpace}
+\AgdaSpaceAroundCode
+\end{AgdaAlign}
 %</sem>
-\begin{code}
-   where
-
-   extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
-   extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
-\end{code}
 
 %<*semren>
 \begin{code}

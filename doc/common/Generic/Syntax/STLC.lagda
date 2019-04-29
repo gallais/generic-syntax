@@ -15,15 +15,24 @@ open import Function
 
 \end{code}
 %<*stlc>
+\begin{AgdaAlign}
+%<*tag>
 \begin{code}
 data `STLC : Set where
   App Lam : Type → Type → `STLC
-
+\end{code}
+%</tag>
+\begin{AgdaSuppressSpace}
+%<*desc>
+\begin{code}
 STLC : Desc Type
 STLC = `σ `STLC $ λ where
   (App σ τ) → `X [] (σ `→ τ) (`X [] σ (`∎ τ))
   (Lam σ τ) → `X (σ ∷ []) τ (`∎ (σ `→ τ))
 \end{code}
+%</desc>
+\end{AgdaSuppressSpace}
+\end{AgdaAlign}
 %</stlc>
 %<*patST>
 \begin{code}

@@ -12,9 +12,9 @@ Type Theory~\cite{dybjer1994inductive} for representing their syntax,
 programmers can \emph{statically} enforce some of the invariants in
 their languages. Managing variable scope is a popular use
 case~\cite{altenkirch1999monadic} as directly manipulating raw de
-Bruijn indices is error-prone.  Solutions range from enforcing well
-scopedness to ensuring full type and scope correctness. In short, we
-use types to ensure that ``illegal states are unrepresentable'', where
+Bruijn indices is notoriously error-prone. Solutions range from enforcing
+well scopedness to ensuring full type- and scope- correctness. In short,
+we use types to ensure that ``illegal states are unrepresentable'', where
 illegal states are ill scoped or ill typed terms.
 
 Despite the large body of knowledge in how to use types to define well
@@ -28,7 +28,9 @@ programming and proving with syntaxes with binding.
 
 To motivate our approach, let us look at the formalisation of an
 apparently straightforward program transformation: the inlining of
-let-bound variables by substitution. You have two languages: the source
+let-bound variables by substitution together with a soundness lemma
+proving that reductions in the source languages can be simulated by
+reductions in the target one. You have two languages: the source
 (\AD{S}), which has let-bindings, and the target (\AD{T}), which only
 differs in that it does not:
 \begin{displaymath}
@@ -60,7 +62,7 @@ pair of source and target languages. If you were to change your
 languages $\AD{S}$ or $\AD{T}$, you would have to repeat the same work
 all over again (or at least do a lot of cutting, pasting, and
 editing).
-% The cases for $\lambda$s and applications in the
+% The cases for λs and applications in the
 % transformation are structural, but if we add more constructs to both
 % languages, we would have to write more and more code to say we are
 % doing nothing interesting to them.
@@ -126,13 +128,13 @@ $1 + (\_)$ extends the running scope with an extra variable.
 An inductive type is the fixpoint of an endofunctor on $\Set{}$.
 Similarly, an inductive family is the fixpoint of an endofunctor on
 $\Set \to \Set$. Using inductive families to enforce scope safety, we
-get the following definition of the untyped $\lambda$-calculus: $T(F)
+get the following definition of the untyped λ-calculus: $T(F)
 = \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)$.
 This endofunctor offers a choice of three constructors.  The first one
 corresponds to the variable case; it packages an inhabitant of $X$,
 the index $\Set{}$. The second corresponds to an application node;
 both the function and its argument live in the same scope as the
-overall expression. The third corresponds to a $\lambda$-abstraction;
+overall expression. The third corresponds to a λ-abstraction;
 it extends the current scope with a fresh variable.  The language is
 obtained as the fixpoint of $T$:
 \[
@@ -177,7 +179,7 @@ argument positions.
 
 To lighten the presentation, we exploit the observation that the
 current scope is either passed unchanged to subterms (e.g. in the application case)
-or extended (e.g. in the $\lambda$-abstraction case) by introducing combinators
+or extended (e.g. in the λ-abstraction case) by introducing combinators
 to build indexed types.
 % All the definitions are polymorphic in the index type
 % (called \AB{A} in Figure~\ref{figure:indexed}).
@@ -190,20 +192,16 @@ to build indexed types.
  \ExecuteMetaData[Stdlib.tex]{adjust}
 \end{minipage}
 \newline
-\begin{minipage}{0.40\textwidth}
- \ExecuteMetaData[Stdlib.tex]{product}
-\end{minipage}\hfill
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.4\textwidth}
  \ExecuteMetaData[Stdlib.tex]{constant}
 \end{minipage}\hfill
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.5\textwidth}
  \ExecuteMetaData[Stdlib.tex]{forall}
 \end{minipage}
 %\caption{Combinators to build indexed Sets}\label{figure:indexed}
 \end{center}
 
-We lift the function space and the product type pointwise with
-\AF{\_⇒\_} and \AF{\_∙×\_} respectively, silently threading the
+We lift the function space pointwise with \AF{\_⇒\_}, silently threading the
 underlying scope. The \AF{\_⊢\_} makes explicit the \emph{adjustment} made to the index
 by a function, conforming to the convention (see e.g.~\cite{martin1982constructive}) of mentioning only
 context \emph{extensions} when presenting judgements
@@ -217,9 +215,9 @@ Lastly, \AF{const} is the constant combinator, ignoring the index.
 We make \AF{⇒} associate to the right as one would expect and give it the
 highest precedence level as it is the most used combinator. These combinators
 lead to more readable type declarations.  For instance, the compact expression
-\AF{∀[} \AF{suc} \AF{⊢} (\AB{P} \AF{∙×} \AB{Q}) \AF{⇒} \AB{R} \AF{]}
+\AF{∀[} \AF{suc} \AF{⊢} (\AF{const} \AB{P} \AF{⇒} \AB{Q}) \AF{⇒} \AB{R} \AF{]}
 desugars to the more verbose type
-\AS{∀} \{\AB{i}\} \AS{→} (\AB{P} (\AF{suc} \AB{i}) \AF{×} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
+\AS{∀} \{\AB{i}\} \AS{→} (\AB{P} \AS{→} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
 As the context comes second in the definition of \AF{\_─Scoped}, we
 can readily use these combinators to thread, modify, or quantify over the
@@ -232,7 +230,7 @@ scope when defining such families:
 \begin{minipage}[t]{0.55\textwidth}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{tm}
 \end{minipage}
-%\caption{Scope Aware Variables and Simply Typed $\lambda$-Terms\label{scoped-untyped}}
+%\caption{Scope Aware Variables and Simply Typed λ-Terms\label{scoped-untyped}}
 %\end{center}
 
 The inductive family \AD{Var} represents well scoped and well kinded
@@ -249,7 +247,7 @@ They respectively normalise to:
 \end{center}
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch
-and Reus' simply typed $\lambda$-calculus representation.
+and Reus' simply typed λ-calculus representation.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

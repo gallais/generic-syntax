@@ -7,12 +7,19 @@
 \usepackage{hyperref}
 \usepackage{natbib}
 \DisableLigatures[>]{}
+\usepackage[T1]{fontenc}
 
 \input{unicode}
 \input{commands}
 
-\setlength\mathindent{0em}
+% fix citation style
+\let\oldciteyear\citeyear
+\renewcommand{\citeyear}[1]{(\oldciteyear{#1})}
+\let\oldcite\cite
+\renewcommand{\cite}[1]{(\oldcite{#1})}
 
+% do not inden code blocks
+\setlength\mathindent{0em}
 
 \title
   [A Type and Scope Safe Universe of Syntaxes with Binding]

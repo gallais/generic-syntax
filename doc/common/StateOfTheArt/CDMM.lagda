@@ -133,22 +133,15 @@ List A = μ (listD A) ∞ tt
 \end{code}
 %</list>
 
-%<*nil>
-\begin{code}
-[] : μ (listD A) ∞ tt
-[] = `con (true , refl)
-\end{code}
-%</nil>
-
 \begin{code}
 infixr 10 _∷_
 \end{code}
-%<*cons>
+%<*nilcons>
 \begin{code}
-_∷_ : A → List A → List A
-x ∷ xs = `con (false , x , xs , refl)
+pattern []       = `con (true , refl)
+pattern _∷_ x xs = `con (false , x , xs , refl)
 \end{code}
-%</cons>
+%</nilcons>
 
 %<*example>
 \begin{code}
@@ -176,11 +169,9 @@ Vec A = μ (vecD A) ∞
 %<*foldr>
 \begin{code}
 foldr : (A → B → B) → B → List A → B
-foldr {A} {B} c n = fold (listD A) alg where
-
-  alg : ⟦ listD A ⟧ (const B) tt → B
-  alg (true             , refl)  = n
-  alg (false , hd , rec , refl)  = c hd rec
+foldr c n = fold (listD _) $ λ where
+  (true              , refl) → n
+  (false , hd , rec  , refl) → c hd rec
 \end{code}
 %</foldr>
 
