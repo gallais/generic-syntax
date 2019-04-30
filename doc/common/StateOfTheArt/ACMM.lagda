@@ -217,9 +217,13 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 module Printer where
  open import Codata.Stream as Stream using (Stream; _∷_; head; tail)
  open RawMonadState (StateMonadState (Stream String _))
+\end{code}
+%<*monad>
+\begin{code}
+ M : Set → Set
  M = State (Stream String _)
 \end{code}
-
+%</monad>
 %<*valprint>
 \begin{code}
  record Wrap (A : Set) (σ : I) (Γ : List I) : Set where

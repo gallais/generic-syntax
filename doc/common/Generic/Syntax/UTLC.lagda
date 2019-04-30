@@ -23,12 +23,22 @@ UTLC = `σ Bool $ λ isApp → if isApp
   else  `X (tt ∷ []) tt (`∎ tt)
 \end{code}
 %</ULC>
+\begin{code}
+private
+  module DISPLAYONLY where
+\end{code}
 %<*LCpat>
 \begin{code}
-pattern `app f t  = `con (true , f , t , refl)
-pattern `lam b    = `con (false , b , refl)
+    pattern `app f t  = `con (true , f , t , refl)
+    pattern `lam b    = `con (false , b , refl)
 \end{code}
 %</LCpat>
+\begin{code}
+pattern `app' f t  = (true , f , t , refl)
+pattern `lam' b    = (false , b , refl)
+pattern `app  f t  = `con (`app' f t)
+pattern `lam  b    = `con (`lam' b)
+\end{code}
 %<*LCid>
 \begin{code}
 `id : Tm UTLC ∞ tt []

@@ -479,7 +479,13 @@ in order to help Agda's inference propagate the appropriate constraints. We defi
 a function \AF{fresh} that generates new concrete names using a \AD{State} monad.
 
 \begin{figure}[h]
+\begin{minipage}{0.6\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{valprint}
+\end{minipage}
+\begin{minipage}{0.3\textwidth}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{monad}
+\end{minipage}
+
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{name}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printer}
@@ -487,7 +493,7 @@ a function \AF{fresh} that generates new concrete names using a \AD{State} monad
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{freshprint}
 \end{minipage}
-\caption{Wrapper and fresh name generation}
+\caption{Wrapper and fresh name generation}\label{fig:fresh}
 \end{figure}
 
 The wrapper \AR{Wrap} does not depend on the scope \AB{$\Gamma$} so it is automatically
@@ -1027,7 +1033,7 @@ are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
 
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{reify}
-\caption{Generic Reification thanks to \AR{VarLike} Values}
+\caption{Generic Reification thanks to \AR{VarLike} Values}\label{fig:genericreify}
 \end{figure}
 
 
@@ -1046,12 +1052,85 @@ is an instance of ACMM's notion of \semrec{}. We will now show that this
 observation can be generalised to arbitrary syntaxes with binding. Unlike
 renaming or substitution, this generic program will require user guidance:
 there is no way for us to guess how an encoded term should be printed. We
-can however take care of the name generation and the traversal generically.
+can however take care of the name generation, deal with variable binding,
+and implement the traversal generically. We want our printer to have type:
 
-Reusing the notions of \AF{Name} introduced in Section~\ref{section:printing},
-we can describe what it means for a substructure to have already been printed.
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{display}
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{printtype}
+
+Reusing the notion of \AR{Name} introduced in Section~\ref{section:printing},
+we can make \AF{Pieces} formal. A subterm has already been printed if we
+have a string representation of it together with an environment of \AR{Name}s
+we have attached to the newly-bound variables this structure contains.
+That is to say:
 
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{pieces}
+
+The key observation that will help us define a generic printer is that
+\AF{M} composed with \AR{Name} is \AR{VarLike}. Indeed as the composition
+of a functor and a trivially thinnable \AR{Wrap}per it is \AF{Thinnable},
+and \AF{fresh} (defined in Figure~\ref{fig:fresh}) is the proof that we
+can generate placeholder values thanks to the name supply.
+
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{vlmname}
+
+This \AR{VarLike} instance empowers us to reify in an effectful manner
+a \AF{Kripke} function space taking \AF{Name}s and returning a \AF{Printer}
+to a set of \AF{Pieces}.
+
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{reifytype}
+
+In case there are no newly bound variables, the \AF{Kripke} function space
+collapses to a mere \AR{Printer} which is precisely the wrapped version of
+the type we expect.
+
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{reifybase}
+
+Otherwise we proceed in a manner reminiscent of the pure reification function
+defined in Figure~\ref{fig:genericreify}. We start by generating an environment
+of names for the newly-bound variables by using the fact that \AF{M} composed
+with \AF{Name} is \AR{VarLike} together with the fact that environments are
+traversable~\cite{mcbride_paterson_2008}. We then run the \AF{Kripke} function
+on these names to obtain the string representation of the subterm. We finally
+return the names we used together with this string.
+
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{reifypieces}
+
+We can put all of these pieces together to obtain the \AF{Printing} semantics.
+The two first constraints can be trivially discharged. When defining the
+algebra we start by reifying the subterms, then use the fact that  one ``layer''
+of term of our syntaxes with binding is always traversable to combine all of
+these results into a value we can apply our display function to.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{printing}
+\caption{Printing with \AF{Name}s as a \AR{Semantics}}\label{fig:genericprinting}
+\end{figure}
+
+This allows us to write a printer for open terms. We start by generating
+an environment of \AR{Name}s for the free variables, then use our semantics
+to get a \AF{printer} which we can run using a stream \AF{names} of distinct
+strings as our name supply.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{print}
+\caption{}\label{fig:genericprint}
+\end{figure}
+
+
+\paragraph{Untyped λ-calculus} Defining a printer for the untyped
+λ-calculus is now very easy: we define a \AF{Display} by case analysis.
+In the application case, we combine the string representation of the
+function and wrap its argument between parentheses. In the lambda
+abstraction case, we are handed the name the bound variable was assigned
+together with the body's representation.
+
+\ExecuteMetaData[Generic/Examples/Printing.tex]{printUTLC}
+
+
+
+\ExecuteMetaData[Generic/Examples/Printing.tex]{printid}
+\ExecuteMetaData[Generic/Examples/Printing.tex]{printopen}
 
 
 \subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}

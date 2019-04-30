@@ -7,6 +7,7 @@ open import Size
 open import Data.List.Base as L hiding (lookup ; [_])
 
 open import Data.Var hiding (z; s)
+open import Data.Var.Varlike using (VarLike; base)
 open import Data.Relation
 open import Relation.Unary
 open import Data.Environment
@@ -89,3 +90,9 @@ record Semantics (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
  closed = semantics ε
 \end{code}
 %</closed>
+%<*eval>
+\begin{code}
+ eval : VarLike 𝓥 → ∀[ Tm d s σ ⇒ 𝓒 σ ]
+ eval vl^𝓥 = semantics (base vl^𝓥)
+\end{code}
+%</eval>
