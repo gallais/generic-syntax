@@ -66,13 +66,13 @@ import Generic.Syntax.LetCounter
 import Generic.Syntax.LetBinders
 
 
+-- Alternative interpretation of descriptions empower us to write:
 
--- Alternative interpretation of descriptions from PHOAS to raw terms.
--- This empowers us to prove that:
--- * to each syntactic term we can associate a term in PHOAS
--- * to each raw term we can try to associate a syntactic term via *generic*
---   scopechecking
-open import Generic.AltSyntax
+-- A converter to PHOAS syntax
+open import Generic.Syntax.PHOAS
+
+-- A generic scope checker converting raw terms to well scoped terms
+open import Generic.Scopecheck
 
 -- SEMANTICS
 --------------------------------------------------------------------------------

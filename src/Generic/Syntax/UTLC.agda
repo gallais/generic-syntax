@@ -19,8 +19,16 @@ UTLC = `σ Bool $ λ isApp → if isApp
   then  `X [] tt (`X [] tt (`∎ tt))
   else  `X (tt ∷ []) tt (`∎ tt)
 
-pattern `app f t  = `con (true , f , t , refl)
-pattern `lam b    = `con (false , b , refl)
+private
+  module DISPLAYONLY where
+
+    pattern `app f t  = `con (true , f , t , refl)
+    pattern `lam b    = `con (false , b , refl)
+
+pattern `app' f t  = (true , f , t , refl)
+pattern `lam' b    = (false , b , refl)
+pattern `app  f t  = `con (`app' f t)
+pattern `lam  b    = `con (`lam' b)
 
 `id : Tm UTLC ∞ tt []
 `id = `lam (`var z)

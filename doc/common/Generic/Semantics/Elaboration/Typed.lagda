@@ -153,7 +153,7 @@ EMB t Γ σ = do
 %</emb>
 %<*elaborate>
 \begin{code}
-Elaborate : Semantics Lang Var- Type-
+Elaborate : Semantics Bidi Var- Type-
 Elaborate .th^𝓥  = th^Var-
 Elaborate .var   = λ where (`var infer) Γ → just (map₂ `var (infer Γ))
 Elaborate .alg   = λ where

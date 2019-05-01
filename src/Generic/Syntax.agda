@@ -5,7 +5,7 @@ module Generic.Syntax where
 open import Size
 open import Data.Bool
 open import Data.List.Base as L hiding ([_])
-open import Data.List.All hiding (sequenceA)
+open import Data.List.All hiding (mapA; sequenceA)
 open import Data.Product as Prod
 open import Function hiding (case_of_)
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -30,8 +30,10 @@ reindex f (`∎ i)     = `∎ (f i)
 private
   variable
     I : Set
-    i : I
+    i σ : I
+    Γ₁ Γ₂ : List I
     s : Size
+    X Y : List I → I ─Scoped
 
 ⟦_⟧ : Desc I → (List I → I ─Scoped) → I ─Scoped
 ⟦ `σ A d    ⟧ X i Γ = Σ[ a ∈ A ] (⟦ d a ⟧ X i Γ)
@@ -156,15 +158,21 @@ module _ {I : Set} {X Y Z : List I → I ─Scoped} where
 
 open import Category.Applicative
 
-module _ {I : Set} {X : List I → I ─Scoped} {A : Set → Set} {{app : RawApplicative A}} where
+module _ {A : Set → Set} {{app : RawApplicative A}} where
 
  module A = RawApplicative app
  open A
 
- sequenceA : {i : I} (d : Desc I) → ∀[ ⟦ d ⟧ (λ Δ j Γ → A (X Δ j Γ)) i ⇒ A ∘ ⟦ d ⟧ X i ]
+ sequenceA : (d : Desc I) →
+             ∀[ ⟦ d ⟧ (λ Δ j Γ → A (X Δ j Γ)) i ⇒ A ∘ ⟦ d ⟧ X i ]
  sequenceA (`σ A d)    (a , t)  = (λ b → a , b) A.<$> sequenceA (d a) t
  sequenceA (`X Δ j d)  (r , t)  = _,_ A.<$> r ⊛ sequenceA d t
  sequenceA (`∎ i)      t        = pure t
+
+ mapA : (d : Desc I) →
+        (f : ∀ Δ j → X Δ j Γ₁ → A (Y Δ j Γ₂))
+        → ⟦ d ⟧ X σ Γ₁ → A (⟦ d ⟧ Y σ Γ₂)
+ mapA d f = sequenceA d ∘ fmap d f
 
 -- Desc Morphisms
 

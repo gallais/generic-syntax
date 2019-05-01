@@ -5,6 +5,7 @@ open import Size
 open import Data.Unit
 open import Data.List.Base hiding (unfold)
 
+open import Data.Var using (_─Scoped)
 open import Data.Environment
 open import Generic.Syntax
 open import Generic.Semantics
@@ -16,10 +17,14 @@ private
     s : Size
 
 
+
+Const : (I → Set) → List I → I ─Scoped
+Const T Δ j Γ = T j
+
 record ∞Tm (d : Desc I) (s : Size) (i : I) : Set where
   coinductive; constructor `con
   field force :  {s' : Size< s} →
-                 ⟦ d ⟧ (λ _ i _ → ∞Tm d s' i) i []
+                 ⟦ d ⟧ (Const (∞Tm d s')) i []
 
 open ∞Tm public
 
@@ -28,7 +33,7 @@ module _ {d : Desc ⊤} where
   plug : TM d tt → ∀ Δ i → Scope (Tm d ∞) Δ i [] → TM d i
   plug t Δ i = Semantics.semantics Sub (pack (λ _ → t))
 
-  unroll : TM d tt → ⟦ d ⟧ (λ _ i _ → TM d i) tt []
+  unroll : TM d tt → ⟦ d ⟧ (Const (TM d)) tt []
   unroll t′@(`con t) = fmap d (plug t′) t
 
   unfold : TM d tt → ∞Tm d s tt

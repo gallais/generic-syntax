@@ -36,7 +36,21 @@ module _ (𝓥ᴿ  : Rel 𝓥ᴬ 𝓥ᴮ) (𝓒ᴿ  : Rel 𝓒ᴬ 𝓒ᴮ) where
   reifyᴿ vlᴿ []         σ kᴿ = kᴿ
   reifyᴿ vlᴿ Δ@(_ ∷ _)  σ kᴿ = kᴿ (freshʳ vl^Var Δ) (VarLikeᴿ.freshˡᴿ vlᴿ _)
 
+  private
+   module DISPLAYONLY where
 
+   record Simulation (d : Desc I)
+     (𝓢ᴬ : Semantics d 𝓥ᴬ 𝓒ᴬ) (𝓢ᴮ : Semantics d 𝓥ᴮ 𝓒ᴮ)
+     (𝓥ᴿ  : Rel 𝓥ᴬ 𝓥ᴮ) (𝓒ᴿ  : Rel 𝓒ᴬ 𝓒ᴮ) : Set where
+     module 𝓢ᴬ = Semantics 𝓢ᴬ
+     module 𝓢ᴮ = Semantics 𝓢ᴮ
+     field  thᴿ   :  (ρ : Thinning Γ Δ) → rel 𝓥ᴿ σ vᴬ vᴮ →
+                     rel 𝓥ᴿ σ (𝓢ᴬ.th^𝓥 vᴬ ρ) (𝓢ᴮ.th^𝓥 vᴮ ρ)
+            varᴿ  : rel 𝓥ᴿ σ vᴬ vᴮ → rel 𝓒ᴿ σ (𝓢ᴬ.var vᴬ) (𝓢ᴮ.var vᴮ)
+            algᴿ  : (b : ⟦ d ⟧ (Scope (Tm d s)) σ Γ) → All 𝓥ᴿ Γ ρᴬ ρᴮ →
+                    let  vᴬ = fmap d (𝓢ᴬ.body ρᴬ) b
+                         vᴮ = fmap d (𝓢ᴮ.body ρᴮ) b
+                    in ⟦ d ⟧ᴿ (Kripkeᴿ 𝓥ᴿ 𝓒ᴿ) vᴬ vᴮ → rel 𝓒ᴿ σ (𝓢ᴬ.alg vᴬ) (𝓢ᴮ.alg vᴮ)
 
 record Simulation (d : Desc I)
   (𝓢ᴬ : Semantics d 𝓥ᴬ 𝓒ᴬ) (𝓢ᴮ : Semantics d 𝓥ᴮ 𝓒ᴮ)

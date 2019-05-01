@@ -6,9 +6,13 @@ open import Data.Var hiding (_<$>_; get)
 open import Data.Environment as E hiding (_>>_ ; extend)
 
 open import Data.Nat.Base
-open import Data.List.Base hiding ([_] ; _++_; lookup)
+open import Data.List.Base using (List; _∷_; [])
 open import Function
 open import Relation.Unary
+
+private
+  variable
+    I : Set
 
 infixr 3 _`→_
 
@@ -18,26 +22,26 @@ data Type : Set where
 
 private
   variable
-    σ τ : Type
-    Γ Δ Θ : List Type
+    σ τ : I
+    Γ Δ Θ : List I
     A B : Set
 
 
 data Lam : Type ─Scoped where
-  `var : ∀[ Var σ ⇒ Lam σ ]
-  `app : ∀[ Lam (σ `→ τ) ⇒ Lam σ ⇒ Lam τ ]
-  `lam : ∀[ (σ ∷_) ⊢ Lam τ ⇒ Lam (σ `→ τ) ]
+  `var  : ∀[ Var σ ⇒ Lam σ ]
+  `app  : ∀[ Lam (σ `→ τ) ⇒ Lam σ ⇒ Lam τ ]
+  `lam  : ∀[ (σ ∷_) ⊢ Lam τ ⇒ Lam (σ `→ τ) ]
 
 module Renaming where
 
- ⟦var⟧ᵣ : ∀[ Var σ ⇒ Lam σ ]
- ⟦var⟧ᵣ = `var
+ varᵣ : ∀[ Var σ ⇒ Lam σ ]
+ varᵣ = `var
 
  extendᵣ : (Γ ─Env) Var Δ → (σ ∷ Γ ─Env) Var (σ ∷ Δ)
  extendᵣ ρ = s <$> ρ ∙ z
 
  ren : (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
- ren ρ (`var k)    = ⟦var⟧ᵣ (lookup ρ k)
+ ren ρ (`var k)    = varᵣ (lookup ρ k)
  ren ρ (`app f t)  = `app (ren ρ f) (ren ρ t)
  ren ρ (`lam b)    = `lam (ren (extendᵣ ρ) b)
 
@@ -45,11 +49,11 @@ module Substitution where
  extendₛ : (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
  extendₛ ρ = Renaming.ren E.extend <$> ρ ∙ `var z
 
- ⟦var⟧ₛ : ∀[ Lam σ ⇒ Lam σ ]
- ⟦var⟧ₛ x = x
+ varₛ : ∀[ Lam σ ⇒ Lam σ ]
+ varₛ x = x
 
  sub : (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
- sub ρ (`var k)    = ⟦var⟧ₛ (lookup ρ k)
+ sub ρ (`var k)    = varₛ (lookup ρ k)
  sub ρ (`app f t)  = `app (sub ρ f) (sub ρ t)
  sub ρ (`lam b)    = `lam (sub (extendₛ ρ) b)
 
@@ -76,52 +80,57 @@ module _ where
    extendₙ : Thinning Δ Θ → (Γ ─Env) Val Δ → Val σ Θ → (σ ∷ Γ ─Env) Val Θ
    extendₙ r ρ v = (λ {σ} v → th^Val σ v r) <$> ρ ∙ v
 
-   ⟦var⟧ₙ : Var σ Γ → ∀[ Val σ ⇒ Val σ ]
-   ⟦var⟧ₙ _ x = x
+   varₙ : Var σ Γ → ∀[ Val σ ⇒ Val σ ]
+   varₙ _ x = x
 
-   ⟦app⟧ₙ : Lam (σ `→ τ) Γ → ∀[ Val (σ `→ τ) ⇒ Val σ ⇒ Val τ ]
-   ⟦app⟧ₙ _ f t = f (pack id) t
+   appₙ : Lam (σ `→ τ) Γ → ∀[ Val (σ `→ τ) ⇒ Val σ ⇒ Val τ ]
+   appₙ _ f t = f (pack id) t
 
  nbe : (Γ ─Env) Val Δ → Lam σ Γ → Val σ Δ
- nbe ρ (`var k)    = ⟦var⟧ₙ k (lookup ρ k)
- nbe ρ (`app f t)  = ⟦app⟧ₙ f (nbe ρ f) (nbe ρ t)
+ nbe ρ (`var k)    = varₙ k (lookup ρ k)
+ nbe ρ (`app f t)  = appₙ f (nbe ρ f) (nbe ρ t)
  nbe ρ (`lam b)    = λ σ v → nbe (extendₙ σ ρ v) b
 
 record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
-  field  th^𝓥  : Thinnable (𝓥 σ)
-         ⟦var⟧ : ∀[ 𝓥 σ ⇒ 𝓒 σ ]
-         ⟦app⟧ : ∀[ 𝓒 (σ `→ τ) ⇒ 𝓒 σ ⇒ 𝓒 τ ]
-         ⟦lam⟧ : ∀[ □ (𝓥 σ ⇒ 𝓒 τ) ⇒ 𝓒 (σ `→ τ) ]
 
-  sem : (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
-  sem ρ (`var k)    = ⟦var⟧ (lookup ρ k)
-  sem ρ (`app f t)  = ⟦app⟧ (sem ρ f) (sem ρ t)
-  sem ρ (`lam b)    = ⟦lam⟧ (λ σ v → sem (extend σ ρ v) b)
+  field
 
-   where
+    th^𝓥  : Thinnable (𝓥 σ)
 
-   extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
-   extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
+    var   : ∀[ 𝓥 σ ⇒ 𝓒 σ ]
+
+    app   : ∀[ 𝓒 (σ `→ τ) ⇒ 𝓒 σ ⇒ 𝓒 τ ]
+
+    lam   : ∀[ □ (𝓥 σ ⇒ 𝓒 τ) ⇒ 𝓒 (σ `→ τ) ]
+
+  extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
+  extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
+
+  semantics : (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
+
+  semantics ρ (`var k)    = var (lookup ρ k)
+  semantics ρ (`app f t)  = app (semantics ρ f) (semantics ρ t)
+  semantics ρ (`lam b)    = lam (λ σ v → semantics (extend σ ρ v) b)
 
 Renaming : Semantics Var Lam
 Renaming = record
   { th^𝓥  = th^Var
-  ; ⟦var⟧ = `var
-  ; ⟦app⟧ = `app
-  ; ⟦lam⟧ = λ b → `lam (b (pack s) z) }
+  ; var   = `var
+  ; app   = `app
+  ; lam   = λ b → `lam (b (pack s) z) }
 
 ren : (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
-ren = Semantics.sem Renaming
+ren = Semantics.semantics Renaming
 
 Substitution : Semantics Lam Lam
 Substitution = record
    { th^𝓥  = λ t ρ → ren ρ t
-   ; ⟦var⟧ = id
-   ; ⟦app⟧ = `app
-   ; ⟦lam⟧ = λ b → `lam (b (pack s) (`var z)) }
+   ; var   = id
+   ; app   = `app
+   ; lam   = λ b → `lam (b (pack s) (`var z)) }
 
 sub : (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
-sub = Semantics.sem Substitution
+sub = Semantics.semantics Substitution
 
 open import Category.Monad.State
 open import Category.Applicative
@@ -131,15 +140,25 @@ open import Data.Product
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 module Printer where
- open RawMonadState (StateMonadState ℕ)
+ open import Codata.Stream as Stream using (Stream; _∷_; head; tail)
+ open RawMonadState (StateMonadState (Stream String _))
 
+ M : Set → Set
+ M = State (Stream String _)
 
- record Wrap (A : Set) (σ : Type) (Γ : List Type) : Set where
+ record Wrap (A : Set) (σ : I) (Γ : List I) : Set where
    constructor MkW; field getW : A
 
  open Wrap public
 
- th^Wrap : Thinnable (Wrap A σ)
+ Name : I ─Scoped
+ Name = Wrap String
+
+ Printer : I ─Scoped
+ Printer = Wrap (M String)
+
+
+ th^Wrap : Thinnable {I} (Wrap A σ)
  th^Wrap w ρ = MkW (getW w)
 
  map^Wrap : (A → B) → ∀[ Wrap A σ ⇒ Wrap B σ ]
@@ -147,26 +166,45 @@ module Printer where
 
  open E hiding (_>>_)
 
- fresh : ∀ σ → State ℕ (Wrap String σ (σ ∷ Γ))
- fresh σ = get >>= λ x → put (suc x) >> return (MkW (show x))
+ fresh : ∀ σ → M (Name σ (σ ∷ Γ))
+ fresh σ = do
+   names ← get
+   put (tail names)
+   pure (MkW (head names))
 
- Printing : Semantics (Wrap String) (Wrap (State ℕ String))
+ Printing : Semantics Name Printer
  Printing = record
    { th^𝓥  =  th^Wrap
-   ; ⟦var⟧ =  map^Wrap return
-   ; ⟦app⟧ =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
+   ; var   =  map^Wrap return
+   ; app   =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
               return $ f ++ "(" ++ t ++ ")"
-   ; ⟦lam⟧ =  λ {σ} mb → MkW $ fresh σ >>= λ x →
+   ; lam   =  λ {σ} mb → MkW $ fresh σ >>= λ x →
               getW (mb extend x) >>= λ b →
               return $ "λ" ++ getW x ++ "." ++ b }
+
+ open import Data.List.NonEmpty as List⁺ using (List⁺; _∷_)
+ open import Codata.Thunk using (force)
+ import Data.Nat.Show as NatShow
+
+ alphabetWithSuffix : String → List⁺ String
+ alphabetWithSuffix suffix = List⁺.map (λ c → fromList (c ∷ []) ++ suffix)
+                           $′ 'a' ∷ toList "bcdefghijklmnopqrstuvwxyz"
+
+ allNats : Stream ℕ _
+ allNats = Stream.iterate suc 0
+
+ names : Stream String _
+ names = Stream.concat
+       $′ Stream.map alphabetWithSuffix
+       $′ "" ∷ λ where .force → Stream.map NatShow.show allNats
 
 open Printer using (Printing)
 
 print : (σ : Type) → Lam σ [] → String
-print _ t = proj₁ $ Printer.getW (Semantics.sem Printing {Δ = []} (pack λ ()) t) 0
+print _ t = proj₁ $ Printer.getW (Semantics.semantics Printing {Δ = []} (pack λ ()) t) Printer.names
 
-_ : print (α `→ α) (`lam (`var z)) ≡ "λ0.0"
+_ : print (α `→ α) (`lam (`var z)) ≡ "λa.a"
 _ = refl
 
-_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λ0.λ1.0(0(1))"
+_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa.λb.a(a(b))"
 _ = refl

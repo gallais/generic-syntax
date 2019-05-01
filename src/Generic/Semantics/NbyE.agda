@@ -61,7 +61,7 @@ module _ {I : Set} {d : Desc I} where
  norm alg  = reify^Dm ∘ Semantics.semantics (nbe alg) (base vl^Dm)
 
  reify^Dm (V k) = just (`var k)
- reify^Dm (C v) = `con <$> sequenceA d (fmap d (λ Θ i → reify^Dm ∘ reify vl^Dm Θ i) v)
+ reify^Dm (C v) = `con <$> mapA d (λ Θ i → reify^Dm ∘ reify vl^Dm Θ i) v
  reify^Dm ⊥     = nothing
 
  Semantics.th^𝓥  (nbe alg) = th^Dm

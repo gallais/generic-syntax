@@ -1,104 +1,108 @@
 {-# OPTIONS --safe --sized-types #-}
 
-module Generic.Semantics.Printing where
+module Generic.Semantics.Printing {I : Set} where
 
+open import Codata.Stream using (Stream)
 open import Size
-open import Codata.Thunk using (Thunk; force)
-open import Codata.Stream using (Stream; _∷_; head; tail; map; concat; iterate)
-open import Data.Unit
-open import Data.Bool
-open import Data.Product using (_×_; _,_; proj₁)
-open import Data.Nat.Base
-open import Data.Nat.Show as Nat
-open import Data.List.Base using (List; []; _∷_)
-open import Data.List.NonEmpty as List⁺ using (List⁺; _∷_)
-open import Data.Char using (Char)
-open import Data.String using (String ; _++_ ; toList; fromList)
+open import Data.Product
+open import Data.List.Base using (List; []; _∷_; _++_)
+open import Data.String using (String)
 open import Category.Monad
 open import Category.Monad.State
 open import Function
+open import Relation.Unary
 
-module ST = RawMonadState (StateMonadState (Stream String ∞))
+-- We reuse Name, Printer, M, fresh, and names from the STLC printing example
 
-M = State (Stream String ∞)
+open import StateOfTheArt.ACMM using (module Printer)
+open Printer using (M; Wrap; Name; Printer; MkW; getW; map^Wrap; th^Wrap; fresh; names)
 
-instance
- _ = ST.rawIApplicative
+private
+  variable
+    Γ Δ : List I
+    σ : I
+    i : Size
 
-open import Data.Var hiding (get)
-open import Data.Environment as E
+-- The Printing Monad we are working with: a state containing a stream
+-- of *distinct* Strings.
+module ST = RawMonadState (StateMonadState (Stream String _))
+open ST renaming (rawIApplicative to ApplicativeM)
+        hiding (_<$>_)
+
+open import Data.Var hiding (get; _<$>_)
+open import Data.Environment hiding (_>>_; sequenceA; _<$>_)
 open import Data.Var.Varlike
-open import Generic.Syntax as S
+open import Generic.Syntax hiding (sequenceA)
 open import Generic.Semantics
 
-module _ {I : Set} where
 
- record Name (i : I) (Γ : List I) : Set where
-   constructor mkN; field getN : String
+vl^MName : VarLike {I} (λ σ → M ∘ (Name σ))
+vl^MName = record
+  { th^𝓥  = th^Functor functor^M th^Wrap
+  ; new   = fresh _
+  }
 
- record Printer (i : I) (Γ : List I) : Set where
-   constructor mkP; field getP : M String
+    where open ST renaming (rawFunctor to functor^M)
 
-open Name
-open Printer
-
-module _ {I : Set} where
-
- fresh : {i : I} {Γ : List I} → M (Name i Γ)
- fresh =  get             >>=  λ nms  →
-          put (tail nms)  >>=  λ _    →
-          return $ mkN $ head nms
-   where open ST
-
-module _ {I : Set} (d : Desc I) where
-
- Pieces : List I → I ─Scoped
- Pieces []  i Γ = String
- Pieces Δ   i Γ = (Δ ─Env) (λ _ _ → String) [] × String
-
- record Display : Set where
-   constructor mkD
-   field getD : ∀ {i Γ} → ⟦ d ⟧ Pieces i Γ → String
-
-open Display public
-
-module _ {I : Set} {d : Desc I} where
-
- printing : Display d → Semantics d Name Printer
- printing dis = record
-   { th^𝓥  = λ n _ → mkN (getN n)
-   ; var   = λ n → mkP (return (getN n))
-   ; alg   = λ {i} {Γ} v → mkP
-           $ let p : M (⟦ d ⟧ (Pieces d) i Γ)
-                 p = S.sequenceA d (fmap d reify^M v)
-             in getD dis ST.<$> p
-   } where
-   open ST
-
-   vl^StName : VarLike {I} (λ i Γ → M (Name i Γ))
-   vl^StName = record
-     { new   = fresh
-     ; th^𝓥  = λ st _ → mkN ∘ getN ST.<$> st }
-
-   reify^M : {Γ : List I} (Δ : List I) (i : I) →
-             Kripke Name Printer Δ i Γ →
-             M (Pieces d Δ i Γ)
-   reify^M []         i = getP
-   reify^M Δ@(_ ∷ _)  i = λ f → let open ST in do
-     let σ = freshˡ vl^StName _
-     ρ ← E.sequenceA σ
-     b ← getP (f (freshʳ vl^Var Δ) ρ)
-     return ((getN E.<$> ρ) , b)
+-- To print a term the user need to explain to us how to display one
+-- layer of term given that the newly-bound variables have been assigned
+-- fresh names and the subterms have already been rendered using these
+-- names.
 
 
- print : Display d → {i : I} → Tm d ∞ i [] → String
- print dis t = proj₁ $ getP (Semantics.closed (printing dis) t) names where
+Pieces : List I → I ─Scoped
+Pieces []  i Γ = String
+Pieces Δ   i Γ = (Δ ─Env) Name (Δ ++ Γ) × String
 
-  letters : List⁺ String
-  letters = List⁺.map (fromList ∘ (_∷ []))
-          $ 'a' ∷ toList "bcdefghijklmnopqrst"
+reify^M : ∀ Δ i → Kripke Name Printer Δ i Γ → M (Pieces Δ i Γ)
 
-  names : Stream String ∞
-  names = concat
-        $ map (λ suff → List⁺.map (_++ suff) letters)
-        $ "" ∷ λ where .force → map show (iterate suc zero)
+reify^M []         i p  = getW p
+
+reify^M Δ@(_ ∷ _)  i f  = do
+  ρ ← sequenceA (freshˡ vl^MName _)
+  b ← getW (f (freshʳ vl^Var Δ) ρ)
+  return (ρ , b)
+
+  where open Data.Environment
+        instance _ = ApplicativeM
+
+
+Display : Desc I → Set
+Display d = ∀ {i Γ} → ⟦ d ⟧ Pieces i Γ → String
+
+
+---------------------------------------------------------------------
+-- Generic Printing Semantics
+
+-- Given a strategy to `Display` one layer of term we can generate a full
+-- printer.
+
+open Semantics
+
+module _ {d : Desc I} where
+
+
+  Printing : Display d → Semantics d Name Printer
+  Printing dis .th^𝓥  = th^Wrap
+  Printing dis .var   = map^Wrap return
+  Printing dis .alg   = λ v → MkW $ dis <$> mapA d reify^M v
+
+    where open Generic.Syntax
+          open ST
+          instance _ = ApplicativeM
+
+-- Corollary: a generic printer using a silly name supply
+
+
+  open Data.Environment
+  instance _ = ApplicativeM
+
+
+  print : Display d → Tm d i σ Γ → String
+
+  print dis t = proj₁ (printer names) where
+    printer : M String
+    printer = do
+      init ← sequenceA (base vl^MName)
+      getW (Semantics.semantics (Printing dis) init t)
+

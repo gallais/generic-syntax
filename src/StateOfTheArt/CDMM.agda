@@ -79,13 +79,10 @@ listD A =  `σ Bool $ λ isNil →
 List : Set → Set
 List A = μ (listD A) ∞ tt
 
-[] : μ (listD A) ∞ tt
-[] = `con (true , refl)
-
 infixr 10 _∷_
 
-_∷_ : A → List A → List A
-x ∷ xs = `con (false , x , xs , refl)
+pattern []       = `con (true , refl)
+pattern _∷_ x xs = `con (false , x , xs , refl)
 
 example : List (List Bool)
 example = (false ∷ []) ∷ (true ∷ []) ∷ []
@@ -99,11 +96,9 @@ Vec : Set → ℕ → Set
 Vec A = μ (vecD A) ∞
 
 foldr : (A → B → B) → B → List A → B
-foldr {A} {B} c n = fold (listD A) alg where
-
-  alg : ⟦ listD A ⟧ (const B) tt → B
-  alg (true             , refl)  = n
-  alg (false , hd , rec , refl)  = c hd rec
+foldr c n = fold (listD _) $ λ where
+  (true              , refl) → n
+  (false , hd , rec  , refl) → c hd rec
 
 _++_ : List A  → List A → List A
 _++_ = foldr (λ hd rec → hd ∷_ ∘ rec) id

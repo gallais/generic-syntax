@@ -6,6 +6,7 @@ open import Size
 open import Data.List.Base as L hiding (lookup ; [_])
 
 open import Data.Var hiding (z; s)
+open import Data.Var.Varlike using (VarLike; base)
 open import Data.Relation
 open import Relation.Unary
 open import Data.Environment
@@ -25,7 +26,8 @@ module _  {d : Desc I} where
   _─Comp : List I → I ─Scoped → List I → Set
   (Γ ─Comp) 𝓒 Δ = ∀ {s σ} → Tm d s σ Γ → 𝓒 σ Δ
 
-  module DISPLAYONLY where
+  private
+   module DISPLAYONLY where
 
    record Semantics (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
      field th^𝓥  : Thinnable (𝓥 σ)
@@ -54,3 +56,6 @@ record Semantics (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
 
  closed : TM d σ → 𝓒 σ []
  closed = semantics ε
+
+ eval : VarLike 𝓥 → ∀[ Tm d s σ ⇒ 𝓒 σ ]
+ eval vl^𝓥 = semantics (base vl^𝓥)

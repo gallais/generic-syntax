@@ -6,6 +6,7 @@ open import Data.Nat.Base as ℕ
 open import Data.List.Base hiding (lookup ; [_])
 open import Data.Sum as S
 open import Function
+open import Category.Functor
 open import Relation.Unary
 open import Relation.Binary.PropositionalEquality as PEq hiding ([_])
 
@@ -19,6 +20,7 @@ private
     T : List I → Set
     𝓥 𝓦 𝓒 : I ─Scoped
     Γ Δ Θ : List I
+    F : Set → Set
 
 infix 3 _─Env
 
@@ -137,6 +139,10 @@ th^□ = duplicate
 
 th^const : Thinnable {I} (const A)
 th^const a _ = a
+
+th^Functor : RawFunctor F → Thinnable T → Thinnable (F ∘ T)
+th^Functor F th^T ft ρ = (λ t → th^T t ρ) F.<$> ft
+  where module F = RawFunctor F
 
 Kripke : (𝓥 𝓒 : I ─Scoped) → (List I → I ─Scoped)
 Kripke 𝓥 𝓒 []  j = 𝓒 j
