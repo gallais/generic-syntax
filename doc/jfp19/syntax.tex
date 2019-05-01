@@ -1121,16 +1121,29 @@ strings as our name supply.
 \paragraph{Untyped λ-calculus} Defining a printer for the untyped
 λ-calculus is now very easy: we define a \AF{Display} by case analysis.
 In the application case, we combine the string representation of the
-function and wrap its argument between parentheses. In the lambda
-abstraction case, we are handed the name the bound variable was assigned
-together with the body's representation.
+function, wrap its argument's representation between parentheses and
+concatenate the two together. In the lambda abstraction case, we are
+handed the name the bound variable was assigned together with the body's
+representation; it is once more a matter of putting the \AF{Pieces}
+together.
 
 \ExecuteMetaData[Generic/Examples/Printing.tex]{printUTLC}
 
+As always, these functions are readily executable and we can check
+their behaviour by writing tests. First, we print the identity function
+in an empty context and verify that we do obtain the string \AStr{"λa. a"}.
+Next, we print an open term in a context of size two and can immediately
+observe that names are generated for the free variables first, and then the
+expression itself is printed.
+
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Examples/Printing.tex]{printid}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Examples/Printing.tex]{printopen}
+\end{minipage}
 
 
-\ExecuteMetaData[Generic/Examples/Printing.tex]{printid}
-\ExecuteMetaData[Generic/Examples/Printing.tex]{printopen}
 
 
 \subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}
