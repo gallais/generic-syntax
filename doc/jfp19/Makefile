@@ -10,6 +10,7 @@ AGDA_FILES:=\
   Generic/Cofinite.lagda \
   Generic/Examples/Colist.lagda \
   Generic/Syntax/LetBinder.lagda \
+  Generic/Syntax/LetCounter.lagda \
   Generic/Semantics/NbyE.lagda \
   Generic/Examples/NbyE.lagda \
   Generic/Syntax/STLC.lagda \
@@ -23,6 +24,7 @@ AGDA_FILES:=\
   Generic/Semantics/Printing.lagda \
   Generic/Examples/Printing.lagda \
   Generic/Semantics/Elaboration/LetBinder.lagda \
+  Generic/Semantics/Elaboration/LetCounter.lagda \
   Generic/Simulation.lagda \
   Generic/Simulation/Syntactic.lagda \
   Generic/Syntax.lagda \

@@ -1290,6 +1290,26 @@ this setup could be a good candidate to implement generic compilation
 passes and could deal with a framework using a wealth of slightly
 different intermediate languages à la Nanopass~\cite{Keep:2013:NFC:2544174.2500618}.
 
+\subsection{Reference Couting and Inlining as a Semantics}\label{section:inlining}
+
+Although useful in its own right, desugaring all let bindings can lead
+to an exponential blow-up in code size. Compilers passes typically try
+to maintain sharing by only inlining let-bound expressions which appear
+at most one time: unused expressions are eliminated as dead code whilst
+expressions used exactly one time can be inlined to open up opportunities
+for additional optimisations.
+
+As we will see shortly, we can implement reference counting and size
+respecting let-inlining as a generic transformation over all syntaxes
+with binding equipped with let binders. But first, we need to look at
+an example demonstrating that this is a rather subtle matter.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetCounter.tex]{}
+\end{figure}
+
+
+
 \subsection{(Unsafe) Normalisation by Evaluation}\label{section:nbyeval}
 
 A key type of traversal we have not studied yet is a language's
