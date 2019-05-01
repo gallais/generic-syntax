@@ -16,7 +16,7 @@ open import Function
 open import Data.Var
 open import Generic.Syntax
 
-import Generic.Syntax.LetBinder as LetBinder
+open import Generic.Syntax.LetBinder using (Let)
 
 data Counter : Set where
   zero : Counter
@@ -54,15 +54,15 @@ module _ {I : Set} where
 
 module _ {I : Set} where
 
-  Let : Desc I
-  Let = `σ Counter $ λ _ → LetBinder.Let
+  CLet : Desc I
+  CLet = `σ Counter $ λ _ → Let
 
 pattern `IN' e t = (_ , e , t , refl)
 pattern `IN  e t = `con (`IN' e t)
 
 module _ {I : Set} {d : Desc I} where
 
-  embed : ∀ {i σ} → ∀[ Tm d i σ ⇒ Tm (d `+ Let) i σ ]
+  embed : ∀ {i σ} → ∀[ Tm d i σ ⇒ Tm (d `+ CLet) i σ ]
   embed = map^Tm (MkDescMorphism (true ,_))
 
 \end{code}
