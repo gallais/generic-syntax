@@ -6,19 +6,19 @@ open import Relation.Binary.PropositionalEquality
 
 open import Generic.Syntax
 
-module Generic.Scopecheck
-       {E I : Set} {d : Desc I} (I-dec : Decidable {A = I} _≡_) where
+module Generic.Scopecheck {E I : Set} (I-dec : Decidable {A = I} _≡_) where
 
 open import Category.Monad
 
 open import Level
 open import Size
-open import Data.List.Base using (List; []; _∷_; _++_)
+open import Data.List.Base using (List; []; _∷_)
 open import Data.List.Relation.Unary.All using (All; []; _∷_)
-open import Data.List.Relation.Unary.All.Properties using (++⁺)
+open import Data.List.Relation.Unary.All.Properties
+  using () renaming (++⁺ to _++_)
 
 open import Data.Product
-open import Data.String as String using (String)
+open import Data.String using (String; _≟_)
 open import Data.Sum
 import Data.Sum.Categorical.Left as SC
 open import Function
@@ -32,38 +32,88 @@ private
     Γ Δ : List I
     i : Size
 
+\end{code}
+%<*names>
+\begin{code}
 Names : List I → Set
 Names = All (const String)
-
+\end{code}
+%</names>
+%<*withnames>
+\begin{code}
 WithNames : (I → Set) → List I → I ─Scoped
 WithNames T []  j Γ = T j
 WithNames T Δ   j Γ = Names Δ × T j
+\end{code}
+%</withnames>
+%<*raw>
+\begin{code}
+data Raw (d : Desc I) : Size → I → Set where
+  `var : E → String → Raw d (↑ i) σ
+  `con : ⟦ d ⟧ (WithNames (Raw d i)) σ [] → Raw d (↑ i) σ
+\end{code}
+%</raw>
+\begin{code}
 
-data Raw : Size → I → Set where
-  `var : E → String → Raw (↑ i) σ
-  `con : ⟦ d ⟧ (WithNames (Raw i)) σ [] → Raw (↑ i) σ
+\end{code}
+%<*error>
+\begin{code}
+data Error : Set where
+  OutOfScope  : Error
+  WrongSort   : (σ τ : I) → σ ≢ τ → Error
+\end{code}
+%</error>
+\begin{code}
 
 private
-  M : Set → Set
-  M = (E × String) ⊎_
-open RawMonad (SC.monad (E × String) zero)
+\end{code}
+%<*monad>
+\begin{code}
+ M : Set → Set
+ M A = (Error × E × String) ⊎ A
+\end{code}
+%</monad>
+\begin{code}
+
+open RawMonad (SC.monad (Error × E × String) zero)
 
 instance _ =  rawIApplicative
 
-var : E → String → ∀ σ Γ → Names Γ → M (Var σ Γ)
-var e str σ []       []         = inj₁ (e , str)
-var e str σ (τ ∷ Γ)  (nm ∷ scp) with nm String.≟ str
-... | no ¬p = s <$> var e str σ Γ scp
-... | yes p with I-dec σ τ
-... | no ¬eq   = inj₁ (e , str)
-... | yes refl = inj₂ z
-
-toTm     : Names Γ → Raw i σ → M (Tm d i σ Γ)
-toScope  : Names Γ → ∀ Δ σ → WithNames (Raw i) Δ σ [] → M (Scope (Tm d i) Δ σ Γ)
-
-toTm scp (`var e v) = `var <$> var e v _ _ scp
-toTm scp (`con b)   = `con <$> mapA d (toScope scp) b
-
-toScope scp []        σ b         = toTm scp b
-toScope scp Δ@(_ ∷ _) σ (nms , b) = toTm (++⁺ nms scp) b
 \end{code}
+%<*toVar>
+\begin{code}
+toVar : E → String → ∀ σ Γ → Names Γ → M (Var σ Γ)
+toVar e x σ [] [] = inj₁ (OutOfScope , e , x)
+toVar e x σ (τ ∷ Γ) (y ∷ scp) with x ≟ y | I-dec σ τ
+... | yes _  | yes refl  = inj₂ z
+... | no ¬p  | _         = s <$> toVar e x σ Γ scp
+... | yes _  | no ¬eq    = inj₁ (WrongSort σ τ ¬eq , e , x)
+\end{code}
+%</toVar>
+\begin{code}
+module _ {d : Desc I} where
+\end{code}
+%<*scopechecktype>
+\begin{AgdaAlign}
+\begin{AgdaSuppressSpace}
+%<*totmtype>
+\begin{code}
+ toTm     : Names Γ → Raw d i σ → M (Tm d i σ Γ)
+\end{code}
+%</totmtype>
+\begin{code}
+ toScope  : Names Γ → ∀ Δ σ → WithNames (Raw d i) Δ σ [] → M (Scope (Tm d i) Δ σ Γ)
+\end{code}
+\end{AgdaSuppressSpace}
+\end{AgdaAlign}
+%</scopechecktype>
+
+%<*scopecheck>
+\begin{code}
+ toTm scp (`var e v)  = `var <$> toVar e v _ _ scp
+ toTm scp (`con b)    = `con <$> mapA d (toScope scp) b
+
+ toScope scp []         σ b          = toTm scp b
+ toScope scp Δ@(_ ∷ _)  σ (bnd , b)  = toTm (bnd ++ scp) b
+\end{code}
+%</scopecheck>

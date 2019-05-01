@@ -1114,7 +1114,7 @@ strings as our name supply.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{print}
-\caption{}\label{fig:genericprint}
+\caption{Generic Printer for Open Terms}\label{fig:genericprint}
 \end{figure}
 
 
@@ -1144,6 +1144,77 @@ expression itself is printed.
 \end{minipage}
 
 
+\subsection{Writing a Generic Scope Checker}\label{section:genericscoping}
+
+Converting terms in the internal syntax to strings which can in turn be
+displayed in a terminal or an editor window is only part of a compiler's
+interactive loop. The other direction takes strings as inputs and attempts to
+produce terms in the internal syntax. The first step is to parse the input
+strings into structured data, the second is to perform scope checking,
+and the third step consist in type checking terms in the well scoped syntax.
+
+Parsing is currently out of scope for our library; users can write safe
+ad-hoc parsers for their object language by either using a library of total
+parser combinators~\cite{DBLP:conf/icfp/Danielsson10,allais2018agdarsec}
+or invoking a parser generator oracle whose target is a total
+language~\cite{Stump:2016:VFP:2841316}. As we will see shortly, we can
+write a generic scope checker transforming terms in a raw syntax where
+variables are represented as strings into a well scoped syntax. We will
+come back to typechecking with a concrete example in section~\ref{section:typechecking}
+and then discuss related future work in the conclusion.
+
+Our scope checker will be a function taking two explicit arguments: a name for
+each variable in scope \AB{Γ}, a raw term for a syntax description \AB{d} and
+either fail or return a well scoped and sorted term for that description.
+
+\ExecuteMetaData[Generic/Scopecheck.tex]{totmtype}
+
+We can obtain \AF{Names} by reusing the standard library's \AF{All}, a predicate
+transformer making sure a predicate holds of all the element of a list. The
+definition of \AF{WithNames} is analogous to \AF{Pieces} in the previous section:
+we expect \AF{Names} for the newly bound variables. Terms in the raw syntax are
+leveraging these definitions: they are either a variable i.e. a \AD{String}
+potentially accompanied by some extra information \AB{E} (typically a position in
+a file) or a ``layer'' of raw term where subterms are raw terms with names for the
+newly-bound variables.
+
+\begin{figure}[h]
+\begin{minipage}{0.35\textwidth}
+  \ExecuteMetaData[Generic/Scopecheck.tex]{names}
+\end{minipage}
+\begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[Generic/Scopecheck.tex]{withnames}
+\end{minipage}
+\ExecuteMetaData[Generic/Scopecheck.tex]{raw}
+\caption{Names and Raw Terms}
+\end{figure}
+
+Various things can go wrong during scope checking: evidently a name can
+be out of scope but it is also possible that it may be associated to a
+variable of the wrong sort. We define an enumerating type covering these
+two cases. The scope checker will return a computation in the monad \AF{M}
+thus allowing us to fail and return an error, the string that caused the
+failure and the extra data of type \AB{E} that accompanied it.
+
+\begin{figure}[h]
+\begin{minipage}{0.5\textwidth}
+  \ExecuteMetaData[Generic/Scopecheck.tex]{error}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+  \ExecuteMetaData[Generic/Scopecheck.tex]{monad}
+\end{minipage}
+\caption{Error Type and Scope Checking Monad}
+\end{figure}
+
+
+
+\ExecuteMetaData[Generic/Scopecheck.tex]{toVar}
+
+
+\ExecuteMetaData[Generic/Scopecheck.tex]{scopechecktype}
+
+
+\ExecuteMetaData[Generic/Scopecheck.tex]{scopecheck}
 
 
 \subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}

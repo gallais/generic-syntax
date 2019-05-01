@@ -5,6 +5,7 @@ all: latex/$(PAPER).pdf
 AGDA_FILES:=\
   Stdlib.lagda \
   Data/Environment.lagda \
+  Generic/Scopecheck.lagda \
   Generic/Bisimilar.lagda \
   Generic/Cofinite.lagda \
   Generic/Examples/Colist.lagda \
