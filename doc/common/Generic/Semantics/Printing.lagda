@@ -109,7 +109,7 @@ module _ {d : Desc I} where
   Printing : Display d → Semantics d Name Printer
   Printing dis .th^𝓥  = th^Wrap
   Printing dis .var   = map^Wrap return
-  Printing dis .alg   = λ v → MkW $ dis <$> sequenceA d (fmap d reify^M v)
+  Printing dis .alg   = λ v → MkW $ dis <$> mapA d reify^M v
 \end{code}
 %</printing>
 \begin{code}
