@@ -5,10 +5,10 @@
 module Generic.Syntax.LetCounter where
 
 open import Algebra
+open import Algebra.Structures
 open import Data.Bool
-open import Data.Product
 open import Data.List.Relation.Unary.All as All
-open import Data.Product
+open import Data.Product using (_×_; _,_)
 open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Relation.Unary
@@ -73,9 +73,8 @@ many  * many  = many
 \end{code}
 %</multiplication>
 
-
-
 \begin{code}
+
 module _ {I : Set} where
 
   private
@@ -92,7 +91,8 @@ module _ {I : Set} where
 %<*zeros>
 \begin{code}
   zeros : ∀[ Count ]
-  zeros = tabulate (λ _ → zero)
+  zeros {[]}     = []
+  zeros {σ ∷ Γ}  = zero ∷ zeros
 \end{code}
 %</zeros>
 %<*fromVar>
@@ -109,18 +109,30 @@ module _ {I : Set} where
 \begin{code}
   merge : ∀[ Count ⇒ Count ⇒ Count ]
   merge []        []        = []
-  merge (m ∷ cs)  (n ∷ ds)  = (m + n) ∷ merge cs ds
+  merge (m ∷ cs)  (n ∷ ds)  =
+    (m + n) ∷ merge cs ds
 \end{code}
 %</merge>
 \begin{code}
 
+\end{code}
+%<*control>
+\begin{code}
+  control : Counter → ∀[ Count ⇒ Count ]
+  control zero  cs = zeros
+  control one   cs = cs -- inlined
+  control many  cs = cs -- not inlined
+\end{code}
+%</control>
+\begin{code}
 
 \end{code}
 %<*scale>
 \begin{code}
   scale : Counter → ∀[ Count ⇒ Count ]
-  scale one  cs = cs
-  scale k    cs = All.map (k *_) cs
+  scale zero  cs = zeros
+  scale one   cs = cs
+  scale k     cs = map (k *_) cs
 \end{code}
 %</scale>
 \begin{code}

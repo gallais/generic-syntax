@@ -1281,13 +1281,19 @@ of the semantics can be defined by parts thanks to \AF{case} defined in
 Section~\ref{desccomb}: the old constructors are kept the same by interpreting
 them using the generic \AF{Substitution} algebra;
 whilst the let-binder precisely provides the extra value to be added to the
-environment. The process of removing let binders is kickstarted with a
-placeholder environment associating each variable to itself.
+environment.
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unletcode}
+\caption{Desugaring as a \AR{Semantics}}
+\end{figure}
+
+The process of removing let binders is kickstarted with a placeholder
+environment associating each variable to itself.
+
+\begin{figure}[h]
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unlet}
-\caption{Inlining Let Binding}
+\caption{Specialising \AF{semantics} with an environment of placeholder values}
 \end{figure}
 
 In less than 10 lines of code we have defined a generic extension of
@@ -1326,44 +1332,148 @@ work. That is to say that the contribution of the expression bound to
 \AB{y} in the overall count depends directly on whether \AB{y} itself
 appears free in the body of the let binding it.
 
-\begin{figure}[h]
+%\begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{cheap}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{expensive}
 \end{minipage}
-\end{figure}
+%\end{figure}
 
 Our transformation will consist of two passes: the first one will annotate
-the tree with accurate count information precisely recording whether let-bound
-variables are used \AIC{zero}, \AIC{one}, or \AIC{many} times. This annotation
-process can be described as a variation on the \AF{Let} syntax extension of
-Section~\ref{section:letbinding}, producing a {(\AB{d} \AF{`+} \AF{CLet})} term
-from a {(\AB{d} \AF{`+} \AF{Let})} one.
+the tree with accurate count information precisely recording whether
+let-bound variables are used \AIC{zero}, \AIC{one}, or \AIC{many} times.
+The second one will inline precisely the let-binders whose variable is
+used at most once.
+
+During the counting phase we need to be particularly careful not to overestimate
+the contribution of a let-bound expression. If the let-bound variable is not used
+then we can naturally safely ignore the associated count. But if it used \AIC{many}
+times then we know we will not inline this let-binding and the count should
+therefore only contribute once to the running total. We define the \AF{control}
+combinator in Figure~\ref{fig:combinatorscount} precisely to explicitly handle this
+subtle case.
+
+The first step is to introduce the \AD{Counter} additive monoid. Addition will
+allow us to combine counts coming from different subterms: if any of the two
+counters is \AIC{zero} then we return the other, otherwise we know we have
+\AIC{many} occurences.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{counter}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{clet}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{addition}
 \end{minipage}
-\caption{Counters and Counted Lets}
+\caption{The (\AD{Counter}, \AIC{zero}, \AF{\_+\_}) additive monoid}
 \end{figure}
+
+The annotation process can be described as a variation on the \AF{Let} syntax
+extension of Section~\ref{section:letbinding}, attaching a \AD{Counter} to
+each \AF{Let} node. That is to say, a function computing a
+{(\AB{d} \AF{`+} \AF{CLet})} term from a {(\AB{d} \AF{`+} \AF{Let})} one.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{clet}
+\caption{Counted Lets}
+\end{figure}
+
+We keep a tally of the usage information for the variables in scope. This
+allows us to know which \AD{Counter} to attach to each \AF{Let} node.
+Following the same strategy as in Section~\ref{section:genericscoping},
+we use the standard library's \AD{All} to represent this mapping. We say
+that a scoped value has been \AF{Counted} if it is paired with a \AD{Count}.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{count}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
-  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{zeros}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetCounter.tex]{counted}
 \end{minipage}
+\caption{Counting i.e. Associating a \AD{Counter} to each \AD{Var} in scope.}
 \end{figure}
 
-\ExecuteMetaData[Generic/Syntax/LetCounter.tex]{fromVar}
+The two most basic counts are described in Figure~\ref{fig:basiccount}: the
+empty one is \AIC{zero} everywhere and the one corresponding to a single use
+of a single variable \AB{v} which is \AIC{zero} everywhere except for \AB{v}
+where it's \AIC{one}.
 
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{zeros}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{fromVar}
+\end{minipage}
+\caption{Zero Count and Count of One for a Specific Variable}\label{fig:basiccount}
+\end{figure}
 
+When we collect usage information from different subterms, we need to put the
+various counts together. The combinators in Figure~\ref{fig:combinatorscount}
+allow us to easily do so: \AF{merge} adds up two counts in a pointwise manner
+while \AF{control} uses one \AD{Counter} to decide whether to erase an existing
+\AD{Count}. This is particularly convenient when computing the contribution of
+a let-bound expression to the total tally: the contribution of the let-bound
+expression will only matter if the corresponding variable is actually used.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{merge}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{control}
+\end{minipage}
+\caption{Combinators to Compute \AD{Count}s}\label{fig:combinatorscount}
+\end{figure}
+
+We can now focus on the core of the elaboration phase. We define a
+\AR{Semantics} whose values are variables themselves and computations
+are the pairing of a term in {(\AB{d} \AF{`+} \AF{CLet})} together with
+a \AF{Count}. The variable case is trivial: provided a variable \AB{v},
+we return {(\AIC{`var} \AB{v})} together with the count {(\AF{fromVar} \AB{v})}.
+
+The non-let case is purely structural: we reify the \AF{Kripke} function
+space and obtain a scope together with the corresponding \AF{Count}. We
+unceremoniously \AF{drop} the \AD{Counter}s associated to the variables
+bound in this subterm and return the scope together with the tally for
+the ambient context.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetCounter.tex]{reifycount}
+  \caption{Purely Structural Case}
+\end{figure}
+
+The \AF{Let}-to-\AF{CLet} case in Figure~\ref{fig:lettoclet} is the most
+interesting one. We start by reifying the \AB{body} of the let binder which
+gives us a tally \AB{cx} for the bound variable and \AB{ct} for the body's
+contribution to the ambient environment's \AD{Count}. We annotate the node
+with \AB{cx} and use it as a \AF{control} to decide whether we are going to
+merge any of the let-bound's expression contribution \AB{ce} to form the
+overall tally.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetCounter.tex]{letcount}
+  \caption{Annotating Let Binders}\label{fig:lettoclet}
+\end{figure}
+
+Putting all of these things together we obtain the \AR{Semantics} \AF{Annotate}
+which we promptly specialise using an environment of placeholder value to
+obtain the traversal \AF{annotate} elaborating raw let-binders into counted
+ones.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetCounter.tex]{annotate}
+\caption{Specialising \AR{semantics} to obtain an annotation function}
+\end{figure}
+
+Using techniques similar to the ones described in Section~\ref{section:letbinding},
+we can write an \AF{Inline} semantics working on {(\AB{d} \AF{`+} \AF{CLet})} terms
+and producing {(\AB{d} \AF{`+} \AF{Let})} ones. We make sure to preserve all the
+let-binders annotated with \AIC{many} and to inline all the other ones. By composing
+\AF{Annotate} with \AF{Inline} we obtain a size-preserving generic optimisation pass.
 
 \subsection{(Unsafe) Normalisation by Evaluation}\label{section:nbyeval}
 
@@ -1410,7 +1520,6 @@ the various constructors because there is no way for us to
 know what the binders are supposed to represent: they may
 stand for λ-abstractions, $\Sigma$-types, fixpoints, or
 anything else.
-
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics/NbyE.tex]{nbe-setup}

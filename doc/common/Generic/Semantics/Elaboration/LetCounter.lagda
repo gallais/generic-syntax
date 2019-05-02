@@ -11,9 +11,9 @@ open import Agda.Builtin.Equality
 open import Agda.Builtin.Bool
 open import Data.Product
 import Data.Product.Categorical.Right as PC
-open import Data.List.Base
+open import Data.List.Base using (List; []; _∷_)
 open import Data.List.Relation.Unary.All as All using (All; _∷_)
-open import Data.List.Relation.Unary.All.Properties
+open import Data.List.Relation.Unary.All.Properties renaming (++⁻ʳ to drop)
 open import Function
 
 open import Data.Var
@@ -44,34 +44,44 @@ Counted T i Γ = T i Γ × Count Γ
 reify^Count :  ∀ Δ σ →
   Kripke Var (Counted (Tm (d `+ CLet) ∞)) Δ σ Γ →
   Counted (Scope (Tm (d `+ CLet) ∞) Δ) σ Γ
-reify^Count Δ σ kr =  let (scp , c) = reify vl^Var Δ σ kr in
-                      scp , ++⁻ʳ Δ c
+reify^Count Δ σ kr = let (scp , c) = reify vl^Var Δ σ kr in scp , drop Δ c
 \end{code}
 %</reifycount>
 %<*letcount>
 \begin{code}
-letcount : ⟦ Let ⟧ (Kripke Var (Counted (Tm (d `+ CLet) ∞))) σ Γ →
-           Counted (⟦ CLet ⟧ (Scope (Tm (d `+ CLet) ∞))) σ Γ
-letcount (στ , (e , ce) , tct , eq) = case tct extend (ε ∙ z) of λ where
-  (t , cx ∷ ct) →  (cx , στ , e , t , eq) , merge (scale cx ce) ct
+clet :  ⟦ Let ⟧ (Kripke Var (Counted (Tm (d `+ CLet) ∞))) σ Γ →
+        Counted (⟦ CLet ⟧ (Scope (Tm (d `+ CLet) ∞))) σ Γ
+clet (στ , (e , ce) , body , eq) = case body extend (ε ∙ z) of λ where
+  (t , cx ∷ ct) →  (cx , στ , e , t , eq) , merge (control cx ce) ct
 \end{code}
 %</letcount>
 
+%<*Annotate>
 \begin{code}
-LetCount : Semantics (d `+ Let) Var (Counted (Tm (d `+ CLet) ∞))
-Semantics.th^𝓥  LetCount = th^Var
-Semantics.var    LetCount = λ v → `var v , fromVar v
-Semantics.alg    LetCount = λ where
+Annotate : Semantics (d `+ Let) Var (Counted (Tm (d `+ CLet) ∞))
+Semantics.th^𝓥   Annotate = th^Var
+Semantics.var    Annotate = λ v → `var v , fromVar v
+Semantics.alg    Annotate = λ where
   (true , t)    → let (t' , c)   = mapA d reify^Count t in `con (true , t') , c
-  (false , et)  → let (et' , c)  = letcount et in `con (false , et') , c
+  (false , et)  → let (et' , c)  = clet et in `con (false , et') , c
 \end{code}
+%</Annotate>
+
+%<*annotate>
+\begin{AgdaAlign}
+\begin{AgdaSuppressSpace}
 %<*annotatetype>
 \begin{code}
 annotate : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ CLet) ∞ σ Γ
 \end{code}
 %</annotatetype>
 \begin{code}
-annotate = proj₁ ∘′ Semantics.semantics LetCount (base vl^Var)
+annotate = proj₁ ∘′ Semantics.semantics Annotate (base vl^Var)
+\end{code}
+\end{AgdaSuppressSpace}
+\end{AgdaAlign}
+%</annotate>
+\begin{code}
 
 Inline : Semantics (d `+ CLet) (Tm (d `+ Let) ∞) (Tm (d `+ Let) ∞)
 Semantics.th^𝓥 Inline = th^Tm
