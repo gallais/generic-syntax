@@ -36,7 +36,6 @@
    University of Edinburgh (UK)
   }
 
-\bibliographystyle{jfp}
 \begin{document}
 
 \maketitle
@@ -64,5 +63,9 @@ Agda and are available in the accompanying material.
 
 \input{syntax.tex}
 
+\renewcommand{\bibsection}{}
+\section*{References}
+\bibliographystyle{jfp}
 \bibliography{main}
+
 \end{document}
