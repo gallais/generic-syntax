@@ -86,14 +86,14 @@ toVar : E → String → ∀ σ Γ → Names Γ → M (Var σ Γ)
 toVar e x σ [] [] = inj₁ (OutOfScope , e , x)
 toVar e x σ (τ ∷ Γ) (y ∷ scp) with x ≟ y | I-dec σ τ
 ... | yes _  | yes refl  = inj₂ z
-... | no ¬p  | _         = s <$> toVar e x σ Γ scp
 ... | yes _  | no ¬eq    = inj₁ (WrongSort σ τ ¬eq , e , x)
+... | no ¬p  | _         = s <$> toVar e x σ Γ scp
 \end{code}
 %</toVar>
 \begin{code}
 module _ {d : Desc I} where
 \end{code}
-%<*scopechecktype>
+%<*scopecheck>
 \begin{AgdaAlign}
 \begin{AgdaSuppressSpace}
 %<*totmtype>
@@ -103,17 +103,13 @@ module _ {d : Desc I} where
 %</totmtype>
 \begin{code}
  toScope  : Names Γ → ∀ Δ σ → WithNames (Raw d i) Δ σ [] → M (Scope (Tm d i) Δ σ Γ)
-\end{code}
-\end{AgdaSuppressSpace}
-\end{AgdaAlign}
-%</scopechecktype>
 
-%<*scopecheck>
-\begin{code}
  toTm scp (`var e v)  = `var <$> toVar e v _ _ scp
  toTm scp (`con b)    = `con <$> mapA d (toScope scp) b
 
  toScope scp []         σ b          = toTm scp b
  toScope scp Δ@(_ ∷ _)  σ (bnd , b)  = toTm (bnd ++ scp) b
 \end{code}
+\end{AgdaSuppressSpace}
+\end{AgdaAlign}
 %</scopecheck>

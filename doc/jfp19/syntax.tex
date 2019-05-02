@@ -1148,10 +1148,10 @@ expression itself is printed.
 
 Converting terms in the internal syntax to strings which can in turn be
 displayed in a terminal or an editor window is only part of a compiler's
-interactive loop. The other direction takes strings as inputs and attempts to
+interaction loop. The other direction takes strings as inputs and attempts to
 produce terms in the internal syntax. The first step is to parse the input
 strings into structured data, the second is to perform scope checking,
-and the third step consist in type checking terms in the well scoped syntax.
+and the third step consist in type checking.
 
 Parsing is currently out of scope for our library; users can write safe
 ad-hoc parsers for their object language by either using a library of total
@@ -1206,16 +1206,32 @@ failure and the extra data of type \AB{E} that accompanied it.
 \caption{Error Type and Scope Checking Monad}
 \end{figure}
 
+Equipped with these notions, we can write down the type of \AF{toVar}
+which tackles the core of the problem: variable resolution. Given a string
+corresponding to a variable's name and provided that we have names for the
+variables in the ambient scope and know the sort the variable needs to be
+we can either fail or return a well scoped and well sorted \AD{Var}.
 
+If the ambient scope is empty then we can only return \AIC{OutOfScope} error.
+Alternatively, if the variable's name corresponds to that of the first one
+in scope we check that the sorts match up and either return \AIC{z} or fail
+with a \AIC{WrongSort} error. Otherwise we look for the variable further
+down the scope and use \AIC{s} to lift the result to the full scope.
 
+\begin{figure}[h]
 \ExecuteMetaData[Generic/Scopecheck.tex]{toVar}
+\caption{Variable Resolution}
+\end{figure}
 
+Scope checking an entire term then amounts to lifting this action on
+variables to an action on terms. Our error monad \AF{M} is evidently
+an applicative and by design our terms are traversable~\cite{bird_paterson_1999}.
+The action on term is defined mutually with the action on scopes.
 
-\ExecuteMetaData[Generic/Scopecheck.tex]{scopechecktype}
-
-
+\begin{figure}[h]
 \ExecuteMetaData[Generic/Scopecheck.tex]{scopecheck}
-
+\caption{Generic Scope Checking for Terms and Scopes}
+\end{figure}
 
 \subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}
 
