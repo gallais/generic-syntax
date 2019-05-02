@@ -3,9 +3,10 @@
 module Generic.Syntax.LetCounter where
 
 open import Algebra
+open import Algebra.Structures
 open import Data.Bool
-open import Data.Product
-open import Data.List.All
+open import Data.List.Relation.Unary.All as All
+open import Data.Product using (_×_; _,_)
 open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Relation.Unary
@@ -16,31 +17,82 @@ open import Generic.Syntax
 
 open import Generic.Syntax.LetBinder using (Let)
 
+module _ {a} {A : Set a} (expensive : A) where
+
+-- inlining is hard
+
+  _ : A × A
+  -- here we better not inline x (but it's fine to inline y)
+
+  _ =  let x = expensive  in
+       let y = (x , x)    in
+       y
+
+  _ : A
+  -- here on the other hand we can inline all the lets!
+
+  _ =  let x = expensive  in
+       let y = (x , x)    in
+       x
+
 data Counter : Set where
-  zero : Counter
-  one  : Counter
-  many : Counter
+  zero  : Counter
+  one   : Counter
+  many  : Counter
 
 _+_ : Counter → Counter → Counter
-zero + n = n
-m + zero = m
-_ + _    = many
+zero  + n     = n
+m     + zero  = m
+_     + _     = many
+
+_*_ : Counter → Counter → Counter
+zero  * n     = zero
+m     * zero  = zero
+one   * n     = n
+m     * one   = m
+many  * many  = many
+
 
 module _ {I : Set} where
 
+  private
+    variable
+      σ : I
+
+
   Count : List I → Set
-  Count = All (λ _ → Counter)
+  Count = All (const Counter)
 
   zeros : ∀[ Count ]
-  zeros = tabulate (λ _ → zero)
+  zeros {[]}     = []
+  zeros {σ ∷ Γ}  = zero ∷ zeros
 
-  fromVar : ∀ {i} → ∀[ Var i ⇒ Count ]
-  fromVar z     = one ∷ zeros
-  fromVar (s v) = zero ∷ fromVar v
+  fromVar : ∀[ Var σ ⇒ Count ]
+  fromVar z      = one ∷ zeros
+  fromVar (s v)  = zero ∷ fromVar v
+
+
 
   merge : ∀[ Count ⇒ Count ⇒ Count ]
-  merge []       []       = []
-  merge (m ∷ cs) (n ∷ ds) = m + n ∷ merge cs ds
+  merge []        []        = []
+  merge (m ∷ cs)  (n ∷ ds)  =
+    (m + n) ∷ merge cs ds
+
+
+
+  control : Counter → ∀[ Count ⇒ Count ]
+  control zero  cs = zeros
+  control one   cs = cs -- inlined
+  control many  cs = cs -- not inlined
+
+
+
+  scale : Counter → ∀[ Count ⇒ Count ]
+  scale zero  cs = zeros
+  scale one   cs = cs
+  scale k     cs = map (k *_) cs
+
+
 
   rawMonoid : List I → RawMonoid _ _
   rawMonoid Γ = record
@@ -50,10 +102,11 @@ module _ {I : Set} where
     ; ε       = tabulate (λ _ → zero)
     }
 
-module _ {I : Set} where
 
   CLet : Desc I
   CLet = `σ Counter $ λ _ → Let
+
+
 
 pattern `IN' e t = (_ , e , t , refl)
 pattern `IN  e t = `con (`IN' e t)
