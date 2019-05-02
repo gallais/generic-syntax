@@ -1309,20 +1309,59 @@ different intermediate languages à la Nanopass~\cite{Keep:2013:NFC:2544174.2500
 \subsection{Reference Couting and Inlining as a Semantics}\label{section:inlining}
 
 Although useful in its own right, desugaring all let bindings can lead
-to an exponential blow-up in code size. Compilers passes typically try
+to an exponential blow-up in code size. Compiler passes typically try
 to maintain sharing by only inlining let-bound expressions which appear
-at most one time: unused expressions are eliminated as dead code whilst
-expressions used exactly one time can be inlined to open up opportunities
-for additional optimisations.
+at most one time. Unused expressions are eliminated as dead code whilst
+expressions used exactly one time can be inlined: this transformation is
+size preserving and opens up opportunities for additional optimisations.
 
 As we will see shortly, we can implement reference counting and size
 respecting let-inlining as a generic transformation over all syntaxes
 with binding equipped with let binders. But first, we need to look at
-an example demonstrating that this is a rather subtle matter.
+an example demonstrating that this is a slightly subtle matter. Assuming
+that \AB{expensive} takes a long time to evaluate, inlining all of the
+lets in the first expression is a really good idea whilst we only want
+to inline the one binding \AB{y} in the second one to avoid duplicating
+work. That is to say that the contribution of the expression bound to
+\AB{y} in the overall count depends directly on whether \AB{y} itself
+appears free in the body of the let binding it.
 
 \begin{figure}[h]
-  \ExecuteMetaData[Generic/Semantics/Elaboration/LetCounter.tex]{}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{cheap}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{expensive}
+\end{minipage}
 \end{figure}
+
+Our transformation will consist of two passes: the first one will annotate
+the tree with accurate count information precisely recording whether let-bound
+variables are used \AIC{zero}, \AIC{one}, or \AIC{many} times. This annotation
+process can be described as a variation on the \AF{Let} syntax extension of
+Section~\ref{section:letbinding}, producing a {(\AB{d} \AF{`+} \AF{CLet})} term
+from a {(\AB{d} \AF{`+} \AF{Let})} one.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{counter}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{clet}
+\end{minipage}
+\caption{Counters and Counted Lets}
+\end{figure}
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{count}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{zeros}
+\end{minipage}
+\end{figure}
+
+\ExecuteMetaData[Generic/Syntax/LetCounter.tex]{fromVar}
 
 
 

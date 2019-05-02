@@ -7,7 +7,8 @@ module Generic.Syntax.LetCounter where
 open import Algebra
 open import Data.Bool
 open import Data.Product
-open import Data.List.All
+open import Data.List.Relation.Unary.All as All
+open import Data.Product
 open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Relation.Unary
@@ -18,31 +19,112 @@ open import Generic.Syntax
 
 open import Generic.Syntax.LetBinder using (Let)
 
+module _ {a} {A : Set a} (expensive : A) where
+
+-- inlining is hard
+
+  _ : A × A
+  -- here we better not inline x (but it's fine to inline y)
+\end{code}
+%<*expensive>
+\begin{code}
+  _ =  let x = expensive  in
+       let y = (x , x)    in
+       y
+\end{code}
+%</expensive>
+\begin{code}
+  _ : A
+  -- here on the other hand we can inline all the lets!
+\end{code}
+%<*cheap>
+\begin{code}
+  _ =  let x = expensive  in
+       let y = (x , x)    in
+       x
+\end{code}
+%</cheap>
+
+%<*counter>
+\begin{code}
 data Counter : Set where
-  zero : Counter
-  one  : Counter
-  many : Counter
-
+  zero  : Counter
+  one   : Counter
+  many  : Counter
+\end{code}
+%</counter>
+%<*addition>
+\begin{code}
 _+_ : Counter → Counter → Counter
-zero + n = n
-m + zero = m
-_ + _    = many
+zero  + n     = n
+m     + zero  = m
+_     + _     = many
+\end{code}
+%</addition>
 
+%<*multiplication>
+\begin{code}
+_*_ : Counter → Counter → Counter
+zero  * n     = zero
+m     * zero  = zero
+one   * n     = n
+m     * one   = m
+many  * many  = many
+\end{code}
+%</multiplication>
+
+
+
+\begin{code}
 module _ {I : Set} where
 
-  Count : List I → Set
-  Count = All (λ _ → Counter)
+  private
+    variable
+      σ : I
 
+\end{code}
+%<*count>
+\begin{code}
+  Count : List I → Set
+  Count = All (const Counter)
+\end{code}
+%</count>
+%<*zeros>
+\begin{code}
   zeros : ∀[ Count ]
   zeros = tabulate (λ _ → zero)
+\end{code}
+%</zeros>
+%<*fromVar>
+\begin{code}
+  fromVar : ∀[ Var σ ⇒ Count ]
+  fromVar z      = one ∷ zeros
+  fromVar (s v)  = zero ∷ fromVar v
+\end{code}
+%</fromVar>
+\begin{code}
 
-  fromVar : ∀ {i} → ∀[ Var i ⇒ Count ]
-  fromVar z     = one ∷ zeros
-  fromVar (s v) = zero ∷ fromVar v
-
+\end{code}
+%<*merge>
+\begin{code}
   merge : ∀[ Count ⇒ Count ⇒ Count ]
-  merge []       []       = []
-  merge (m ∷ cs) (n ∷ ds) = m + n ∷ merge cs ds
+  merge []        []        = []
+  merge (m ∷ cs)  (n ∷ ds)  = (m + n) ∷ merge cs ds
+\end{code}
+%</merge>
+\begin{code}
+
+
+\end{code}
+%<*scale>
+\begin{code}
+  scale : Counter → ∀[ Count ⇒ Count ]
+  scale one  cs = cs
+  scale k    cs = All.map (k *_) cs
+\end{code}
+%</scale>
+\begin{code}
+
 
   rawMonoid : List I → RawMonoid _ _
   rawMonoid Γ = record
@@ -52,10 +134,15 @@ module _ {I : Set} where
     ; ε       = tabulate (λ _ → zero)
     }
 
-module _ {I : Set} where
-
+\end{code}
+%<*clet>
+\begin{code}
   CLet : Desc I
   CLet = `σ Counter $ λ _ → Let
+\end{code}
+%</clet>
+\begin{code}
+
 
 pattern `IN' e t = (_ , e , t , refl)
 pattern `IN  e t = `con (`IN' e t)
