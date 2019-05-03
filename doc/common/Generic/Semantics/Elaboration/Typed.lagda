@@ -16,7 +16,7 @@ import Data.Maybe.Categorical as MC
 open RawMonad (MC.monad {Level.zero})
 
 open import Generic.Syntax.Bidirectional
-open import Generic.Syntax.STLC
+open import Generic.Syntax.STLC as S
 
 open import Relation.Unary hiding (_∈_)
 open import Data.Var hiding (_<$>_)
@@ -54,13 +54,13 @@ Elab : Type ─Scoped → Type → (ms : List Mode) → Typing ms → Set
 Elab T σ _ Γ = T σ (fromTyping Γ)
 \end{code}
 %</elab>
-%<*typemode>
+%<*elabmode>
 \begin{code}
-Type- : Mode ─Scoped
-Type- Check  ms = ∀ Γ → (σ : Type) → Maybe (Elab (Tm STLC ∞) σ ms Γ)
-Type- Infer  ms = ∀ Γ → Maybe (Σ[ σ ∈ Type ] Elab (Tm STLC ∞) σ ms Γ)
+Elab- : Mode ─Scoped
+Elab- Check  ms = ∀ Γ → (σ : Type) → Maybe (Elab (Tm STLC ∞) σ ms Γ)
+Elab- Infer  ms = ∀ Γ → Maybe (Σ[ σ ∈ Type ] Elab (Tm STLC ∞) σ ms Γ)
 \end{code}
-%</typemode>
+%</elabmode>
 %<*varmode>
 \begin{code}
 data Var- : Mode ─Scoped where
@@ -122,7 +122,7 @@ isArrow _         = nothing
 %</arrow>
 %<*app>
 \begin{code}
-app : ∀[ Type- Infer ⇒ Type- Check ⇒ Type- Infer ]
+app : ∀[ Elab- Infer ⇒ Elab- Check ⇒ Elab- Infer ]
 app f t Γ = do
   (arr , F)  ← f Γ
   (σ `→ τ)   ← isArrow arr
@@ -135,7 +135,7 @@ app f t Γ = do
 var₀ : Var- Infer (Infer ∷ ms)
 var₀ = `var λ where (σ ∷ _) → (σ , z)
 
-lam : ∀[ Kripke Var- Type- (Infer ∷ []) Check ⇒ Type- Check ]
+lam : ∀[ Kripke Var- Elab- (Infer ∷ []) Check ⇒ Elab- Check ]
 lam b Γ arr = do
   (σ `→ τ)  ← isArrow arr
   B         ← b (bind Infer) (ε ∙ var₀) (σ ∷ Γ) τ
@@ -144,7 +144,7 @@ lam b Γ arr = do
 %</lam>
 %<*emb>
 \begin{code}
-emb : ∀[ Type- Infer ⇒ Type- Check ]
+emb : ∀[ Elab- Infer ⇒ Elab- Check ]
 emb t Γ σ = do
   (τ , T)  ← t Γ
   refl     ← σ =? τ
@@ -153,13 +153,13 @@ emb t Γ σ = do
 %</emb>
 %<*cut>
 \begin{code}
-cut : Type → ∀[ Type- Check ⇒ Type- Infer ]
+cut : Type → ∀[ Elab- Check ⇒ Elab- Infer ]
 cut σ t Γ = (σ ,_) <$> t Γ σ
 \end{code}
 %</cut>
 %<*elaborate>
 \begin{code}
-Elaborate : Semantics Bidi Var- Type-
+Elaborate : Semantics Bidi Var- Elab-
 Elaborate .th^𝓥  = th^Var-
 Elaborate .var   = λ where (`var infer) Γ → just (map₂ `var (infer Γ))
 Elaborate .alg   = λ where
@@ -170,3 +170,44 @@ Elaborate .alg   = λ where
 \end{code}
 %</elaborate>
 \end{code}
+
+
+
+%<*typemode>
+\begin{code}
+Type- : Mode → Set
+Type- Check  = ∀ σ → Maybe (TM STLC σ)
+Type- Infer  = Maybe (∃ λ σ → TM STLC σ)
+\end{code}
+%</typemode>
+
+%<*type->
+\begin{code}
+type- : ∀ p → TM Bidi p → Type- p
+type- Check  t = Semantics.closed Elaborate t []
+type- Infer  t = Semantics.closed Elaborate t []
+\end{code}
+%</type->
+
+\begin{code}
+module B = PATTERNS
+\end{code}
+
+%<*identities>
+\begin{code}
+id^B : TM Bidi Check
+id^B = B.`lam (B.`emb (`var z))
+
+id^S : TM STLC (σ `→ σ)
+id^S = S.`lam (`var z)
+\end{code}
+%</identities>
+
+%<*example>
+\begin{code}
+_ : let β = α `→ α in
+    type- Infer  ( B.`app (B.`cut (β `→ β)  id^B)  id^B)
+  ≡ just (β      , S.`app                   id^S   id^S)
+_ = refl
+\end{code}
+%</example>

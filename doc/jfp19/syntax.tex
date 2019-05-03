@@ -1685,7 +1685,7 @@ in the inference mode we expect that given any typing of the scope, we can \AD{M
 return a type together with a term at that type in the induced context.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{typemode}
+\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elabmode}
 \caption{Computations as \AD{Mode}-indexed Elaboration Functions\label{fig:elabcomputations}}
 \end{figure}
 
@@ -1746,7 +1746,33 @@ inference and touch it up to return a term rather than a mere variable. Finally 
 define the algebra (\ARF{alg}) by pattern-matching on the constructor and using our
 previous combinators.
 
-\todo{add examples}
+We can once more define a specialised version of the traversal induced by this
+\AR{Semantics} for closed terms: not only can we give a (trivial) initial
+environment but we can also give a (trivial) initial \AF{Typing}. This leads to
+the following definitions:
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{typemode}
+\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{type-}
+\caption{Evidence-producing Type (Checking / Inference) Function}
+\end{figure}
+
+Revisiting the example introduced in Section~\ref{section:typechecking},
+we can check that elaborating the expression {(λx.x : (α→α)→(α→α))(λx.x)}
+yields the type {(α→α)} together with the term {(λx.x)(λx.x)} in internal
+syntax. Type annotations have disappeared as all the type invariants are
+enforced intrinsically.
+
+\begin{figure}[h]
+\begin{minipage}{0.35\textwidth}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{identities}
+\end{minipage}
+\begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{example}
+\end{minipage}
+\end{figure}
+
+
 
 \subsection{Binding as Self-Reference: Representing Cyclic Structures}\label{def:colist}
 
