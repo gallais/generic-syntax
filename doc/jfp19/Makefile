@@ -25,6 +25,7 @@ AGDA_FILES:=\
   Generic/Examples/Printing.lagda \
   Generic/Semantics/Elaboration/LetBinder.lagda \
   Generic/Semantics/Elaboration/LetCounter.lagda \
+  Generic/Semantics/Elaboration/Typed.lagda \
   Generic/Simulation.lagda \
   Generic/Simulation/Syntactic.lagda \
   Generic/Syntax.lagda \
@@ -54,7 +55,7 @@ SLIDES_DEPENDENCIES:=\
   $(PAPER_DEPENDENCIES)
 
 common:
-	make -C ../common
+	$(MAKE) -C ../common
 
 latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 	cd latex; latexmk -pdf $(SLIDES).tex

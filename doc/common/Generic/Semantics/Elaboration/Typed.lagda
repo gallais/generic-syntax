@@ -101,66 +101,72 @@ open Semantics
 \end{code}
 %<*equal>
 \begin{code}
-_==_ : (σ τ : Type) → Maybe (σ ≡ τ)
-α ==  α  = just refl
-(σ₁ `→ τ₁) == (σ₂ `→ τ₂)  = do
-  refl ← σ₁ == σ₂
-  refl ← τ₁ == τ₂
+_=?_ : (σ τ : Type) → Maybe (σ ≡ τ)
+α         =? α         = just refl
+(σ `→ τ)  =? (φ `→ ψ)  = do
+  refl ← σ =? φ
+  refl ← τ =? ψ
   return refl
-_ == _ = nothing
+_ =? _ = nothing
 \end{code}
 %</equal>
 %<*arrow>
 \begin{code}
 data Arrow : Type → Set where
-  _`→_ : (σ τ : Type) → Arrow (σ `→ τ)
+  _`→_ : ∀ σ τ → Arrow (σ `→ τ)
 
 isArrow : ∀ σ → Maybe (Arrow σ)
-isArrow α         = nothing
 isArrow (σ `→ τ)  = just (σ `→ τ)
+isArrow _         = nothing
 \end{code}
 %</arrow>
 %<*app>
 \begin{code}
-APP : ∀[ Type- Infer ⇒ Type- Check ⇒ Type- Infer ]
-APP f t Γ = do
-  (σ`→τ , F)  ← f Γ
-  (σ `→ τ)    ← isArrow σ`→τ
-  T           ← t Γ σ
+app : ∀[ Type- Infer ⇒ Type- Check ⇒ Type- Infer ]
+app f t Γ = do
+  (arr , F)  ← f Γ
+  (σ `→ τ)   ← isArrow arr
+  T          ← t Γ σ
   return (τ , `app F T)
 \end{code}
 %</app>
 %<*lam>
 \begin{code}
-VAR0 : Var- Infer (Infer ∷ ms)
-VAR0 = `var λ where (σ ∷ _) → (σ , z)
+var₀ : Var- Infer (Infer ∷ ms)
+var₀ = `var λ where (σ ∷ _) → (σ , z)
 
-LAM : ∀[ Kripke Var- Type- (Infer ∷ []) Check ⇒ Type- Check ]
-LAM b Γ σ`→τ = do
-  (σ `→ τ) ← isArrow σ`→τ
-  B        ← b (bind Infer) (ε ∙ VAR0) (σ ∷ Γ) τ
+lam : ∀[ Kripke Var- Type- (Infer ∷ []) Check ⇒ Type- Check ]
+lam b Γ arr = do
+  (σ `→ τ)  ← isArrow arr
+  B         ← b (bind Infer) (ε ∙ var₀) (σ ∷ Γ) τ
   return (`lam B)
 \end{code}
 %</lam>
 %<*emb>
 \begin{code}
-EMB : ∀[ Type- Infer ⇒ Type- Check ]
-EMB t Γ σ = do
+emb : ∀[ Type- Infer ⇒ Type- Check ]
+emb t Γ σ = do
   (τ , T)  ← t Γ
-  refl     ← σ == τ
+  refl     ← σ =? τ
   return T
 \end{code}
 %</emb>
+%<*cut>
+\begin{code}
+cut : Type → ∀[ Type- Check ⇒ Type- Infer ]
+cut σ t Γ = (σ ,_) <$> t Γ σ
+\end{code}
+%</cut>
 %<*elaborate>
 \begin{code}
 Elaborate : Semantics Bidi Var- Type-
 Elaborate .th^𝓥  = th^Var-
 Elaborate .var   = λ where (`var infer) Γ → just (map₂ `var (infer Γ))
 Elaborate .alg   = λ where
-  (App , f , t , refl)  → APP f t
-  (Lam , b , refl)      → LAM b
-  (Emb , t , refl)      → EMB t
-  (Cut σ , t , refl)    → λ Γ → (σ ,_) <$> t Γ σ
+  (PATTERNS.`app' f t)  → app f t
+  (PATTERNS.`lam' b)    → lam b
+  (PATTERNS.`emb' t)    → emb t
+  (PATTERNS.`cut' σ t)  → cut σ t
 \end{code}
 %</elaborate>
 \end{code}

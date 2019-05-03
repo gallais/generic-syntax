@@ -5,8 +5,7 @@ module Generic.Semantics.TypeChecking where
 
 open import Size
 open import Function
-open import Data.Unit
-open import Data.Bool
+open import Data.Unit using (⊤; tt)
 open import Data.Product
 open import Data.List hiding ([_])
 open import Data.Maybe
@@ -25,21 +24,21 @@ open M
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
-infix 2 _==_
+infix 2 _=?_
 \end{code}
 %<*typeeq>
 \begin{code}
-_==_ : (σ τ : Type) → Maybe ⊤
-α           == α            = just tt
-(σ₁ `→ τ₁)  == (σ₂ `→ τ₂)   = (σ₁ == σ₂) >> (τ₁ == τ₂)
-_           == _            = nothing
+_=?_ : (σ τ : Type) → Maybe ⊤
+α         =? α         = just tt
+(σ `→ τ)  =? (φ `→ ψ)  = (σ =? φ) >> (τ =? ψ)
+_         =? _         = nothing
 \end{code}
 %</typeeq>
 %<*isArrow>
 \begin{code}
-isArrow : (σ : Type) → Maybe (Type × Type)
-isArrow (σ `→ τ) = just (σ , τ)
-isArrow _       = nothing
+isArrow : Type → Maybe (Type × Type)
+isArrow (σ `→ τ)  = just (σ , τ)
+isArrow _         = nothing
 \end{code}
 %</isArrow>
 
@@ -86,7 +85,7 @@ cut σ t = σ <$ t σ
 emb : Type- Infer → Type- Check
 emb t σ = do
   τ ← t
-  σ == τ
+  σ =? τ
 \end{code}
 %</emb>
 %<*lam>
@@ -113,16 +112,15 @@ Semantics.alg   Typecheck = λ where
 
 %<*type->
 \begin{code}
-type- : (p : Mode) → TM Bidi p → Type- p
-type- p t = Semantics.closed Typecheck t
+type- : ∀ p → TM Bidi p → Type- p
+type- p = Semantics.closed Typecheck
 \end{code}
 %</type->
 %<*example>
 \begin{code}
-_ : let  id  : Tm Bidi ∞ Check []
-         id  = `lam (`emb (`var z))
-    in type- Infer (`app (`cut ((α `→ α) `→ (α `→ α)) id) id)
-     ≡ just (α `→ α)
+_ : let  id : TM Bidi Check; id  = `lam (`emb (`var z))
+         σ  = (α `→ α) `→ (α `→ α)
+    in type- Infer (`app (`cut σ id) id) ≡ just (α `→ α)
 _ = refl
 \end{code}
 %</example>
