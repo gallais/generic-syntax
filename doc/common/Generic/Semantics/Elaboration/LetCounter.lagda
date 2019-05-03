@@ -41,9 +41,8 @@ Counted T i Γ = T i Γ × Count Γ
 %</counted>
 %<*reifycount>
 \begin{code}
-reify^Count :  ∀ Δ σ →
-  Kripke Var (Counted (Tm (d `+ CLet) ∞)) Δ σ Γ →
-  Counted (Scope (Tm (d `+ CLet) ∞) Δ) σ Γ
+reify^Count : ∀ Δ σ →  Kripke Var (Counted (Tm (d `+ CLet) ∞)) Δ σ Γ →
+                       Counted (Scope (Tm (d `+ CLet) ∞) Δ) σ Γ
 reify^Count Δ σ kr = let (scp , c) = reify vl^Var Δ σ kr in scp , drop Δ c
 \end{code}
 %</reifycount>
