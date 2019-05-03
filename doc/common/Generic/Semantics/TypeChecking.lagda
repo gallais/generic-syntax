@@ -12,10 +12,10 @@ open import Data.List hiding ([_])
 open import Data.Maybe
 import Data.Maybe.Categorical as MC
 
-
 open import Data.Var hiding (_<$>_)
 open import Data.Environment hiding (_<$>_ ; _>>_)
 open import Generic.Syntax
+open import Generic.Syntax.Bidirectional; open PATTERNS
 open import Generic.Semantics
 
 import Category.Monad as CM
@@ -25,34 +25,24 @@ open M
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
-infixr 5 _⇒_
-data Type : Set where
-  α    : Type
-  _⇒_  : Type → Type → Type
-
-infix 3 _==_
+infix 2 _==_
+\end{code}
+%<*typeeq>
+\begin{code}
 _==_ : (σ τ : Type) → Maybe ⊤
-α     == α       = just tt
-σ ⇒ τ == σ' ⇒ τ' = (σ == σ') >> (τ == τ')
-_     == _       = nothing
-
-isArrow : (σ⇒τ : Type) → Maybe (Type × Type)
-isArrow (σ ⇒ τ) = just (σ , τ)
+α           == α            = just tt
+(σ₁ `→ τ₁)  == (σ₂ `→ τ₂)   = (σ₁ == σ₂) >> (τ₁ == τ₂)
+_           == _            = nothing
+\end{code}
+%</typeeq>
+%<*isArrow>
+\begin{code}
+isArrow : (σ : Type) → Maybe (Type × Type)
+isArrow (σ `→ τ) = just (σ , τ)
 isArrow _       = nothing
 \end{code}
-%<*constructors>
-\begin{code}
-data LangC : Set where
-  App Lam Emb : LangC
-  Cut : Type → LangC
-\end{code}
-%</constructors>
-%<*phase>
-\begin{code}
-data Mode : Set where
-  Check Infer : Mode
-\end{code}
-%</phase>
+%</isArrow>
+
 \begin{code}
 
 private
@@ -61,24 +51,7 @@ private
     Γ : List Mode
 
 \end{code}
-%<*bidirectional>
-\begin{code}
-Lang : Desc Mode
-Lang  =  `σ LangC $ λ where
-  App      → `X [] Infer (`X [] Check (`∎ Infer))
-  Lam      → `X (Infer ∷ []) Check (`∎ Check)
-  (Cut σ)  → `X [] Check (`∎ Infer)
-  Emb      → `X [] Infer (`∎ Check)
-\end{code}
-%</bidirectional>
-%<*langsyntax>
-\begin{code}
-pattern `app f t  = `con (App , f , t , refl)
-pattern `lam b    = `con (Lam , b , refl)
-pattern `cut σ t  = `con (Cut σ , t , refl)
-pattern `emb t    = `con (Emb , t , refl)
-\end{code}
-%</langsyntax>
+
 %<*typemode>
 \begin{code}
 Type- : Mode → Set
@@ -88,36 +61,68 @@ Type- Infer  =         Maybe Type
 %</typemode>
 %<*varmode>
 \begin{code}
-Var- : Mode → Set
-Var- _ = Type
+data Var- : Mode → Set where
+  `var : Type → Var- Infer
 \end{code}
 %</varmode>
+
+%<*app>
+\begin{code}
+app : Type- Infer → Type- Check → Type- Infer
+app f t = do
+  arr      ← f
+  (σ , τ)  ← isArrow arr
+  τ <$ t σ
+\end{code}
+%</app>
+%<*cut>
+\begin{code}
+cut : Type → Type- Check → Type- Infer
+cut σ t = σ <$ t σ
+\end{code}
+%</cut>
+%<*emb>
+\begin{code}
+emb : Type- Infer → Type- Check
+emb t σ = do
+  τ ← t
+  σ == τ
+\end{code}
+%</emb>
+%<*lam>
+\begin{code}
+lam : Kripke (const ∘ Var-) (const ∘ Type-) (Infer ∷ []) Check Γ → Type- Check
+lam b arr = do
+  (σ , τ) ← isArrow arr
+  b (bind Infer) (ε ∙ `var σ) τ
+\end{code}
+%</lam>
+
 %<*typecheck>
 \begin{code}
-Typecheck : Semantics Lang (const ∘ Var-) (const ∘ Type-)
-Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
-
-   var : (i : Mode) → Var- i → Type- i
-   var Infer  = just
-   var Check  = _==_
-
-   alg : ⟦ Lang ⟧ (Kripke (const ∘ Var-) (const ∘ Type-)) i Γ → Type- i
-   alg (App , f , t , refl)  =  f            >>= λ σ⇒τ →
-                                isArrow σ⇒τ  >>= uncurry λ σ τ →
-                                τ <$ t σ
-   alg (Lam , b , refl)      =  λ σ⇒τ → isArrow σ⇒τ >>= uncurry λ σ τ →
-                                b (extend {σ = Infer}) (ε ∙ σ) τ
-   alg (Cut σ , t , refl)    =  σ <$ t σ
-   alg (Emb , t , refl)      =  λ σ → t >>= λ τ → σ == τ
+Typecheck : Semantics Bidi (const ∘ Var-) (const ∘ Type-)
+Semantics.th^𝓥  Typecheck = th^const
+Semantics.var   Typecheck = λ where (`var σ) → just σ
+Semantics.alg   Typecheck = λ where
+  (`app' f t)  → app f t
+  (`cut' σ t)  → cut σ t
+  (`emb' t)    → emb t
+  (`lam' b)    → lam b
 \end{code}
 %</typecheck>
-\begin{code}
-type- : (p : Mode) → Tm Lang ∞ p [] → Type- p
-type- p t = Semantics.semantics Typecheck {Δ = []} ε t
 
-_ : let  id  : Tm Lang ∞ Check []
+%<*type->
+\begin{code}
+type- : (p : Mode) → TM Bidi p → Type- p
+type- p t = Semantics.closed Typecheck t
+\end{code}
+%</type->
+%<*example>
+\begin{code}
+_ : let  id  : Tm Bidi ∞ Check []
          id  = `lam (`emb (`var z))
-    in type- Infer (`app (`cut ((α ⇒ α) ⇒ (α ⇒ α)) id) id)
-     ≡ just (α ⇒ α)
+    in type- Infer (`app (`cut ((α `→ α) `→ (α `→ α)) id) id)
+     ≡ just (α `→ α)
 _ = refl
 \end{code}
+%</example>

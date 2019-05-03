@@ -11,6 +11,7 @@ AGDA_FILES:=\
   Generic/Cofinite.lagda \
   Generic/Examples/Colist.lagda \
   Generic/Syntax/LetBinder.lagda \
+  Generic/Syntax/Bidirectional.lagda \
   Generic/Semantics/NbyE.lagda \
   Generic/Examples/NbyE.lagda \
   Generic/Syntax/STLC.lagda \
@@ -50,7 +51,7 @@ SLIDES_DEPENDENCIES:=\
   $(PAPER_DEPENDENCIES)
 
 common:
-	make -C ../common
+	$(MAKE) -C ../common
 
 latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 	cd latex; latexmk -pdf $(SLIDES).tex

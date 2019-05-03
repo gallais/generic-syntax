@@ -1124,19 +1124,20 @@ into \AIC{Check}ables.
 
 \begin{figure}[h]
 \begin{minipage}{0.3\textwidth}
-  \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{constructors}
+  \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{tagmode}
 \end{minipage}\hfill
 \begin{minipage}{0.6\textwidth}
-  \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{bidirectional}
+  \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{desc}
 \end{minipage}
 \caption{A Bidirectional Simply Typed Language}
 \end{figure}
 
-The values stored in the environment will be \AD{Type} information for bound
-variables no matter what their \AD{Mode} is. In contrast, the generated
-computations will, depending on the mode, either take a type candidate and
-\AIC{Check} it is valid or \AIC{Infer} a type for their argument. These
-computations are always potentially failing so we use the \AD{Maybe} monad.
+The values stored in the environment will attach \AD{Type} information for
+bound variables whose \AD{Mode} is \AIC{Infer}, guaranteeing no variable ever
+uses another mode. In contrast, the generated computations will, depending
+on the mode, either take a type candidate and \AIC{Check} it is valid or
+\AIC{Infer} a type for their argument. These computations are always potentially
+failing so we use the \AD{Maybe} monad.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
@@ -1150,25 +1151,25 @@ computations are always potentially failing so we use the \AD{Maybe} monad.
 
 We can now define typechecking as a \semrec{}. The algebra describes the
 algorithm (\AF{\_<\$\_} takes an \AB{A} and a {\AD{Maybe} \AB{B}} and returns
-a {\AD{Maybe} \AB{A}} which has the same structure as its second argument):
-\begin{itemize}
-  \item when facing an application: infer the type of the function, make sure
-    it is an arrow type, check the argument at the domain's type and return the
-    codomain
-  \item for a $\lambda$-abstraction: check the input type is an arrow type and
-    check the body at the codomain type in the extended environment where the
-    newly-bound variable has the domain's type
-  \item a cut always comes with a type candidate against which to check the term
-    and to be returned in case of success
-  \item finally, the change of direction from \AIC{Infer}rable to \AIC{Check}able
-    is successful
-    when the inferred type is equal to the expected one.
-\end{itemize}
+a {\AD{Maybe} \AB{A}} which has the same structure as its second argument).
 
-\begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typecheck}
-\caption{Type- Inference / Checking as a Semantics}
-\end{figure}
+\paragraph{Application} When facing an application: infer the type of the function,
+make sure it is an arrow type, check the argument at the domain's type and return
+the codomain.
+\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{app}
+\paragraph{$\lambda$-abstraction} For a $\lambda$-abstraction: check the input
+type is an arrow type and check the body at the codomain type in the extended
+environment where the newly-bound variable is of mode \AIC{Infer} and has the
+domain's type.
+\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{lam}
+\paragraph{Cut: A \AIC{Check} in an \AIC{Infer} position} A cut always comes
+with a type candidate against which to check the term and to be returned in
+case of success.
+\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{cut}
+\paragraph{Embedding of \AIC{Infer} into \AIC{Check}} Finally, the change of
+direction from \AIC{Infer}rable to \AIC{Check}able is successful when the
+inferred type is equal to the expected one.
+\ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{emb}
 
 We have defined a bidirectional typechecker for
 this simple language by leveraging the \semrec{}framework. The code attached
