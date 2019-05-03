@@ -43,6 +43,13 @@ PAPER_DEPENDENCIES:=\
   common\
   latex/$(PAPER).tex\
   latex/syntax.tex \
+  latex/catalogue/desugaring.tex\
+  latex/catalogue/elaborating.tex\
+  latex/catalogue/inlining.tex\
+  latex/catalogue/normalising.tex\
+  latex/catalogue/printing.tex\
+  latex/catalogue/scopechecking.tex\
+  latex/catalogue/typechecking.tex\
   latex/jfp1.cls \
   latex/jfp.bst \
   latex/commands.tex \
@@ -56,6 +63,10 @@ SLIDES_DEPENDENCIES:=\
 
 common:
 	$(MAKE) -C ../common
+
+latex/catalogue/%.tex: catalogue/%.tex
+	mkdir -p $(dir $@)
+	cp $< $@
 
 latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 	cd latex; latexmk -pdf $(SLIDES).tex

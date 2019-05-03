@@ -1,0 +1,78 @@
+\subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}
+
+One of the advantages of having a universe of programming language
+descriptions is the ability to concisely define an \emph{extension}
+of an existing language by using \AD{Desc}ription transformers
+grafting extra constructors à la Swiestra~\citeyear{swierstra_2008}.
+This is made extremely simple by the
+disjoint sum combinator \AF{\_`+\_} which we defined in Section~\ref{desccomb}.
+An example of such an extension is the addition of let-bindings to
+an existing language.
+
+Let bindings allow the user to avoid repeating themselves by naming
+sub-expressions and then using these names to refer to the associated
+terms. Preprocessors adding these types of mechanisms to existing
+languages (from C to CSS) are rather popular. We introduce a
+description of \AD{Let}-bindings which can be used to extend any
+language description \AB{d} to \AB{d} \AF{`+} \AF{Let} (where \AF{`+}
+is the disjoint sum of two descriptions defined in Figure~\ref{figure:descsum}):
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letcode}
+\caption{Description of a Single Let Binding}
+\end{figure}
+
+This description states that a let-binding node stores a pair of types
+\AB{$\sigma$} and \AB{$\tau$} and two subterms. First comes the let-bound
+expression of type \AB{$\sigma$} and second comes the body of the let which
+has type \AB{$\tau$} in a context extended with a fresh variable of type
+\AB{$\sigma$}. This defines a term of type \AB{$\tau$}.
+
+In a dependently typed language, a type may depend on a value which
+in the presence of let bindings may be a variable standing for an
+expression. The user naturally does not want it to make any difference
+whether they used a variable referring to a let-bound expression or
+the expression itself. Various typechecking strategies can accommodate
+this expectation: in Coq~\cite{Coq:manual} let bindings are primitive
+constructs of the language and have their own typing and reduction
+rules whereas in Agda they are elaborated away to the core language
+by inlining.
+
+This latter approach to extending a language \AB{d} with let bindings
+by inlining them before typechecking can be implemented generically as
+a semantics over (\AB{d} \AF{`+} \AF{Let}). For this semantics values
+in the environment and computations are both let-free terms. The algebra
+of the semantics can be defined by parts thanks to \AF{case} defined in
+Section~\ref{desccomb}: the old constructors are kept the same by interpreting
+them using the generic \AF{Substitution} algebra;
+whilst the let-binder precisely provides the extra value to be added to the
+environment.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unletcode}
+\caption{Desugaring as a \AR{Semantics}}
+\end{figure}
+
+The process of removing let binders is kickstarted with a placeholder
+environment associating each variable to itself.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unlet}
+\caption{Specialising \AF{semantics} with an environment of placeholder values}
+\end{figure}
+
+In less than 10 lines of code we have defined a generic extension of
+syntaxes with binding together with a semantics which corresponds
+to an elaborator translating away this new construct. In their
+own setting working on STLC, ACMM~\citeyear{allais2017type} have
+shown that it is similarly possible to implement a Continuation
+Passing Style transformation as a semantics.
+
+We have demonstrated how easily one can define extensions and combine
+them on top of a base language without having to reimplement common
+traversals for each one of the intermediate representations. Moreover,
+it is possible to define \emph{generic} transformations elaborating
+these added features in terms of lower-level ones. This suggests that
+this setup could be a good candidate to implement generic compilation
+passes and could deal with a framework using a wealth of slightly
+different intermediate languages à la Nanopass~\cite{Keep:2013:NFC:2544174.2500618}.
