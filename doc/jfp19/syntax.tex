@@ -1042,6 +1042,20 @@ are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
 
 \section{A Catalogue of Generic Programs for Syntax with Binding}
 
+In this section we explore a large part of the spectrum of traversals a
+compiler writer may need to write when implementing their own language.
+In Section~\ref{section:genericprinting} we look at the production of
+human-readable representations of internal syntax; in Section~\ref{section:genericscoping}
+we write a generic scope checker thus bridging the gap between raw data
+fresh out of a parser to well scoped syntax; we then demonstrate how to
+write a type checker in Section~\ref{section:typechecking} and even an
+elaboration function turning well scoped into well scoped and typed syntax
+in Section~\ref{section:elaboration}. We then study type and scope respecting
+transformations on internal syntax: desugaring in Section~\ref{section:letbinding}
+and size preserving inlining in Section~\ref{section:inlining}. We conclude
+with an unsafe but generic evaluator defined using normalisation by evaluation
+in Section~\ref{section:nbyeval}.
+
 \input{catalogue/printing.tex}
 \input{catalogue/scopechecking.tex}
 \input{catalogue/typechecking.tex}
