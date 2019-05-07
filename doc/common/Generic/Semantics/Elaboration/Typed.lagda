@@ -184,8 +184,8 @@ Type- Infer  = Maybe (∃ λ σ → TM STLC σ)
 %<*type->
 \begin{code}
 type- : ∀ p → TM Bidi p → Type- p
-type- Check  t = Semantics.closed Elaborate t []
-type- Infer  t = Semantics.closed Elaborate t []
+type- Check  t = closed Elaborate t []
+type- Infer  t = closed Elaborate t []
 \end{code}
 %</type->
 

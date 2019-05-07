@@ -38,6 +38,10 @@ norm^LC = norm $ λ where
 \begin{code}
 open import Relation.Binary.PropositionalEquality hiding ([_] ; refl)
 
-_ : norm^LC (`app `id (`app `id `id)) ≡ just `id
+\end{code}
+%<*example>
+\begin{code}
+_ : norm^LC (`app id^U (`app id^U id^U)) ≡ just id^U
 _ = refl
 \end{code}
+%</example>

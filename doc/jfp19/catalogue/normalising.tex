@@ -13,7 +13,8 @@ characteristic of our semantics and the one that shows up in
 normalisation by evaluation suggests we ought to manage to
 give an unsafe generic framework for normalisation by evaluation.
 By temporarily \textbf{disabling Agda's positivity checker},
-we can define a generic reflexive domain \AD{Dm} in which to
+we can define a generic reflexive domain \AD{Dm}
+(cf. Figure~\ref{fig:reflexivedomain}) in which to
 interpret our syntaxes. It has three constructors corresponding
 respectively to a free variable, a constructor's counterpart where
 scopes have become \AF{Kripke} functional spaces on \AD{Dm} and
@@ -21,18 +22,19 @@ an error token because the evaluation of untyped programs may go wrong.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics/NbyE.tex]{domain}
-\caption{Generic Reflexive Domain}
+\caption{Generic Reflexive Domain}\label{fig:reflexivedomain}
 \end{figure}
 
 This datatype definition is utterly unsafe. The more conservative
-user will happily restrict herself to typed settings where the
+user will happily restrict themselves to typed settings where the
 domain can be defined as a logical predicate or opt instead for
 a step-indexed approach.
 
 But this domain does make it possible to define a generic \AF{nbe}
 semantics which, given a term, produces a value in the reflexive
 domain. Thanks to the fact we have picked a universe of finitary syntaxes, we
-can \emph{traverse}~\cite{mcbride_paterson_2008} the functor to define
+can \emph{traverse}~\cite{mcbride_paterson_2008,DBLP:journals/jfp/GibbonsO09}
+the functor to define
 a (potentially failing) reification function turning elements of the
 reflexive domain into terms. By composing them, we obtain the
 normalisation function which gives its name to normalisation by
@@ -53,7 +55,10 @@ Using this setup, we can write a normaliser for the untyped λ-calculus
 by simply providing an algebra. We start by defining two patterns for
 semantical values: one for application and the other for lambda abstraction.
 
+\begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbepatterns}
+\caption{Pattern synonyms for UTLC-specific \AD{Dm} values}
+\end{figure}
 
 We then define the algebra by case analysis: if the node at hand is an
 application and its first component evaluates to a lambda, we fire it.
@@ -67,4 +72,10 @@ we already have a value and can simply return it using \AIC{C}.
 
 We have not used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
 (by disabling totality checking we have lost all guarantees of the sort) we know
-we will get a term in normal form.
+we will get a term in normal form. See for instance this untyped yet normalising
+term: {(λx. x) ((λx. x) (λx. x))} normalises to {(λx. x)}.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Examples/NbyE.tex]{example}
+\caption{Example of a normalising untyped term}
+\end{figure}

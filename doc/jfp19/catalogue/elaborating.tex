@@ -112,12 +112,17 @@ previous combinators.
 
 We can once more define a specialised version of the traversal induced by this
 \AR{Semantics} for closed terms: not only can we give a (trivial) initial
-environment but we can also give a (trivial) initial \AF{Typing}. This leads to
-the following definitions:
+environment (using the \AF{closed} corollary defined in Figure~\ref{fig:evalclosed})
+but we can also give a (trivial) initial \AF{Typing}. This leads to the
+following definitions:
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{typemode}
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{type-}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{typemode}
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{type-}
+\end{minipage}
 \caption{Evidence-producing Type (Checking / Inference) Function}
 \end{figure}
 
