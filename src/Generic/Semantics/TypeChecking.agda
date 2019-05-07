@@ -4,17 +4,16 @@ module Generic.Semantics.TypeChecking where
 
 open import Size
 open import Function
-open import Data.Unit
-open import Data.Bool
+open import Data.Unit using (⊤; tt)
 open import Data.Product
 open import Data.List hiding ([_])
 open import Data.Maybe
 import Data.Maybe.Categorical as MC
 
-
 open import Data.Var hiding (_<$>_)
 open import Data.Environment hiding (_<$>_ ; _>>_)
 open import Generic.Syntax
+open import Generic.Syntax.Bidirectional; open PATTERNS
 open import Generic.Semantics
 
 import Category.Monad as CM
@@ -24,27 +23,16 @@ open M
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
-infixr 5 _⇒_
-data Type : Set where
-  α    : Type
-  _⇒_  : Type → Type → Type
+infix 2 _=?_
 
-infix 3 _==_
-_==_ : (σ τ : Type) → Maybe ⊤
-α     == α       = just tt
-σ ⇒ τ == σ' ⇒ τ' = (σ == σ') >> (τ == τ')
-_     == _       = nothing
+_=?_ : (σ τ : Type) → Maybe ⊤
+α         =? α         = just tt
+(σ `→ τ)  =? (φ `→ ψ)  = (σ =? φ) >> (τ =? ψ)
+_         =? _         = nothing
 
-isArrow : (σ⇒τ : Type) → Maybe (Type × Type)
-isArrow (σ ⇒ τ) = just (σ , τ)
-isArrow _       = nothing
-
-data LangC : Set where
-  App Lam Emb : LangC
-  Cut : Type → LangC
-
-data Mode : Set where
-  Check Infer : Mode
+isArrow : Type → Maybe (Type × Type)
+isArrow (σ `→ τ)  = just (σ , τ)
+isArrow _         = nothing
 
 
 private
@@ -53,46 +41,48 @@ private
     Γ : List Mode
 
 
-Lang : Desc Mode
-Lang  =  `σ LangC $ λ where
-  App      → `X [] Infer (`X [] Check (`∎ Infer))
-  Lam      → `X (Infer ∷ []) Check (`∎ Check)
-  (Cut σ)  → `X [] Check (`∎ Infer)
-  Emb      → `X [] Infer (`∎ Check)
-
-pattern `app f t  = `con (App , f , t , refl)
-pattern `lam b    = `con (Lam , b , refl)
-pattern `cut σ t  = `con (Cut σ , t , refl)
-pattern `emb t    = `con (Emb , t , refl)
-
 Type- : Mode → Set
 Type- Check  = Type →  Maybe ⊤
 Type- Infer  =         Maybe Type
 
-Var- : Mode → Set
-Var- _ = Type
+data Var- : Mode → Set where
+  `var : Type → Var- Infer
 
-Typecheck : Semantics Lang (const ∘ Var-) (const ∘ Type-)
-Typecheck = record { th^𝓥 = λ v ρ → v; var = var _; alg = alg } where
+app : Type- Infer → Type- Check → Type- Infer
+app f t = do
+  arr      ← f
+  (σ , τ)  ← isArrow arr
+  τ <$ t σ
 
-   var : (i : Mode) → Var- i → Type- i
-   var Infer  = just
-   var Check  = _==_
+cut : Type → Type- Check → Type- Infer
+cut σ t = σ <$ t σ
 
-   alg : ⟦ Lang ⟧ (Kripke (const ∘ Var-) (const ∘ Type-)) i Γ → Type- i
-   alg (App , f , t , refl)  =  f            >>= λ σ⇒τ →
-                                isArrow σ⇒τ  >>= uncurry λ σ τ →
-                                τ <$ t σ
-   alg (Lam , b , refl)      =  λ σ⇒τ → isArrow σ⇒τ >>= uncurry λ σ τ →
-                                b (extend {σ = Infer}) (ε ∙ σ) τ
-   alg (Cut σ , t , refl)    =  σ <$ t σ
-   alg (Emb , t , refl)      =  λ σ → t >>= λ τ → σ == τ
+emb : Type- Infer → Type- Check
+emb t σ = do
+  τ ← t
+  σ =? τ
 
-type- : (p : Mode) → Tm Lang ∞ p [] → Type- p
-type- p t = Semantics.semantics Typecheck {Δ = []} ε t
+lam : Kripke (const ∘ Var-) (const ∘ Type-) (Infer ∷ []) Check Γ → Type- Check
+lam b arr = do
+  (σ , τ) ← isArrow arr
+  b (bind Infer) (ε ∙ `var σ) τ
 
-_ : let  id  : Tm Lang ∞ Check []
-         id  = `lam (`emb (`var z))
-    in type- Infer (`app (`cut ((α ⇒ α) ⇒ (α ⇒ α)) id) id)
-     ≡ just (α ⇒ α)
-_ = refl
+Typecheck : Semantics Bidi (const ∘ Var-) (const ∘ Type-)
+Semantics.th^𝓥  Typecheck = th^const
+Semantics.var   Typecheck = λ where (`var σ) → just σ
+Semantics.alg   Typecheck = λ where
+  (`app' f t)  → app f t
+  (`cut' σ t)  → cut σ t
+  (`emb' t)    → emb t
+  (`lam' b)    → lam b
+
+type- : ∀ p → TM Bidi p → Type- p
+type- p = Semantics.closed Typecheck
+
+module _ where
+
+  private β = α `→ α
+
+
+  _ : type- Infer (`app (`cut (β `→ β) id^B) id^B) ≡ just β
+  _ = refl

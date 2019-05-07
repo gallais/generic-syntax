@@ -2,11 +2,13 @@
 
 module Generic.Syntax.Bidirectional where
 
+open import Size
 open import Data.Product
 open import Agda.Builtin.List
 open import Agda.Builtin.Equality
 open import Function
 
+open import Data.Var
 open import Generic.Syntax
 
 open import StateOfTheArt.ACMM using (Type; α; _`→_) public
@@ -22,6 +24,10 @@ data `Bidi : Set where
   App Lam Emb : `Bidi
   Cut : Type → `Bidi
 
+
+private
+  variable
+    σ : Mode
 
 -- On top of the traditional Application and Lambda-Abstraction constructors,
 -- we have two change of direction ones: `Emb` which takes inferable terms and
@@ -40,8 +46,19 @@ Bidi  =  `σ `Bidi $ λ where
 
 module PATTERNS where
 
-  pattern APP f t  = `con (App , f , t , refl)
-  pattern LAM b    = `con (Lam , b , refl)
-  pattern CUT σ t  = `con (Cut σ , t , refl)
-  pattern EMB t    = `con (Emb , t , refl)
 
+  pattern `app' f t  = (App , f , t , refl)
+  pattern `lam' b    = (Lam , b , refl)
+  pattern `cut' σ t  = (Cut σ , t , refl)
+  pattern `emb' t    = (Emb , t , refl)
+
+  pattern `app f t  = `con (`app' f t)
+  pattern `lam b    = `con (`lam' b)
+  pattern `cut σ t  = `con (`cut' σ t)
+  pattern `emb t    = `con (`emb' t)
+
+
+id^B : Tm Bidi ∞ Check []
+id^B = `lam (`emb (`var z))
+
+  where open PATTERNS

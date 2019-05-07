@@ -12,6 +12,10 @@ open import Data.Var
 open import StateOfTheArt.ACMM using (Type ; α ; _`→_)
 open import Function
 
+private
+  variable
+    σ : Type
+
 
 data `STLC : Set where
   App Lam : Type → Type → `STLC
@@ -26,3 +30,6 @@ pattern `lam b    = `con (Lam _ _ , b , refl)
 
 _ : Tm STLC ∞ ((α `→ α) `→ (α `→ α)) []
 _ = `lam (`lam (`app (`var (s z)) (`var z)))
+
+id^S : Tm STLC ∞ (σ `→ σ) []
+id^S = `lam (`var z)

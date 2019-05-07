@@ -28,9 +28,7 @@ printUTLC = λ where
 open import Agda.Builtin.Equality
 
 
-_ : let id : Tm UTLC _ _ []
-        id = `lam (`var z)
-    in print printUTLC id ≡ "λa. a"
+_ : print printUTLC id^U ≡ "λa. a"
 _ = refl
 
 _ : let tm : Tm UTLC _ _ (_ ∷ _ ∷ [])

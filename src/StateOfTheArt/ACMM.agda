@@ -112,12 +112,14 @@ record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
   semantics ρ (`app f t)  = app (semantics ρ f) (semantics ρ t)
   semantics ρ (`lam b)    = lam (λ σ v → semantics (extend σ ρ v) b)
 
+open E using (extend)
+
 Renaming : Semantics Var Lam
 Renaming = record
   { th^𝓥  = th^Var
   ; var   = `var
   ; app   = `app
-  ; lam   = λ b → `lam (b (pack s) z) }
+  ; lam   = λ b → `lam (b extend z) }
 
 ren : (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
 ren = Semantics.semantics Renaming
@@ -127,7 +129,7 @@ Substitution = record
    { th^𝓥  = λ t ρ → ren ρ t
    ; var   = id
    ; app   = `app
-   ; lam   = λ b → `lam (b (pack s) (`var z)) }
+   ; lam   = λ b → `lam (b extend (`var z)) }
 
 sub : (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
 sub = Semantics.semantics Substitution
@@ -177,10 +179,10 @@ module Printer where
    { th^𝓥  =  th^Wrap
    ; var   =  map^Wrap return
    ; app   =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
-              return $ f ++ "(" ++ t ++ ")"
+              return $ f ++ " (" ++ t ++ ")"
    ; lam   =  λ {σ} mb → MkW $ fresh σ >>= λ x →
               getW (mb extend x) >>= λ b →
-              return $ "λ" ++ getW x ++ "." ++ b }
+              return $ "λ" ++ getW x ++ ". " ++ b }
 
  open import Data.List.NonEmpty as List⁺ using (List⁺; _∷_)
  open import Codata.Thunk using (force)
@@ -203,8 +205,20 @@ open Printer using (Printing)
 print : (σ : Type) → Lam σ [] → String
 print _ t = proj₁ $ Printer.getW (Semantics.semantics Printing {Δ = []} (pack λ ()) t) Printer.names
 
-_ : print (α `→ α) (`lam (`var z)) ≡ "λa.a"
+_ : print (α `→ α) (`lam (`var z)) ≡ "λa. a"
 _ = refl
 
-_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa.λb.a(a(b))"
+module _ {σ τ : Type} where
+
+
+  apply : Lam ((σ `→ τ) `→ (σ `→ τ)) []
+  apply =  `lam {- f -} $ `lam {- x -}
+        $  `app (`var (s z) {- f -}) (`var z {- x -})
+
+
+  _ : print _ apply ≡ "λa. λb. a (b)"
+  _ = refl
+
+
+_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa. λb. a (a (b))"
 _ = refl

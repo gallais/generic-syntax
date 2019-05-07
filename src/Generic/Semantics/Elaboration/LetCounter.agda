@@ -35,9 +35,8 @@ instance _ = PCR.applicative
 Counted : I ─Scoped → I ─Scoped
 Counted T i Γ = T i Γ × Count Γ
 
-reify^Count :  ∀ Δ σ →
-  Kripke Var (Counted (Tm (d `+ CLet) ∞)) Δ σ Γ →
-  Counted (Scope (Tm (d `+ CLet) ∞) Δ) σ Γ
+reify^Count : ∀ Δ σ →  Kripke Var (Counted (Tm (d `+ CLet) ∞)) Δ σ Γ →
+                       Counted (Scope (Tm (d `+ CLet) ∞) Δ) σ Γ
 reify^Count Δ σ kr = let (scp , c) = reify vl^Var Δ σ kr in scp , drop Δ c
 
 clet :  ⟦ Let ⟧ (Kripke Var (Counted (Tm (d `+ CLet) ∞))) σ Γ →
@@ -54,7 +53,7 @@ Semantics.alg    Annotate = λ where
 
 annotate : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ CLet) ∞ σ Γ
 
-annotate = proj₁ ∘′ Semantics.semantics Annotate (base vl^Var)
+annotate = proj₁ ∘ Semantics.semantics Annotate (base vl^Var)
 
 
 Inline : Semantics (d `+ CLet) (Tm (d `+ Let) ∞) (Tm (d `+ Let) ∞)

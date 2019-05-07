@@ -15,7 +15,7 @@ import Data.Maybe.Categorical as MC
 open RawMonad (MC.monad {Level.zero})
 
 open import Generic.Syntax.Bidirectional
-open import Generic.Syntax.STLC
+open import Generic.Syntax.STLC as S
 
 open import Relation.Unary hiding (_∈_)
 open import Data.Var hiding (_<$>_)
@@ -43,9 +43,9 @@ fromTyping (σ ∷ Γ)  = σ ∷ fromTyping Γ
 Elab : Type ─Scoped → Type → (ms : List Mode) → Typing ms → Set
 Elab T σ _ Γ = T σ (fromTyping Γ)
 
-Type- : Mode ─Scoped
-Type- Check  ms = ∀ Γ → (σ : Type) → Maybe (Elab (Tm STLC ∞) σ ms Γ)
-Type- Infer  ms = ∀ Γ → Maybe (Σ[ σ ∈ Type ] Elab (Tm STLC ∞) σ ms Γ)
+Elab- : Mode ─Scoped
+Elab- Check  ms = ∀ Γ → (σ : Type) → Maybe (Elab (Tm STLC ∞) σ ms Γ)
+Elab- Infer  ms = ∀ Γ → Maybe (Σ[ σ ∈ Type ] Elab (Tm STLC ∞) σ ms Γ)
 
 data Var- : Mode ─Scoped where
   `var : (infer : ∀ Γ → Σ[ σ ∈ Type ] Elab Var σ ms Γ) → Var- Infer ms
@@ -81,48 +81,71 @@ th^Var- (`var infer) ρ = `var λ Δ →
 
 open Semantics
 
-_==_ : (σ τ : Type) → Maybe (σ ≡ τ)
-α ==  α  = just refl
-(σ₁ `→ τ₁) == (σ₂ `→ τ₂)  = do
-  refl ← σ₁ == σ₂
-  refl ← τ₁ == τ₂
+_=?_ : (σ τ : Type) → Maybe (σ ≡ τ)
+α         =? α         = just refl
+(σ `→ τ)  =? (φ `→ ψ)  = do
+  refl ← σ =? φ
+  refl ← τ =? ψ
   return refl
-_ == _ = nothing
+_ =? _ = nothing
 
 data Arrow : Type → Set where
-  _`→_ : (σ τ : Type) → Arrow (σ `→ τ)
+  _`→_ : ∀ σ τ → Arrow (σ `→ τ)
 
 isArrow : ∀ σ → Maybe (Arrow σ)
-isArrow α         = nothing
 isArrow (σ `→ τ)  = just (σ `→ τ)
+isArrow _         = nothing
 
-APP : ∀[ Type- Infer ⇒ Type- Check ⇒ Type- Infer ]
-APP f t Γ = do
-  (σ`→τ , F)  ← f Γ
-  (σ `→ τ)    ← isArrow σ`→τ
-  T           ← t Γ σ
+app : ∀[ Elab- Infer ⇒ Elab- Check ⇒ Elab- Infer ]
+app f t Γ = do
+  (arr , F)  ← f Γ
+  (σ `→ τ)   ← isArrow arr
+  T          ← t Γ σ
   return (τ , `app F T)
 
-VAR0 : Var- Infer (Infer ∷ ms)
-VAR0 = `var λ where (σ ∷ _) → (σ , z)
+var₀ : Var- Infer (Infer ∷ ms)
+var₀ = `var λ where (σ ∷ _) → (σ , z)
 
-LAM : ∀[ Kripke Var- Type- (Infer ∷ []) Check ⇒ Type- Check ]
-LAM b Γ σ`→τ = do
-  (σ `→ τ) ← isArrow σ`→τ
-  B        ← b (bind Infer) (ε ∙ VAR0) (σ ∷ Γ) τ
+lam : ∀[ Kripke Var- Elab- (Infer ∷ []) Check ⇒ Elab- Check ]
+lam b Γ arr = do
+  (σ `→ τ)  ← isArrow arr
+  B         ← b (bind Infer) (ε ∙ var₀) (σ ∷ Γ) τ
   return (`lam B)
 
-EMB : ∀[ Type- Infer ⇒ Type- Check ]
-EMB t Γ σ = do
+emb : ∀[ Elab- Infer ⇒ Elab- Check ]
+emb t Γ σ = do
   (τ , T)  ← t Γ
-  refl     ← σ == τ
+  refl     ← σ =? τ
   return T
 
-Elaborate : Semantics Bidi Var- Type-
+cut : Type → ∀[ Elab- Check ⇒ Elab- Infer ]
+cut σ t Γ = (σ ,_) <$> t Γ σ
+
+Elaborate : Semantics Bidi Var- Elab-
 Elaborate .th^𝓥  = th^Var-
 Elaborate .var   = λ where (`var infer) Γ → just (map₂ `var (infer Γ))
 Elaborate .alg   = λ where
-  (App , f , t , refl)  → APP f t
-  (Lam , b , refl)      → LAM b
-  (Emb , t , refl)      → EMB t
-  (Cut σ , t , refl)    → λ Γ → (σ ,_) <$> t Γ σ
+  (PATTERNS.`app' f t)  → app f t
+  (PATTERNS.`lam' b)    → lam b
+  (PATTERNS.`emb' t)    → emb t
+  (PATTERNS.`cut' σ t)  → cut σ t
+
+Type- : Mode → Set
+Type- Check  = ∀ σ → Maybe (TM STLC σ)
+Type- Infer  = Maybe (∃ λ σ → TM STLC σ)
+
+type- : ∀ p → TM Bidi p → Type- p
+type- Check  t = closed Elaborate t []
+type- Infer  t = closed Elaborate t []
+
+module B = PATTERNS
+
+module _ where
+
+  private
+    β : Type
+    β = α `→ α
+
+  _ :  type- Infer  ( B.`app (B.`cut (β `→ β)  id^B)  id^B)
+    ≡  just (β      , S.`app                   id^S   id^S)
+  _ = refl
