@@ -116,11 +116,15 @@ type- : ∀ p → TM Bidi p → Type- p
 type- p = Semantics.closed Typecheck
 \end{code}
 %</type->
+\begin{code}
+module _ where
+
+  private β = α `→ α
+
+\end{code}
 %<*example>
 \begin{code}
-_ : let  id : TM Bidi Check; id  = `lam (`emb (`var z))
-         σ  = (α `→ α) `→ (α `→ α)
-    in type- Infer (`app (`cut σ id) id) ≡ just (α `→ α)
-_ = refl
+  _ : type- Infer (`app (`cut (β `→ β) id^B) id^B) ≡ just β
+  _ = refl
 \end{code}
 %</example>

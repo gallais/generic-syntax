@@ -9,8 +9,13 @@ there is no way for us to guess how an encoded term should be printed. We
 can however take care of the name generation, deal with variable binding,
 and implement the traversal generically. We want our printer to have type:
 
-\ExecuteMetaData[Generic/Semantics/Printing.tex]{display}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{printtype}
+
+where \AF{Display} explains how to print one `layer' of term provided that
+we are handed the \AF{Pieces} corresponding to the printed subterm and the
+names the bound variables where assigned:
+
+\ExecuteMetaData[Generic/Semantics/Printing.tex]{display}
 
 Reusing the notion of \AR{Name} introduced in Section~\ref{section:printing},
 we can make \AF{Pieces} formal. A subterm has already been printed if we
@@ -50,7 +55,8 @@ return the names we used together with this string.
 
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{reifypieces}
 
-We can put all of these pieces together to obtain the \AF{Printing} semantics.
+We can put all of these pieces together to obtain the \AF{Printing} semantics
+presented in Figure~\ref{fig:genericprinting}.
 The two first constraints can be trivially discharged. When defining the
 algebra we start by reifying the subterms, then use the fact that  one ``layer''
 of term of our syntaxes with binding is always traversable to combine all of
@@ -61,7 +67,8 @@ these results into a value we can apply our display function to.
 \caption{Printing with \AF{Name}s as a \AR{Semantics}}\label{fig:genericprinting}
 \end{figure}
 
-This allows us to write a printer for open terms. We start by generating
+This allows us to write a \AF{printer} for open terms as demonstrated in
+Figure~\ref{fig:genericprint}. We start by generating
 an environment of \AR{Name}s for the free variables, then use our semantics
 to get a \AF{printer} which we can run using a stream \AF{names} of distinct
 strings as our name supply.
@@ -85,6 +92,7 @@ together.
 
 As always, these functions are readily executable and we can check
 their behaviour by writing tests. First, we print the identity function
+defined in Figure~\ref{fig:identity}
 in an empty context and verify that we do obtain the string \AStr{"λa. a"}.
 Next, we print an open term in a context of size two and can immediately
 observe that names are generated for the free variables first, and then the

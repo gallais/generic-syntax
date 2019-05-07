@@ -191,23 +191,17 @@ type- Infer  t = Semantics.closed Elaborate t []
 
 \begin{code}
 module B = PATTERNS
+
+module _ where
+
+  private
+    β : Type
+    β = α `→ α
 \end{code}
-
-%<*identities>
-\begin{code}
-id^B : TM Bidi Check
-id^B = B.`lam (B.`emb (`var z))
-
-id^S : TM STLC (σ `→ σ)
-id^S = S.`lam (`var z)
-\end{code}
-%</identities>
-
 %<*example>
 \begin{code}
-_ : let β = α `→ α in
-    type- Infer  ( B.`app (B.`cut (β `→ β)  id^B)  id^B)
-  ≡ just (β      , S.`app                   id^S   id^S)
-_ = refl
+  _ :  type- Infer  ( B.`app (B.`cut (β `→ β)  id^B)  id^B)
+    ≡  just (β      , S.`app                   id^S   id^S)
+  _ = refl
 \end{code}
 %</example>

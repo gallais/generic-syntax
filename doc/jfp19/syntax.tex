@@ -96,8 +96,8 @@ construct generic proofs by formally describing what it means for a
 semantics to be able to simulate another one
 (Section~\ref{section:simulation}), or for two semantics to be fusable
 (Section~\ref{section:fusion}). This allows us to prove the lemmas
-required above for renaming and substitution generically, for
-\emph{every} syntax in our universe.
+required above for renaming, substitution, and desugaring of let binders
+generically, for \emph{every} syntax in our universe.
 
 \medskip
 
@@ -246,8 +246,18 @@ They respectively normalise to:
   \AIC{s} : {\AS{∀} \AB{σ} \AB{τ} \AB{Γ} → \AD{Var} \AB{σ} \AB{Γ} \AS{→} \AD{Var} \AB{σ} (\AB{τ} \AIC{::} \AB{Γ})}
 \end{center}
 
-The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch
-and Reus' simply typed λ-calculus representation.
+The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch and Reus'
+intrinsically typed representation of the simply typed λ-calculus.
+We can readily write well scoped-and-typed terms such as e.g. application,
+a closed term of type {((\AB{σ} \AIC{`→} \AB{τ}) \AIC{`→} (\AB{σ} \AIC{`→} \AB{τ}))}
+(\AC{\{-} and \AC{-\}} delimit comments meant to help the reader see which
+binder the de Bruijn indices are referring too):
+
+
+\begin{figure}[h]
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}\label{figure:apply}
+\caption{Example of a well scoped-and-typed term in \AD{Lam}}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -256,7 +266,7 @@ and Reus' simply typed λ-calculus representation.
 
 \section{A Primer on Type and Scope Safe Programs}\label{section:primer-program}
 
-The scope-and-type safe representation described in the previous section is
+The scope- and type- safe representation described in the previous section is
 naturally only a start: once the programmer has access to a good
 representation of the language they are interested in, they will naturally
 want to (re)implement standard traversals manipulating terms.
@@ -282,8 +292,10 @@ for \AF{ren} and \AF{sub} but they serve the same purpose: \AF{var} is used to
 turn a value looked up in the evaluation environment into a term and \AF{extend}
 is used to alter the environment when going under a binder. This presentation
 highlights the common structure between \AF{ren} and \AF{sub} which we will exploit
-later in this section, particularly in Figures~\ref{figure:lamsem} and \ref{figure:fdmlamsem}
+later in this section, particularly in Section~\ref{section:lamsem}
 where we define an abstract notion of semantics and the corresponding generic traversal.
+
+\subsection{A Generic Notion of Environments}
 
 Both renaming and substitution are defined in terms of \emph{environments}
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ}} that describe how to associate a value \AB{𝓥}
@@ -327,14 +339,28 @@ over environment extensions which is typical of Kripke semantics.
 %\caption{Thinnings: A Special Case of Environments}
 %\end{figure}
 
-\AF{Thinning}s subsume more structured notions such as the Category of
+\paragraph{The Special Case of Thinnings} \AF{Thinning}s subsume more
+structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
-Embeddings~\cite{chapman2009type}. In particular, they do not prevent the
+Embeddings~\cite{chapman2009type}, cf. Figure~\ref{fig:thincomb} for
+some examples of combinators. In particular, they do not prevent the
 user from defining arbitrary permutations or from introducing contractions
 although we will not use such instances. However, such extra flexibility
 will not get in our way, and permits a representation as a function space
 which grants us monoid laws ``for free'' as per Jeffrey's
 observation~\citeyear{jeffrey2011assoc}.
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Data/Environment.tex]{identity}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \ExecuteMetaData[Data/Environment.tex]{extend}
+\end{minipage}
+  \ExecuteMetaData[Data/Environment.tex]{select}
+\caption{Identity Thinning, context extension, and (generalised) transitivity}\label{fig:thincomb}
+\end{figure}
+
 
 The \AF{□} combinator turns any (\AD{List} \AB{I})-indexed Set into one that can
 absorb thinnings. This is accomplished by abstracting over all possible thinnings
@@ -372,9 +398,11 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 \caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable.}
 \end{figure}
 
+\subsection{A Generic Notion of Semantics}
+
 As Allais, Chapman, McBride and McKinna (ACMM)~\citeyear{allais2017type}
 shows, equipped with these new notions we can define an abstract concept
-of semantics for our scope-and-type safe language. Provided that a set of
+of semantics for our scope- and type- safe language. Provided that a set of
 constraints on two ({\AF{Type} \AF{─Scoped}}) \AB{𝓥} and \AB{𝓒} is
 satisfied, we will obtain a traversal of the following type:
 
@@ -382,7 +410,7 @@ satisfied, we will obtain a traversal of the following type:
 
 Broadly speaking, a semantics turns our deeply embedded abstract syntax
 trees into the shallow embedding of the corresponding parametrised higher
-order abstract syntax term. We get a choice of useful scope-and-sort safe
+order abstract syntax term. We get a choice of useful scope- and type- safe
 traversals by using different `host languages' for this shallow embedding.
 
 Semantics, specified in terms of a record \semrec{}, are defined in terms
@@ -390,7 +418,7 @@ of a choice of values \AB{𝓥} and computations \AB{𝓒}. A semantics must
 satisfy constraints on the notions of values \AB{𝓥} and computations \AB{𝓒}
 at hand.
 
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsemtype}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsemtype}\label{section:lamsem}
 
 First of all, values should be thinnable so that \semfun{} may push the
 environment under binders. This constraint allows us to define \AF{extend}
@@ -419,7 +447,6 @@ produces a representation of the result.
 
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{app}
 
-
 The interpretation of the λ-abstraction is of particular interest:
 it is a variant on the Kripke function space one can find in normalisation
 by evaluation. In all possible thinnings of the scope at hand, it promises
@@ -446,6 +473,8 @@ transforms a  \AD{Lam} term into a computation \AB{𝓒}.
 \caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}}\label{figure:fdmlamsem}
 \end{figure}
 
+\subsection{Instances of \AR{Semantics}}
+
 Coming back to renaming and substitution, we see that they both fit in the
 \semrec{} framework. We notice that the definition of substitution depends on
 the definition of renaming: to be able to push terms under binder, we need to
@@ -463,11 +492,11 @@ have already proven that they are thinnable.
 \caption{Renaming and Substitution as Instances of \semrec{}}
 \end{figure}
 
-In both cases we use (\AIC{pack} \AIC{s}) (where \AIC{pack} is the constructor
-for environments and \AIC{s}, defined in Section \ref{section:mech-reus}, is the function
-lifting an existing de Bruijn variable
-into an extended scope) as the definition of the thinning embedding \AB{$\Gamma$}
-into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
+In both cases we use (\AF{extend}) defined in Figure~\ref{fig:thincomb} as
+(\AIC{pack} \AIC{s}) (where \AIC{pack} is the constructor for environments and
+\AIC{s}, defined in Section \ref{section:mech-reus}, is the function lifting an
+existing de Bruijn variable into an extended scope) as the definition of the
+thinning embedding \AB{$\Gamma$} into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
 
 \label{section:printing}
 We also include the definition of a basic printer relying on a name supply
@@ -510,6 +539,11 @@ prepend a ``λ'' binding the fresh name.
 \caption{Printing as an instance of \semrec{}}\label{fig:printing}
 \end{figure}
 
+We can readily run the printer on some examples. Using \AF{apply} defined
+in Figure~\ref{figure:apply}, we get:
+
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{applyprint}
+
 Both printing and renaming highlight the importance of distinguishing
 values and computations: the type of values in their respective
 environments are distinct from their type of computations.
@@ -535,7 +569,7 @@ datatypes.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DATATYPES
 
-\section{A Primer on the Universe of Data Types}\label{section:data}
+\section{A Primer on Universes of Data Types}\label{section:data}
 
 Chapman, Dagand, McBride and Morris (CDMM)~\citeyear{Chapman:2010:GAL:1863543.1863547}
 defined a universe of data types inspired by Dybjer and Setzer's
@@ -804,16 +838,35 @@ arguments by using ``\AS{\_}'', in which case they will be filled in
 by unification just like any other implicit argument: there is no
 extra cost to using an encoding!  The only downside is that the
 language currently does not allow the user to specify type annotations
-for pattern synonyms.
+for pattern synonyms. We only include examples of pattern synonyms
+for the two extreme examples, the definition for \AF{Bidi} are similar.
 
 \begin{figure}[h]
 \begin{minipage}{0.40\textwidth}
- \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCpat}
+  \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCpat}
 \end{minipage}\hspace{2em}
 \begin{minipage}{0.50\textwidth}
-\ExecuteMetaData[Generic/Syntax/STLC.tex]{patST}
+  \ExecuteMetaData[Generic/Syntax/STLC.tex]{patST}
 \end{minipage}
-\caption{Respective Pattern Synonyms for the Untyped and Simply Typed Lambda Calculus}
+\caption{Respective Pattern Synonyms for \AF{UTLC} and \AF{STLC}.}
+\end{figure}
+
+As a usage example of these pattern synonyms, we define the identity
+function in all three languages in Figure~\ref{fig:identity}. The code
+is virtually the same except for \AF{Bidi} which records explicitly
+the change of direction from \AIC{Check} to \AIC{Infer}.
+
+\begin{figure}[h]
+\begin{minipage}{0.28\textwidth}
+  \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCid}
+\end{minipage}\hfill
+\begin{minipage}{0.30\textwidth}
+  \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{BDid}
+\end{minipage}\hfill
+\begin{minipage}{0.32\textwidth}
+  \ExecuteMetaData[Generic/Syntax/STLC.tex]{STid}
+\end{minipage}
+\caption{Identity function in all three languages}\label{fig:identity}
 \end{figure}
 
 It is the third time (the first and second times being the definition of
@@ -982,6 +1035,15 @@ that our terms are indexed by a \AF{Size} is once more crucial in
 getting the termination checker to see that our proof is indeed
 well founded.
 
+We immediately introduce a corollary of the fundamental lemma of semantics
+for the special cases of closed terms: we can use an empty environment to
+kickstart the evaluation.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Semantics.tex]{closed}
+\caption{Corollary: evaluation of closed terms}\label{fig:evalclosed}
+\end{figure}
+
 \subsection{Our First Generic Programs: Renaming and Substitution}\label{section:renandsub}
 
 Similarly to ACMM~\citeyear{allais2017type} renaming can be defined generically
@@ -1043,7 +1105,7 @@ are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
 \section{A Catalogue of Generic Programs for Syntax with Binding}
 
 In this section we explore a large part of the spectrum of traversals a
-compiler writer may need to write when implementing their own language.
+compiler writer may need when implementing their own language.
 In Section~\ref{section:genericprinting} we look at the production of
 human-readable representations of internal syntax; in Section~\ref{section:genericscoping}
 we write a generic scope checker thus bridging the gap between raw data
@@ -1498,7 +1560,7 @@ direct comparison with permutation-based treatments such as those of
 Pitts' and Gabbay's nominal syntax~\cite{gabbay:newaas-jv}.
 
 Our generic universe of syntax is based on
-scope-and-typed de Bruijn indices~\cite{de1972lambda} but it is not
+scoped and typed de Bruijn indices~\cite{de1972lambda} but it is not
 a necessity. It is for instance possible to give an interpretation
 of \AD{Desc}riptions corresponding to Chlipala's Parametric Higher-Order
 Abstract Syntax~\citeyear{chlipala2008parametric} and we would be interested
@@ -1595,10 +1657,9 @@ for defining new well scoped-and-typed semantics and proving their properties.
 
 Érdi~\citeyear{gergodraft} defines a universe inspired by a first draft of this
 paper and gives three different interpretations (raw, scoped and typed syntax)
-related via erasure. He provides scope-and-type
-preserving renaming and substitution as well as various generic proofs that
-they are well behaved but offers neither a generic notion of semantics, nor
-generic proof frameworks.
+related via erasure. He provides scope- and type- preserving renaming and
+substitution as well as various generic proofs that they are well behaved but
+offers neither a generic notion of semantics, nor generic proof frameworks.
 
 Copello~\citeyear{copello2017} works with \emph{named} binders and
 defines nominal techniques (e.g. name swapping) and ultimately $\alpha$-equivalence
@@ -1612,17 +1673,16 @@ over a universe of regular trees with binders inspired by Morris'~\citeyear{morr
 \section{Conclusion and Future Work}
 
 Recalling Allais, Chapman, McBride and McKinna's earlier work~\citeyear{allais2017type}
-we have started from an example
-of a scope-and-type safe language (the simply typed λ-calculus), have studied
-common invariant preserving traversals and noticed their similarity.
-After introducing a notion of semantics and refactoring these traversals as
+we have started from an example of a scope- and type- safe language (the simply typed
+λ-calculus), have studied common invariant preserving traversals and noticed their
+similarity. After introducing a notion of semantics and refactoring these traversals as
 instances of the same fundamental lemma, we have observed the tight
 connection between the abstract definition of semantics and the shape of the
 language.
 
 By extending a universe of datatype descriptions to support a notion of binding,
 we have given a generic presentation of syntaxes with binding as well
-as a large class of scope-and-type safe generic programs acting on all of them:
+as a large class of scope- and type- safe generic programs acting on all of them:
 from renaming and substitution, to normalisation by evaluation, and the desugaring
 of new constructors added by a language transformer. The code accompanying the
 paper also demonstrates how to generically write a printer or a scope-checker

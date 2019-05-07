@@ -41,7 +41,7 @@ pattern `lam  b    = `con (`lam' b)
 \end{code}
 %<*LCid>
 \begin{code}
-`id : Tm UTLC ∞ tt []
-`id = `lam (`var z)
+id^U : Tm UTLC ∞ tt []
+id^U = `lam (`var z)
 \end{code}
 %</LCid>

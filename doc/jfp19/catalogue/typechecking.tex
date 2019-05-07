@@ -67,8 +67,10 @@ inferred type is equal to the expected one.
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{emb}
 
 We have defined a bidirectional typechecker for this simple language by
-leveraging the \semrec{}framework. We can readily run it on closed terms
-and infer the type of the expression (λx.x : (α→α)→(α→α))(λx.x).
+leveraging the \semrec{} framework. We can readily run it on closed terms
+using the \AF{closed} corollary defined in Figure~\ref{fig:evalclosed}
+and (defining \AB{β} to be {(\AB{α} \AIC{`→} \AB{α})}) infer the type of
+the expression {(λx. x : β → β) (λx. x)}.
 
 \begin{figure}[h]
 \begin{minipage}{0.35\textwidth}

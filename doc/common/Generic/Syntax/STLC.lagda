@@ -13,6 +13,10 @@ open import Data.Var
 open import StateOfTheArt.ACMM using (Type ; α ; _`→_)
 open import Function
 
+private
+  variable
+    σ : Type
+
 \end{code}
 %<*stlc>
 \begin{AgdaAlign}
@@ -44,3 +48,10 @@ pattern `lam b    = `con (Lam _ _ , b , refl)
 _ : Tm STLC ∞ ((α `→ α) `→ (α `→ α)) []
 _ = `lam (`lam (`app (`var (s z)) (`var z)))
 \end{code}
+
+%<*STid>
+\begin{code}
+id^S : Tm STLC ∞ (σ `→ σ) []
+id^S = `lam (`var z)
+\end{code}
+%</STid>

@@ -19,18 +19,20 @@ and then discuss related future work in the conclusion.
 
 Our scope checker will be a function taking two explicit arguments: a name for
 each variable in scope \AB{Γ}, a raw term for a syntax description \AB{d} and
-either fail or return a well scoped and sorted term for that description.
+either fail (the monad \AF{M} granting us the ability to fail is made explicit
+in Figure~\ref{fig:scopemonad}) or return a well scoped and sorted term for
+that description.
 
 \ExecuteMetaData[Generic/Scopecheck.tex]{totmtype}
 
-We can obtain \AF{Names} by reusing the standard library's \AF{All}, a predicate
-transformer making sure a predicate holds of all the element of a list. The
-definition of \AF{WithNames} is analogous to \AF{Pieces} in the previous section:
-we expect \AF{Names} for the newly bound variables. Terms in the raw syntax are
-leveraging these definitions: they are either a variable i.e. a \AD{String}
-potentially accompanied by some extra information \AB{E} (typically a position in
-a file) or a ``layer'' of raw term where subterms are raw terms with names for the
-newly-bound variables.
+\paragraph{Raw Terms} We can obtain \AF{Names} by reusing the standard library's
+\AF{All}, a predicate transformer making sure a predicate holds of all the element
+of a list. The definition of \AF{WithNames} is analogous to \AF{Pieces} in the
+previous section: we expect \AF{Names} for the newly bound variables.
+Terms in the raw syntax are leveraging these definitions: they are either a variable
+i.e. a \AD{String} potentially accompanied by some extra information \AB{E} (typically
+a position in a file) or a ``layer'' of raw term where subterms are raw terms with
+names for the newly-bound variables.
 
 \begin{figure}[h]
 \begin{minipage}{0.35\textwidth}
@@ -43,12 +45,12 @@ newly-bound variables.
 \caption{Names and Raw Terms}
 \end{figure}
 
-Various things can go wrong during scope checking: evidently a name can
-be out of scope but it is also possible that it may be associated to a
-variable of the wrong sort. We define an enumerating type covering these
-two cases. The scope checker will return a computation in the monad \AF{M}
-thus allowing us to fail and return an error, the string that caused the
-failure and the extra data of type \AB{E} that accompanied it.
+\paragraph{Error Handling} Various things can go wrong during scope checking:
+evidently a name can be out of scope but it is also possible that it may be
+associated to a variable of the wrong sort. We define an enumerating type
+covering these two cases. The scope checker will return a computation in the
+monad \AF{M} thus allowing us to fail and return an error, the string that
+caused the failure and the extra data of type \AB{E} that accompanied it.
 
 \begin{figure}[h]
 \begin{minipage}{0.5\textwidth}
@@ -57,7 +59,7 @@ failure and the extra data of type \AB{E} that accompanied it.
 \begin{minipage}{0.4\textwidth}
   \ExecuteMetaData[Generic/Scopecheck.tex]{monad}
 \end{minipage}
-\caption{Error Type and Scope Checking Monad}
+\caption{Error Type and Scope Checking Monad}\label{fig:scopemonad}
 \end{figure}
 
 Equipped with these notions, we can write down the type of \AF{toVar}
@@ -66,7 +68,7 @@ corresponding to a variable's name and provided that we have names for the
 variables in the ambient scope and know the sort the variable needs to be
 we can either fail or return a well scoped and well sorted \AD{Var}.
 
-If the ambient scope is empty then we can only return \AIC{OutOfScope} error.
+If the ambient scope is empty then we can only fail with an \AIC{OutOfScope} error.
 Alternatively, if the variable's name corresponds to that of the first one
 in scope we check that the sorts match up and either return \AIC{z} or fail
 with a \AIC{WrongSort} error. Otherwise we look for the variable further
@@ -82,6 +84,9 @@ variables to an action on terms. Our error monad \AF{M} is evidently
 an applicative and by design our terms are
 traversable~\cite{bird_paterson_1999,DBLP:journals/jfp/GibbonsO09}.
 The action on term is defined mutually with the action on scopes.
+As we can see in the second equation for \AF{toScope}, thanks to the
+definition of \AF{WithNames}, concrete names arrive just in time to
+check the subterm with newly-bound variables.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Scopecheck.tex]{scopecheck}

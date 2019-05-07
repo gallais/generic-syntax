@@ -122,16 +122,11 @@ the following definitions:
 \end{figure}
 
 Revisiting the example introduced in Section~\ref{section:typechecking},
-we can check that elaborating the expression {(λx.x : (α→α)→(α→α))(λx.x)}
-yields the type {(α→α)} together with the term {(λx.x)(λx.x)} in internal
-syntax. Type annotations have disappeared as all the type invariants are
-enforced intrinsically.
+we can check that elaborating the expression {(λx. x : β → β) (λx. x)}
+yields the type {β} together with the term {(λx. x) (λx. x)} in internal
+syntax. Type annotations have disappeared in the internal syntax as all
+the type invariants are enforced intrinsically.
 
 \begin{figure}[h]
-\begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{identities}
-\end{minipage}
-\begin{minipage}{0.55\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{example}
-\end{minipage}
 \end{figure}

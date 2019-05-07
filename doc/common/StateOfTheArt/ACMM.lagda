@@ -173,6 +173,10 @@ record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
 \end{AgdaAlign}
 %</sem>
 
+\begin{code}
+open E using (extend)
+\end{code}
+
 %<*semren>
 \begin{code}
 Renaming : Semantics Var Lam
@@ -180,7 +184,7 @@ Renaming = record
   { th^𝓥  = th^Var
   ; var   = `var
   ; app   = `app
-  ; lam   = λ b → `lam (b (pack s) z) }
+  ; lam   = λ b → `lam (b extend z) }
 \end{code}
 %</semren>
 %<*semrenfun>
@@ -196,7 +200,7 @@ Substitution = record
    { th^𝓥  = λ t ρ → ren ρ t
    ; var   = id
    ; app   = `app
-   ; lam   = λ b → `lam (b (pack s) (`var z)) }
+   ; lam   = λ b → `lam (b extend (`var z)) }
 \end{code}
 %</semsub>
 %<*semsubfun>
@@ -271,10 +275,10 @@ module Printer where
    { th^𝓥  =  th^Wrap
    ; var   =  map^Wrap return
    ; app   =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
-              return $ f ++ "(" ++ t ++ ")"
+              return $ f ++ " (" ++ t ++ ")"
    ; lam   =  λ {σ} mb → MkW $ fresh σ >>= λ x →
               getW (mb extend x) >>= λ b →
-              return $ "λ" ++ getW x ++ "." ++ b }
+              return $ "λ" ++ getW x ++ ". " ++ b }
 \end{code}
 %</semprint>
 \begin{code}
@@ -302,10 +306,29 @@ open Printer using (Printing)
 print : (σ : Type) → Lam σ [] → String
 print _ t = proj₁ $ Printer.getW (Semantics.semantics Printing {Δ = []} (pack λ ()) t) Printer.names
 
-_ : print (α `→ α) (`lam (`var z)) ≡ "λa.a"
+_ : print (α `→ α) (`lam (`var z)) ≡ "λa. a"
 _ = refl
 
-_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa.λb.a(a(b))"
+module _ {σ τ : Type} where
+
+\end{code}
+%<*apply>
+\begin{code}
+  apply : Lam ((σ `→ τ) `→ (σ `→ τ)) []
+  apply =  `lam {- f -} $ `lam {- x -}
+        $  `app (`var (s z) {- f -}) (`var z {- x -})
+
+\end{code}
+%</apply>
+%<*applyprint>
+\begin{code}
+  _ : print _ apply ≡ "λa. λb. a (b)"
+  _ = refl
+\end{code}
+%</applyprint>
+\begin{code}
+
+_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa. λb. a (a (b))"
 _ = refl
 \end{code}
 

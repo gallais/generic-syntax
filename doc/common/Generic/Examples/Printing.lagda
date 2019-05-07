@@ -35,9 +35,7 @@ open import Agda.Builtin.Equality
 \end{code}
 %<*printid>
 \begin{code}
-_ : let id : Tm UTLC _ _ []
-        id = `lam (`var z)
-    in print printUTLC id ≡ "λa. a"
+_ : print printUTLC id^U ≡ "λa. a"
 _ = refl
 \end{code}
 %</printid>
