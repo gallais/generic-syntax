@@ -216,9 +216,9 @@ Lastly, \AF{const} is the constant combinator, ignoring the index.
 We make \AF{⇒} associate to the right as one would expect and give it the
 highest precedence level as it is the most used combinator. These combinators
 lead to more readable type declarations.  For instance, the compact expression
-\AF{∀[} \AF{suc} \AF{⊢} (\AF{const} \AB{P} \AF{⇒} \AB{Q}) \AF{⇒} \AB{R} \AF{]}
+\AF{∀[} \AIC{s} \AF{⊢} (\AF{const} \AB{P} \AF{⇒} \AB{Q}) \AF{⇒} \AB{R} \AF{]}
 desugars to the more verbose type
-\AS{∀} \{\AB{i}\} \AS{→} (\AB{P} \AS{→} \AB{Q} (\AF{suc} \AB{i})) \AS{→} \AB{R} \AB{i}.
+\AS{∀} \{\AB{i}\} \AS{→} (\AB{P} \AS{→} \AB{Q} (\AIC{s} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
 As the context comes second in the definition of \AF{\_─Scoped}, we
 can readily use these combinators to thread, modify, or quantify over the
