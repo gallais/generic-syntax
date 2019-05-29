@@ -47,7 +47,7 @@ module _ {d : Desc ⊤} where
 %<*unroll>
 \begin{code}
   unroll : TM d tt → ⟦ d ⟧ (Const (TM d)) tt []
-  unroll t′@(`con t) = fmap d (plug t′) t
+  unroll t@(`con b) = fmap d (plug t) b
 \end{code}
 %</unroll>
 %<*unfold>

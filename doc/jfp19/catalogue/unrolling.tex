@@ -1,0 +1,96 @@
+\subsection{Binding as Self-Reference: Representing Cyclic Structures}\label{def:colist}
+
+Ghani, Hamana, Uustalu and Vene~\citeyear{ghani2006representing} have
+demonstrated how Altenkirch and Reus' type-level de Bruijn
+indices~\citeyear{altenkirch1999monadic} can be used to represent
+potentially cyclic structures by a finite object. In their
+representation each bound variable is a pointer to the node
+that introduced it. Given that we are, at the top-level, only
+interested in structures with no ``dangling pointers'', we introduce
+the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
+\AD{Tm} \AB{d} \AF{∞} \AIC{[]}).
+
+A basic example of such a structure is a potentially cyclic list which
+offers a choice of two constructors: \AIC{[]} which ends the list and
+\AIC{\_::\_} which combines a head and a tail but also acts as a binder
+for a self-reference; these pointers can be used by using the \AIC{var}
+constructor which we have renamed \AIC{↶} (pronounced ``backpointer'')
+to match the domain-specific meaning.
+We can see this approach in action in the examples
+\AF{[0, 1]} and \AF{01↺} (pronounced ``0-1-cycle'') which describe
+respectively a finite list containing
+0 followed by 1 and a cyclic list starting with 0, then 1, and then
+repeating the whole list again by referring to the first cons cell
+represented here by the de Bruijn variable 1 (i.e. \AIC{s} \AIC{z}).
+
+\begin{figure}[h]
+\begin{minipage}{0.55\textwidth}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistD}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistpat}
+\end{minipage}\hfill
+\begin{minipage}{0.35\textwidth}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones}
+\end{minipage}
+\caption{Potentially Cyclic Lists: Description, Pattern Synonyms and Examples}
+\end{figure}
+
+These finite representations are interesting in their own right
+and we can use the generic semantics framework defined earlier
+to manipulate them. A basic building block is the \AF{unroll}
+function which takes a closed tree, exposes its top node and
+unrolls any cycle which has it as its starting point. We can
+decompose it using the \AF{plug} function which, given a closed
+and an open term, closes the latter by plugging the former at
+each free \AIC{`var} leaf. Noticing that \AF{plug}'s fundamental nature
+is that of substituting a term for each leaf, it makes sense to
+implement it by re-using the \AF{Substitution} semantics we already have.
+
+\begin{figure}[h]
+\begin{minipage}{0.52\textwidth}
+  \ExecuteMetaData[Generic/Cofinite.tex]{plug}
+\end{minipage}\hspace{2em}
+\begin{minipage}{0.43\textwidth}
+  \ExecuteMetaData[Generic/Cofinite.tex]{unroll}
+\end{minipage}
+\caption{Plug and Unroll: Exposing a Cyclic Tree's Top Layer}
+\end{figure}
+
+However, one thing still out of our reach with our current tools
+is the underlying co-finite trees these finite objects are meant
+to represent. We start by defining the coinductive type
+corresponding to them as the greatest fixpoint of a notion of
+layer. One layer of a co-finite tree is precisely given by the
+meaning of its description where we completely ignore the binding
+structure. We show with \AF{01⋯} the infinite list that
+corresponds to the example \AF{01↺} given above. The definition
+proceeds by copattern-matching as introduced in \cite{abel2013copatterns}
+and showcased in \cite{thibodeau2016case}.
+
+\begin{figure}[h]
+\begin{minipage}{0.5\textwidth}
+  \ExecuteMetaData[Generic/Cofinite.tex]{cotm}
+\end{minipage}\hfill
+\begin{minipage}{0.4\textwidth}
+  \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones2}
+\end{minipage}
+\caption{Co-finite Trees: Definition and Example}
+\end{figure}
+
+We can then make the connection between potentially cyclic
+structures and the co-finite trees formal by giving an \AF{unfold}
+function which, given a closed term, produces its unfolding.
+The definition proceeds by unrolling the term's top layer and
+co-recursively unfolding all the subterms.
+
+\begin{figure}[h]
+ \ExecuteMetaData[Generic/Cofinite.tex]{unfold}
+\caption{Generic Unfold of Potentially Cyclic Structures}
+\end{figure}
+
+Even if the
+powerful notion of semantics described in Section~\ref{section:semantics}
+cannot encompass all the traversals we may be interested in,
+it provides us with reusable building blocks: the definition
+of \AF{unfold} was made very simple by reusing the generic
+program \AF{fmap} and the \AF{Substitution} semantics whilst
+the definition of \AR{∞Tm} was made easy by reusing \AF{⟦\_⟧}.

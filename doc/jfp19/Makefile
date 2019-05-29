@@ -50,6 +50,7 @@ PAPER_DEPENDENCIES:=\
   latex/catalogue/printing.tex\
   latex/catalogue/scopechecking.tex\
   latex/catalogue/typechecking.tex\
+  latex/catalogue/unrolling.tex\
   latex/jfp1.cls \
   latex/jfp.bst \
   latex/commands.tex \
