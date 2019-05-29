@@ -1,0 +1,10 @@
+\subsection{Generic Decidable Equality for Terms}
+
+If we forget the binding structure of syntaxes with binding, we are left with
+standard inductive families. Haskell programmers are used to receiving help
+from the `deriving' mechanism~\cite{DBLP:journals/entcs/HinzeJ00,DBLP:conf/haskell/MagalhaesDJL10}.
+
+In type theory we can do better than an uninformative boolean function claiming
+that two terms are equal: we can implement a decision procedure for propositional
+equality~\cite{DBLP:conf/icfp/LohM11} which either returns a proof that its two
+inputs are equal or a proof that they cannot possibly be.

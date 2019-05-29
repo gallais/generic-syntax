@@ -6,6 +6,7 @@ AGDA_FILES:=\
   Stdlib.lagda \
   Data/Environment.lagda \
   Generic/Scopecheck.lagda \
+  Generic/Equality.lagda \
   Generic/Bisimilar.lagda \
   Generic/Cofinite.lagda \
   Generic/Examples/Colist.lagda \
@@ -51,6 +52,7 @@ PAPER_DEPENDENCIES:=\
   latex/catalogue/scopechecking.tex\
   latex/catalogue/typechecking.tex\
   latex/catalogue/unrolling.tex\
+  latex/catalogue/equality.tex\
   latex/jfp1.cls \
   latex/jfp.bst \
   latex/commands.tex \
