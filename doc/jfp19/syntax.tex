@@ -1682,13 +1682,13 @@ connection between the abstract definition of semantics and the shape of the
 language.
 
 By extending a universe of datatype descriptions to support a notion of binding,
-we have given a generic presentation of syntaxes with binding as well
-as a large class of scope- and type- safe generic programs acting on all of them:
-from renaming and substitution, to normalisation by evaluation, and the desugaring
-of new constructors added by a language transformer. The code accompanying the
-paper also demonstrates how to generically write a printer or a scope-checker
-elaborating values of a raw syntax using strings as variable names into scope-safe
-ones.
+we have given a generic presentation of syntaxes with binding. We then described
+a large class of scope- and type- safe generic programs acting on all of them
+We started with syntactic traversals such as renaming and substitution. We then
+demonstrated how to write a small compiler pipeline: scope checking, type checking
+and elaboration to a core language, desugaring of new constructors added by a language
+transformer, dead code elimination and inlining, partial evaluation, and printing
+with names.
 
 We have seen how to construct generic proofs about these generic programs. We
 first introduced a Simulation relation showing what it means for two semantics
@@ -1758,12 +1758,20 @@ be proven generically is still an open problem.
 
 \subsection{Future work}
 
-The diverse influences leading to this work suggest many opportunities
-for future research.
+The diverse influences leading to this work suggest many opportunities for
+future research.
 
-Our example of the elaboration of an enriched language to a core one, and ACMM's
-implementation of a Continuation Passing Style conversion function raises the question
-of how many such common compilation passes can be implemented generically.
+Our example of the elaboration of an enriched language to a core one, ACMM's
+implementation of a Continuation Passing Style conversion function, and
+Jander's work~\citeyear{Jander:Thesis:2019} on the certification of a intrinsically
+typed CPS transformation raises the question of how many such common compilation
+passes can be implemented generically.
+
+Atkey and Wood's work on quantitative type theory~\cite{DBLP:conf/lics/Atkey18,context-constrained}
+suggests a natural extension: a generic treatment of resource-aware syntaxes
+with binding based on a refinement of the Kripke function space used in our
+notion of \AR{Semantics} to track both potential context extensions but also
+usage information.
 
 An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
 could provide an appropriate framework to highlight the connection between various
