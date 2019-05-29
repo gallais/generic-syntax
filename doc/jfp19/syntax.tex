@@ -1666,6 +1666,22 @@ Copello~\citeyear{copello2017} works with \emph{named} binders and
 defines nominal techniques (e.g. name swapping) and ultimately $\alpha$-equivalence
 over a universe of regular trees with binders inspired by Morris'~\citeyear{morris-regulartt}.
 
+\subsection{Fusion of Successive Traversals}
+
+The careful characterisation of the successive recursive traversals which can be
+fused together into a single pass in a semantics-preserving way is not new. This
+transformation is a much needed optimisation principle in a high-level functional
+language.
+
+Through the careful study of the recursion operator associated to each strictly
+positive datatype, Malcolm~\citeyear{DBLP:journals/scp/Malcolm90} defined proof
+principles which can be used as optimising fusion rules.
+
+Other optimisations such as deforestation~\cite{DBLP:journals/tcs/Wadler90}
+or the compilation of a recursive definition into an equivalent abstract
+machine-based tail-recursive program~\cite{DBLP:conf/icfp/CortinasS18}
+rely on similar generic proofs that these transformations are meaning-preserving.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
