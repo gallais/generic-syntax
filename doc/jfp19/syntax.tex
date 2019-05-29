@@ -1709,7 +1709,56 @@ in other domains by seeing our syntaxes with binding as potentially cyclic
 terms. Their unfolding is a non-standard semantics and we provide the
 user with a generic notion of bisimilarity to reason about them.
 
-% \subsection{Future work}
+\subsection{Limitations of the Current Framework}
+
+Although quite versatile already our current framework has some limitations
+which suggest avenues for future work. We list these limitations from easiest
+to hardest to resolve. Remember that each modification to the universe of
+syntaxes needs to be given an appropriate semantics.
+
+\paragraph{Closure under Products} Our current universe of descriptions is
+closed under sums as demonstrated in Section~\ref{desccomb}. It is however
+not closed under products: two arbitrary right-nested products conforming
+to a description may disagree on the kind of the term they are constructing.
+An approach where the kind is an input from which the description of allowed
+constructors is computed (à la Dagand \citeyear{DBLP:phd/ethos/Dagand13} where,
+for instance, the \AIC{`lam} constructor is only offered if the input kind is
+a function type) would not suffer from this limitation.
+
+\paragraph{Unrestricted Variables} Our current notion of variable can be used
+to form a term of any kind. We remarked in Sections~\ref{section:typechecking}
+and \ref{section:elaboration} that in some languages we want to restrict this
+ability to one kind in particular. In that case, we wanted users to only be able
+to use variables at the kind \AIC{Infer} of our bidirectional language. For the
+time being we made do by restricting the environment values our \AR{Semantics}
+use to a subset of the kinds: terms with variables of the wrong kind will not be
+given a semantics.
+
+\paragraph{Flat Binding Structure} Our current setup limits us to flat binding
+structures: variable and binder share the same kinds. This prevents us from
+representing languages with binding patterns, for instance pattern-matching
+let-binders which can have arbitrarily nested patterns taking pairs apart.
+
+\paragraph{Closure under Derivation} One-hole contexts play a major role in the
+theory of programming languages. Just like the one-hole context of a datatype is
+a datatype~\cite{DBLP:journals/fuin/AbbottAMG05}, we would like our universe to
+be closed under derivatives so that the formalisation of e.g. evaluation contexts
+could benefit directly from the existing machinery.
+
+\paragraph{Closure under Closures} Jander's work on formalising and certifying
+continuation passing style transformations~\cite{Jander:Thesis:2019} highlighted
+the need for a notion of syntaxes with closures. Recalling that our notion of
+Semantics is always compatible with a preliminary renaming~\cite{Kaiser-wsdebr}
+but not necessarily a preliminary substitution (printing is for instance not
+stable under substitution), accomodating terms with suspended substitutions is
+a real challenge. Preliminary experiments show that a drastic modification of
+the type of the fundamental lemma of \AR{Semantics} makes dealing with such
+closures possible. Whether the resulting traversal has good properties that can
+be proven generically is still an open problem.
+
+
+
+\subsection{Future work}
 
 The diverse influences leading to this work suggest many opportunities
 for future research.
