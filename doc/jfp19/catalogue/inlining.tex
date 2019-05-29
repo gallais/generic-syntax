@@ -9,23 +9,31 @@ size preserving and opens up opportunities for additional optimisations.
 
 As we will see shortly, we can implement reference counting and size
 respecting let-inlining as a generic transformation over all syntaxes
-with binding equipped with let binders. But first, we need to look at
-an example demonstrating that this is a slightly subtle matter. Assuming
-that \AB{expensive} takes a long time to evaluate, inlining all of the
-lets in the first expression is a really good idea whilst we only want
-to inline the one binding \AB{y} in the second one to avoid duplicating
-work. That is to say that the contribution of the expression bound to
-\AB{y} in the overall count depends directly on whether \AB{y} itself
-appears free in the body of the let which binds it.
+with binding equipped with let binders. This two-pass simple transformation
+takes linear time which may seem surprising given the results due to Appel and
+Jim~\citeyear{DBLP:journals/jfp/AppelJ97}. Our optimisation only inlines
+let-bound variables whereas theirs also encompasses the reduction of static
+β-redices of (potentially) recursive function. While we can easily count how
+often a variable is used in the body of a let binder, the interaction between
+inlining and β-reduction in theirs creates cascading simplification opportunities
+thus making the problem much harder.
 
-%\begin{figure}[h]
+But first, we need to look at an example demonstrating that this is a
+slightly subtle matter. Assuming that \AB{expensive} takes a long time
+to evaluate, inlining all of the lets in the first expression is a really
+good idea whilst we only want to inline the one binding \AB{y} in the
+second one to avoid duplicating work. That is to say that the contribution
+of the expression bound to \AB{y} in the overall count depends directly
+on whether \AB{y} itself appears free in the body of the let which binds it.
+
+\begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{cheap}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{expensive}
 \end{minipage}
-%\end{figure}
+\end{figure}
 
 Our transformation will consist of two passes: the first one will annotate
 the tree with accurate count information precisely recording whether
