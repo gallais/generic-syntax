@@ -49,8 +49,8 @@ WithNames T Δ   j Γ = Names Δ × T j
 %<*raw>
 \begin{code}
 data Raw (d : Desc I) : Size → I → Set where
-  `var : E → String → Raw d (↑ i) σ
-  `con : ⟦ d ⟧ (WithNames (Raw d i)) σ [] → Raw d (↑ i) σ
+  `var  : E → String → Raw d (↑ i) σ
+  `con  : ⟦ d ⟧ (WithNames (Raw d i)) σ [] → Raw d (↑ i) σ
 \end{code}
 %</raw>
 \begin{code}

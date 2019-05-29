@@ -130,11 +130,14 @@ app f t Γ = do
   return (τ , `app F T)
 \end{code}
 %</app>
-%<*lam>
+%<*var0>
 \begin{code}
 var₀ : Var- Infer (Infer ∷ ms)
 var₀ = `var λ where (σ ∷ _) → (σ , z)
-
+\end{code}
+%</var0>
+%<*lam>
+\begin{code}
 lam : ∀[ Kripke Var- Elab- (Infer ∷ []) Check ⇒ Elab- Check ]
 lam b Γ arr = do
   (σ `→ τ)  ← isArrow arr

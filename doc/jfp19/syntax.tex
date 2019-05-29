@@ -287,7 +287,7 @@ These constraints show up in the types of renaming and substitution: % defined a
 \caption{Type and Scope Preserving Renaming and Substitution}
 \end{figure}
 
-We have voluntarily hidden technical details behind some auxiliary definitions
+We have intentionally hidden technical details behind some auxiliary definitions
 left abstract here: \AF{var} and \AF{extend}. Their implementations are distinct
 for \AF{ren} and \AF{sub} but they serve the same purpose: \AF{var} is used to
 turn a value looked up in the evaluation environment into a term and \AF{extend}
@@ -1402,7 +1402,9 @@ Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} make: \emph{assuming
 functional extensionality}, all the ACMM~\citeyear{allais2017type} traversals
 are compatible with variable renaming. We can reproduce this result generically
 for all syntaxes (see accompanying code) but refrain from using it in practice
-when an axiom-free alternative is provable.
+when an axiom-free alternative is provable. Their observation naturally raises
+the question of whether the same semantics are also stable under substitution.
+Our semantics implementing printing with names is a clear counter-example.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,11 +1,11 @@
 \subsection{An Algebraic Approach to Elaboration}\label{section:elaboration}
 
 Instead of generating a type or checking that a candidate will do, we can use
-our language of \AD{Desc}riptions to describe not only the source language but
-also a language of evidence. During typechecking we generate at the same time
-an expression's type and a well scoped and well typed term of that type. We use
-\AF{STLC} (defined in Section~\ref{par:intrinsicSTLC}) as our \emph{internal}
-language.
+our language of \AD{Desc}riptions to define not only an untyped source language
+but also an intrinsically typed internal language. During typechecking we generate
+at the same time an expression's type and a well scoped and well typed term of
+that type. We use \AF{STLC} (defined in Section~\ref{par:intrinsicSTLC}) as our
+internal language.
 
 Before we can jump right in, we need to set the stage: a \AR{Semantics} for a
 \AF{Bidi} term will involve ({\AD{Mode} \AF{─Scoped}}) notions of values and
@@ -14,32 +14,44 @@ introduce a \AF{Typing} associating types to each of the modes in scope, togethe
 with \AF{fromTyping} extracting the context thus defined.
 
 \begin{figure}[h]
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}[t]{0.4\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{typing}
 \end{minipage}
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{fromtyping}
 \end{minipage}
 \caption{Typing: From Contexts of \AD{Mode}s to Contexts of \AD{Type}s\label{fig:typingmodes}}
 \end{figure}
 
 We can then explain what it means for elaboration to target \AB{T} a
-({\AD{Type} \AF{─Scoped}}) at a type \AB{σ}: provided a list of modes and a corresponding
-typing, we should get a \AB{T} of type \AB{σ} in the context induced by that \AF{Typing}.
+({\AD{Type} \AF{─Scoped}}) at a type \AB{σ}: provided a list of modes and a
+corresponding \AF{Typing}, we should get a \AB{T} of type \AB{σ} in the
+typing context induced by that \AF{Typing}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elab}
 \caption{Elaboration of a Scoped Family}
 \end{figure}
 
-In particular, our environment values are elaboration functions targeting \AD{Var}. We
-expect all values to be in scope i.e. provided any typing of the scope of modes, we are
-guaranteed to return a type together with a variable of that type in the context induced
-by the typing. We once more limit environment values to the \AIC{Infer} mode only.
+Our first example of an elaboration function is our notion of environment values.
+To each variable in scope of mode \AIC{Infer} we associate an elaboration function
+targeting \AD{Var}. In other words: our values are all in scope i.e. provided any
+typing of the scope, we can assuredly return a type together with a variable of
+that type.
+
+\begin{figure}[h!]
+\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{varmode}
+\caption{Values as Elaboration Functions for Variables\label{fig:elabvalues}}
+\end{figure}
+
+We can for instance prove that we have such an inference function for a newly-bound
+variable of mode \AIC{Infer}: given that the context has been extended with a variable
+of mode \AIC{Infer}, the \AF{Typing} must also have been extended with a type \AB{σ}.
+We can return that type paired with the variable \AIC{z}.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{varmode}
-\caption{Values as Variables and Inference Functions\label{fig:elabvalues}}
+\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{var0}
+\caption{Inference Function for the 0-th Variable\label{fig:elabvar0}}
 \end{figure}
 
 The computations are a bit more tricky. On the one hand, if we are in checking mode
