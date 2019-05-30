@@ -11,7 +11,7 @@ Algebraic Data Types (GADTs) or the more general indexed families of
 Type Theory~\cite{dybjer1994inductive} for representing their syntax,
 programmers can \emph{statically} enforce some of the invariants in
 their languages. Managing variable scope is a popular use
-case in LEGO, Idris, Coq, Agda and Haskell~\cite{altenkirch1999monadic,DBLP:conf/gpce/BradyH06,DBLP:journals/jar/HirschowitzM12,BachPoulsen,plfa2018,eisenbergsticth18}
+case in LEGO, Idris, Coq, Agda and Haskell~\cite{altenkirch1999monadic,DBLP:conf/gpce/BradyH06,DBLP:journals/jar/HirschowitzM12,DBLP:conf/icfp/KeuchelJ12,BachPoulsen,plfa2018,eisenbergsticth18}
  as directly manipulating raw de
 Bruijn indices is notoriously error-prone. Solutions range from enforcing
 well scopedness to ensuring full type- and scope- correctness. In short,
@@ -1559,6 +1559,16 @@ and McBride's observation that generic programming is everyday programming
 in dependently-typed languages~\citeyear{genericprogramming-dtp}, we can naturally
 expect generic, provably sound, treatments of these notions in tools such as
 Agda or Coq.
+
+Keuchel~\citeyear{Keuchel:Thesis:2011} together with Jeuring~\citeyear{DBLP:conf/icfp/KeuchelJ12}
+define a universe of syntaxes with binding with a rich notion of binding patterns
+closed under product but also sum as long as the disjoint patterns bind the same
+variables. They give their universe two distinct semantics: a first one based on well
+scoped de Bruijn indices and a second one based on Parametric Higher-Order Abstract
+Syntax (PHOAS)~\cite{DBLP:conf/icfp/Chlipala08} together with a generic conversion
+function from the de Bruijn syntax to the PHOAS one. Following McBride~\citeyear{mcbride2005type},
+they implement both renaming and substitution in one swift move. They leave other
+opportunities for generic programming and proving to future work.
 
 Keuchel, Weirich, and Schrijvers' Knot~\citeyear{needleandknot} implements
 as a set of generic programs the traversals and lemmas generated in specialised
