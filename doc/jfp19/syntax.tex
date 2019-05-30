@@ -1472,7 +1472,7 @@ compare various methods.
 Having based our work on a de Bruijn encoding of variables, and thus a
 canonical treatment of \(\alpha\)-equivalence classes, our work has no
 direct comparison with permutation-based treatments such as those of
-Pitts' and Gabbay's nominal syntax~\cite{gabbay:newaas-jv}.
+Pitts' and Gabbay's nominal syntax~\citeyear{gabbay:newaas-jv}.
 
 Our generic universe of syntax is based on
 scoped and typed de Bruijn indices~\cite{de1972lambda} but it is not
@@ -1485,6 +1485,15 @@ to see what the appropriate notion of Semantics is for this representation.
 present here is based on a flat, lexical scoping strategy. There are
 other strategies and it would be interesting to see whether
 our approach could be reused in these cases.
+
+Weirich, Yorgey, and Sheard's work~\citeyear{DBLP:conf/icfp/WeirichYS11}
+encompassing a large array of patterns (nested, recursive, telescopic, and
+n-ary) can inform our design. They do not enforce scoping invariants internally
+which forces them to introduce separate constructors for a simple binder, a
+recursive one, or a telescopic pattern. They recover guarantees by giving
+their syntaxes a nominal semantics thus bolting down the precise meaning of
+each combinators and then proving that users may only generate well formed
+terms.
 
 Bach Poulsen, Rouvoet, Tolmach, Krebbers and Visser~\citeyear{BachPoulsen}
 introduce notions of scope graphs and frames to scale the techniques typical
