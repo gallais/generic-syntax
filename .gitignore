@@ -4,6 +4,5 @@
 *.hash
 latex/
 latex-agda-output/
-src/
 *.o
 *.hi

@@ -34,7 +34,7 @@ module _ {d : Desc ⊤} where
   plug t Δ i = Semantics.semantics Sub (pack (λ _ → t))
 
   unroll : TM d tt → ⟦ d ⟧ (Const (TM d)) tt []
-  unroll t′@(`con t) = fmap d (plug t′) t
+  unroll t@(`con b) = fmap d (plug t) b
 
   unfold : TM d tt → ∞Tm d s tt
   unfold t .force = fmap d (λ _ _ → unfold) (unroll t)
