@@ -16,7 +16,7 @@ case in LEGO, Idris, Coq, Agda and Haskell~\cite{altenkirch1999monadic,DBLP:conf
 Bruijn indices is notoriously error-prone. Solutions range from enforcing
 well scopedness to ensuring full type- and scope- correctness. In short,
 we use types to ensure that ``illegal states are unrepresentable'', where
-illegal states are ill scoped or ill typed terms.
+illegal states correspond to ill scoped or ill typed terms.
 
 Despite the large body of knowledge in how to use types to define well
 formed syntax (see the Related Work in Section
@@ -302,8 +302,8 @@ Both renaming and substitution are defined in terms of \emph{environments}
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ}} that describe how to associate a value \AB{𝓥}
 (variables for renaming, terms for substitution) well scoped and typed in \AB{Δ}
 to every entry in \AB{Γ}. Environments are defined as the following record
-structure (using a record helps Agda's type inference reconstruct the type of
-values \AB{𝓥} for us):
+structure (using a record helps Agda's type inference reconstruct the type family
+\AB{𝓥} of values for us):
 
 %\begin{figure}[h]
 \begin{center}
@@ -402,7 +402,7 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 \subsection{A Generic Notion of Semantics}
 
 As Allais, Chapman, McBride and McKinna (ACMM)~\citeyear{allais2017type}
-shows, equipped with these new notions we can define an abstract concept
+show, equipped with these new notions we can define an abstract concept
 of semantics for our scope- and type- safe language. Provided that a set of
 constraints on two ({\AF{Type} \AF{─Scoped}}) \AB{𝓥} and \AB{𝓒} is
 satisfied, we will obtain a traversal of the following type:
@@ -421,7 +421,7 @@ at hand.
 
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsemtype}\label{section:lamsem}
 
-First of all, values should be thinnable so that \semfun{} may push the
+First of all, values \AB{𝓥} should be \AF{Thinnable} so that \semfun{} may push the
 environment under binders. This constraint allows us to define \AF{extend}
 which takes a context extension from \AB{Δ} to \AB{Θ} in the form of a
 thinning, an existing evaluation environment mapping \AB{Γ} variables to
@@ -529,7 +529,7 @@ a function \AF{fresh} that generates new concrete names using a \AD{State} monad
 The wrapper \AR{Wrap} does not depend on the scope \AB{$\Gamma$} so it is automatically
 a Thinnable functor. We jump straight
 to the definition of the printer. To print an application, we produce
-a string representation of the term in function position, then of its argument and combine
+a string representation of the term in function position, then one of its argument and combine
 them by putting the argument between parentheses. To print a λ-abstraction,
 we start by generating a fresh name for the newly-bound variable, use that
 name to generate a string representing the body of the function to which we
@@ -609,7 +609,8 @@ to lists of elements in $A$ stores a \AD{Bool}ean which stands for whether
 the current node is the empty list or not. Depending on its value, the
 rest of the description is either the ``stop'' token or a pair of an element
 in $A$ and a recursive substructure i.e. the tail of the list. The \AD{List} type
-is unindexed, we represent the lack of an index with the unit type \AD{$\top$}.
+is unindexed, we represent the lack of an index with the unit type \AD{$\top$}
+whose unique inhabitant is \AIC{tt}.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{listD}
@@ -748,7 +749,7 @@ of type \AD{List} \AB{I} \AS{→} \AB{I} \AF{─Scoped} by appending the two
 \AD{List} indices, we recover a meaning function producing an endofunctor on
 \AB{I} \AF{─Scoped}. So far we have only shown the action of the functor on objects;
 its action on morphisms is given by a function \AF{fmap} defined by induction over
-the description just like in Section~\ref{section:data}.
+the description just as in Section~\ref{section:data}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{scope}
@@ -1092,7 +1093,7 @@ For any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh\textsuperscript{r}} of
 type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})} and \AF{fresh\textsuperscript{l}} of
 type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Γ} \AF{++} \AB{Δ})} by combining the use
 of placeholder values and thinnings, and it is almost immediate that variables
-are \AR{VarLike}. Hence, we can then write \AF{reify} like so:
+are \AR{VarLike}. Hence, we can then implement \AF{reify} as in Figure~\ref{fig:genericreify}:
 
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{reify}
@@ -1206,11 +1207,11 @@ synchronised. The simulation constraint on the algebras for two \semrec{}
 then becomes: given synchronized objects, the algebras should yield
 related computations. Together with self-explanatory constraints on
 \ARF{var} and \ARF{th\textasciicircum{}𝓥}, this constitutes the whole \AR{Simulation}
-constraint:
+constraint, as show in Figure~\ref{fig:genericsim}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Simulation.tex]{recsim1}
-\caption{A Generic Notion of Simulation}
+\caption{A Generic Notion of Simulation}\label{fig:genericsim}
 \end{figure}
 
 The fundamental lemma of simulations is a generic theorem showing that for

@@ -19,7 +19,7 @@ and then discuss related future work in the conclusion.
 
 Our scope checker will be a function taking two explicit arguments: a name for
 each variable in scope \AB{Γ}, a raw term for a syntax description \AB{d} and
-either fail (the monad \AF{M} granting us the ability to fail is made explicit
+either fail (the Monad \AF{M} granting us the ability to fail is made explicit
 in Figure~\ref{fig:scopemonad}) or return a well scoped and sorted term for
 that description.
 
@@ -29,7 +29,7 @@ that description.
 \AF{All}, a predicate transformer making sure a predicate holds of all the element
 of a list. The definition of \AF{WithNames} is analogous to \AF{Pieces} in the
 previous section: we expect \AF{Names} for the newly bound variables.
-Terms in the raw syntax are leveraging these definitions: they are either a variable
+Terms in the raw syntax then leverage these definitions: they are either a variable
 i.e. a \AD{String} potentially accompanied by some extra information \AB{E} (typically
 a position in a file) or a ``layer'' of raw term where subterms are raw terms with
 names for the newly-bound variables.
@@ -49,7 +49,7 @@ names for the newly-bound variables.
 evidently a name can be out of scope but it is also possible that it may be
 associated to a variable of the wrong sort. We define an enumerating type
 covering these two cases. The scope checker will return a computation in the
-monad \AF{M} thus allowing us to fail and return an error, the string that
+Monad \AF{M} thus allowing us to fail and return an error, the string that
 caused the failure and the extra data of type \AB{E} that accompanied it.
 
 \begin{figure}[h]
@@ -80,9 +80,9 @@ down the scope and use \AIC{s} to lift the result to the full scope.
 \end{figure}
 
 Scope checking an entire term then amounts to lifting this action on
-variables to an action on terms. The error monad \AF{M} is by definition
-an applicative and by design our terms are
-traversable~\cite{bird_paterson_1999,DBLP:journals/jfp/GibbonsO09}.
+variables to an action on terms. The error Monad \AF{M} is by definition
+an Applicative and by design our terms are
+Traversable~\cite{bird_paterson_1999,DBLP:journals/jfp/GibbonsO09}.
 The action on term is defined mutually with the action on scopes.
 As we can see in the second equation for \AF{toScope}, thanks to the
 definition of \AF{WithNames}, concrete names arrive just in time to

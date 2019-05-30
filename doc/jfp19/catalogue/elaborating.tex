@@ -71,8 +71,8 @@ checking case we want to get a proof of propositional equality but we only care
 about the successful path and will happily return \AIC{nothing} when failing.
 Agda's support for (dependent!) \AK{do}-notations makes writing the check
 really easy. For the arrow type, we introduce a family \AD{Arrow} constraining the
-shape of its index to be an arrow type and redefine \AF{isArrow} as a view targeting
-this inductive family~\cite{DBLP:conf/popl/Wadler87}.
+shape of its index to be an arrow type and redefine \AF{isArrow} as a \emph{view} targeting
+this inductive family~\cite{DBLP:conf/popl/Wadler87,DBLP:journals/jfp/McBrideM04}.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -98,7 +98,7 @@ with the internal function applied to the internal argument.
 \paragraph{λ-abstraction} For the λ-abstraction case, we start by checking that
 the type candidate is an \AD{Arrow}. We can then elaborate the body of the lambda
 in a context extended with one \AIC{Infer} variable assigned an inference function
-thanks to the auxiliary function \AF{var0}. From this we get an internal term
+thanks to the auxiliary function \AF{var₀}. From this we get an internal term
 corresponding to the body of the λ-abstraction and conclude by returning it wrapped
 in a \AIC{`lam} constructor.
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{lam}
