@@ -1134,12 +1134,25 @@ in Section~\ref{section:nbyeval}.
 
 \section{Other Opportunities for Generic Programming}
 
+Some generic programs of interest do not fit in the \AR{Semantics}
+framework. They can still be implemented once and for all, and even
+benefit from the \AR{Semantics}-based definitions.
+
+We will first explore existing work on representing cyclic structures
+using a syntax with binding: a binder is a tree node declaring a pointer
+giving subtrees the ability to point back to it, thus forming a cycle.
+Substitution will naturally play a central role in giving these finite
+terms a semantics as their potentially infinite unfolding.
+
+We will then see that much of the standard traversals produced by the
+`deriving' machinery familiar to Haskell programmers can be implemented
+on syntaxes too, sometimes with more informative types.
+
 \input{catalogue/unrolling.tex}
-\input{catalogue/equality.tex}\todo{finish}
+\input{catalogue/equality.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GENERIC PROOFS
-
 
 \section{Building Generic Proofs about Generic Programs}
 

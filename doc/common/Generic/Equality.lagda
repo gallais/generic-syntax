@@ -21,25 +21,56 @@ private
     Γ : List I
     d : Desc I
     i : Size
+\end{code}
+\begin{code}
 
-Constraint : Desc I → Set
-Constraint (`σ A d)   = ((a b : A) → Dec (a ≡ b))
-                      × (∀ a → Constraint (d a))
-Constraint (`X _ _ d) = Constraint d
-Constraint (`∎ _)     = ⊤
+\end{code}
+%<*constraints>
+\begin{code}
+Constraints : Desc I → Set
+Constraints (`σ A d)    = ((a b : A) → Dec (a ≡ b)) × (∀ a → Constraints (d a))
+Constraints (`X _ _ d)  = Constraints d
+Constraints (`∎ _)      = ⊤
+\end{code}
+%</constraints>
+\begin{code}
 
+\end{code}
+%<*eqVarType>
+\begin{code}
 eq^Var : (v w : Var σ Γ) → Dec (v ≡ w)
-eq^Var z     z     = yes refl
-eq^Var z     (s w) = no (λ ())
-eq^Var (s v) z     = no (λ ())
-eq^Var (s v) (s w) with eq^Var v w
+\end{code}
+%</eqVarType>
+%<*eqVarNo>
+\begin{code}
+eq^Var z      (s w)  = no (λ ())
+eq^Var (s v)  z      = no (λ ())
+\end{code}
+%</eqVarNo>
+%<*eqVarYesZ>
+\begin{code}
+eq^Var z      z      = yes refl
+\end{code}
+%</eqVarYesZ>
+%<*eqVarYesS>
+\begin{code}
+eq^Var (s v)  (s w)  with eq^Var v w
 ... | yes p = yes (cong s p)
 ... | no ¬p = no λ where refl → ¬p refl
+\end{code}
+%</eqVarYesS>
+\begin{code}
 
-module _ (eq^d : Constraint d) where
+module _ (eq^d : Constraints d) where
 
+\end{code}
+%<*eqTmType>
+\begin{code}
   eq^Tm : (t u : Tm d i σ Γ) → Dec (t ≡ u)
-  eq^⟦⟧ : ∀ e → Constraint e → (b c : ⟦ e ⟧ (Scope (Tm d i)) σ Γ) → Dec (b ≡ c)
+  eq^⟦⟧ : ∀ e → Constraints e → (b c : ⟦ e ⟧ (Scope (Tm d i)) σ Γ) → Dec (b ≡ c)
+\end{code}
+%</eqTmType>
+\begin{code}
 
 
   eq^Tm (`var v) (`con c) = no (λ ())

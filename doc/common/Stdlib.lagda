@@ -41,3 +41,24 @@ _⊢_ : (A → B) → (B → Set) → (A → Set)
 (f ⊢ P) x = P (f x)
 \end{code}
 %</adjust>
+\begin{code}
+
+
+\end{code}
+%<*bottom>
+\begin{code}
+data ⊥ : Set where
+\end{code}
+%</bottom>
+\begin{code}
+
+
+\end{code}
+%<*dec>
+\begin{code}
+data Dec (P : Set) : Set where
+  yes  : P        → Dec P
+  no   : (P → ⊥)  → Dec P
+\end{code}
+%</dec>
+\begin{code}

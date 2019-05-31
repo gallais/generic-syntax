@@ -1,10 +1,107 @@
 \subsection{Generic Decidable Equality for Terms}
 
-If we forget the binding structure of syntaxes with binding, we are left with
-standard inductive families. Haskell programmers are used to receiving help
-from the `deriving' mechanism~\cite{DBLP:journals/entcs/HinzeJ00,DBLP:conf/haskell/MagalhaesDJL10}.
+Haskell programmers are used to receiving help from the `deriving'
+mechanism~\cite{DBLP:journals/entcs/HinzeJ00,DBLP:conf/haskell/MagalhaesDJL10}
+to automatically generate common traversals for every inductive type
+they define. Recalling that generic programming is normal programming
+over a universe in a dependently typed
+language~\cite{DBLP:conf/ifip2-1/AltenkirchM02}, we ought to be able to
+deliver similar functionalities.
 
-In type theory we can do better than an uninformative boolean function claiming
-that two terms are equal: we can implement a decision procedure for propositional
-equality~\cite{DBLP:conf/icfp/LohM11} which either returns a proof that its two
-inputs are equal or a proof that they cannot possibly be.
+We will focus in this section on the definition of an equality test. The
+techniques used in this concrete example are general enough that they also
+apply to the definition of an ordering test, a \texttt{Show} instance, etc.
+In type theory we can do better than an uninformative boolean function
+claiming that two terms are equal: we can implement a decision procedure
+for propositional equality~\cite{DBLP:conf/icfp/LohM11} which either
+returns a proof that its two inputs are equal or a proof that they
+cannot possibly be.
+
+The notion of decidability can be neatly formalised by an inductive family
+with two constructors: a \AF{Set} \AB{P} is decidable if we can either say
+\AIC{yes} and return a proof of \AB{P} or \AIC{no} and provide a proof of
+the negation of \AB{P} (here, a proof that \AB{P} implies the empty type
+\AD{⊥}).
+
+\begin{figure}[h]
+\begin{minipage}[t]{0.45\textwidth}
+  \ExecuteMetaData[Stdlib.tex]{bottom}
+\end{minipage}
+\begin{minipage}[t]{0.45\textwidth}
+  \ExecuteMetaData[Stdlib.tex]{dec}
+\end{minipage}
+\caption{Empty Type and Decidability as an Inductive Family}
+\end{figure}
+
+To get acquainted with these new notions we can start by proving that equality
+of variables is decidable.
+
+\subsubsection{Deciding Variable Equality}
+
+The type of the decision procedure for equality of variables is as follows:
+given any two variables (of the same type, in the same context), the set of
+equality proofs between them is \AD{Dec}idable.
+
+\ExecuteMetaData[Generic/Equality.tex]{eqVarType}
+
+We can easily dismiss two trivial cases: if the two variables have distinct
+head constructors then they cannot possibly be equal. Agda allows us to
+dismiss the impossible premisse of the function stored in the \AIC{no}
+contructor by using an absurd pattern \AS{()}.
+
+\ExecuteMetaData[Generic/Equality.tex]{eqVarNo}
+
+Otherwise if the two head constructors agree we can be in one of two
+situations. If they are both \AIC{z} then we can conclude that the two
+variables are indeed equal to each other.
+
+\ExecuteMetaData[Generic/Equality.tex]{eqVarYesZ}
+
+Finally if the two variables are {(\AIC{s} \AB{v})} and {(\AIC{s} \AB{w})}
+respectively then we need to check recursively whether \AB{v} is equal
+to \AB{w}. If it is the case we can conclude by invoking the congruence
+rule for \AIC{c}. If \AB{v} and \AB{w} are not equal then a proof that
+{(\AIC{s} \AB{v})} and {(\AIC{s} \AB{w})} are will lead to a direct
+contradiction by injectivity of the constructor \AIC{s}.
+
+\ExecuteMetaData[Generic/Equality.tex]{eqVarYesS}
+
+\subsubsection{Deciding Term Equality}
+
+The constructor \AIC{`σ} for descriptions gives us the ability to store
+values of any \AF{Set} in terms. For some of these \AF{Set}s (e.g.
+{(\AD{ℕ} → \AD{ℕ})}), equality is not decidable. As a consequence
+our decision procedure will be conditioned to the satisfaction of a
+certain set of \AF{Constraints} which we can compute from the \AD{Descr}
+itself, as show in Figure~\ref{fig:eqconstraints}. We demand that we are
+able to decide equality for all of the \AF{Set}s mentioned in a description.
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Equality.tex]{constraints}
+\caption{Constraints Necessary for Decidable Equality}\label{fig:eqconstraints}
+\end{figure}
+
+Remembering that our descriptions are given a semantics as a big right-nested
+product terminated by an equality constraint, we realise that proving decidable
+equality will entail proving equality between proofs of equality. We are happy
+to assume Streicher's axiom K~\cite{DBLP:conf/lics/HofmannS94} to easily
+dismiss this case. A more conservative approach would be to demand that equality
+is decidable on the index type \AB{I} and to then use the classic Hedberg
+construction~\cite{DBLP:journals/jfp/Hedberg98} to recover uniqueness of
+identity proofs for \AB{I}.
+
+Assuming that the constraints computed by {(\AF{Constraints} \AB{d})} are
+satisfied, we define the decision procedure for equality of terms together
+with its equivalent for bodies. The function \AF{eq\textasciicircum{}Tm}
+is a straightforward case analysis dismissing trivially impossible cases
+where terms have distinct head constructors (\AIC{`var} vs. \AIC{`con})
+and using either \AF{eq\textasciicircum{}Var} or \AF{eq\textasciicircum{}⟦⟧}
+otherwise. The latter is defined by induction over \AB{e}. The somewhat
+verbose definitions are not enlightening so we leave them out here.
+
+
+\begin{figure}[h]
+\ExecuteMetaData[Generic/Equality.tex]{eqTmType}
+\caption{Type of Decidable Equality for Terms and Bodies}\label{fig:eqconstraints}
+\end{figure}
+
