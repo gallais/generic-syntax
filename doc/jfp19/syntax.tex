@@ -1638,7 +1638,7 @@ implementing common traversals and lemmas about them.
 
 \subsection{Universes of Syntaxes with Binding} Keeping in mind Altenkirch
 and McBride's observation that generic programming is everyday programming
-in dependently-typed languages~\citeyear{genericprogramming-dtp}, we can naturally
+in dependently-typed languages~\citeyear{DBLP:conf/ifip2-1/AltenkirchM02}, we can naturally
 expect generic, provably sound, treatments of these notions in tools such as
 Agda or Coq.
 
@@ -1688,10 +1688,11 @@ fused together into a single pass in a semantics-preserving way is not new. This
 transformation is a much needed optimisation principle in a high-level functional
 language.
 
-Through the careful study of the recursion operator associated to each strictly
-positive datatype, Malcolm~\citeyear{DBLP:journals/scp/Malcolm90} defined proof
-principles which can be used as optimising fusion rules.
-
+Through the careful study of the recursion operator associated to each
+strictly positive datatype,
+Malcolm~\citeyear{DBLP:journals/scp/Malcolm90} defined optimising
+fusion proof principles.
+%
 Other optimisations such as deforestation~\cite{DBLP:journals/tcs/Wadler90}
 or the compilation of a recursive definition into an equivalent abstract
 machine-based tail-recursive program~\cite{DBLP:conf/icfp/CortinasS18}
