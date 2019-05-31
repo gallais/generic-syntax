@@ -8,15 +8,17 @@ In modern typed programming languages, programmers writing embedded
 DSLs~\cite{hudak1996building} and researchers formalising them can now
 use the host language's type system to help them. Using Generalised
 Algebraic Data Types (GADTs) or the more general indexed families of
-Type Theory~\cite{dybjer1994inductive} for representing their syntax,
+Type Theory~\cite{dybjer1994inductive} to represent syntax,
 programmers can \emph{statically} enforce some of the invariants in
-their languages. Managing variable scope is a popular use
-case in LEGO, Idris, Coq, Agda and Haskell~\cite{altenkirch1999monadic,DBLP:conf/gpce/BradyH06,DBLP:journals/jar/HirschowitzM12,DBLP:conf/icfp/KeuchelJ12,BachPoulsen,plfa2018,eisenbergsticth18}
- as directly manipulating raw de
-Bruijn indices is notoriously error-prone. Solutions range from enforcing
-well scopedness to ensuring full type- and scope- correctness. In short,
-we use types to ensure that ``illegal states are unrepresentable'', where
-illegal states correspond to ill scoped or ill typed terms.
+their languages. For example, managing variable scope is a popular use
+case in LEGO, Idris, Coq, Agda and
+Haskell~\cite{altenkirch1999monadic,DBLP:conf/gpce/BradyH06,DBLP:journals/jar/HirschowitzM12,DBLP:conf/icfp/KeuchelJ12,BachPoulsen,plfa2018,eisenbergsticth18}
+as directly manipulating raw de Bruijn indices is notoriously
+error-prone. Solutions have been proposed that range from enforcing
+well scopedness of variables to ensuring full type correctness. In
+short, these techniques use the host languages' types to ensure that
+``illegal states are unrepresentable'', where illegal states
+correspond to ill scoped or ill typed terms in the object language.
 
 Despite the large body of knowledge in how to use types to define well
 formed syntax (see the Related Work in Section
@@ -24,14 +26,15 @@ formed syntax (see the Related Work in Section
 designer or formaliser to redefine essential functions like renaming
 and substitution for each new syntax, and then to reprove essential
 lemmas about those functions. To reduce the burden of such repeated
-work and boilerplate, we apply the methodology of datatype-genericity to
-programming and proving with syntaxes with binding.
+work and boilerplate, in this paper we apply the methodology of
+datatype-genericity to programming and proving with syntaxes with
+binding.
 
 To motivate our approach, let us look at the formalisation of an
 apparently straightforward program transformation: the inlining of
 let-bound variables by substitution together with a soundness lemma
 proving that reductions in the source languages can be simulated by
-reductions in the target one. You have two languages: the source
+reductions in the target one. There are two languages: the source
 (\AD{S}), which has let-bindings, and the target (\AD{T}), which only
 differs in that it does not:
 \begin{displaymath}
@@ -40,21 +43,22 @@ differs in that it does not:
   \AD{T} ::= x \mid \AD{T}~\AD{T} \mid \lambda x. \AD{T}
 \end{displaymath}
 
-Breaking the task down, you need to define an operational semantics for
-each language, define the program transformation itself, and prove a
-correctness lemma that states each step in the source language is
-simulated by zero or more steps of the transformed terms in the target
-language. In the course of doing this, you discover that you actually
-have a large amount of work to do:
+Breaking the task down, an implementer needs to define an operational
+semantics for each language, define the program transformation itself,
+and prove a correctness lemma that states each step in the source
+language is simulated by zero or more steps of the transformed terms
+in the target language. In the course of doing this, they will
+discover that there is actually a large amount of work:
 
 \begin{enumerate}
-\item To define the operational semantics you need to define
-  substitution, and hence renaming, for both the source and target
-  languages, even though they are very similar;
-\item In the course of proving the correctness lemma, you discover
-  that you need to prove eight lemmas about the interactions of
-  renaming, substitution, and transformation that are all remarkably
-  similar, but must be stated and proved separately (e.g, as in
+\item To define the operational semantics, one needs to define
+  substitution, and hence renaming. This needs to be done separately
+  for both the source and target languages, even though they are very
+  similar;
+\item In the course of proving the correctness lemma, one needs to
+  prove eight lemmas about the interactions of renaming, substitution,
+  and transformation that are all remarkably similar, but must be
+  stated and proved separately (e.g, as observed by
   \cite{benton2012strongly}).
 \end{enumerate}
 
@@ -68,8 +72,9 @@ editing).
 % languages, we would have to write more and more code to say we are
 % doing nothing interesting to them.
 
-Using the universe of syntaxes with binding we present in this paper,
-we are able to solve this repetition problem \emph{once and for all}.
+The main contribution of this paper is this: using the universe of
+syntaxes with binding we present in this paper, we are able to solve
+this repetition problem \emph{once and for all}.
 
 %  For
 % \emph{every} syntax in our universe, we are able to generically define
@@ -79,7 +84,8 @@ we are able to solve this repetition problem \emph{once and for all}.
 % transformation fusion lemmas (\ref{section:fusion}.
 
 \paragraph{Content and Contributions.}\todo{Highlight new contributions compared to ICFP}
-We start with primers on scoped and sorted terms
+To introduce the basic ideas that this paper bulids on, we start with
+primers on scoped and sorted terms
 (Section~\ref{section:primer-term}), scope and sort safe programs
 acting on them (Section~\ref{section:primer-program}), and
 programmable descriptions of data types (Section~\ref{section:data}).
@@ -93,12 +99,12 @@ and substitution (Section~\ref{section:renandsub}), a generic
 let-binding removal transformation (generalising the problem stated
 above) (Section~\ref{section:letbinding}), and normalisation by
 evaluation (Section~\ref{section:nbyeval}). Further, we show how to
-construct generic proofs by formally describing what it means for a
-semantics to be able to simulate another one
-(Section~\ref{section:simulation}), or for two semantics to be fusable
-(Section~\ref{section:fusion}). This allows us to prove the lemmas
-required above for renaming, substitution, and desugaring of let binders
-generically, for \emph{every} syntax in our universe.
+construct generic proofs by formally describing what it means for one
+semantics to simulate another (Section~\ref{section:simulation}), or
+for two semantics to be fusable (Section~\ref{section:fusion}). This
+allows us to prove the lemmas required above for renaming,
+substitution, and desugaring of let binders generically, for
+\emph{every} syntax in our universe.
 
 \medskip
 
