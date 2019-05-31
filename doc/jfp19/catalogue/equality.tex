@@ -105,3 +105,9 @@ verbose definitions are not enlightening so we leave them out here.
 \caption{Type of Decidable Equality for Terms and Bodies}\label{fig:eqconstraints}
 \end{figure}
 
+We now have an informative decision procedure for equality between terms
+provided that the syntax they belong to satisfies a set of constraints.
+Other generic generic functions and decision procedure can be defined
+following the same approach: implement a similar function for variables
+first, compute a set of constraints, and demonstrate that they are
+sufficient to handle any input term.
