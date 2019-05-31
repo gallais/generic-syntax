@@ -122,58 +122,111 @@ Idris~\cite{brady2013idris} ought to do.
 
 \section{A Primer on Scope And Sort Safe Terms}\label{section:primer-term}
 
-Scope safe terms follow the discipline that every variable is
-either bound by some binder or is explicitly accounted for in a
-context. Bellegarde and Hook~\citeyear{BELLEGARDE1994287}, Bird and Patterson~\citeyear{bird_paterson_1999},
-and Altenkirch and Reus~\citeyear{altenkirch1999monadic} introduced the
-classic presentation of scope safety using inductive
-\emph{families}~\cite{dybjer1994inductive} instead of inductive types to
-represent abstract syntax. Indeed, using a family indexed by a $\Set{}$,
-we can track scoping information at the type level. The empty $\Set$ represents the empty scope. The functor
+\paragraph{From Inductive Types to Inductive Families for Abstract
+  Syntax} A reasonable way to represent the abstract syntax of the
+untyped $\lambda$-calculus in a typed functional programming language
+is to use an inductive type:
+\begin{displaymath}
+  \begin{array}{l}
+    \AK{data}\;\AD{Lam} : \AD{Set}\;\AK{where} \\
+    \quad\begin{array}{@{}lll}
+           \AIC{`var} &:& \mathbb{N} \to \AD{Lam} \\
+           \AIC{`lam} &:& \AD{Lam} \to \AD{Lam} \\
+           \AIC{`app} &:& \AD{Lam} \to \AD{Lam} \to \AD{Lam}
+    \end{array}
+  \end{array}
+\end{displaymath}
+We have used de Bruijn~\citeyear{de1972lambda} indices to represent
+variables by the number of $\mathsf{`lam}$ binders one has to pass up
+through to reach the binding occurrence. The de Bruijn representation
+has the advantage that terms are automatically represented up to
+$\alpha$-equivalence. If the index goes beyond the number of binders
+enclosing it, then we assume that it is referring to some context,
+left implicit in this representation.
+
+This representation works well enough for writing programs, but the
+programmer must constantly be vigilant to guard against the accidental
+construction of ill-scoped terms. The implicit context that
+accompanies each represented term is prone to being forgotten or
+muddled with another, leading to confusing behaviour when variables
+either have dangling pointers or point to the wrong thing.
+
+To improve on this situtation, previous authors have proposed to use
+the host language's type system to make the implicit context explicit,
+and to enforce well scopedness of variables. Scope safe terms follow
+the discipline that every variable is either bound by some binder or
+is explicitly accounted for in a context. Bellegarde and
+Hook~\citeyear{BELLEGARDE1994287}, Bird and
+Patterson~\citeyear{bird_paterson_1999}, and Altenkirch and
+Reus~\citeyear{altenkirch1999monadic} introduced the classic
+presentation of scope safety using inductive
+\emph{families}~\cite{dybjer1994inductive} instead of plain inductive
+types to represent abstract syntax. Indeed, using a family indexed by
+a $\Set{}$, we can track scoping information at the type level. The
+empty $\Set$ represents the empty scope. The type constructor
 $1 + (\_)$ extends the running scope with an extra variable.
+\begin{displaymath}
+  \begin{array}{l}
+    \AK{data}\;\AD{Lam} : \AD{Set} \to \AD{Set}\;\AK{where} \\
+    \quad\begin{array}{@{}lll}
+           \AIC{`var} &:& X \to \AD{Lam}\,X \\
+           \AIC{`lam} &:& \AD{Lam}\;(\AD{1+} X) \to \AD{Lam}\,X \\
+           \AIC{`app} &:& \AD{Lam}\;X \to \AD{Lam}\;X \to \AD{Lam}\;X
+    \end{array}
+  \end{array}
+\end{displaymath}
+The $\mathit{Lam}$ type is now a family of types, indexed by the set
+of variables in scope. Thus, the context for each represented term has
+been made visible to the type system, and the types enforce that only
+variables that have been explicitly declared can be referenced in the
+$\mathsf{`var}$ constructor. We have made illegal terms
+unrepresentable.
 
-An inductive type is the fixpoint of an endofunctor on $\Set{}$.
-Similarly, an inductive family is the fixpoint of an endofunctor on
-$\Set \to \Set$. Using inductive families to enforce scope safety, we
-get the following definition of the untyped λ-calculus: $T(F)
-= \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)$.
-This endofunctor offers a choice of three constructors.  The first one
-corresponds to the variable case; it packages an inhabitant of $X$,
-the index $\Set{}$. The second corresponds to an application node;
-both the function and its argument live in the same scope as the
-overall expression. The third corresponds to a λ-abstraction;
-it extends the current scope with a fresh variable.  The language is
-obtained as the fixpoint of $T$:
-\[
-   \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
-   \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)
-\]
-Since `Lam' is a endofunction on Set, it makes
-sense to ask whether it is also a functor and a monad. Indeed it is,
-as Altenkirch and Reus have shown. The functorial action corresponds
-to renaming, the monadic `return' corresponds to the use of variables,
-and the monadic `bind' corresponds to substitution. The functor and
-monad laws correspond to well known properties from the equational
-theories of renaming and substitution. We will revisit these properties
-below in Section~\ref{section:fusion}.
 
-\paragraph{A Mechanized Typed Variant of Altenkirch and Reus' Calculus.}\label{section:mech-reus}
+% An inductive type is the fixpoint of an endofunctor on $\Set{}$.
+% Similarly, an inductive family is the fixpoint of an endofunctor on
+% $\Set \to \Set$. Using inductive families to enforce scope safety, we
+% get the following definition of the untyped λ-calculus: $T(F)
+% = \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)$.
+% This endofunctor offers a choice of three constructors.  The first one
+% corresponds to the variable case; it packages an inhabitant of $X$,
+% the index $\Set{}$. The second corresponds to an application node;
+% both the function and its argument live in the same scope as the
+% overall expression. The third corresponds to a λ-abstraction;
+% it extends the current scope with a fresh variable.  The language is
+% obtained as the fixpoint of $T$:
+% \[
+%    \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
+%    \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)
+% \]
+Since `Lam' is defined to be a function $\AD{Set} \to \AD{Set}$, it
+makes sense to ask whether it is also a functor and a monad. Indeed it
+is, as Altenkirch and Reus showed. The functorial action corresponds
+to renaming, the monadic `return' corresponds to the use of variables
+(the $\mathsf{`var}$ constructor), and the monadic `bind' corresponds
+to substitution. The functor and monad laws correspond to well known
+properties from the equational theories of renaming and
+substitution. We will revisit these properties, for our whole universe
+of syntax with binding, in Section~\ref{section:fusion}.
 
-There is no reason to restrict this technique to fixpoints of endofunctors
-on $\Set{}^{\Set{}}$. The more general
-case of fixpoints of (strictly positive) endofunctors on $\Set{}^J$ can be
-endowed with similar operations by using Altenkirch, Chapman and
-Uustalu's relative monads~\citeyear{Altenkirch2010, JFR4389}.
+\paragraph{A Mechanized and Typed Variant of Altenkirch and Reus' Calculus.}\label{section:mech-reus}
 
-We pick as our $J$ the category whose objects are inhabitants of
-\AD{List} \AB{I} (\AB{I} is a parameter of the construction) and whose morphisms are
-thinnings (see Section~\ref{def:thinning}).  This \AD{List} \AB{I} is
-intended to represent the list of the sort (/ kind / types depending
-on the application) of the de Bruijn variables in scope. We can
-recover an untyped approach by picking $I$ to be the unit type.  Given
-this typed setting, our functors take an extra $I$ argument
-corresponding to the type of the expression being built. This is
-summed up by the large type \AB{I}
+There is no reason to restrict this technique to inductive families
+indexed by $\Set{}$. The more general case of inductive families in
+$\Set{}^J$ can be endowed with similar functorial and monadic
+operations by using Altenkirch, Chapman and Uustalu's relative
+monads~\citeyear{Altenkirch2010, JFR4389}.
+
+We pick as our index type $J$ the category whose objects are
+inhabitants of \AD{List} \AB{I} (\AB{I} is a parameter of the
+construction) and whose morphisms are thinnings (permutations that may
+forget elements, see Section~\ref{def:thinning}).  Values of type
+\AD{List} \AB{I} are intended to represent the list of the sorts (or
+kinds, or types, depending on the application) of the de Bruijn
+variables in scope. We can recover an unsorted approach by picking $I$
+to be the unit type.  Given this sorted setting, our functors take an
+extra $I$ argument corresponding to the sort of the expression being
+built. This is captured by the large type \AB{I}
 \AF{─Scoped}:% = $I$ $\to$ \AD{List} $I$ $\to$ \AF{Set}.
 
 \begin{center}
@@ -185,9 +238,14 @@ We use Agda's mixfix operator notation where underscores denote
 argument positions.
 
 To lighten the presentation, we exploit the observation that the
-current scope is either passed unchanged to subterms (e.g. in the application case)
-or extended (e.g. in the λ-abstraction case) by introducing combinators
-to build indexed types.
+current scope is either passed unchanged to subterms (e.g. in the
+application case) or extended (e.g. in the λ-abstraction case) by
+introducing combinators to build indexed types, conforming to the
+convention (see e.g.~\cite{martin1982constructive}) of mentioning only
+context \emph{extensions} when presenting judgements. Indeed, this
+observation is critical to our whole approach to syntax with binding,
+and will arise again in our generic formulation of syntax traversals
+in Section~\ref{section:semantics}.
 % All the definitions are polymorphic in the index type
 % (called \AB{A} in Figure~\ref{figure:indexed}).
 
@@ -208,16 +266,16 @@ to build indexed types.
 %\caption{Combinators to build indexed Sets}\label{figure:indexed}
 \end{center}
 
-We lift the function space pointwise with \AF{\_⇒\_}, silently threading the
-underlying scope. The \AF{\_⊢\_} makes explicit the \emph{adjustment} made to the index
-by a function, conforming to the convention (see e.g.~\cite{martin1982constructive}) of mentioning only
-context \emph{extensions} when presenting judgements
-and write \AB{f} \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed
-Set it operates on. Although it may seem surprising at first to define binary
-infix operators as having arity three, they are meant to be used partially applied,
-surrounded by \AF{∀[\_]} which turns an indexed Set into a Set by implicitly
-quantifying over the index.
-Lastly, \AF{const} is the constant combinator, ignoring the index.
+We lift the function space pointwise with \AF{\_⇒\_}, silently
+threading the underlying scope. The \AF{\_⊢\_} makes explicit the
+\emph{adjustment} made to the index by a function. We write \AB{f}
+\AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed
+Set it operates on. Although it may seem surprising at first to define
+binary infix operators as having arity three, they are meant to be
+used partially applied, surrounded by \AF{∀[\_]} which turns an
+indexed Set into a Set by implicitly quantifying over the index.
+Lastly, \AF{const} is the constant combinator, which ignores the
+index.
 
 We make \AF{⇒} associate to the right as one would expect and give it the
 highest precedence level as it is the most used combinator. These combinators
@@ -226,7 +284,7 @@ lead to more readable type declarations.  For instance, the compact expression
 desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} \AS{→} \AB{Q} (\AIC{s} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
-As the context comes second in the definition of \AF{\_─Scoped}, we
+As the context argument comes second in the definition of \AF{\_─Scoped}, we
 can readily use these combinators to thread, modify, or quantify over the
 scope when defining such families:
 
@@ -241,30 +299,34 @@ scope when defining such families:
 %\end{center}
 
 The inductive family \AD{Var} represents well scoped and well kinded
-de Bruijn~\citeyear{de1972lambda}
-indices. Its \AIC{z} (for zero) constructor refers to
-the nearest binder in a non-empty scope. The \AIC{s} (for successor) constructor lifts a
-a variable in a given scope to the extended scope where
-an extra variable has been bound. Both of the constructors' types have been written using the combinators defined above.
-They respectively normalise to:
+de Bruijn indices. Its \AIC{z} (for zero) constructor refers to the
+nearest binder in a non-empty scope. The \AIC{s} (for successor)
+constructor lifts a a variable in a given scope to the extended scope
+where an extra variable has been bound. Both of the constructors'
+types have been written using the combinators defined above.  They
+respectively normalise to:
 \begin{center}
   \AIC{z} : {\AS{∀} \AB{σ} \AB{Γ} \AS{→} \AD{Var} \AB{σ} (\AB{σ} \AIC{::} \AB{Γ})}
   \qquad
   \AIC{s} : {\AS{∀} \AB{σ} \AB{τ} \AB{Γ} → \AD{Var} \AB{σ} \AB{Γ} \AS{→} \AD{Var} \AB{σ} (\AB{τ} \AIC{::} \AB{Γ})}
 \end{center}
+We will reuse the \AD{Var} family to represent variables in all the
+syntaxes defined in this paper.
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch and Reus'
-intrinsically typed representation of the simply typed λ-calculus.
-We can readily write well scoped-and-typed terms such as e.g. application,
-a closed term of type {((\AB{σ} \AIC{`→} \AB{τ}) \AIC{`→} (\AB{σ} \AIC{`→} \AB{τ}))}
-(\AC{\{-} and \AC{-\}} delimit comments meant to help the reader see which
-binder the de Bruijn indices are referring too):
+intrinsically typed representation of the simply typed λ-calculus,
+where \AD{Type} is the Agda type of simple types.  We can readily
+write well scoped-and-typed terms such as e.g. application, a closed
+term of type {((\AB{σ} \AIC{`→} \AB{τ}) \AIC{`→} (\AB{σ} \AIC{`→}
+  \AB{τ}))} (\AC{\{-} and \AC{-\}} delimit comments meant to help the
+reader see which binder the de Bruijn indices are referring too):
 
-
-\begin{figure}[h]
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}\label{figure:apply}
-\caption{Example of a well scoped-and-typed term in \AD{Lam}}
-\end{figure}
+%\begin{figure}[h]
+\begin{center}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}\label{figure:apply}
+\end{center}
+%\caption{Example of a well scoped-and-typed term in \AD{Lam}}
+%\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
