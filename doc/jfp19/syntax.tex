@@ -84,7 +84,7 @@ this repetition problem \emph{once and for all}.
 % transformation fusion lemmas (\ref{section:fusion}.
 
 \paragraph{Content and Contributions.}
-To introduce the basic ideas that this paper bulids on, we start with
+To introduce the basic ideas that this paper builds on, we start with
 primers on scoped and sorted terms
 (Section~\ref{section:primer-term}), scope and sort safe programs
 acting on them (Section~\ref{section:primer-program}), and
@@ -122,7 +122,7 @@ Idris~\cite{brady2013idris} ought to do.
 is a revised and expanded version of a paper of the same title that
 appeared at ICFP 2018. This extended version of the paper includes
 many more examples of the use of our universe of syntax with binding
-for wriring generic programs in Section~\ref{section:catalogue}:
+for writing generic programs in Section~\ref{section:catalogue}:
 pretty printing with human readable names
 (Section~\ref{section:genericprinting}), scope checking
 (Section~\ref{section:genericscoping}), type checking
@@ -170,7 +170,7 @@ accompanies each represented term is prone to being forgotten or
 muddled with another, leading to confusing behaviour when variables
 either have dangling pointers or point to the wrong thing.
 
-To improve on this situtation, previous authors have proposed to use
+To improve on this situation, previous authors have proposed to use
 the host language's type system to make the implicit context explicit,
 and to enforce well scopedness of variables. Scope safe terms follow
 the discipline that every variable is either bound by some binder or
@@ -645,7 +645,7 @@ We will come back to this in Section~\ref{section:simulation}.
 
 One important observation to make is the tight connection between the constraints
 described in \semrec{} and the definition of \AD{Lam}: the semantical counterparts
-of the \AD{Lam} constructors are obtained by replacing the recursive occurences of
+of the \AD{Lam} constructors are obtained by replacing the recursive occurrences of
 the inductive family with either a computation or a Kripke function space depending
 on whether an extra variable was bound. This suggests that it ought to be possible
 to compute the definition of \semrec{} from the syntax description. Before doing this
@@ -1802,7 +1802,7 @@ continuation passing style transformations~\cite{Jander:Thesis:2019} highlighted
 the need for a notion of syntaxes with closures. Recalling that our notion of
 Semantics is always compatible with a preliminary renaming~\cite{Kaiser-wsdebr}
 but not necessarily a preliminary substitution (printing is for instance not
-stable under substitution), accomodating terms with suspended substitutions is
+stable under substitution), accommodating terms with suspended substitutions is
 a real challenge. Preliminary experiments show that a drastic modification of
 the type of the fundamental lemma of \AR{Semantics} makes dealing with such
 closures possible. Whether the resulting traversal has good properties that can
