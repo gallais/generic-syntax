@@ -1813,35 +1813,45 @@ be proven generically is still an open problem.
 The diverse influences leading to this work suggest many opportunities for
 future research.
 
-Our example of the elaboration of an enriched language to a core one, ACMM's
-implementation of a Continuation Passing Style conversion function, and
-Jander's work~\citeyear{Jander:Thesis:2019} on the certification of a intrinsically
-typed CPS transformation raises the question of how many such common compilation
-passes can be implemented generically.
+\begin{itemize}
+\item Our example of the elaboration of an enriched language to a core
+  one, ACMM's implementation of a Continuation Passing Style
+  conversion function, and Jander's work~\citeyear{Jander:Thesis:2019}
+  on the certification of a intrinsically typed CPS transformation
+  raises the question of how many such common compilation passes can
+  be implemented generically.
+\item Our universe only includes syntaxes that allow unrestricted
+  variable use. Variables may be used multiple times or never, with no
+  restriction. We are interested in representing syntaxes that only
+  allow single use of variables, such as term calculi for linear logic
+  \cite{DBLP:conf/tlca/BentonBPH93,barber96dual,context-constrained},
+  or that annotate variables with usage information
+  \cite{BrunelGMZ14,GhicaS14,PetricekOM14}, or arrange variables into
+  non-list like structures such as bunches
+  \cite{DBLP:journals/jfp/OHearn03}, or arbitrary algebraic structures
+  \cite{DBLP:conf/rta/LicataSR17}, and in investigating what form a
+  generic semantics for these syntaxes takes.
+\item An extension of McBride's theory of
+  ornaments~\citeyear{mcbride2010ornamental} could provide an
+  appropriate framework to formalise and mechanise the connection
+  between various languages, some being seen as refinements of
+  others. This is particularly evident when considering the
+  informative typechecker (see the accompanying code) which given a
+  scoped term produces a scoped-and-typed term by type-checking or
+  type-inference.
+\item Our work on the POPLMark Reloaded challenge highlights a need
+  for generic notions of congruence closure which would come with
+  guarantees (if the original relation is stable under renaming and
+  substitution so should the closure).  Similarly, the ``evaluation
+  contexts'' corresponding to a syntax could be derived automatically
+  by building on the work of Huet~\citeyear{huet_1997} and Abbott,
+  Altenkirch, McBride and
+  Ghani~\citeyear{DBLP:journals/fuin/AbbottAMG05}, allowing us to
+  revisit previous work based on concrete instances of ACMM such as
+  McLaughlin, McKinna and Stark~\citeyear{craig2018triangle}.
+\end{itemize}
 
-Atkey and Wood's work on quantitative type theory~\cite{DBLP:conf/lics/Atkey18,context-constrained}
-suggests a natural extension: a generic treatment of resource-aware syntaxes
-with binding based on a refinement of the Kripke function space used in our
-notion of \AR{Semantics} to track both potential context extensions but also
-usage information.
-
-An extension of McBride's theory of ornaments~\citeyear{mcbride2010ornamental}
-could provide an appropriate framework to highlight the connection between various
-languages, some being seen as refinements of others. This is particularly
-evident when considering the informative typechecker (see the accompanying
-code) which given a scoped term produces a scoped-and-typed term by
-type-checking or type-inference.
-
-Our work on the POPLMark Reloaded challenge highlights a need for generic
-notions of congruence closure which would come with guarantees (if the original
-relation is stable under renaming and substitution so should the closure).
-Similarly, the ``evaluation contexts'' corresponding to a syntax could be
-derived automatically by building on the work of Huet~\citeyear{huet_1997}
-and Abbott, Altenkirch, McBride and Ghani~\citeyear{DBLP:journals/fuin/AbbottAMG05},
-allowing us to revisit previous work based on concrete instances of
-ACMM such as McLaughlin, McKinna and Stark~\citeyear{craig2018triangle}.
-
-Finally, now knowing how to generically describe syntaxes and their
-well behaved semantics, we can start asking what it means to define
-well behaved judgments. Why stop at helping the user write their specific
-language's meta-theory when we could study meta-meta-theory?
+We now know how to generically describe syntaxes and their well
+behaved semantics. We can now start asking what it means to define
+well behaved judgments. Why stop at helping the user write their
+specific language's meta-theory when we could study meta-meta-theory?
