@@ -83,7 +83,7 @@ this repetition problem \emph{once and for all}.
 % generically prove the required renaming, substitution and
 % transformation fusion lemmas (\ref{section:fusion}.
 
-\paragraph{Content and Contributions.}\todo{Highlight new contributions compared to ICFP}
+\paragraph{Content and Contributions.}
 To introduce the basic ideas that this paper bulids on, we start with
 primers on scoped and sorted terms
 (Section~\ref{section:primer-term}), scope and sort safe programs
@@ -115,6 +115,25 @@ powerful as Martin-L\"of Type Theory~\cite{martin1982constructive}
 equipped with inductive families~\cite{dybjer1994inductive} such as
 Coq~\cite{Coq:manual}, Lean~\cite{DBLP:conf/cade/MouraKADR15} or
 Idris~\cite{brady2013idris} ought to do.
+
+\medskip
+
+\paragraph{Changes with respect to the ICFP 2018 version} This paper
+is a revised and expanded version of a paper of the same title that
+appeared at ICFP 2018. This extended version of the paper includes
+many more examples of the use of our universe of syntax with binding
+for wriring generic programs in Section~\ref{section:catalogue}:
+pretty printing with human readable names
+(Section~\ref{section:genericprinting}), scope checking
+(Section~\ref{section:genericscoping}), type checking
+(Section~\ref{section:typechecking}), elaboration
+(Section~\ref{section:elaboration}), inlining of single use let-bound
+expressions (shrinking reductions) (Section~\ref{section:inlining}),
+and normalisation by evaluation (Section~\ref{section:nbyeval}). We
+have also included a discussion of how to define generic programs for
+deciding equality of terms. Additionally, we have elaborated our
+descriptions and examples throughout, and expanded our discussion of
+related work in Section~\ref{section:related-work}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SCOPE SAFE TERMS
@@ -1173,6 +1192,7 @@ are \AR{VarLike}. Hence, we can then implement \AF{reify} as in Figure~\ref{fig:
 %% OTHER GENERIC FUNCTIONS
 
 \section{A Catalogue of Generic Programs for Syntax with Binding}
+\label{section:catalogue}
 
 In this section we explore a large part of the spectrum of traversals a
 compiler writer may need when implementing their own language.
