@@ -354,15 +354,15 @@ reader see which binder the de Bruijn indices are referring too):
 
 \section{A Primer on Type and Scope Safe Programs}\label{section:primer-program}
 
-The scope- and type- safe representation described in the previous section is
-naturally only a start: once the programmer has access to a good
-representation of the language they are interested in, they will naturally
-want to (re)implement standard traversals manipulating terms.
-Renaming and substitution are the two most typical examples
-of such traversals. Now that well-typedness and well-scopedness are enforced
-statically, all of these traversals have to be implemented
-in a type and scope safe manner.
-These constraints show up in the types of renaming and substitution: % defined as follows:
+The scope- and type- safe representation described in the previous
+section is naturally only a start. Once the programmer has access to a
+good representation of the language they are interested in, they will
+want to write programs manipulating terms.  Renaming and substitution
+are the two typical examples that are required for almost all
+syntaxes. Now that well-typedness and well-scopedness are enforced
+statically, all of these traversals have to be implemented in a type
+and scope safe manner.  These constraints show up in the types of
+renaming and substitution: % defined as follows:
 
 \begin{figure}[h]
 \begin{minipage}{0.50\textwidth}
