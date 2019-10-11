@@ -8,7 +8,7 @@ open import Function
 open import Data.Unit using (⊤; tt)
 open import Data.Product
 open import Data.List hiding ([_])
-open import Data.Maybe
+open import Data.Maybe using (Maybe; nothing; just)
 import Data.Maybe.Categorical as MC
 
 open import Data.Var hiding (_<$>_)

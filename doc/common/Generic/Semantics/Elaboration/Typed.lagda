@@ -10,7 +10,7 @@ open import Data.Bool
 open import Data.Product as Prod
 open import Data.List hiding ([_] ; lookup)
 open import Data.List.Relation.Unary.All as All hiding (lookup)
-open import Data.Maybe as Maybe
+open import Data.Maybe as Maybe using (Maybe; nothing; just)
 open import Category.Monad
 import Data.Maybe.Categorical as MC
 open RawMonad (MC.monad {Level.zero})
