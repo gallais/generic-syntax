@@ -266,19 +266,21 @@ see above.
 
 * [ ] p.21: A sentence each describing mapA and sequenceA would be useful here.
 
-* [ ] p.22: "consist in type checking" -> "consists of type checking"
+* [X] p.22: "consist in type checking" -> "consists of type checking"
 
 * [ ] p. 23: The sentence "Terms in the raw syntax ..." was a bit hard to
       follow. Consider more commas, or breaking it in two.
 
 * [ ] p.23: I-dec could use a description/definition in the text
 
-* [ ] p.24: "bi-directional" shouldn't be hyphenated
+* [X] p.24: "bi-directional" shouldn't be hyphenated
+
+      also "bi-sorted" -> "bisorted"
 
 * [ ] p.25: The constructor name alpha didn't get mentioned before this
       page. Consider including a definition of Type somewhere.
 
-* [ ] p.25: "check the input type is" -> "check that the input type is"
+* [X] p.25: "check the input type is" -> "check that the input type is"
 
 * [ ] p.25: The use of the term "cut" for the annotated embedding of
       checkable into inferrable terms is not widespread - consider
@@ -287,7 +289,7 @@ see above.
 * [ ] p.25: The alphas toward the bottom of the page should be in
       constructor font (green)
 
-* [ ] p.26: "During typechecking we generate at the same time an
+* [X] p.26: "During typechecking we generate at the same time an
       expression's type ..." -> "During typechecking we simultaneously
       generate an expression's type ..."
 

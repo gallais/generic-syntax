@@ -1,9 +1,9 @@
 \subsection{An Algebraic Approach to Typechecking}\label{section:typechecking}
 
 Following Atkey~\citeyear{atkey2015algebraic}, we can consider type checking
-and type inference as a possible semantics for a bi-directional~\cite{pierce2000local}
+and type inference as a possible semantics for a bidirectional~\cite{pierce2000local}
 language. We reuse the syntax introduced in Section~\ref{par:bidirectional}; it
-gives us a simply typed bi-directional calculus as a bi-sorted language using
+gives us a simply typed bidirectional calculus as a bisorted language using
 a notion of \AD{Mode} to distinguish between terms for which we will be able to
 \AIC{Infer} the type and the ones for which we will have to \AIC{Check} a type
 candidate.
@@ -52,7 +52,7 @@ which has the same structure as its second argument.
 make sure it is an arrow type, check the argument at the domain's type and return
 the codomain.
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{app}
-\paragraph{λ-abstraction} For a λ-abstraction: check the input
+\paragraph{λ-abstraction} For a λ-abstraction: check that the input
 type is an arrow type and check the body at the codomain type in the extended
 environment where the newly-bound variable is of mode \AIC{Infer} and has the
 domain's type.
