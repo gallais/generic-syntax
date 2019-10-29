@@ -1607,8 +1607,27 @@ terms.
 
 Bach Poulsen, Rouvoet, Tolmach, Krebbers and Visser~\citeyear{BachPoulsen}
 introduce notions of scope graphs and frames to scale the techniques typical
-of well scoped and typed deep embeddings to imperative languages. They can
-already handle a large subset of Middleweight Java.
+of well scoped and typed deep embeddings to imperative languages.
+They showcase the core ideas of their work using STLC extended with references
+and then demonstrate that they can already handle a large subset of Middleweight
+Java.
+\revc{
+We have demonstrated that our framework could be used to define effectful
+semantics by choosing an appropriate monad stack~\cite{DBLP:journals/iandc/Moggi91}.
+This suggests we should be able to model STLC+Ref. It is however clear that
+the scoping structures handled by scope graphs and frames are, in their full
+generality, out of reach for our framework. In constrast, our work shines by
+its generality: we define an entire universe of syntaxes and provide users
+with traversals and lemmas implemented \emph{once and for all}.
+}
+
+Many other opportunities to enrich the notion of binder in our library are
+highlighted by Cheney~\citeyear{DBLP:conf/icfp/Cheney05a}. As we have demonstrated
+in Sections~\ref{section:letbinding} and \ref{section:inlining} we can already
+handle let-bindings generically for all syntaxes. We are currently considering
+the modification of our system to handle deeply-nested patterns by removing the
+constraint that the binders' and variables' sorts are identical. A notion of
+binding corresponding to hierarchical namespaces would be an exciting addition.
 
 We have demonstrated how to write generic programs over the potentially
 cyclic structures of Ghani, Hamana, Uustalu and Vene~\citeyear{ghani2006representing}.
@@ -1672,7 +1691,7 @@ Agda or Coq.
 
 Keuchel~\citeyear{Keuchel:Thesis:2011} together with Jeuring~\citeyear{DBLP:conf/icfp/KeuchelJ12}
 define a universe of syntaxes with binding with a rich notion of binding patterns
-closed under product but also sum as long as the disjoint patterns bind the same
+closed under products but also sums as long as the disjoint patterns bind the same
 variables. They give their universe two distinct semantics: a first one based on well
 scoped de Bruijn indices and a second one based on Parametric Higher-Order Abstract
 Syntax (PHOAS)~\cite{DBLP:conf/icfp/Chlipala08} together with a generic conversion
@@ -1779,10 +1798,10 @@ syntaxes needs to be given an appropriate semantics.
 \paragraph{Closure under Products} Our current universe of descriptions is
 closed under sums as demonstrated in Section~\ref{desccomb}. It is however
 not closed under products: two arbitrary right-nested products conforming
-to a description may disagree on the kind of the term they are constructing.
-An approach where the kind is an input from which the description of allowed
+to a description may disagree on the sort of the term they are constructing.
+An approach where the sort is an input from which the description of allowed
 constructors is computed (à la Dagand \citeyear{DBLP:phd/ethos/Dagand13} where,
-for instance, the \AIC{`lam} constructor is only offered if the input kind is
+for instance, the \AIC{`lam} constructor is only offered if the input sort is
 a function type) would not suffer from this limitation.
 
 \paragraph{Unrestricted Variables} Our current notion of variable can be used

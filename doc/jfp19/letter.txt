@@ -1,7 +1,0 @@
-We have highlighted the non-cosmetic changes with a bar of
-colour in the margin. The colour of the bar corresponds to
-the reviewer that motivated the change:
-
-* blue  for reviewer 1
-* red   for reviewer 2
-* green for reviewer 3

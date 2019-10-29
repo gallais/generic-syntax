@@ -332,18 +332,20 @@ rendered as inline code.
 
 done.
 
-* [ ] p. 46: The article should discuss how related work is related, not
+* [X] p. 46: The article should discuss how related work is related, not
       just list the fact that it is related. But the discussion of Back
       Poulsen et al doesn't discuss that relationship.
+
+Fair enough. Also added a discussion of Cheney.
 
 * [ ] p.47: The vertical gap above 10.5 is very large.
 
 * [ ] p.47: Why are Pickering et al cited for Agda's pattern synonyms?
       Haskell's are much younger, and what's described in the cited paper.
 
-* [ ] p.47: "but also sum" -> "but also sums"
+* [X] p.47: "but also sum" -> "but also sums"
 
-* [ ] p.49: Under "closure under products" and "unrestricted variables", the
+* [X] p.49: Under "closure under products" and "unrestricted variables", the
       word "kind" is used the way that "sort" was used in most of the
       article
 
