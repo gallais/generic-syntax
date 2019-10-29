@@ -661,7 +661,7 @@ datatypes.
 
 Chapman, Dagand, McBride and Morris (CDMM)~\citeyear{Chapman:2010:GAL:1863543.1863547}
 defined a universe of data types inspired by Dybjer and Setzer's
-finite axiomatisation of Inductive-Recursive definitions~\citeyear{Dybjer1999}
+finite axiomatisation of inductive-recursive definitions~\citeyear{Dybjer1999}
 and Benke, Dybjer and Jansson's universes for generic programs and proofs~\citeyear{benke-ugpp}.
 This explicit definition of \emph{codes} for data types empowers the
 user to write generic programs tackling \emph{all} of the data types
@@ -704,7 +704,7 @@ whose unique inhabitant is \AIC{tt}.
 \caption{The Description of the base functor for \AD{List} \AB{A}}\label{figure:listD}
 \end{figure}
 
-Indexes can be used to enforce invariants. For example, the type {\AD{Vec} \AB{A} \AB{n}}
+Indices can be used to enforce invariants. For example, the type {\AD{Vec} \AB{A} \AB{n}}
 of length-indexed lists. It has the same structure as the definition of \AF{listD}.
 We start with a \AF{Bool}ean distinguishing the two constructors: either
 the empty list (in which case the branch's index is enforced to be $0$) or a
@@ -942,7 +942,7 @@ for the two extreme examples, the definition for \AF{Bidi} are similar.
 
 As a usage example of these pattern synonyms, we define the identity
 function in all three languages in Figure~\ref{fig:identity}. The code
-is virtually the same except for \AF{Bidi} which records explicitly
+is virtually the same except for \AF{Bidi} which explicitly records 
 the change of direction from \AIC{Check} to \AIC{Infer}.
 
 \begin{figure}[h]
@@ -1762,7 +1762,7 @@ language.
 
 By extending a universe of datatype descriptions to support a notion of binding,
 we have given a generic presentation of syntaxes with binding. We then described
-a large class of scope- and type- safe generic programs acting on all of them
+a large class of scope- and type-safe generic programs acting on all of them.
 We started with syntactic traversals such as renaming and substitution. We then
 demonstrated how to write a small compiler pipeline: scope checking, type checking
 and elaboration to a core language, desugaring of new constructors added by a language
@@ -1825,15 +1825,17 @@ be closed under derivatives so that the formalisation of e.g. evaluation context
 could benefit directly from the existing machinery.
 
 \paragraph{Closure under Closures} Jander's work on formalising and certifying
-continuation passing style transformations~\cite{Jander:Thesis:2019} highlighted
-the need for a notion of syntaxes with closures. Recalling that our notion of
-Semantics is always compatible with a preliminary renaming~\cite{Kaiser-wsdebr}
-but not necessarily a preliminary substitution (printing is for instance not
-stable under substitution), accommodating terms with suspended substitutions is
-a real challenge. Preliminary experiments show that a drastic modification of
-the type of the fundamental lemma of \AR{Semantics} makes dealing with such
-closures possible. Whether the resulting traversal has good properties that can
-be proven generically is still an open problem.
+continuation passing style transformations~\cite{Jander:Thesis:2019}
+highlighted the need for a notion of syntaxes with closures. Recalling
+that our notion of Semantics is always compatible with precomposition
+with a renaming~\cite{Kaiser-wsdebr} but not necessarily
+precomposition with a substitution (printing is for instance not
+stable under substitution), accommodating terms with suspended
+substitutions is a real challenge. Preliminary experiments show that a
+drastic modification of the type of the fundamental lemma of
+\AR{Semantics} makes dealing with such closures possible. Whether the
+resulting traversal has good properties that can be proven generically
+is still an open problem.
 
 \subsection{Future work}
 

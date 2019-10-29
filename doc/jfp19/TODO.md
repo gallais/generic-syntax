@@ -77,10 +77,10 @@ removed.
       (section 10.4), it would be interesting to also compare to the ott
       tool for mechanized metatheory.
 
-* [ ] There's a typo in section 11: the period at the sentence ending with
+* [X] There's a typo in section 11: the period at the sentence ending with
       "acting on all of them" is missing.
 
-* [ ] The usage of the word "preliminary" in the last paragraph of section
+* [X] The usage of the word "preliminary" in the last paragraph of section
       11.1 feels wrong; I would reword this to 'precomposition with a
       renaming'.
 
@@ -224,19 +224,19 @@ see above.
       not. The do-notation seems much easier to read. Can it be used in
       Fig. 7?
 
-* [ ] p.10: "Inductive-Recursive" should be lowercase
+* [X] p.10: "Inductive-Recursive" should be lowercase
 
 * [ ] p.11: A high-level description of the roles played by I and J in Desc
       would be useful. Why are there two parameters?
 
-* [ ] p.11: "Indexes" should probably read "indices", esp. in an article
+* [X] p.11: "Indexes" should probably read "indices", esp. in an article
       using UK English
 
 * [ ] p.12: Later, on p. 15, the paper says that Agda uses pattern synonyms
       to resugar output. This discussion should perhaps occur here, at the
       first use of pattern synonyms.
 
-* [ ] p.16: "records explicitly the change" -> "explicitly records the change"
+* [X] p.16: "records explicitly the change" -> "explicitly records the change"
 
 * [ ] p.16: Here's another name with a ^ in it, still unexplained
 
