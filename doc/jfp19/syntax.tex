@@ -15,13 +15,13 @@ case in LEGO, Idris, Coq, Agda and
 Haskell~\cite{altenkirch1999monadic,DBLP:conf/gpce/BradyH06,DBLP:journals/jar/HirschowitzM12,DBLP:conf/icfp/KeuchelJ12,BachPoulsen,plfa2018,eisenbergsticth18}
 as directly manipulating raw de Bruijn indices is notoriously
 error-prone. Solutions have been proposed that range from enforcing
-well-scopedness of variables to ensuring full type correctness. In
+well scopedness of variables to ensuring full type correctness. In
 short, these techniques use the host languages' types to ensure that
 ``illegal states are unrepresentable'', where illegal states
-correspond to ill-scoped or ill-typed terms in the object language.
+correspond to ill scoped or ill typed terms in the object language.
 
 Despite the large body of knowledge in how to use types to define well
-formed syntax (see the Related Work in Section
+formed syntax (see the related work in Section
 \ref{section:related-work}), it is still necessary for the working DSL
 designer or formaliser to redefine essential functions like renaming
 and substitution for each new syntax, and then to reprove essential
@@ -59,12 +59,12 @@ discover that there is actually a large amount of work:
   prove eight lemmas about the interactions of renaming, substitution,
   and transformation that are all remarkably similar, but must be
   stated and proved separately (e.g, as observed by
-  \cite{benton2012strongly}).
+  \citet{benton2012strongly}).
 \end{enumerate}
 
-Even after doing all of this work, you have only a result for a single
-pair of source and target languages. If you were to change your
-languages $\AD{S}$ or $\AD{T}$, you would have to repeat the same work
+Even after doing all of this work, they have only a result for a single
+pair of source and target languages. If they were to change their
+languages $\AD{S}$ or $\AD{T}$, they would have to repeat the same work
 all over again (or at least do a lot of cutting, pasting, and
 editing).
 % The cases for λs and applications in the
@@ -101,7 +101,7 @@ above) (Section~\ref{section:letbinding}), and normalisation by
 evaluation (Section~\ref{section:nbyeval}). Further, we show how to
 construct generic proofs by formally describing what it means for one
 semantics to simulate another (Section~\ref{section:simulation}), or
-for two semantics to be fusable (Section~\ref{section:fusion}). This
+for two semantics to be fusible (Section~\ref{section:fusion}). This
 allows us to prove the lemmas required above for renaming,
 substitution, and desugaring of let binders generically, for
 \emph{every} syntax in our universe.
@@ -111,7 +111,7 @@ substitution, and desugaring of let binders generically, for
 Our implementation language is
 Agda~\cite{norell2009dependently}. However, our techniques are
 language independent: any dependently typed language at least as
-powerful as Martin-L\"of Type Theory~\cite{martin1982constructive}
+powerful as Martin-L\"of Type Theory\cite{martin1982constructive}
 equipped with inductive families~\cite{dybjer1994inductive} such as
 Coq~\cite{Coq:manual}, Lean~\cite{DBLP:conf/cade/MouraKADR15} or
 Idris~\cite{brady2013idris} ought to do.
@@ -165,14 +165,14 @@ left implicit in this representation.
 
 This representation works well enough for writing programs, but the
 programmer must constantly be vigilant to guard against the accidental
-construction of ill-scoped terms. The implicit context that
+construction of ill scoped terms. The implicit context that
 accompanies each represented term is prone to being forgotten or
 muddled with another, leading to confusing behaviour when variables
 either have dangling pointers or point to the wrong thing.
 
 To improve on this situation, previous authors have proposed to use
 the host language's type system to make the implicit context explicit,
-and to enforce well-scopedness of variables. Scope safe terms follow
+and to enforce well scopedness of variables. Scope safe terms follow
 the discipline that every variable is either bound by some binder or
 is explicitly accounted for in a context. Bellegarde and
 Hook~\citeyear{BELLEGARDE1994287}, Bird and
@@ -250,7 +250,7 @@ built. This is captured by the large type \AB{I}
 
 \begin{center}
 \ExecuteMetaData[Data/Var.tex]{scoped}
-%\caption{Type of Well \AB{I}-Kinded and Well-Scoped Families}
+%\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
 \end{center}
 
 We use Agda's mixfix operator notation where underscores denote
@@ -317,7 +317,7 @@ scope when defining such families:
 %\caption{Scope Aware Variables and Simply Typed λ-Terms\label{scoped-untyped}}
 %\end{center}
 
-The inductive family \AD{Var} represents well-scoped and well kinded
+The inductive family \AD{Var} represents well scoped and well kinded
 de Bruijn indices. Its \AIC{z} (for zero) constructor refers to the
 nearest binder in a non-empty scope. The \AIC{s} (for successor)
 constructor lifts a a variable in a given scope to the extended scope
@@ -335,7 +335,7 @@ syntaxes defined in this paper.
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch and Reus'
 intrinsically typed representation of the simply typed λ-calculus,
 where \AD{Type} is the Agda type of simple types.  We can readily
-write well-scoped-and-typed terms such as e.g. application, a closed
+write well scoped-and-typed terms such as e.g. application, a closed
 term of type {((\AB{σ} \AIC{`→} \AB{τ}) \AIC{`→} (\AB{σ} \AIC{`→}
   \AB{τ}))} (\AC{\{-} and \AC{-\}} delimit comments meant to help the
 reader see which binder the de Bruijn indices are referring too):
@@ -344,7 +344,7 @@ reader see which binder the de Bruijn indices are referring too):
 \begin{center}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}\label{figure:apply}
 \end{center}
-%\caption{Example of a well-scoped-and-typed term in \AD{Lam}}
+%\caption{Example of a well scoped-and-typed term in \AD{Lam}}
 %\end{figure}
 
 
@@ -359,7 +359,7 @@ section is naturally only a start. Once the programmer has access to a
 good representation of the language they are interested in, they will
 want to write programs manipulating terms.  Renaming and substitution
 are the two typical examples that are required for almost all
-syntaxes. Now that well-typedness and well-scopedness are enforced
+syntaxes. Now that well typedness and well scopedness are enforced
 statically, all of these traversals have to be implemented in a type
 and scope safe manner.  These constraints show up in the types of
 renaming and substitution: % defined as follows:
@@ -387,7 +387,7 @@ where we define an abstract notion of semantics and the corresponding generic tr
 
 Both renaming and substitution are defined in terms of \emph{environments}
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ}} that describe how to associate a value \AB{𝓥}
-(variables for renaming, terms for substitution) well-scoped and typed in \AB{Δ}
+(variables for renaming, terms for substitution) well scoped and typed in \AB{Δ}
 to every entry in \AB{Γ}. Environments are defined as the following record
 structure (using a record helps Agda's type inference reconstruct the type family
 \AB{𝓥} of values for us):
@@ -396,7 +396,7 @@ structure (using a record helps Agda's type inference reconstruct the type famil
 \begin{center}
 \ExecuteMetaData[Data/Environment.tex]{env}
 \end{center}
-%\caption{Well-Typed and Scoped Environments of Values}
+%\caption{Well Typed and Scoped Environments of Values}
 %\end{figure}
 
 As we have already observed, the definitions of renaming and substitution have very
@@ -412,7 +412,7 @@ as various instances of a more general traversal. As we will show in Section~\re
 typechecking in the style of Atkey~\citeyear{atkey2015algebraic} also
 fits in that framework. To make sense of this body of work, we
 need to introduce three new notions: \AF{Thinning}, a generalisation of
-renaming; \AF{Thinnable}s which are types that permit thinning; and the
+renaming; \AF{Thinnable}s, which are types that permit thinning; and the
 \AF{□} functor, which freely adds Thinnability to any indexed type.
 %%%
 We use \AF{□}, and our compact notation for the indexed function space
@@ -770,7 +770,7 @@ for all data types that can be described. These are exactly the features we desi
 for a universe of data types with binding, so in the next section we will see how
 to extend CDMM's approach to include binding.
 
-The functor underlying any well-scoped and sorted syntax can be coded as some
+The functor underlying any well scoped and sorted syntax can be coded as some
 {\AD{Desc} (I \AR{$\times$} \AD{List} I) (I \AR{$\times$} \AD{List} I)}, with the
 free monad construction from CDMM uniformly adding the variable case. Whilst a
 good start, \AD{Desc} treats its index types as unstructured, so this construction
@@ -859,10 +859,10 @@ the parallel substitution \AF{sub}) in the next section.
 \end{figure}
 
 Coming back to our original examples, we now have the ability to give
-codes for the well-scoped untyped λ-calculus and, just as well,
+codes for the well scoped untyped λ-calculus and, just as well,
 the intrinsically typed simply typed λ-calculus. We add a third
-example to showcase the whole spectrum of syntaxes: a well-scoped and
-well-sorted but not well-typed bidirectional language. In all examples,
+example to showcase the whole spectrum of syntaxes: a well scoped and
+well sorted but not well typed bidirectional language. In all examples,
 the variable case will be added by the free monad construction so we only
 have to describe the other constructors.
 
@@ -1199,9 +1199,9 @@ compiler writer may need when implementing their own language.
 In Section~\ref{section:genericprinting} we look at the production of
 human-readable representations of internal syntax; in Section~\ref{section:genericscoping}
 we write a generic scope checker thus bridging the gap between raw data
-fresh out of a parser to well-scoped syntax; we then demonstrate how to
+fresh out of a parser to well scoped syntax; we then demonstrate how to
 write a type checker in Section~\ref{section:typechecking} and even an
-elaboration function turning well-scoped into well-scoped and typed syntax
+elaboration function turning well scoped into well scoped and typed syntax
 in Section~\ref{section:elaboration}. We then study type and scope respecting
 transformations on internal syntax: desugaring in Section~\ref{section:letbinding}
 and size preserving inlining in Section~\ref{section:inlining}. We conclude
@@ -1331,7 +1331,7 @@ that renaming and substitution are extensional (given extensionally
 equal environments they produce syntactically equal terms), or that
 renaming is a special case of substitution. Of course these results
 are not new but having them generically over all syntaxes with binding
-is convenient; which we have experienced first hand when tackling the
+is convenient. We experience this first hand when tackling the
 POPLMark Reloaded challenge where \AF{rensub} was actually needed.
 
 \begin{figure}[h]
@@ -1362,7 +1362,7 @@ this more complex example for all syntaxes definable in our framework.
 
 \subsection{Fusion Lemma}\label{section:fusion}
 
-Results which can be reformulated as the ability to fuse two traversals
+Results that can be reformulated as the ability to fuse two traversals
 obtained as \semrec{} into one abound. When claiming that \AF{Tm} is
 a Functor, we have to prove that two successive renamings can be fused into
 a single renaming where the \AF{Thinning}s have been composed. Similarly,
@@ -1377,7 +1377,7 @@ environment corresponding to the evaluated substitution.
 
 A direct application of these results is our (to be published) entry to the
 POPLMark Reloaded challenge~\citeyear{poplmarkreloaded}. By using a \AD{Desc}-based
-representation of intrinsically well-typed and well-scoped terms we directly inherit
+representation of intrinsically well typed and well scoped terms we directly inherit
 not only renaming and substitution but also all four fusion lemmas as corollaries
 of our generic results. This allows us to remove the usual boilerplate
 and go straight to the point.
@@ -1466,7 +1466,7 @@ afterwards we need to recover a piece of syntax. This is possible if the
 \AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥ᴬ} arguments
 (which can be manufactured thanks to the \ARF{vl\^{𝓥ᴬ}} we mentioned before) and
 then quoted. Provided that the result of running \AB{𝓢ᴮ} on that term is
-related via {\AF{⟦} \AB{d} \AF{⟧ᴿ} (\AF{Kripkeᴿ} \AB{𝓥ᴿ} \AB{𝓒ᴿ} to the result
+related via {\AF{⟦} \AB{d} \AF{⟧ᴿ} (\AF{Kripkeᴿ} \AB{𝓥ᴿ} \AB{𝓒ᴿ}) to the result
 of running \AB{𝓢ᴬᴮ} on the original term, the \ARF{algᴿ} constraint states
 that the two evaluations yield related computations.
 
@@ -1474,7 +1474,7 @@ that the two evaluations yield related computations.
 
 \subsubsection{The Fundamental Lemma of Fusion}
 
-This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
+This set of constraints is enough to prove a fundamental lemma of \AR{Fus}ion
 stating that from a triple of related environments, one gets a pair of related
 computations: the composition of \AB{𝓢ᴬ} and \AB{𝓢ᴮ} on one hand and
 \AB{𝓢ᴬᴮ} on the other. This lemma is once again proven mutually with its
@@ -1581,7 +1581,7 @@ scoped and typed de Bruijn indices~\cite{de1972lambda} but it is not
 a necessity. It is for instance possible to give an interpretation
 of \AD{Desc}riptions corresponding to Chlipala's Parametric Higher-Order
 Abstract Syntax~\citeyear{DBLP:conf/icfp/Chlipala08} and we would be interested
-to see what the appropriate notion of Semantics is for this representation.
+to see what the appropriate notion of \AD{Semantics} is for this representation.
 
 \subsection{Alternative Binding Structures} The binding structure we
 present here is based on a flat, lexical scoping strategy. There are
@@ -1594,12 +1594,12 @@ n-ary) can inform our design. They do not enforce scoping invariants internally
 which forces them to introduce separate constructors for a simple binder, a
 recursive one, or a telescopic pattern. They recover guarantees by giving
 their syntaxes a nominal semantics thus bolting down the precise meaning of
-each combinators and then proving that users may only generate well formed
+each combinator and then proving that users may only generate well formed
 terms.
 
 Bach Poulsen, Rouvoet, Tolmach, Krebbers and Visser~\citeyear{BachPoulsen}
 introduce notions of scope graphs and frames to scale the techniques typical
-of well-scoped and typed deep embeddings to imperative languages. They can
+of well scoped and typed deep embeddings to imperative languages. They can
 already handle a large subset of Middleweight Java.
 
 We have demonstrated how to write generic programs over the potentially
@@ -1643,11 +1643,11 @@ Polonowski's DBGen~\citeyear{polonowski:db} takes as input a raw syntax with
 comments annotating binding sites. It generates a module defining lifting,
 substitution as well as a raw syntax using names and a validation function
 transforming named terms into de Bruijn ones; we refrain from calling it a
-scopechecker as terms are not statically proven to be well-scoped.
+scopechecker as terms are not statically proven to be well scoped.
 
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} build on our previous paper
 to draft possible theoretical foundations for Autosubst, a so-far untrusted
-set of tactics. The paper is based on a specific syntax: well-scoped call-by-value
+set of tactics. The paper is based on a specific syntax: well scoped call-by-value
 System F. In contrast, our effort has been here to carve out
 a precise universe of syntaxes with binding and give a systematic account
 of their semantics and proofs.
@@ -1689,7 +1689,7 @@ shifting
 de Bruijn indices or substituting terms for parameters) as well as common
 predicates (e.g. being a closed term) and provides generic lemmas proving that
 they are well behaved. It does not offer a generic framework
-for defining new well-scoped-and-typed semantics and proving their properties.
+for defining new well scoped-and-typed semantics and proving their properties.
 
 Érdi~\citeyear{gergodraft} defines a universe inspired by a first draft of this
 paper and gives three different interpretations (raw, scoped and typed syntax)
