@@ -129,6 +129,9 @@ see above.
       sized types is a key part of making the fixed point construction go
       through. Is that not the case?
 
+Cf. clarification in letter.md. Do we want to include this discussion
+somewhere in the paper? Certainly not on page 3!
+
 * [ ] p.4: The line "We use Agda's" seems to be a part of the paragraph
       prior to the example of _-Scoped, so it should not be indented.
 
