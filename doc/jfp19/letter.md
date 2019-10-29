@@ -6,6 +6,11 @@ the reviewer that motivated the change:
 * red   for reviewer 2
 * green for reviewer 3
 
+# Debatted points
+
+* We have added a paragraph explaining the programming style
+  which led us to pick the same name for the arrow constructor
+  and the constructor of the isArrow view.
 
 
 # Additional extensions:
