@@ -12,7 +12,11 @@ done.
 
 - p22. The definition of `base` is missing.
 
+done (on page 19 with VarLike).
+
 - p38. congruence rule for c -> s.
+
+done.
 
 - generic generic
 
@@ -55,9 +59,11 @@ done.
 - p.2: The citation of Benton et al is in parentheses, but it's used as
 an ordinary noun phrase and thus should not be parenthesized.
 
+done.
+
 - p.2, last line: "Fusable" should probably be "fusible"
 
-done
+done.
 
 - p.3: This page states that the techniques are language-independent,
 requiring only inductive families, but it seems to me that the use of
