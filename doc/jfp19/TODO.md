@@ -84,9 +84,10 @@ removed.
       11.1 feels wrong; I would reword this to 'precomposition with a
       renaming'.
 
-* [ ] Some of the capitalization in the references is off, e.g. Miniagda,
+* [X] Some of the capitalization in the references is off, e.g. Miniagda,
       Poplmark, coq.
 
+fixed those three.
 
 # Review 3 "detailed comments"
 
