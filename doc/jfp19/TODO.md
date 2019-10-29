@@ -10,19 +10,13 @@ removed.
 
 * [X] p21. "the two first" -> "the first two"?
 
-done.
-
 * [X] p22. The definition of `base` is missing.
 
-done (on page 19 with VarLike).
+(added on page 19 with VarLike).
 
 * [X] p38. congruence rule for c -> s.
 
-done.
-
 * [X] generic generic
-
-done.
 
 # Review 3 "detailed comments"
 
@@ -48,24 +42,16 @@ see above.
 * [X] p.2: "Related Work" should not be capitalized, as it's not used as a
        proper noun here
 
-done.
-
 * [X] p.2: The paragraph beginning with "Breaking the task down" refers to
   an implementor, also referred to with the pronoun "they". The
   paragraph right after the numbered list, that begins with "Even
   after", uses the pronoun "you" to refer to the
   implementor. Consistency is necessary, and "they" seems better here.
 
-done.
-
 * [X] p.2: The citation of Benton et al is in parentheses, but it's used as
       an ordinary noun phrase and thus should not be parenthesized.
 
-done.
-
 * [X] p.2, last line: "Fusable" should probably be "fusible"
-
-done.
 
 * [ ] p.3: This page states that the techniques are language-independent,
       requiring only inductive families, but it seems to me that the use of
@@ -113,8 +99,6 @@ done.
       Env just come first?
 
 * [ ] p6: Missing comma after "Thinnables" on the last line
-
-done.
 
 * [ ] p7: Fig. 2 is in a float, which means that the figure is
       left-justified. This looks very different from the Thinning definition
@@ -277,7 +261,7 @@ no
 
 * [X] p.37: "premisse" -> "premise"
 
-done.
+
 
 * [X] p.38:  "generic" is repeated in the last line of the page. 
 
@@ -286,7 +270,7 @@ done (also spotted by reviewer 1).
 * [X] p.39: "and decision procedure can be defined" -> "and decision
       procedures can be defined"
 
-done.
+
 
 * [X] p.39: The code in figure 72 is the first time the articule used lambda
       as an argument without either using $ or parentheses. When that's
@@ -300,7 +284,7 @@ done
 * [X] p.40: Break the sentence at "; which we have experience" and write "We
       experience this first hand when tackling..." as a new sentence.
 
-done.
+
 
 * [X] p.41: "Results which" -> "Results that" (because it's a restrictive
       use)
@@ -313,12 +297,12 @@ fixed
       NbE, which use a bona fide reification function that extracts terms
       from model values"
 
-done. much better indeed!
+ much better indeed!
 
 * [X] p.43: The parenthesis opened after "on that term is related via" and
       before Kripke is never closed.
 
-done.
+
 
 * [X] p.43: "This set of constraint" -> "This set of constraints"
 
@@ -327,7 +311,7 @@ fixed.
 * [X] p.43: The font in Fusion changes after the s, and it doesn't seem to
       be a reference to an identifier Fus in this article.
 
-done. Also multiple instances of Sim.
+ Also multiple instances of Sim.
 
 * [X] p.45: "the appropriate notion of Semantics" seems to have "Semantics"
       in the wrong font.
@@ -335,8 +319,6 @@ done. Also multiple instances of Sim.
 rendered as inline code.
 
 * [X] p. 46: "of each combinators" -> "of each combinator"
-
-done.
 
 * [X] p. 46: The article should discuss how related work is related, not
       just list the fact that it is related. But the discussion of Back
