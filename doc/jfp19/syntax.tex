@@ -1331,7 +1331,7 @@ that renaming and substitution are extensional (given extensionally
 equal environments they produce syntactically equal terms), or that
 renaming is a special case of substitution. Of course these results
 are not new but having them generically over all syntaxes with binding
-is convenient; which we have experienced first hand when tackling the
+is convenient. We experience this first hand when tackling the
 POPLMark Reloaded challenge where \AF{rensub} was actually needed.
 
 \begin{figure}[h]
@@ -1362,7 +1362,7 @@ this more complex example for all syntaxes definable in our framework.
 
 \subsection{Fusion Lemma}\label{section:fusion}
 
-Results which can be reformulated as the ability to fuse two traversals
+Results that can be reformulated as the ability to fuse two traversals
 obtained as \semrec{} into one abound. When claiming that \AF{Tm} is
 a Functor, we have to prove that two successive renamings can be fused into
 a single renaming where the \AF{Thinning}s have been composed. Similarly,
@@ -1466,7 +1466,7 @@ afterwards we need to recover a piece of syntax. This is possible if the
 \AF{Kripke} functional spaces are reified by being fed placeholder \AB{𝓥ᴬ} arguments
 (which can be manufactured thanks to the \ARF{vl\^{𝓥ᴬ}} we mentioned before) and
 then quoted. Provided that the result of running \AB{𝓢ᴮ} on that term is
-related via {\AF{⟦} \AB{d} \AF{⟧ᴿ} (\AF{Kripkeᴿ} \AB{𝓥ᴿ} \AB{𝓒ᴿ} to the result
+related via {\AF{⟦} \AB{d} \AF{⟧ᴿ} (\AF{Kripkeᴿ} \AB{𝓥ᴿ} \AB{𝓒ᴿ}) to the result
 of running \AB{𝓢ᴬᴮ} on the original term, the \ARF{algᴿ} constraint states
 that the two evaluations yield related computations.
 
@@ -1474,7 +1474,7 @@ that the two evaluations yield related computations.
 
 \subsubsection{The Fundamental Lemma of Fusion}
 
-This set of constraint is enough to prove a fundamental lemma of \AR{Fus}ion
+This set of constraints is enough to prove a fundamental lemma of \AR{Fus}ion
 stating that from a triple of related environments, one gets a pair of related
 computations: the composition of \AB{𝓢ᴬ} and \AB{𝓢ᴮ} on one hand and
 \AB{𝓢ᴬᴮ} on the other. This lemma is once again proven mutually with its
@@ -1581,7 +1581,7 @@ scoped and typed de Bruijn indices~\cite{de1972lambda} but it is not
 a necessity. It is for instance possible to give an interpretation
 of \AD{Desc}riptions corresponding to Chlipala's Parametric Higher-Order
 Abstract Syntax~\citeyear{DBLP:conf/icfp/Chlipala08} and we would be interested
-to see what the appropriate notion of Semantics is for this representation.
+to see what the appropriate notion of \AD{Semantics} is for this representation.
 
 \subsection{Alternative Binding Structures} The binding structure we
 present here is based on a flat, lexical scoping strategy. There are
@@ -1594,7 +1594,7 @@ n-ary) can inform our design. They do not enforce scoping invariants internally
 which forces them to introduce separate constructors for a simple binder, a
 recursive one, or a telescopic pattern. They recover guarantees by giving
 their syntaxes a nominal semantics thus bolting down the precise meaning of
-each combinators and then proving that users may only generate well formed
+each combinator and then proving that users may only generate well formed
 terms.
 
 Bach Poulsen, Rouvoet, Tolmach, Krebbers and Visser~\citeyear{BachPoulsen}

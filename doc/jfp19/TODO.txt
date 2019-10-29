@@ -267,10 +267,16 @@ citations.
 
 - p.37: "premisse" -> "premise"
 
+done.
+
 - p.38:  "generic" is repeated in the last line of the page. 
+
+done (also spotted by reviewer 1).
 
 - p.39: "and decision procedure can be defined" -> "and decision
 procedures can be defined"
+
+done.
 
 - p.39: The code in figure 72 is the first time the articule used lambda
 as an argument without either using $ or parentheses. When that's
@@ -282,8 +288,12 @@ Please explain this.
 - p.40: Break the sentence at "; which we have experience" and write "We
 experience this first hand when tackling..." as a new sentence.
 
+done.
+
 - p.41: "Results which" -> "Results that" (because it's a restrictive
 use)
+
+fixed
 
 - p.42: "prevents to try to prove for instance that" occurs in a very
 long, run-on sentence. Consider reformulating the sentence to
@@ -294,7 +304,11 @@ from model values"
 - p.43: The parenthesis opened after "on that term is related via" and
 before Kripke is never closed.
 
+done.
+
 - p.43: "This set of constraint" -> "This set of constraints"
+
+fixed.
 
 - p.43: The font in Fusion changes after the s, and it doesn't seem to
 be a reference to an identifier Fus in this article.
@@ -302,7 +316,11 @@ be a reference to an identifier Fus in this article.
 - p.45: "the appropriate notion of Semantics" seems to have "Semantics"
 in the wrong font.
 
+rendered as inline code.
+
 - p. 46: "of each combinators" -> "of each combinator"
+
+done.
 
 - p. 46: The article should discuss how related work is related, not
 just list the fact that it is related. But the discussion of Back
@@ -320,3 +338,5 @@ word "kind" is used the way that "sort" was used in most of the
 article
 
 - p.50: "well-behaved" needs a hyphen
+
+see above.
