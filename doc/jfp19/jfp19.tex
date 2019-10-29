@@ -20,6 +20,36 @@
 \let\oldcite\cite
 \renewcommand{\cite}[1]{(\oldcite{#1})}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% TRACKING CHANGES %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[xcolor]{changebar}
+
+%% colored changebar for different reviewers
+\newcommand{\reva}[1]{%
+  \cbcolor{yellow}
+  \begin{changebar}
+    #1
+  \end{changebar}%
+  }%
+
+\newcommand{\revb}[1]{%
+  \cbcolor{red}
+  \begin{changebar}
+    #1
+  \end{changebar}%
+  }%
+
+\newcommand{\revc}[1]{%
+	\cbcolor{green}
+	\begin{changebar}
+		#1
+	\end{changebar}%
+}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % do not inden code blocks
 \setlength\mathindent{0em}
 
