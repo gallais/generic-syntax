@@ -310,7 +310,7 @@ see above.
 
 * [ ] p.29: The patterns `IN and `IN' were difficult to distinguish at first
 
-* [ ] p.30: In figure 51, what is "pack"?
+* [X] p.30: In figure 51, what is "pack"?
 
 * [X] p.30: Hyphenate "size-preserving" and "size-respecting"
 
