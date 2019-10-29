@@ -13,7 +13,7 @@ with binding equipped with let binders. This two-pass simple transformation
 takes linear time which may seem surprising given the results due to Appel and
 Jim~\citeyear{DBLP:journals/jfp/AppelJ97}. Our optimisation only inlines
 let-bound variables whereas theirs also encompasses the reduction of static
-β-redices of (potentially) recursive function. While we can easily count how
+β-redexes of (potentially) recursive function. While we can easily count how
 often a variable is used in the body of a let binder, the interaction between
 inlining and β-reduction in theirs creates cascading simplification opportunities
 thus making the problem much harder.
@@ -95,7 +95,7 @@ empty one is \AIC{zero} everywhere and the one corresponding to a single use
 of a single variable \AB{v} which is \AIC{zero} everywhere except for \AB{v}
 where it's \AIC{one}.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{zeros}
 \end{minipage}
@@ -124,7 +124,7 @@ expression will only matter if the corresponding variable is actually used.
 \end{figure}
 
 We can now focus on the core of the elaboration phase. We define a
-\AR{Semantics} whose values are variables themselves and computations
+\AR{Semantics} whose values are variables themselves and whose computations
 are the pairing of a term in {(\AB{d} \AF{`+} \AF{CLet})} together with
 a \AF{Count}. The variable case is trivial: provided a variable \AB{v},
 we return {(\AIC{`var} \AB{v})} together with the count {(\AF{fromVar} \AB{v})}.
@@ -154,7 +154,7 @@ overall tally.
 \end{figure}
 
 Putting all of these things together we obtain the \AR{Semantics} \AF{Annotate}
-which we promptly specialise using an environment of placeholder value to
+which we promptly specialise using an environment of placeholder values to
 obtain the traversal \AF{annotate} elaborating raw let-binders into counted
 ones.
 

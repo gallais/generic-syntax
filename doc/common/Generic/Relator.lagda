@@ -33,7 +33,7 @@ private
                      → ∀[ ⟦ d ⟧ X σ ⇒ ⟦ d ⟧ Y σ ⇒ const Set ]
 ⟦ `∎ j      ⟧ᴿ R x        y         = ⊤
 ⟦ `X Δ j d  ⟧ᴿ R (r , x)  (r' , y)  = R Δ j r r' × ⟦ d ⟧ᴿ R x y
-⟦ `σ A d    ⟧ᴿ R (a , x)  (a' , y)  = Σ (a' ≡ a) λ where refl → ⟦ d a ⟧ᴿ R x y
+⟦ `σ A d    ⟧ᴿ R (a , x)  (a' , y)  = Σ (a' ≡ a) (λ where refl → ⟦ d a ⟧ᴿ R x y)
 \end{code}
 %</ziptype>
 \begin{code}

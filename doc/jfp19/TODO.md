@@ -262,13 +262,13 @@ done.
 
 no
 
-* [ ] p.31: Redex is short for "reducible expression" - it's not a Latin
+* [X] p.31: Redex is short for "reducible expression" - it's not a Latin
       word, so it should be pluralized "redexes".
 
-* [ ] p.32: "and computations are the pairing" --> "and whose computations
+* [X] p.32: "and computations are the pairing" --> "and whose computations
       are the pairing"
 
-* [ ] p.35: "much of the standard traversals" -> "many of the standard
+* [X] p.35: "much of the standard traversals" -> "many of the standard
       traversals" (because "traversal" is grammatically countable)
 
 * [ ] p.36: Copattern matching is introduced here, after it's been used
@@ -288,9 +288,11 @@ done (also spotted by reviewer 1).
 
 done.
 
-* [ ] p.39: The code in figure 72 is the first time the articule used lambda
+* [X] p.39: The code in figure 72 is the first time the articule used lambda
       as an argument without either using $ or parentheses. When that's
       paired up with the where syntax, consider some extraneous parentheses.
+
+done
 
 * [ ] p.40: What does it mean to have a module definition inside a record?
       Please explain this.
