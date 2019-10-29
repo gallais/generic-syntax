@@ -18,6 +18,76 @@ removed.
 
 * [X] generic generic
 
+# Review 2 "opportunities for improvement
+
+* [ ] Since the 'variable' feature of Agda is quite new and the paper
+      makes heavy use of it, perhaps it would help to add a short
+      explanation of which variable declarations are used (e.g. "We use σ
+      for variables of type Type and Γ for variables of type List Type").
+
+* [ ] For the scope checker in section 7.2, the error messages provide
+      additional information as to what went wrong, but this is not the
+      case for the typechecker in section 7.3 or the elaborator in section
+      7.4. Is there a particular reason for using Maybe instead of a more
+      informative Either here?
+
+* [ ] Since the paper is quite long, it would help the reader to provide
+      pointers to where concepts are defined, especially when it is more
+      than one section ago since they were used. For example, 'case' from
+      section 5 is used in the definition of UnLet in section 7.5, and
+      'closed' from section 6.2 is used in 7.4.
+
+* [ ] In the definition of elaboration in section 7.4, the letter Γ is
+      used both for a List of modes and for a Typing. Although both are
+      similar, it would be less confusing if they would use a different
+      symbol.
+
+* [ ] It feels a bit silly to refer to your own 2017 paper in 3rd person.
+
+* [ ] In Figure 48, I didn't find where 'Elaborate' is defined. If it is
+      omitted from the paper intentionally, it would help to give at least
+      its type signature.
+
+* [ ] For the generic version of NbE in section 7.7, currently the
+      positivity checker has to be disabled. However (as the paper also
+      notes) this can destroy the soundness of Agda's theory. Thus I
+      wonder whether it would be possible to provide a safe (but still
+      generic) version of NbE by using either a Delay monad or define a
+      suitable domain directly using domain theory.
+
+* [ ] Currently the paper requires some knowledge of Agda's standard
+      library to understand completely. For example, I had to look up the
+      definition of Rel and rel which are used in section 9.1. It would
+      improve the paper if it either explained these concepts or at least
+      referred to the modules of the standard library where they are
+      defined.
+
+* [ ] I did not understand some of the terminology used in section 9.1,
+      e.g. what does it mean for two objects to be 'synchronized'? And
+      what does it mean for two environments to be 'extensionally equal'?
+
+* [ ] The POPLMark challenge is referenced on page 42, but it is mentioned
+      already two pages earlier.
+
+* [ ] The sentence in section 10.3 ending with "... to go further in
+      developing machine-checked such implementations and proofs" looks
+      weird, maybe it's better to reword it in some other way?
+
+* [ ] In the related work on alternative approaches via code generation
+      (section 10.4), it would be interesting to also compare to the ott
+      tool for mechanized metatheory.
+
+* [ ] There's a typo in section 11: the period at the sentence ending with
+      "acting on all of them" is missing.
+
+* [ ] The usage of the word "preliminary" in the last paragraph of section
+      11.1 feels wrong; I would reword this to 'precomposition with a
+      renaming'.
+
+* [ ] Some of the capitalization in the references is off, e.g. Miniagda,
+      Poplmark, coq.
+
+
 # Review 3 "detailed comments"
 
 * [X] p.1: There should be an indication that the paper uses color on the
