@@ -74,6 +74,15 @@ Agda's support for (dependent!) \AK{do}-notations makes writing the check
 really easy. For the arrow type, we introduce a family \AD{Arrow} constraining the
 shape of its index to be an arrow type and redefine \AF{isArrow} as a \emph{view} targeting
 this inductive family~\cite{DBLP:conf/popl/Wadler87,DBLP:journals/jfp/McBrideM04}.
+\revc{
+We purposefully overload the constructor of the \AD{isArrow} family by calling
+it \AIC{\_`→\_}. This means that the proof that a given type has the shape
+{(\AB{σ} \AIC{`→} \AB{τ})} is literally written {(\AB{σ} \AIC{`→} \AB{τ})}.
+This allows us to specify \emph{in the type} whether we want to work with the
+full set of values in \AD{Type} or only the subset corresponding to function
+types and to then proceed to write the same programs a Haskell programmers would,
+with the added confidence that ours are guaranteed to be total.
+}
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}

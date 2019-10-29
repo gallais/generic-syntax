@@ -301,8 +301,10 @@ see above.
 * [ ] p.27: "do-notation" should be singular, not plural (do a search of thea
       article)
 
-* [ ] p.27: The overloading in the definition of isArrow is confusing. Could
+* [X] p.27: The overloading in the definition of isArrow is confusing. Could
       one arrow be made different, perhaps the one in the view?
+
+No. But added an explanation.
 
 * [ ] p. 28: What is bind again? The code b (bind Infer) (epsilon dot var_0)
       (sigma :: Gamma) tau was pretty opaque.
@@ -312,7 +314,7 @@ see above.
 
 * [ ] p.29: The patterns `IN and `IN' were difficult to distinguish at first
 
-* [ ] p.30: In figure 51, what is "pack"?
+* [X] p.30: In figure 51, what is "pack"?
 
 * [X] p.30: Hyphenate "size-preserving" and "size-respecting"
 
@@ -335,7 +337,7 @@ no
 
 
 
-* [X] p.38:  "generic" is repeated in the last line of the page. 
+* [X] p.38:  "generic" is repeated in the last line of the page.
 
 done (also spotted by reviewer 1).
 
