@@ -42,16 +42,22 @@ see above.
 - p.2: "Related Work" should not be capitalized, as it's not used as a
   proper noun here
 
+done.
+
 - p.2: The paragraph beginning with "Breaking the task down" refers to
   an implementor, also referred to with the pronoun "they". The
   paragraph right after the numbered list, that begins with "Even
   after", uses the pronoun "you" to refer to the
   implementor. Consistency is necessary, and "they" seems better here.
 
+done.
+
 - p.2: The citation of Benton et al is in parentheses, but it's used as
 an ordinary noun phrase and thus should not be parenthesized.
 
 - p.2, last line: "Fusable" should probably be "fusible"
+
+done
 
 - p.3: This page states that the techniques are language-independent,
 requiring only inductive families, but it seems to me that the use of
@@ -99,6 +105,8 @@ initially. It seems to mix postfix and ordinary notation. Why can't
 Env just come first?
 
 p6: Missing comma after "Thinnables" on the last line
+
+done.
 
 p7: Fig. 2 is in a float, which means that the figure is
 left-justified. This looks very different from the Thinning definition

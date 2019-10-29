@@ -21,7 +21,7 @@ short, these techniques use the host languages' types to ensure that
 correspond to ill scoped or ill typed terms in the object language.
 
 Despite the large body of knowledge in how to use types to define well
-formed syntax (see the Related Work in Section
+formed syntax (see the related work in Section
 \ref{section:related-work}), it is still necessary for the working DSL
 designer or formaliser to redefine essential functions like renaming
 and substitution for each new syntax, and then to reprove essential
@@ -59,12 +59,12 @@ discover that there is actually a large amount of work:
   prove eight lemmas about the interactions of renaming, substitution,
   and transformation that are all remarkably similar, but must be
   stated and proved separately (e.g, as observed by
-  \cite{benton2012strongly}).
+  \citet{benton2012strongly}).
 \end{enumerate}
 
-Even after doing all of this work, you have only a result for a single
-pair of source and target languages. If you were to change your
-languages $\AD{S}$ or $\AD{T}$, you would have to repeat the same work
+Even after doing all of this work, they have only a result for a single
+pair of source and target languages. If they were to change their
+languages $\AD{S}$ or $\AD{T}$, they would have to repeat the same work
 all over again (or at least do a lot of cutting, pasting, and
 editing).
 % The cases for λs and applications in the
@@ -101,7 +101,7 @@ above) (Section~\ref{section:letbinding}), and normalisation by
 evaluation (Section~\ref{section:nbyeval}). Further, we show how to
 construct generic proofs by formally describing what it means for one
 semantics to simulate another (Section~\ref{section:simulation}), or
-for two semantics to be fusable (Section~\ref{section:fusion}). This
+for two semantics to be fusible (Section~\ref{section:fusion}). This
 allows us to prove the lemmas required above for renaming,
 substitution, and desugaring of let binders generically, for
 \emph{every} syntax in our universe.
@@ -111,7 +111,7 @@ substitution, and desugaring of let binders generically, for
 Our implementation language is
 Agda~\cite{norell2009dependently}. However, our techniques are
 language independent: any dependently typed language at least as
-powerful as Martin-L\"of Type Theory~\cite{martin1982constructive}
+powerful as Martin-L\"of Type Theory\cite{martin1982constructive}
 equipped with inductive families~\cite{dybjer1994inductive} such as
 Coq~\cite{Coq:manual}, Lean~\cite{DBLP:conf/cade/MouraKADR15} or
 Idris~\cite{brady2013idris} ought to do.
@@ -412,7 +412,7 @@ as various instances of a more general traversal. As we will show in Section~\re
 typechecking in the style of Atkey~\citeyear{atkey2015algebraic} also
 fits in that framework. To make sense of this body of work, we
 need to introduce three new notions: \AF{Thinning}, a generalisation of
-renaming; \AF{Thinnable}s which are types that permit thinning; and the
+renaming; \AF{Thinnable}s, which are types that permit thinning; and the
 \AF{□} functor, which freely adds Thinnability to any indexed type.
 %%%
 We use \AF{□}, and our compact notation for the indexed function space
