@@ -69,9 +69,11 @@ these results into a value we can apply our display function to.
 \end{figure}
 
 This allows us to write a \AF{printer} for open terms as demonstrated in
-Figure~\ref{fig:genericprint}. We start by generating
-an environment of \AR{Name}s for the free variables, then use our semantics
-to get a \AF{printer} which we can run using a stream \AF{names} of distinct
+Figure~\ref{fig:genericprint}.
+\reva{We start by using \AF{base} (defined in Section~\ref{sec:varlike:base})
+}
+to generate an environment of \AR{Name}s for the free variables, then use
+our semantics to get a \AF{printer} which we can run using a stream \AF{names} of distinct
 strings as our name supply.
 
 \begin{figure}[h]

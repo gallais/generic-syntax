@@ -58,8 +58,8 @@ discover that there is actually a large amount of work:
 \item In the course of proving the correctness lemma, one needs to
   prove eight lemmas about the interactions of renaming, substitution,
   and transformation that are all remarkably similar, but must be
-  stated and proved separately (e.g, as observed by
-  \citet{benton2012strongly}).
+  stated and proved separately (e.g, as observed by Benton, Hur, Kennedy
+  and McBride~\citeyear{benton2012strongly}).
 \end{enumerate}
 
 Even after doing all of this work, they have only a result for a single
@@ -1125,8 +1125,8 @@ getting the termination checker to see that our proof is indeed
 well founded.
 
 We immediately introduce a corollary of the fundamental lemma of semantics
-for the special cases of closed terms: we can use an empty environment to
-kickstart the evaluation.
+for the special cases of closed terms in Figure~\ref{fig:evalclosed}: we
+can use an empty environment to kickstart the evaluation.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{closed}
@@ -1176,12 +1176,20 @@ in non-empty contexts.
 \caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values}
 \end{figure}
 
-For any \AR{VarLike} \AB{𝓥}, we can define \AF{fresh\textsuperscript{r}} of
-type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})} and \AF{fresh\textsuperscript{l}} of
-type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Γ} \AF{++} \AB{Δ})} by combining the use
-of placeholder values and thinnings, and it is almost immediate that variables
-are \AR{VarLike}. Hence, we can then implement \AF{reify} as in Figure~\ref{fig:genericreify}:
+\label{sec:varlike:base}
+\reva{Given a proof that \AB{𝓥} is \AR{VarLike}, we can manufacture
+  several useful \AB{𝓥}-environments. We provide users with
+  \AF{base} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Γ}},
+  \AF{fresh\textsuperscript{r}} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})}
+  and \AF{fresh\textsuperscript{l}} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Γ} \AF{++} \AB{Δ})}
+  by combining the use of placeholder values and thinnings.
+  In the \AD{Var} case these very general definitions respectively specialise
+  to the identity renaming for a context \AB{Γ} and the injection of \AB{Γ}
+  fresh variables to the right or the left of an ambiant context \AB{Δ}.
+}
 
+It is almost immediate that variables are \AR{VarLike}. Hence, we can
+then implement \AF{reify} as in Figure~\ref{fig:genericreify}:
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{reify}
 \caption{Generic Reification thanks to \AR{VarLike} Values}\label{fig:genericreify}
