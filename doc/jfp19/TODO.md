@@ -143,11 +143,11 @@ somewhere in the paper? Certainly not on page 3!
       be useful to explain these kinds of naming conventions, to help
       readers understand the code by understanding the conventions used.
 
-* [ ] p.4: The citation of "Martin-Löf (1982)" has far too many parentheses
+* [X] p.4: The citation of "Martin-Löf (1982)" has far too many parentheses
       around it. In this case, it's a noun phrase - use \citet or the
       equivalent.
 
-* [ ] p.5: The turnstile notation (_⊢_) seems a bit obscure. Please consider
+* [ ] p.5: The turnstile notation (\_⊢\_) seems a bit obscure. Please consider
       adding an explanation of why it was chosen to help readers remember
       its meaning later on.
 
@@ -164,7 +164,7 @@ somewhere in the paper? Certainly not on page 3!
       variable, while alpha is used as a datatype constructor, and only the
       color distinguishes these cases in the typesetting)
 
-* [ ] p.5: It would be nice if the _$_ notation were explained, or if
+* [ ] p.5: It would be nice if the \_$\_ notation were explained, or if
       ordinary parentheses were used. Not everyone who works with dependent
       types is a major Haskell user.
 
