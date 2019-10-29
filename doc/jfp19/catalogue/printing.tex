@@ -11,9 +11,10 @@ and implement the traversal generically. We want our printer to have type:
 
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{printtype}
 
+\noindent
 where \AF{Display} explains how to print one `layer' of term provided that
 we are handed the \AF{Pieces} corresponding to the printed subterm and
-names for the bound variables where assigned:
+names for the bound variables:
 
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{display}
 
@@ -57,7 +58,7 @@ return the names we used together with this string.
 
 We can put all of these pieces together to obtain the \AF{Printing} semantics
 presented in Figure~\ref{fig:genericprinting}.
-The two first constraints can be trivially discharged. When defining the
+The first two constraints can be trivially discharged. When defining the
 algebra we start by reifying the subterms, then use the fact that  one ``layer''
 of term of our syntaxes with binding is always traversable to combine all of
 these results into a value we can apply our display function to.

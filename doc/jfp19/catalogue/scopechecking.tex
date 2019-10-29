@@ -13,14 +13,14 @@ parser combinators~\cite{DBLP:conf/icfp/Danielsson10,allais2018agdarsec}
 or invoking a parser generator oracle whose target is a total
 language~\cite{Stump:2016:VFP:2841316}. As we will see shortly, we can
 write a generic scope checker transforming terms in a raw syntax where
-variables are represented as strings into a well scoped syntax. We will
+variables are represented as strings into a well-scoped syntax. We will
 come back to typechecking with a concrete example in section~\ref{section:typechecking}
 and then discuss related future work in the conclusion.
 
 Our scope checker will be a function taking two explicit arguments: a name for
 each variable in scope \AB{Γ}, a raw term for a syntax description \AB{d} and
 either fail (the Monad \AF{M} granting us the ability to fail is made explicit
-in Figure~\ref{fig:scopemonad}) or return a well scoped and sorted term for
+in Figure~\ref{fig:scopemonad}) or return a well-scoped and sorted term for
 that description.
 
 \ExecuteMetaData[Generic/Scopecheck.tex]{totmtype}
@@ -66,7 +66,7 @@ Equipped with these notions, we can write down the type of \AF{toVar}
 which tackles the core of the problem: variable resolution. Given a string
 corresponding to a variable's name and provided that we have names for the
 variables in the ambient scope and know the sort the variable needs to be
-we can either fail or return a well scoped and well sorted \AD{Var}.
+we can either fail or return a well-scoped and well-sorted \AD{Var}.
 
 If the ambient scope is empty then we can only fail with an \AIC{OutOfScope} error.
 Alternatively, if the variable's name corresponds to that of the first one
