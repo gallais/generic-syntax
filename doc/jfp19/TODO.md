@@ -195,7 +195,7 @@ see above.
       (e.g. manifest fields) allowed as part of a record? If so, say so, and
       make it clear which code is in the record body.
 
-* [ ] p8: When talking about the Kripke function space in NbE, please cite
+* [X] p8: When talking about the Kripke function space in NbE, please cite
       it so interested readers can follow up.
 
 * [ ] p8, last sentence: This sentence has a very complicated
