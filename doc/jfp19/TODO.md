@@ -305,11 +305,13 @@ done.
 
 fixed
 
-* [ ] p.42: "prevents to try to prove for instance that" occurs in a very
+* [X] p.42: "prevents to try to prove for instance that" occurs in a very
       long, run-on sentence. Consider reformulating the sentence to
       something like "Nothing prevents proofs, such as the idempotence of
       NbE, which use a bona fide reification function that extracts terms
       from model values"
+
+done. much better indeed!
 
 * [X] p.43: The parenthesis opened after "on that term is related via" and
       before Kripke is never closed.
@@ -320,8 +322,10 @@ done.
 
 fixed.
 
-* [ ] p.43: The font in Fusion changes after the s, and it doesn't seem to
+* [X] p.43: The font in Fusion changes after the s, and it doesn't seem to
       be a reference to an identifier Fus in this article.
+
+done. Also multiple instances of Sim.
 
 * [X] p.45: "the appropriate notion of Semantics" seems to have "Semantics"
       in the wrong font.

@@ -1324,7 +1324,7 @@ constraint, as show in Figure~\ref{fig:genericsim}.
 \end{figure}
 
 The fundamental lemma of simulations is a generic theorem showing that for
-each pair of \semrec{} respecting the \AR{Sim}ulation constraint, we
+each pair of \semrec{} respecting the \AR{Simulation} constraint, we
 get related computations given environments of related input values. This
 theorem is once more mutually proven with a statement about \AF{Scope}s,
 and \AD{Size}s play a crucial role in ensuring that the function is indeed total.
@@ -1352,7 +1352,7 @@ When studying specific languages, new opportunities to deploy the
 fundamental lemma of simulations arise. Our solution to the POPLMark
 Reloaded challenge for instance describes the fact that {\AF{sub} \AB{$\rho$} \AB{t}}
 reduces to {\AF{sub} \AB{$\rho$'} \AB{t}} whenever for all \AB{v},
-\AB{$\rho$}(\AB{v}) reduces to \AB{$\rho$'}(\AB{v}) as a \AR{Sim}ulation.
+\AB{$\rho$}(\AB{v}) reduces to \AB{$\rho$'}(\AB{v}) as a \AR{Simulation}.
 The main theorem (strong normalisation of STLC via a logical relation)
 is itself an instance of (the unary version of) the simulation lemma.
 
@@ -1419,9 +1419,9 @@ after \AB{𝓢ᴬ}'': for this statement to make sense, the result of running
 term from a \AB{𝓒ᴬ}. Hence the first constraint: the existence of a \ARF{reifyᴬ}
 function, which we supply as a field of the record \AR{Fusion}. When dealing with
 syntactic semantics such as renaming or substitution
-this function will be the identity. However nothing prevents to try to prove for
-instance that normalisation by evaluation is idempotent in which case a bona fide
-reification function extracting terms from model values will be used.
+this function will be the identity. Nothing prevents proofs, such as the
+idempotence of NbE, which use a bona fide reification function that extracts
+terms from model values.
 
 \ExecuteMetaData[Generic/Fusion.tex]{reify}
 
@@ -1482,7 +1482,7 @@ that the two evaluations yield related computations.
 
 \subsubsection{The Fundamental Lemma of Fusion}
 
-This set of constraints is enough to prove a fundamental lemma of \AR{Fus}ion
+This set of constraints is enough to prove a fundamental lemma of \AR{Fusion}
 stating that from a triple of related environments, one gets a pair of related
 computations: the composition of \AB{𝓢ᴬ} and \AB{𝓢ᴮ} on one hand and
 \AB{𝓢ᴬᴮ} on the other. This lemma is once again proven mutually with its
@@ -1491,7 +1491,7 @@ counterpart for \semrec{}'s \AF{body}'s action on \AR{Scope}s.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
-\caption{Fundamental Lemma of \AR{Fus}ion}
+\caption{Fundamental Lemma of \AR{Fusion}}
 \end{figure}
 
 \subsubsection{Instances of Fusion}
