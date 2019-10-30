@@ -130,7 +130,14 @@ yield any additional insight so we leave it out here. The semantical counterpart
 variables (\ARF{var}) is fairly straightforward: provided a \AF{Typing}, we run the
 inference and touch it up to return a term rather than a mere variable. Finally we
 define the algebra (\ARF{alg}) by pattern-matching on the constructor and using our
-previous combinators.
+previous combinators. \revb{
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elaborate}
+  \caption{\AF{Elaborate}, the elaboration semantics}
+\end{figure}
+
+}
 
 We can once more define a specialised version of the traversal induced by this
 \AR{Semantics} for closed terms: not only can we give a (trivial) initial

@@ -50,7 +50,7 @@ paper to detect all occurences of similar problems.
 ICFP double blind precautions. Took the opportunity to expand on the
 Moggi's ML.
 
-* [ ] In Figure 48, I didn't find where 'Elaborate' is defined. If it is
+* [X] In Figure 48, I didn't find where 'Elaborate' is defined. If it is
       omitted from the paper intentionally, it would help to give at least
       its type signature.
 

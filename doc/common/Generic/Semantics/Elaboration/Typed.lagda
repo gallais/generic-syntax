@@ -166,12 +166,14 @@ Elaborate : Semantics Bidi Var- Elab-
 Elaborate .th^𝓥  = th^Var-
 Elaborate .var   = λ where (`var infer) Γ → just (map₂ `var (infer Γ))
 Elaborate .alg   = λ where
-  (PATTERNS.`app' f t)  → app f t
-  (PATTERNS.`lam' b)    → lam b
-  (PATTERNS.`emb' t)    → emb t
-  (PATTERNS.`cut' σ t)  → cut σ t
+  (`app' f t)  → app f t
+  (`lam' b)    → lam b
+  (`emb' t)    → emb t
+  (`cut' σ t)  → cut σ t
 \end{code}
 %</elaborate>
+\begin{code}
+    where open PATTERNS
 \end{code}
 
 
