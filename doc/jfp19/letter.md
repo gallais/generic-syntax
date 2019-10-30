@@ -8,6 +8,26 @@ the reviewer that motivated the change:
 
 # Clarifications
 
+> Later on in the conclusion you mention Kaiser, Schaëffer and Starks's remark
+> that assuming functional extensionality, all traversals of ACMM are stable
+> under renaming.
+> Couldn't the extensionality requirement be dropped by considering a
+> different representation of environments (...)
+
+The problem lies somewhere else. The compatibility of semantics with renaming
+ultimately amounts to a statement about two different evaluations of the same
+term yielding the same value. If we have a renaming ρᵥ (ᵥ for var) and an
+evaluation environment ρₛ (ₛ for semantics), the statement looks something like:
+((t [ρᵥ]) [ρₛ]) is equal to (t [ρₛ ∘ ρᵥ]).
+
+This 'is equal' is the hard thing to deal with: subterms with extra bound
+variables are interpreted as (Kripke) function spaces in the host language
+and the only thing we can prove generically about them is that they take
+equal values to equal results. So an intensional notion of equality will
+simply not do.
+
+We have expanded the remark in Section 9.2 to include this explanation.
+
 > p3. This page states that the techniques are language-independent,
 > requiring only inductive families, but it seems to me that the use of
 > sized types is a key part of making the fixed point construction go

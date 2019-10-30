@@ -1512,11 +1512,20 @@ renaming has been applied to the environment.
 Another corollary of the fundamental lemma of fusion is the observation that
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} make: \emph{assuming
 functional extensionality}, all the ACMM~\citeyear{allais2017type} traversals
-are compatible with variable renaming. We can reproduce this result generically
-for all syntaxes (see accompanying code) but refrain from using it in practice
-when an axiom-free alternative is provable. Their observation naturally raises
-the question of whether the same semantics are also stable under substitution.
-Our semantics implementing printing with names is a clear counter-example.
+are compatible with variable renaming.
+\reva{
+We reproduced this result generically for all syntaxes (see accompanying code).
+The need for functional extensionality arises in the proof when dealing with
+subterms which have extra bound variables. These terms are interpreted as
+Kripke functional spaces in the host language and we can only prove that they
+take equal inputs to equal outputs. An intensional notion of equality will
+simply not do here.
+}
+As a consequence, we refrain from using the generic result in practice when
+an axiom-free alternative is provable. Kaiser, Schäfer and Stark's observation
+naturally raises the question of whether the same semantics are also stable
+under substitution. Our semantics implementing printing with names is a clear
+counter-example.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,3 +1,55 @@
+# Review 1 main questions / comments
+
+
+* [X] You note in section 3.1 that renaming and substitution can be
+  generically derived for all your syntaxes, relying on the notion of
+  Thinability and VarLike values. To mechanize this, you choose to
+  profit from the strict monoidal structure of arrow types to define the
+  Thinning notion. A similar choice is made in the sigma-calculus
+  presentation of Shaëffer et al (ITP 2015), where renamings are `nat ->
+  nat` functions and substitutions `nat -> term` functions and one needs
+  to show extensionality properties of functions using them. Later on in
+  the conclusion you mention Kaiser, Schaëffer and Starks's remark that
+  assuming functional extensionality, all traversals of ACMM are stable
+  under renaming. Couldn't the extensionality requirement be dropped by
+  considering a different representation of environments etc... using
+  finite support functions (represented as finite tuples?). Especially
+  in the case considered in this article, as all variables are
+  well-scoped (_-Scoped), there must be a finite number of free variables
+  in any situation. Of course one could also rely on an OTT/HoTT-like
+  theory with functional extensionality built-in and not bother with this.
+  Maybe the point you make is also about higher-order functions?
+
+* [ ] Suspended substitutions are hard, but I'm missing the other direction:
+  generic implementations of lifting and substitution in the more
+  space-efficient fashion which does not carry a substitution everywhere
+  but only a lifting index and does the de Bruijn arithmetic at the
+  variable sites only. It is easy to implement on untyped syntax, but it
+  seems to me that the VarLike requirements prevent it in the general
+  framework you present (of course, if it doesn't prevent it, I would be
+  glad to know how to do it). As I understand it, the way semantics are
+  defined, an application of renaming will switch between PHOAS-like
+  (Kripke) and concrete (interpretation of a description) presentations
+  of the term. IIUC, in the printing example, `reify` takes a Kripke
+  function built from an existing concrete term, and applies it to built
+  a new concrete term by combining it with the action of fresh, hence
+  producing fresh names for the bound variables, already knowing about
+  the names of the free variables computed with `(base vl^MName)`.  I'm
+  curious what the computational content of these manipulations is and
+  if the back-and-forth of going through Kripke function spaces is
+  efficient or can be optimized? How would the renaming function you get
+  through Semantics compare with a straightforward recursive
+  implementation applying a lifting to the current renaming at each
+  binder and with a function accumulating the lifting index (or types)
+  and applying it in one go at the var leaves only (if that is indeed
+  definable).
+
+* [ ] The obvious question that is not directly answered in future work
+  is: would this lift to a dependently-typed language easily? The closure
+  under products issue is the first obstacle I guess, and it could use
+  an explanatory example. Probably this also links to the unrestricted
+  variable sorting issue.
+
 # Review 1 "presentation" comments
 
 * [X] I guess you want figure 32 to appear on page 19, not 20.
@@ -67,6 +119,9 @@ Moggi's ML.
       improve the paper if it either explained these concepts or at least
       referred to the modules of the standard library where they are
       defined.
+
+Not actually stdlib but good point: we should explain that just like we
+need \_--Env, we also need Rel
 
 * [ ] I did not understand some of the terminology used in section 9.1,
       e.g. what does it mean for two objects to be 'synchronized'? And
