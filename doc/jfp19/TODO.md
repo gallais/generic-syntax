@@ -45,7 +45,10 @@ paper to detect all occurences of similar problems.
       similar, it would be less confusing if they would use a different
       symbol.
 
-* [ ] It feels a bit silly to refer to your own 2017 paper in 3rd person.
+* [X] It feels a bit silly to refer to your own 2017 paper in 3rd person.
+
+ICFP double blind precautions. Took the opportunity to expand on the
+Moggi's ML.
 
 * [ ] In Figure 48, I didn't find where 'Elaborate' is defined. If it is
       omitted from the paper intentionally, it would help to give at least

@@ -62,7 +62,16 @@ All of these technical details are however outside the scope of this paper.
 
 # Additional extensions:
 
+* Cheney's ``Toward a general theory of names: binding and scope''
+
 While addressing the remark by reviewer 3 inciting us to compare
 and contrast Bach Poulsen et al.'s work with ours, we were reminded
 of Cheney's ``Toward a general theory of names: binding and scope''
 and added a discussion of the possible extensions this works suggests.
+
+* Hatcliff and Danvy's ``A generic account of continuation-passing styles''
+
+While reformulating the reference to our previous work that was done in
+3rd person (due to ICFP double blind constraints) we expandend on the
+CPS translation. The hope is that readers will get a clearer sense of
+whether they want to look into it.
