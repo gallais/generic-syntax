@@ -550,10 +550,14 @@ bound variable. This is concisely expressed by the constraint's type:
 %\caption{Semantics for \AD{Lam}}\label{figure:lamsem}
 %\end{figure}
 
-Agda allows us to package, together with the fields of the record
-\semrec{}, the generic traversal function \semfun{}, which is brought
-into scope for any instance of \semrec{}. We thus realise the promise
-made earlier, namely that any given {\semrec{} \AB{𝓥} \AB{𝓒}} induces
+\revc{
+Agda allows us to package the definition of the generic traversal function
+\semfun{} together with the fields of the record \semrec{}. This causes the
+definition to be specialised and brought into scope for any instance of
+\semrec{} the user will define.
+}
+We thus realise the promise made earlier, namely that any given
+{\semrec{} \AB{𝓥} \AB{𝓒}} induces
 a function which, given a value in \AB{𝓥} for each variable in scope,
 transforms a  \AD{Lam} term into a computation \AB{𝓒}.
 

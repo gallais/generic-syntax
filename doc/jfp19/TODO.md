@@ -250,8 +250,10 @@ somewhere in the paper? Certainly not on page 3!
       and explaining it clearly would increase the accessibility of the
       paper to non-Agda-experts.
 
-* [ ] p8: The uses of script V and script C at the top of the page should be
+* [X] p8: The uses of script V and script C at the top of the page should be
       after their introductions halfway down the page.
+
+They already are.
 
 * [ ] p8, code: the code on page 8 seems to be mostly part of the record
       Semantics, but this took some reverse engineering. Can the fields be
@@ -262,7 +264,7 @@ somewhere in the paper? Certainly not on page 3!
 * [X] p8: When talking about the Kripke function space in NbE, please cite
       it so interested readers can follow up.
 
-* [ ] p8, last sentence: This sentence has a very complicated
+* [X] p8, last sentence: This sentence has a very complicated
       structure. What about a rewrite like "Agda allows us to package a
       generic traversal function "semantics" together with the fields of the
       record "Semantics", which causes it to be brought into scope for any
