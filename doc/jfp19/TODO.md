@@ -37,6 +37,9 @@ removed.
       section 5 is used in the definition of UnLet in section 7.5, and
       'closed' from section 6.2 is used in 7.4.
 
+Dealt with this one case. Need an additional reading of the **whole**
+paper to detect all occurences of similar problems.
+
 * [ ] In the definition of elaboration in section 7.4, the letter Γ is
       used both for a List of modes and for a Typing. Although both are
       similar, it would be less confusing if they would use a different
