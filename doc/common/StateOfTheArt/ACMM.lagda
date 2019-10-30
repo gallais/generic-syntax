@@ -271,17 +271,38 @@ module Printer where
 %<*semprint>
 \begin{code}
  Printing : Semantics Name Printer
- Printing = record
-   { th^𝓥  =  th^Wrap
-   ; var   =  map^Wrap return
-   ; app   =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
-              return $ f ++ " (" ++ t ++ ")"
-   ; lam   =  λ {σ} mb → MkW $ fresh σ >>= λ x →
-              getW (mb extend x) >>= λ b →
-              return $ "λ" ++ getW x ++ ". " ++ b }
+ Printing = record { th^𝓥 = th^Wrap; var = var; app = app; lam = lam }
 \end{code}
 %</semprint>
 \begin{code}
+  where
+\end{code}
+%<*printvar>
+\begin{code}
+   var : ∀[ Name σ ⇒ Printer σ ]
+   var = map^Wrap return
+\end{code}
+%</printvar>
+%<*printapp>
+\begin{code}
+   app : ∀[ Printer (σ `→ τ) ⇒ Printer σ ⇒ Printer τ ]
+   app mf mt = MkW do
+     f ← getW mf
+     t ← getW mt
+     return (f ++ " (" ++ t ++ ")")
+\end{code}
+%</printapp>
+%<*printlam>
+\begin{code}
+   lam : ∀[ □ (Name σ ⇒ Printer τ) ⇒ Printer (σ `→ τ) ]
+   lam {σ} mb = MkW do
+     x ← fresh σ
+     b ← getW (mb extend x)
+     return ("λ" ++ getW x ++ ". " ++ b)
+\end{code}
+%</printlam>
+\begin{code}
+
  open import Data.List.NonEmpty as List⁺ using (List⁺; _∷_)
  open import Codata.Thunk using (force)
  import Data.Nat.Show as NatShow

@@ -243,6 +243,8 @@ somewhere in the paper? Certainly not on page 3!
       where the captions on figures have inconsistent font coloration and
       capitalization with respect to the main text.
 
+SOLUTION: use the new agdasnippet environment for non-figure code blocks.
+
 * [ ] p7: Fig 2 uses copatterns. These are introduced and cited much later
       in the article, but they're used here. Please move their introduction
       to the first place they're used. Copatterns are also used in both
@@ -281,13 +283,13 @@ They already are.
       sorts of little high-level descriptions would make the paper much less
       laborious to read.
 
-* [ ] p9: The sentence starting with "To print a variable" should be there
+* [X] p9: The sentence starting with "To print a variable" should be there
       to match the rest of the syntax, but it's not.
 
 * [X] p9: "so it is automatically a Thinnable functor" - is this reflected
       in any code? Is this standing for an implementation of th^V?
 
-* [ ] p.10: The code in Fig 6 uses do-notation, but the code in Fig. 7 does
+* [X] p.10: The code in Fig 6 uses do-notation, but the code in Fig. 7 does
       not. The do-notation seems much easier to read. Can it be used in
       Fig. 7?
 

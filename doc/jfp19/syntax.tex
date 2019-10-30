@@ -640,15 +640,38 @@ a function \AF{fresh} that generates new concrete names using a \AD{State} monad
 \caption{Wrapper and fresh name generation}\label{fig:fresh}
 \end{figure}
 
-The wrapper \AR{Wrap} does not depend on the scope \AB{Γ} so it is
-automatically a \AF{Thinnable} functor,\revc{ as witnessed by the (used but not
-shown) definition \AF{th\textasciicircum{}Wrap}}. We jump straight
-to the definition of the printer. To print an application, we produce
-a string representation of the term in function position, then one of its argument and combine
-them by putting the argument between parentheses. To print a λ-abstraction,
-we start by generating a fresh name for the newly-bound variable, use that
-name to generate a string representing the body of the function to which we
-prepend a ``λ'' binding the fresh name.
+\revc{The wrapper \AR{Wrap} does not depend on the scope \AB{Γ} so it is
+automatically a thinnable functor, that is to say that we have the (used
+but not shown here) definitions \AF{map\textasciicircum{}Wrap} witnessing
+the functoriality of \AR{Wrap} and \AF{th\textasciicircum{}Wrap} witnessing
+its thinnability. We jump straight
+to the definition of the printer. To print a variable, we are handed
+the \AR{Name} associated to it by the environment and \AF{return} it
+immediately.
+
+\begin{agdasnippet}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{printvar}
+\end{agdasnippet}
+}
+
+To print an application, we produce a string representation of the term in
+function position, then one of its argument and combine them by putting the
+argument between parentheses.
+
+\begin{agdasnippet}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{printapp}
+\end{agdasnippet}
+
+To print a λ-abstraction, we start by generating a fresh name for the
+newly-bound variable, use that name to generate a string representing the
+body of the function to which we prepend a ``λ'' binding the fresh name.
+
+\begin{agdasnippet}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{printlam}
+\end{agdasnippet}
+
+Putting this all together, we get the \AF{Printing} semantics shown
+in Figure~\ref{fig:printing}.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}

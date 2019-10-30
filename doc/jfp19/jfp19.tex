@@ -20,6 +20,14 @@
 \let\oldcite\cite
 \renewcommand{\cite}[1]{(\oldcite{#1})}
 
+\newenvironment{agdasnippet}[1][0]
+ {\ifx{#1}\undefined
+   \centering
+  \else
+  \fi\small
+}{
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%% TRACKING CHANGES %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
