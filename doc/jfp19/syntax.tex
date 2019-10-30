@@ -640,8 +640,9 @@ a function \AF{fresh} that generates new concrete names using a \AD{State} monad
 \caption{Wrapper and fresh name generation}\label{fig:fresh}
 \end{figure}
 
-The wrapper \AR{Wrap} does not depend on the scope \AB{$\Gamma$} so it is automatically
-a Thinnable functor. We jump straight
+The wrapper \AR{Wrap} does not depend on the scope \AB{Γ} so it is
+automatically a \AF{Thinnable} functor,\revc{ as witnessed by the (used but not
+shown) definition \AF{th\textasciicircum{}Wrap}}. We jump straight
 to the definition of the printer. To print an application, we produce
 a string representation of the term in function position, then one of its argument and combine
 them by putting the argument between parentheses. To print a λ-abstraction,

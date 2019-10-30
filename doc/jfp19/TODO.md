@@ -284,7 +284,7 @@ They already are.
 * [ ] p9: The sentence starting with "To print a variable" should be there
       to match the rest of the syntax, but it's not.
 
-* [ ] p9: "so it is automatically a Thinnable functor" - is this reflected
+* [X] p9: "so it is automatically a Thinnable functor" - is this reflected
       in any code? Is this standing for an implementation of th^V?
 
 * [ ] p.10: The code in Fig 6 uses do-notation, but the code in Fig. 7 does
