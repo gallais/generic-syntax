@@ -582,8 +582,16 @@ transforms a  \AD{Lam} term into a computation \AB{𝓒}.
 
 \subsection{Instances of \AR{Semantics}}
 
+\revc{
+Recall that each \AR{Semantics} is parametrised by two families: \AB{𝓥}
+and \AB{𝓒}. During the evaluation of a term, variables are replaced by
+values of type \AB{𝓥} and the overall result is a computation of type \AB{𝓒}.
 Coming back to renaming and substitution, we see that they both fit in the
-\semrec{} framework. We notice that the definition of substitution depends on
+\semrec{} framework. The family \AB{𝓥} of values is respectively the family
+of variables for renaming, and the family of λ-terms for substitution.
+In both cases \AB{𝓒} is the family of λ-terms because the result of the
+operation will be a term.
+} We notice that the definition of substitution depends on
 the definition of renaming: to be able to push terms under binder, we need to
 have already proven that they are thinnable.
 

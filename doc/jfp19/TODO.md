@@ -275,7 +275,7 @@ They already are.
       explain this naming convention - how should the caret be understood
       and pronounced? Is it intended to imply a superscript?
 
-* [ ] p9: At the beginning of 3.3, it would be nice to remind readers that,
+* [X] p9: At the beginning of 3.3, it would be nice to remind readers that,
       in the arguments to Semantics, the first argument is what gets
       substituted, and the second is the syntax being operated over. These
       sorts of little high-level descriptions would make the paper much less
