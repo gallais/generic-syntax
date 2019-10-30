@@ -372,6 +372,7 @@ renaming and substitution: % defined as follows:
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{sub}
 \end{minipage}
 \caption{Type and Scope Preserving Renaming and Substitution}
+\label{figure:rensubACMM}
 \end{figure}
 
 We have intentionally hidden technical details behind some auxiliary definitions
@@ -508,15 +509,28 @@ at hand.
 
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsemtype}\label{section:lamsem}
 
-First of all, values \AB{𝓥} should be \AF{Thinnable} so that \semfun{} may push the
-environment under binders. This constraint allows us to define \AF{extend}
-which takes a context extension from \AB{Δ} to \AB{Θ} in the form of a
-thinning, an existing evaluation environment mapping \AB{Γ} variables to
-\AB{Δ} values and a value living in the extended context \AB{Θ} and returns
-an evaluation environment mapping ({\AB{σ} \AIC{∷} \AB{Γ}}) variables to
-\AB{Θ} values.
+First of all, values \AB{𝓥} should be \AF{Thinnable} so that \semfun{} may push
+the environment under binders.
+\revc{We call this constraint \ARF{th\textasciicircum{}𝓥},
+using a caret to generate a mnemonic name: \ARF{th} refers to \emph{th}innable
+and \ARF{𝓥} clarifies the family which is proven to be thinnable\footnote{
+We use this convention consistently throughout the paper, using names
+such as \AF{vl\textasciicircum{}Tm} for the proof that terms are
+\AR{VarLike}}.}
 
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{thV}
+
+This constraint allows us to define \AF{extend}, the generalisation of the two
+auxiliary definitions we used in Figure~\ref{figure:rensubACMM} without showing
+their definitions. It takes a context extension from \AB{Δ} to \AB{Θ} in the
+form of a thinning, an existing evaluation environment mapping \AB{Γ} variables
+to \AB{Δ} values and a value living in the extended context \AB{Θ} and returns
+an evaluation environment mapping ({\AB{σ} \AIC{∷} \AB{Γ}}) variables to \AB{Θ}
+values.
+% When defining a record in Agda, we are allowed to interleave field
+% declarations and auxiliary definitions that may depend on the so-far already
+% declared fields.
+
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{extend}
 
 

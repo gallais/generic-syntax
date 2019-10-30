@@ -271,7 +271,7 @@ They already are.
       instance of "Semantics".". And how is this different from having a
       field with a function type?
 
-* [ ] p8: This page has the first name that contains a caret (^). Please
+* [X] p8: This page has the first name that contains a caret (^). Please
       explain this naming convention - how should the caret be understood
       and pronounced? Is it intended to imply a superscript?
 
