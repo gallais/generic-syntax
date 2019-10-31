@@ -13,7 +13,7 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import Data.Var hiding (z; s)
 open import Relation.Unary
-open import Data.Environment as E hiding (sequenceA)
+open import Data.Environment as E hiding (sequenceA; uncurry)
 
 -- Descriptions and their Interpretation
 

@@ -1,5 +1,5 @@
 \begin{code}
-{-# OPTIONS --safe #-}
+{-# OPTIONS --safe --sized-types #-}
 
 module Data.Pred where
 

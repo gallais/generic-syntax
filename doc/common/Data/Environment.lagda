@@ -1,14 +1,15 @@
 \begin{code}
-{-# OPTIONS --safe #-}
+{-# OPTIONS --safe --sized-types #-}
 
 module Data.Environment where
 
+open import Size
 open import Data.Nat.Base as ℕ
-open import Data.List.Base hiding (lookup ; [_])
-open import Data.Sum as S
+open import Data.List.Base using (List; []; _∷_; _++_)
+open import Data.Sum using (_⊎_)
 open import Function
 open import Category.Functor
-open import Relation.Unary
+open import Relation.Unary using (IUniversal; _⇒_)
 open import Relation.Binary.PropositionalEquality as PEq hiding ([_])
 
 open import Data.Var hiding (_<$>_)
@@ -18,7 +19,7 @@ private
   variable
     I A : Set
     i σ : I
-    T : List I → Set
+    S T : List I → Set
     𝓥 𝓦 𝓒 : I ─Scoped
     Γ Δ Θ : List I
     F : Set → Set
@@ -35,7 +36,6 @@ record _─Env (Γ : List I) (𝓥 : I ─Scoped) (Δ : List I) : Set where
 \begin{code}
 
 open _─Env public
-
 \end{code}
 %<*thinning>
 \begin{code}
@@ -145,6 +145,14 @@ injectʳ-<+> (x ∷ Γ) ρ₁ ρ₂ v = injectʳ-<+> Γ ρ₁ (select extend ρ�
 (□ T) Γ = ∀[ Thinning Γ ⇒ T ]
 \end{code}
 %</box>
+\begin{code}
+infixl 5 _◃_
+record ◇ (T : List I → Set) (Γ : List I) : Set where
+  constructor _◃_
+  field {support} : List I
+        value     : T support
+        thinning  : Thinning support Γ
+\end{code}
 %<*extract>
 \begin{code}
 extract : ∀[ □ T ⇒ T ]
@@ -159,9 +167,10 @@ duplicate t ρ σ = t (select ρ σ)
 %</duplicate>
 \begin{code}
 
+module □ where
 
-join : ∀[ □ (□ T) ⇒ □ T ]
-join = extract
+  join : ∀[ □ (□ T) ⇒ □ T ]
+  join = extract
 
 \end{code}
 %<*thinnable>
@@ -188,6 +197,50 @@ th^□ : Thinnable (□ T)
 th^□ = duplicate
 \end{code}
 %</thBox>
+\begin{code}
+curry : ∀[ ◇ S ⇒ T ] → ∀[ S ⇒ □ T ]
+curry f v th = f (v ◃ th)
+
+uncurry : ∀[ S ⇒ □ T ] → ∀[ ◇ S ⇒ T ]
+uncurry f (v ◃ th) = f v th
+
+module DI where
+
+  th^◇ : Thinnable (◇ T)
+  th^◇ (t ◃ Θ⊆Γ) Γ⊆Δ = t ◃ select Θ⊆Γ Γ⊆Δ
+
+  pure : ∀[ T ⇒ ◇ T ]
+  pure t = t ◃ identity
+
+  join : ∀[ ◇ (◇ T) ⇒ ◇ T ]
+  join (t ◃ Γ⊆Δ ◃ Δ⊆Θ) = t ◃ select Γ⊆Δ Δ⊆Θ
+
+  map : ∀[ S ⇒ T ] → ∀[ ◇ S ⇒ ◇ T ]
+  map f (sΓ ◃ Γ⊆Δ) = f sΓ ◃ Γ⊆Δ
+
+  _>>=_ : ◇ S Γ → ∀[ S ⇒ ◇ T ] → ◇ T Γ
+  ◇s >>= f = join (map f ◇s)
+
+  run : Thinnable T → ∀[ ◇ T ⇒ T ]
+  run = uncurry
+
+-- stack-based environment
+infix 4 _⊣_,,_
+
+data SEnv (𝓥 : I ─Scoped) : Size → (Γ Δ : List I) → Set where
+  [_]    : ∀{Γ} → ∀[ (Γ ─Env) 𝓥 ⇒ SEnv 𝓥 (↑ i) Γ ]
+  _⊣_,,_ : ∀ Γ₂ {Γ₁} → ∀[ (Γ₂ ─Env) 𝓥 ⇒ ◇ (SEnv 𝓥 i Γ₁) ⇒ SEnv 𝓥 (↑ i) (Γ₂ ++ Γ₁) ]
+
+infix 3 _─◇Env
+_─◇Env : (Γ : List I) (𝓥 : I ─Scoped) (Δ : List I) → Set
+(Γ ─◇Env) 𝓥 Δ = SEnv 𝓥 _ Γ Δ
+
+slookup : SEnv 𝓥 i Γ Δ → Var σ Γ → ◇ (𝓥 σ) Δ
+slookup [ ρ ]           k = DI.pure (lookup ρ k)
+slookup (Γ ⊣ ρ₂ ,, ◇ρ₁) k with split Γ k
+... | inj₁ kˡ = DI.pure (lookup ρ₂ kˡ)
+... | inj₂ kʳ = ◇ρ₁ DI.>>= λ ρ₁ → slookup ρ₁ kʳ
+\end{code}
 %<*thConst>
 \begin{code}
 th^const : Thinnable {I} (const A)

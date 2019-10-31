@@ -44,6 +44,8 @@
   and applying it in one go at the var leaves only (if that is indeed
   definable).
 
+reify the th^Env calls into a datastructure using the diamond monad
+
 * [ ] The obvious question that is not directly answered in future work
   is: would this lift to a dependently-typed language easily? The closure
   under products issue is the first obstacle I guess, and it could use
