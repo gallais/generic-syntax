@@ -733,16 +733,26 @@ one can obtain this way. In this section we recall the main aspects
 of this construction we are interested in to build up our generic
 representation of syntaxes with binding.
 
-The first component of CDMM's universe's definition is an inductive type
-of \AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to
-$\Set{}^I$. It has three constructors: \AIC{`σ} to store data (the rest of
+The first component of CDMM's universe's definition is an inductive type of
+\AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to $\Set{}^I$.
+\revc{
+These functors correspond to \AB{I}-indexed containers of \AB{J}-indexed
+payloads. Keeping these index types distinct prevents mistaking one for the
+other when constructing the interpretation of descriptions. Later of course
+we can use these containers as the nodes of recursive datastructures by
+interpreting some payloads sorts as requests for
+subnodes~\cite{DBLP:journals/jfp/AltenkirchGHMM15}.
+}
+
+The inductive type of descriptions has three constructors:
+\AIC{`σ} to store data (the rest of
 the description can depend upon this stored value), \AIC{`X} to attach a
-recursive substructure indexed by $J$ and \AIC{`$\blacksquare$} to stop with a particular
-index value.
+recursive substructure indexed by $J$ and \AIC{`$\blacksquare$} to stop
+with a particular index value.
 
 The recursive function \AF{⟦\_⟧} makes the interpretation of the
-descriptions formal. Interpretation of descriptions give rise right-nested tuples
-terminated by equality constraints.
+descriptions formal. Interpretation of descriptions give rise
+right-nested tuples terminated by equality constraints.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -751,7 +761,8 @@ terminated by equality constraints.
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{interp}
 \end{minipage}
-\caption{Datatype Descriptions and their Meaning as Functors}\label{figure:desc}
+\caption{Datatype Descriptions and their Meaning as Functors}
+\label{figure:desc}
 \end{figure}
 
 These constructors give the programmer the ability to build up the data

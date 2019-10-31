@@ -297,7 +297,7 @@ They already are.
 
 * [X] p.10: "Inductive-Recursive" should be lowercase
 
-* [ ] p.11: A high-level description of the roles played by I and J in Desc
+* [X] p.11: A high-level description of the roles played by I and J in Desc
       would be useful. Why are there two parameters?
 
 * [X] p.11: "Indexes" should probably read "indices", esp. in an article
