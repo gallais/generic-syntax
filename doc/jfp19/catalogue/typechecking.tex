@@ -14,12 +14,16 @@ variable ever uses the \AIC{Check} mode. In contrast, the generated computations
 will, depending on the mode, either take a type candidate and \AIC{Check} it is
 valid or \AIC{Infer} a type for their argument. These computations are always
 potentially failing so we use the \AD{Maybe} monad.
+\revb{In an actual compiler pipeline we would naturally use a different error monad
+and generate helpful error messages pointing out where the type error occured. The
+interested reader can see a fine-grained analysis of type errors in the extended
+example of a typechecker in \citet{DBLP:journals/jfp/McBrideM04}.}
 
 \begin{figure}[h]
-\begin{minipage}{0.40\textwidth}
+\begin{minipage}[t]{0.40\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{varmode}
 \end{minipage}\hfill
-\begin{minipage}{0.50\textwidth}
+\begin{minipage}[t]{0.50\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typemode}
 \end{minipage}
 \caption{Var- and Type- Relations indexed by the Mode}
@@ -32,10 +36,10 @@ with \AF{isArrow} that our candidate's head constructor is indeed an arrow, and
 collect the domain and codomain.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typeeq}
 \end{minipage}\hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{isArrow}
 \end{minipage}
 \caption{Tests for \AD{Type} values}
@@ -51,21 +55,32 @@ which has the same structure as its second argument.
 \paragraph{Application} When facing an application: infer the type of the function,
 make sure it is an arrow type, check the argument at the domain's type and return
 the codomain.
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{app}
+\end{agdasnippet}
+%
 \paragraph{λ-abstraction} For a λ-abstraction: check that the input
 type is an arrow type and check the body at the codomain type in the extended
 environment where the newly-bound variable is of mode \AIC{Infer} and has the
 domain's type.
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{lam}
+\end{agdasnippet}
+%
 \paragraph{Cut: A \AIC{Check} in an \AIC{Infer} position} A cut always comes
 with a type candidate against which to check the term and to be returned in
 case of success.
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{cut}
+\end{agdasnippet}
+%
 \paragraph{Embedding of \AIC{Infer} into \AIC{Check}} Finally, the change of
 direction from \AIC{Infer}rable to \AIC{Check}able is successful when the
 inferred type is equal to the expected one.
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{emb}
-
+\end{agdasnippet}
+%
 We have defined a bidirectional typechecker for this simple language by
 leveraging the \semrec{} framework. We can readily run it on closed terms
 using the \AF{closed} corollary defined in Figure~\ref{fig:evalclosed}

@@ -830,12 +830,12 @@ conveniently resugars them when displaying a goal. Finally, we can get
 our hands on the types' eliminators by instantiating the generic \AF{fold}.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{list}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{nilcons}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{cons}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{foldr}
 \end{minipage}
 \caption{List, its constructors, and eliminator\label{fig:list}}
@@ -1837,7 +1837,7 @@ rely on similar generic proofs that these transformations are meaning-preserving
 
 \section{Conclusion and Future Work}
 
-Recalling Allais, Chapman, McBride and McKinna's earlier work~\citeyear{allais2017type}
+Recalling our earlier work~\citeyear{allais2017type}
 we have started from an example of a scope- and type- safe language (the simply typed
 λ-calculus), have studied common invariant preserving traversals and noticed their
 similarity. After introducing a notion of semantics and refactoring these traversals as

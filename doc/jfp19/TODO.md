@@ -79,7 +79,7 @@ removed.
       explanation of which variable declarations are used (e.g. "We use σ
       for variables of type Type and Γ for variables of type List Type").
 
-* [ ] For the scope checker in section 7.2, the error messages provide
+* [X] For the scope checker in section 7.2, the error messages provide
       additional information as to what went wrong, but this is not the
       case for the typechecker in section 7.3 or the elaborator in section
       7.4. Is there a particular reason for using Maybe instead of a more
@@ -356,6 +356,8 @@ They already are.
 * [ ] p.25: The use of the term "cut" for the annotated embedding of
       checkable into inferrable terms is not widespread - consider
       explaining it here.
+TODO for James McKinna
+
 
 * [ ] p.25: The alphas toward the bottom of the page should be in
       constructor font (green)
