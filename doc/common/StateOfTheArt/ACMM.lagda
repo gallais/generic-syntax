@@ -319,37 +319,53 @@ module Printer where
        $′ Stream.map alphabetWithSuffix
        $′ "" ∷ λ where .force → Stream.map NatShow.show allNats
 
-open Printer using (Printing)
+open Printer using (getW; Printing; Name; names)
+open Semantics
 \end{code}
 
-
+%<*print>
 \begin{code}
-print : (σ : Type) → Lam σ [] → String
-print _ t = proj₁ $ Printer.getW (Semantics.semantics Printing {Δ = []} (pack λ ()) t) Printer.names
+print : Lam σ [] → String
+print t = proj₁ (getW printer names) where
 
-_ : print (α `→ α) (`lam (`var z)) ≡ "λa. a"
+  empty : ([] ─Env) Name []
+  empty = ε
+
+  printer = semantics Printing empty t
+\end{code}
+%</print>
+\begin{code}
+_ : print {α `→ α} (`lam (`var z)) ≡ "λa. a"
 _ = refl
 
-module _ {σ τ : Type} where
+module Fig1 {σ τ : Type} where
 
 \end{code}
 %<*apply>
 \begin{code}
   apply : Lam ((σ `→ τ) `→ (σ `→ τ)) []
-  apply =  `lam {- f -} $ `lam {- x -}
-        $  `app (`var (s z) {- f -}) (`var z {- x -})
-
+  apply =  `lam {- f -} (`lam {- x -}
+           (`app (`var (s z) {- f -}) (`var z {- x -})))
 \end{code}
 %</apply>
+\begin{code}
+module Print {σ τ : Type} where
+
+\end{code}
 %<*applyprint>
 \begin{code}
-  _ : print _ apply ≡ "λa. λb. a (b)"
+  apply : Lam ((σ `→ τ) `→ (σ `→ τ)) []
+  apply = `lam (`lam (`app (`var (s z)) (`var z)))
+
+  _ : print apply ≡ "λa. λb. a (b)"
   _ = refl
 \end{code}
 %</applyprint>
 \begin{code}
 
-_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa. λb. a (a (b))"
+_ : print {(α `→ α) `→ (α `→ α)}
+          (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z)))))
+  ≡ "λa. λb. a (a (b))"
 _ = refl
 \end{code}
 

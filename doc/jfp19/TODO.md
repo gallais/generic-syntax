@@ -227,7 +227,7 @@ somewhere in the paper? Certainly not on page 3!
       variable, while alpha is used as a datatype constructor, and only the
       color distinguishes these cases in the typesetting)
 
-* [ ] p.5: It would be nice if the \_$\_ notation were explained, or if
+* [X] p.5: It would be nice if the \_$\_ notation were explained, or if
       ordinary parentheses were used. Not everyone who works with dependent
       types is a major Haskell user.
 

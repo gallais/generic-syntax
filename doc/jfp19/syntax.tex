@@ -645,9 +645,10 @@ automatically a thinnable functor, that is to say that we have the (used
 but not shown here) definitions \AF{map\textasciicircum{}Wrap} witnessing
 the functoriality of \AR{Wrap} and \AF{th\textasciicircum{}Wrap} witnessing
 its thinnability. We jump straight
-to the definition of the printer. To print a variable, we are handed
-the \AR{Name} associated to it by the environment and \AF{return} it
-immediately.
+to the definition of the printer.
+
+To print a variable, we are handed the \AR{Name} associated to it by the
+environment and \AF{return} it immediately.
 
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printvar}
@@ -670,18 +671,30 @@ body of the function to which we prepend a ``λ'' binding the fresh name.
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printlam}
 \end{agdasnippet}
 
-Putting this all together, we get the \AF{Printing} semantics shown
-in Figure~\ref{fig:printing}.
+Putting all of these pieces together, we get the \AF{Printing} semantics
+shown in Figure~\ref{fig:printing}.
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}
 \caption{Printing as an instance of \semrec{}}\label{fig:printing}
 \end{figure}
 
-We can readily run the printer on some examples. Using \AF{apply} defined
-in Figure~\ref{figure:apply}, we get:
+We show how one can use this newly-defined semantics to implement \AF{print},
+a printer for closed terms assuming that we have already defined \AF{names},
+a stream of distinct strings used as our name supply. We show the result of
+running \AF{print} on the term \AF{apply} (first introduced in
+Figure~\ref{figure:apply}).
 
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{applyprint}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{agdasnippet}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{print}
+\end{agdasnippet}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+\begin{agdasnippet}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{applyprint}
+\end{agdasnippet}
+\end{minipage}
 
 Both printing and renaming highlight the importance of distinguishing
 values and computations: the type of values in their respective
