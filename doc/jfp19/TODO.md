@@ -303,7 +303,7 @@ They already are.
 * [X] p.11: "Indexes" should probably read "indices", esp. in an article
       using UK English
 
-* [ ] p.12: Later, on p. 15, the paper says that Agda uses pattern synonyms
+* [X] p.12: Later, on p. 15, the paper says that Agda uses pattern synonyms
       to resugar output. This discussion should perhaps occur here, at the
       first use of pattern synonyms.
 

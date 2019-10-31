@@ -824,9 +824,10 @@ termination checker to see that \AF{fold} is a total function.
 \end{figure}
 
 We can see in Figure~\ref{fig:list} that we can recover the types we are
-used to thanks to this least fixpoint, that pattern synonyms let us hide
-away the encoding and have the constructors we want, and that we can get
-our hands on the types' eliminators by instantiating \AF{fold}.
+used to thanks to this least fixpoint. Pattern synonyms let us hide away
+the encoding: users can use them to pattern-match on lists and Agda
+conveniently resugars them when displaying a goal. Finally, we can get
+our hands on the types' eliminators by instantiating the generic \AF{fold}.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
