@@ -9,14 +9,18 @@ there is no way for us to guess how an encoded term should be printed. We
 can however take care of the name generation, deal with variable binding,
 and implement the traversal generically. We want our printer to have type:
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{printtype}
+\end{agdasnippet}
 
 \noindent
 where \AF{Display} explains how to print one `layer' of term provided that
 we are handed the \AF{Pieces} corresponding to the printed subterm and
 names for the bound variables:
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{display}
+\end{agdasnippet}
 
 Reusing the notion of \AR{Name} introduced in Section~\ref{section:printing},
 we can make \AF{Pieces} formal. A subterm has already been printed if we
@@ -24,7 +28,9 @@ have a string representation of it together with an environment of \AR{Name}s
 we have attached to the newly-bound variables this structure contains.
 That is to say:
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{pieces}
+\end{agdasnippet}
 
 The key observation that will help us define a generic printer is that
 \AF{M} composed with \AR{Name} is \AR{VarLike}. Indeed as the composition
@@ -32,19 +38,25 @@ of a functor and a trivially thinnable \AR{Wrap}per it is \AF{Thinnable},
 and \AF{fresh} (defined in Figure~\ref{fig:fresh}) is the proof that we
 can generate placeholder values thanks to the name supply.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{vlmname}
+\end{agdasnippet}
 
 This \AR{VarLike} instance empowers us to reify in an effectful manner
 a \AF{Kripke} function space taking \AF{Name}s and returning a \AF{Printer}
 to a set of \AF{Pieces}.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{reifytype}
+\end{agdasnippet}
 
 In case there are no newly bound variables, the \AF{Kripke} function space
 collapses to a mere \AR{Printer} which is precisely the wrapped version of
 the type we expect.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{reifybase}
+\end{agdasnippet}
 
 Otherwise we proceed in a manner reminiscent of the pure reification function
 defined in Figure~\ref{fig:genericreify}. We start by generating an environment
@@ -54,7 +66,9 @@ traversable~\cite{mcbride_paterson_2008}. We then run the \AF{Kripke} function
 on these names to obtain the string representation of the subterm. We finally
 return the names we used together with this string.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{reifypieces}
+\end{agdasnippet}
 
 We can put all of these pieces together to obtain the \AF{Printing} semantics
 presented in Figure~\ref{fig:genericprinting}.
@@ -91,7 +105,9 @@ handed the name the bound variable was assigned together with the body's
 representation; it is once more a matter of putting the \AF{Pieces}
 together.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Examples/Printing.tex]{printUTLC}
+\end{agdasnippet}
 
 As always, these functions are readily executable and we can check
 their behaviour by writing tests. First, we print the identity function
@@ -102,8 +118,12 @@ observe that names are generated for the free variables first, and then the
 expression itself is printed.
 
 \begin{minipage}{0.45\textwidth}
+  \begin{agdasnippet}
   \ExecuteMetaData[Generic/Examples/Printing.tex]{printid}
+  \end{agdasnippet}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
+  \begin{agdasnippet}
   \ExecuteMetaData[Generic/Examples/Printing.tex]{printopen}
+  \end{agdasnippet}
 \end{minipage}

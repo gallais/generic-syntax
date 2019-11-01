@@ -85,10 +85,10 @@ with the added confidence that ours are guaranteed to be total.
 }
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{equal}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{arrow}
 \end{minipage}
 \caption{Informative Equality Check and Arrow View\label{fig:informativecheck}}
@@ -104,25 +104,33 @@ function and we get its type together with its internal representation. We then
 check that the inferred type is indeed an \AD{Arrow} and elaborate the argument
 using the corresponding domain. We conclude by returning the codomain together
 with the internal function applied to the internal argument.
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{app}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{app}
+\end{agdasnippet}
 \paragraph{λ-abstraction} For the λ-abstraction case, we start by checking that
 the type candidate is an \AD{Arrow}. We can then elaborate the body of the lambda
 in a context extended with one \AIC{Infer} variable assigned an inference function
 thanks to the auxiliary function \AF{var₀}. From this we get an internal term
 corresponding to the body of the λ-abstraction and conclude by returning it wrapped
 in a \AIC{`lam} constructor.
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{lam}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{lam}
+\end{agdasnippet}
 \paragraph{Cut: A \AD{Check} in an \AD{Infer} position} For cut, we start by
 elaborating the term with the type annotation provided and return them paired
 together.
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{cut}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{cut}
+\end{agdasnippet}
 \paragraph{Embedding of \AD{Infer} into \AD{Check}} For the change of direction
 \AIC{Emb} we not only want to check that the inferred type and the type candidate
 are equal: we need to cast the internal term labelled with the inferred type to
 match the type candidate. Luckily, Agda's dependent \AK{do}-notations make once
 again our job easy: when we make the pattern \AIC{refl} explicit, the equality holds
 in the rest of the block.
-\ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{emb}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{emb}
+\end{agdasnippet}
 
 We have almost everything we need to define elaboration as a semantics. Discharging
 the \ARF{th\textasciicircum{}𝓥} constraint is a bit laborious and the proof doesn't

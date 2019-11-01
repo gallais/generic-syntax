@@ -42,20 +42,26 @@ The type of the decision procedure for equality of variables is as follows:
 given any two variables (of the same type, in the same context), the set of
 equality proofs between them is \AD{Dec}idable.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{eqVarType}
+\end{agdasnippet}
 
 We can easily dismiss two trivial cases: if the two variables have distinct
 head constructors then they cannot possibly be equal. Agda allows us to
 dismiss the impossible premise of the function stored in the \AIC{no}
 contructor by using an absurd pattern \AS{()}.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{eqVarNo}
+\end{agdasnippet}
 
 Otherwise if the two head constructors agree we can be in one of two
 situations. If they are both \AIC{z} then we can conclude that the two
 variables are indeed equal to each other.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{eqVarYesZ}
+\end{agdasnippet}
 
 Finally if the two variables are {(\AIC{s} \AB{v})} and {(\AIC{s} \AB{w})}
 respectively then we need to check recursively whether \AB{v} is equal
@@ -64,7 +70,9 @@ rule for \AIC{s}. If \AB{v} and \AB{w} are not equal then a proof that
 {(\AIC{s} \AB{v})} and {(\AIC{s} \AB{w})} are will lead to a direct
 contradiction by injectivity of the constructor \AIC{s}.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{eqVarYesS}
+\end{agdasnippet}
 
 \subsubsection{Deciding Term Equality}
 
@@ -98,7 +106,6 @@ where terms have distinct head constructors (\AIC{`var} vs. \AIC{`con})
 and using either \AF{eq\textasciicircum{}Var} or \AF{eq\textasciicircum{}⟦⟧}
 otherwise. The latter is defined by induction over \AB{e}. The somewhat
 verbose definitions are not enlightening so we leave them out here.
-
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Equality.tex]{eqTmType}

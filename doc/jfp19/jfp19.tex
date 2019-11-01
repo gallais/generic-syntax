@@ -21,11 +21,11 @@
 \renewcommand{\cite}[1]{(\oldcite{#1})}
 
 \newenvironment{agdasnippet}[1][0]
- {\ifx{#1}\undefined
+ {\small\ifx{#1}\undefined
    \centering
   \else
-  \fi\small
-}{
+  \fi
+}{\ignorespacesafterend%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
