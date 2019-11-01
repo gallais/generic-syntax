@@ -112,11 +112,11 @@ thanks to the auxiliary function \AF{var₀}. From this we get an internal term
 corresponding to the body of the λ-abstraction and conclude by returning it wrapped
 in a \AIC{`lam} constructor.
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{lam}
-\paragraph{Cut: A \AIC{Check} in an \AIC{Infer} position} For cut, we start by
+\paragraph{Cut: A \AD{Check} in an \AD{Infer} position} For cut, we start by
 elaborating the term with the type annotation provided and return them paired
 together.
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{cut}
-\paragraph{Embedding of \AIC{Infer} into \AIC{Check}} For the change of direction
+\paragraph{Embedding of \AD{Infer} into \AD{Check}} For the change of direction
 \AIC{Emb} we not only want to check that the inferred type and the type candidate
 are equal: we need to cast the internal term labelled with the inferred type to
 match the type candidate. Luckily, Agda's dependent \AK{do}-notations make once
