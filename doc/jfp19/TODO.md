@@ -235,6 +235,18 @@ somewhere in the paper? Certainly not on page 3!
       initially. It seems to mix postfix and ordinary notation. Why can't
       Env just come first?
 
+DISCUSS: have we at any point argued about what the most lucid
+notation for all these concepts might be? Informally, we use \subseteq
+for Thinnings, and in my cover versions with Craig of original ACMM, I
+used \Vdash (variants of?) for substitutions. Regarding the infix
+nature of the definition, I would happily write
+
+ \Gamma \Vdash[ V ] \Delta for (\Gamma -Env) V \Delta
+
+and specilaise, where needed, eg V = Var. 
+
+Any takers? 
+
 * [ ] p6: Missing comma after "Thinnables" on the last line
 
 * [ ] p7: Fig. 2 is in a float, which means that the figure is
