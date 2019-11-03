@@ -60,7 +60,9 @@ environment.
 \end{figure}
 
 The process of removing let binders is kickstarted with a placeholder
-environment of type {(\AB{Γ} \AR{─Env}) (\AD{Tm} \AB{d} ∞) \AB{Γ}}.
+environment 
+%%%  (\AF{base} \AF{vl\textasciicircum{}Tm})
+of type {(\AB{Γ} \AR{─Env}) (\AD{Tm} \AB{d} ∞) \AB{Γ}}. 
 The constructor \AIC{pack}, introduced in Figure~\ref{fig:environment},
 turns a function from variables to values into the corresponding environment,
 here the environment associating each variable to itself (seen as a term).
