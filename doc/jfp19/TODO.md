@@ -1,3 +1,27 @@
+# James McKinna's remarks (with gallais' spin on them)
+
+* [ ] The text uses copatterns to define an η-expansion of
+  'pack s', but it is this later which is used in running text to
+  describe the term. Can we reconcile this copattern vs. constructor
+  terminology somehow?
+
+* [ ] Add ticked pattern synonyms for list and define foldr using
+  them on page 13
+
+* [ ] Use a pattern-matching lambda in the definition of annotate
+  instead of proj1
+
+* [ ] norm^LC should use a locally defined `fire` function in the
+  `(APP' (LAM f) t)`. Introducing this `fire` is a great opportunity
+  to: - show its type
+      - explain why `extract` and the *singleton* environment `ε • t`
+        are used.
+
+* [ ] add `Rel`'s definition and introduce `packᴿ λ _ → refl` as `reflᴿ`.
+  by analogy with other instances of 'pack var', 'pack id', ... ie
+  'pack (Semantics.var S)' for some Semantics S, should we name this object,
+  as 'the identity Relator' or some such?
+
 # Review 1 main questions / comments
 
 
