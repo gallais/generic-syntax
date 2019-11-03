@@ -1240,12 +1240,13 @@ and reifying the bodies of binders.
 \caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding}
 \end{figure}
 
-The reification process mentioned in the definition of renaming
-and substitution can be implemented generically for \semrec{}
-families which have \AR{VarLike} values (\AF{vl\textasciicircum{}Var} and \AF{vl\textasciicircum{}Tm}
-are proofs of \AR{VarLike} for \AD{Var} and \AD{Tm} respectively) i.e.
-values which are thinnable and such that we can craft placeholder values
-in non-empty contexts.
+The reification process mentioned in the definition of renaming and
+substitution can be implemented generically for \semrec{} families
+which have \AR{VarLike} values, i.e.  values which are thinnable and
+such that we can craft placeholder values in non-empty contexts. It is
+almost immediate that both \AD{Var} and \AD{Tm} are \AR{VarLike} (with
+proofs \AF{vl\textasciicircum{}Var} and \AF{vl\textasciicircum{}Tm},
+respectively).
 
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{varlike}
@@ -1264,8 +1265,8 @@ in non-empty contexts.
   fresh variables to the right or the left of an ambient context \AB{Δ}.
 }
 
-It is almost immediate that variables are \AR{VarLike}. Hence, we can
-then implement \AF{reify} as in Figure~\ref{fig:genericreify}:
+Hence, we can then implement \AF{reify} as in
+Figure~\ref{fig:genericreify}:
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{reify}
 \caption{Generic Reification thanks to \AR{VarLike} Values}\label{fig:genericreify}
