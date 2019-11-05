@@ -75,7 +75,7 @@ annotate : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ CLet) ∞ σ Γ
 \end{code}
 %</annotatetype>
 \begin{code}
-annotate = proj₁ ∘ Semantics.semantics Annotate (base vl^Var)
+annotate t = let (t' , _) = Semantics.semantics Annotate (base vl^Var) t in t'
 \end{code}
 \end{AgdaSuppressSpace}
 \end{AgdaAlign}

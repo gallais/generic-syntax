@@ -8,7 +8,7 @@
 * [X] Add ticked pattern synonyms for list and define foldr using
   them on page 13
 
-* [ ] Use a pattern-matching lambda in the definition of annotate
+* [X] Use a pattern-matching let in the definition of annotate
   instead of proj1
 
 * [ ] norm^LC should use a locally defined `fire` function in the
