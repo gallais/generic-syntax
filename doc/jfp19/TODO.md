@@ -123,6 +123,8 @@ paper to detect all occurences of similar problems.
       similar, it would be less confusing if they would use a different
       symbol.
 
+Is this even true? We are using ms for lists of modes and Γ for typings!
+
 * [X] It feels a bit silly to refer to your own 2017 paper in 3rd person.
 
 ICFP double blind precautions. Took the opportunity to expand on the
