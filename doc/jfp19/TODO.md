@@ -155,7 +155,7 @@ need \_--Env, we also need Rel
       e.g. what does it mean for two objects to be 'synchronized'? And
       what does it mean for two environments to be 'extensionally equal'?
 
-* [ ] The POPLMark challenge is referenced on page 42, but it is mentioned
+* [X] The POPLMark challenge is referenced on page 42, but it is mentioned
       already two pages earlier.
 
 * [ ] The sentence in section 10.3 ending with "... to go further in
