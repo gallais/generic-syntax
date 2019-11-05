@@ -247,22 +247,55 @@ to be the unit type.  Given this sorted setting, our functors take an
 extra $I$ argument corresponding to the sort of the expression being
 built. This is captured by the large type \AB{I}
 \AF{─Scoped}:% = $I$ $\to$ \AD{List} $I$ $\to$ \AF{Set}.
-
-\begin{center}
+%
+\begin{agdasnippet}
 \ExecuteMetaData[Data/Var.tex]{scoped}
 %\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
-\end{center}
-
+\end{agdasnippet}
+%
 We use Agda's mixfix operator notation where underscores denote
 argument positions.
 
 To lighten the presentation, we exploit the observation that the
 current scope is either passed unchanged to subterms (e.g. in the
 application case) or extended (e.g. in the λ-abstraction case) by
-introducing combinators to build indexed types, conforming to the
-convention (see e.g.~\citet{martin1982constructive}) of mentioning only
-context \emph{extensions} when presenting judgements. Indeed, this
-observation is critical to our whole approach to syntax with binding,
+introducing combinators to build indexed types. We conform to the
+convention (see e.g.~\citet{martin1982constructive}) of mentioning
+only context \emph{extensions} when presenting judgements.
+\revc{That is
+to say that we aim to write sequents with an \emph{implicit} ambient
+context. Concretely: we would rather use the rule \AB{appᵢ} than
+\AB{appₑ} as the inference rule for application in STLC.
+
+\begin{mathpar}
+\inferrule{f : σ → τ \and t : σ}
+ {f\,t : τ}
+ {appᵢ}
+\and
+\inferrule{Γ ⊢ f : σ → τ \and Γ ⊢ t : σ}
+ {Γ ⊢ f\,t : τ}
+ {appₑ}
+\end{mathpar}
+
+In this discipline, the turnstyle is used in rules which are binding
+fresh variables. It separates the \emph{extension} applied to the ambient
+context on its left and the judgment that lives in the thus extended
+context on its right. Concretely: we would rather use the rule \AB{lamᵢ}
+than \AB{lamₑ} as the inference rule for λ-abstraction in STLC.
+
+\begin{mathpar}
+\inferrule{x:σ ⊢ b : τ}
+ {λx.t : σ → τ}
+ {lamᵢ}
+\and
+\inferrule{Γ, x:σ ⊢ b : τ}
+ {Γ ⊢ λx.t : σ → τ}
+ {lamₑ}
+\end{mathpar}
+}
+
+This observation that an ambient context is either passed around as is
+or extended for subterms is critical to our whole approach to syntax with binding,
 and will arise again in our generic formulation of syntax traversals
 in Section~\ref{section:semantics}.
 % All the definitions are polymorphic in the index type
@@ -287,7 +320,8 @@ in Section~\ref{section:semantics}.
 
 We lift the function space pointwise with \AF{\_⇒\_}, silently
 threading the underlying scope. The \AF{\_⊢\_} makes explicit the
-\emph{adjustment} made to the index by a function. We write \AB{f}
+\emph{adjustment} made to the index by a function, a generalisation
+of the idea of \emph{extension}. We write \AB{f}
 \AF{⊢} \AB{T} where \AB{f} is the modification and \AB{T} the indexed
 Set it operates on. Although it may seem surprising at first to define
 binary infix operators as having arity three, they are meant to be

@@ -236,7 +236,7 @@ somewhere in the paper? Certainly not on page 3!
       around it. In this case, it's a noun phrase - use \citet or the
       equivalent.
 
-* [ ] p.5: The turnstile notation (\_⊢\_) seems a bit obscure. Please consider
+* [X] p.5: The turnstile notation (\_⊢\_) seems a bit obscure. Please consider
       adding an explanation of why it was chosen to help readers remember
       its meaning later on.
 
