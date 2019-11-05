@@ -1726,16 +1726,16 @@ generic programs over them is still an open problem.
 of a general \emph{semantic} framework for signatures with binding, algebras
 for such signatures, and initiality of the term algebra, giving rise to a
 categorical `program' for substitution and proofs of its properties, was given
-by Fiore, Plotkin and Turi~\cite{FiorePlotkinTuri99}, working in the category of presheaves
+by Fiore, Plotkin and Turi~\cite{FiorePlotkinTuri99}. They worked in the category of presheaves
 over renamings, (a skeleton of) the category of finite sets. The presheaf
 condition corresponds to our notion of being \AF{Thinnable}. Exhibiting
 algebras based on both de Bruijn \emph{level} and \emph{index} encodings,
 their approach isolates the usual (abstract) arithmetic required of such encodings.
 
-By contrast, working in an \emph{implemented} type theory, where the encoding
-can be understood as its own foundation, without appeal to an external mathematical
-semantics, we are able to go further in developing machine-checked such
-implementations and proofs, themselves generic with respect to an abstract syntax
+By contrast, we are working in an \emph{implemented} type theory where the
+encoding can be understood as its own foundation without appeal to an external
+mathematical semantics. We are able to go further in developing machine-checked
+such implementations and proofs, themselves generic with respect to an abstract syntax
 \AD{Desc} of syntaxes-with-binding. Moreover, the usual source of implementation
 anxiety, namely concrete arithmetic on de Bruijn indices, has been successfully
 encapsulated via the \AF{□} coalgebra structure. It is perhaps noteworthy that

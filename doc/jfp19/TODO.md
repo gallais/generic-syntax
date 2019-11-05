@@ -158,7 +158,7 @@ need \_--Env, we also need Rel
 * [X] The POPLMark challenge is referenced on page 42, but it is mentioned
       already two pages earlier.
 
-* [ ] The sentence in section 10.3 ending with "... to go further in
+* [X] The sentence in section 10.3 ending with "... to go further in
       developing machine-checked such implementations and proofs" looks
       weird, maybe it's better to reword it in some other way?
 
