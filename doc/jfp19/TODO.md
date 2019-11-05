@@ -389,11 +389,9 @@ They already are.
 
 * [X] p.25: "check the input type is" -> "check that the input type is"
 
-* [ ] p.25: The use of the term "cut" for the annotated embedding of
+* [X] p.25: The use of the term "cut" for the annotated embedding of
       checkable into inferrable terms is not widespread - consider
       explaining it here.
-TODO for James McKinna
-
 
 * [ ] p.25: The alphas toward the bottom of the page should be in
       constructor font (green)
