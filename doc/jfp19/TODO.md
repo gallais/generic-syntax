@@ -5,7 +5,7 @@
   describe the term. Can we reconcile this copattern vs. constructor
   terminology somehow?
 
-* [ ] Add ticked pattern synonyms for list and define foldr using
+* [X] Add ticked pattern synonyms for list and define foldr using
   them on page 13
 
 * [ ] Use a pattern-matching lambda in the definition of annotate
