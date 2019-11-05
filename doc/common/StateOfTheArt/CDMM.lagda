@@ -138,10 +138,11 @@ infixr 10 _∷_
 \end{code}
 %<*nilcons>
 \begin{code}
-pattern []'       = (true , refl)
-pattern _∷'_ x xs = (false , x , xs , refl)
-pattern []       = `con []'
-pattern _∷_ x xs = `con (x ∷' xs)
+pattern []'  = (true , refl)
+pattern []   = `con []'
+
+pattern _∷'_ x xs  = (false , x , xs , refl)
+pattern _∷_ x xs   = `con (x ∷' xs)
 \end{code}
 %</nilcons>
 
@@ -172,8 +173,8 @@ Vec A = μ (vecD A) ∞
 \begin{code}
 foldr : (A → B → B) → B → List A → B
 foldr c n = fold (listD _) $ λ where
-  []' → n
-  (hd ∷' rec) → c hd rec
+  []'          → n
+  (hd ∷' rec)  → c hd rec
 \end{code}
 %</foldr>
 
