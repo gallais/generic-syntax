@@ -6,34 +6,32 @@ is an instance of ACMM's notion of \semrec{}. We will now show that this
 observation can be generalised to arbitrary syntaxes with binding. Unlike
 renaming or substitution, this generic program will require user guidance:
 there is no way for us to guess how an encoded term should be printed. We
-can however take care of the name generation, deal with variable binding,
+can however take care of the name generation (using the monad \AF{Fresh}
+introduced in Figure~\ref{fig:fresh}), deal with variable binding,
 and implement the traversal generically. We want our printer to have type:
-
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{printtype}
 \end{agdasnippet}
-
-\noindent
+%
 where \AF{Display} explains how to print one `layer' of term provided that
 we are handed the \AF{Pieces} corresponding to the printed subterm and
 names for the bound variables:
-
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Semantics/Printing.tex]{display}
+  \ExecuteMetaData[Generic/Semantics/Printing.tex]{display}
 \end{agdasnippet}
-
+%
 Reusing the notion of \AR{Name} introduced in Section~\ref{section:printing},
 we can make \AF{Pieces} formal. A subterm has already been printed if we
 have a string representation of it together with an environment of \AR{Name}s
 we have attached to the newly-bound variables this structure contains.
 That is to say:
-
+%
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{pieces}
 \end{agdasnippet}
-
+%
 The key observation that will help us define a generic printer is that
-\AF{M} composed with \AR{Name} is \AR{VarLike}. Indeed as the composition
+\AF{Fresh} composed with \AR{Name} is \AR{VarLike}. Indeed as the composition
 of a functor and a trivially thinnable \AR{Wrap}per it is \AF{Thinnable},
 and \AF{fresh} (defined in Figure~\ref{fig:fresh}) is the proof that we
 can generate placeholder values thanks to the name supply.

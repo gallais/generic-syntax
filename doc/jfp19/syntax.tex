@@ -648,13 +648,17 @@ existing de Bruijn variable into an extended scope) as the definition of the
 thinning embedding \AB{$\Gamma$} into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
 
 \label{section:printing}
-We also include the definition of a basic printer relying on a name supply
-to highlight the fact that computations can very well be effectful.
+We also include the definition of a basic printer relying on a name supply to
+highlight the fact that computations can very well be effectful. \revc{The ability
+to generate fresh names is given to us by a monad that we decide to call \AF{Fresh}.
+Concretely, \AF{Fresh} is implemented as an instance of the state monad where
+the state is a stream of distinct strings.}.
 The \AF{Printing} semantics is defined by using \AF{Name}s (i.e. \AD{String}s)
-as values and \AF{Printer}s (i.e. {\AF{State} (\AD{Stream} \AD{String}) \AD{String}})
+as values and \AF{Printer}s (i.e. monadic actions in \AF{Fresh} returning a \AD{String})
 as computations. We use a \AR{Wrap}per with a type and a context as phantom types
 in order to help Agda's inference propagate the appropriate constraints. We define
-a function \AF{fresh} that generates new concrete names using a \AD{State} monad.
+a function \AF{fresh} that fetches a name from the name supply and makes sure it is
+not available anymore.
 
 \begin{figure}[h]
 \begin{minipage}{0.6\textwidth}
@@ -1233,16 +1237,20 @@ that our terms are indexed by a \AF{Size} is once more crucial in
 getting the termination checker to see that our proof is indeed
 well founded.
 
-We immediately introduce a corollary of the fundamental lemma of semantics
-for the special cases of closed terms in Figure~\ref{fig:evalclosed}: we
-can use an empty environment to kickstart the evaluation.
+We immediately introduce \AF{closed}, a corollary of the fundamental lemma of
+semantics for the special cases of closed terms in Figure~\ref{fig:evalclosed}.
+Given a \AR{Semantics} with value type \AB{𝓥} and computation type \AB{𝓒},
+we can evaluate a closed term of type \AB{σ} and obtain a computation of
+type {(\AB{𝓒} \AB{σ} \AIC{[]})} by kickstarting the evaluation with an
+empty environment.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{closed}
 \caption{Corollary: evaluation of closed terms}\label{fig:evalclosed}
 \end{figure}
 
-\subsection{Our First Generic Programs: Renaming and Substitution}\label{section:renandsub}
+\subsection{Our First Generic Programs: Renaming and Substitution}%
+\label{section:renandsub}
 
 Similarly to ACMM~\citeyear{allais2017type} renaming can be defined generically
 for all syntax descriptions as a semantics with \AF{Var} as values and \AD{Tm} as
@@ -1297,9 +1305,8 @@ respectively).
   to the identity renaming for a context \AB{Γ} and the injection of \AB{Γ}
   fresh variables to the right or the left of an ambient context \AB{Δ}.
 }
+Using these definitions, we can then implement \AF{reify} as in Figure~\ref{fig:genericreify}.
 
-Hence, we can then implement \AF{reify} as in
-Figure~\ref{fig:genericreify}:
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{reify}
 \caption{Generic Reification thanks to \AR{VarLike} Values}\label{fig:genericreify}

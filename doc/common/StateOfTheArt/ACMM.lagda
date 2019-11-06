@@ -224,8 +224,8 @@ module Printer where
 \end{code}
 %<*monad>
 \begin{code}
- M : Set → Set
- M = State (Stream String _)
+ Fresh : Set → Set
+ Fresh = State (Stream String _)
 \end{code}
 %</monad>
 %<*valprint>
@@ -246,7 +246,7 @@ module Printer where
 %<*printer>
 \begin{code}
  Printer : I ─Scoped
- Printer = Wrap (M String)
+ Printer = Wrap (Fresh String)
 \end{code}
 %</printer>
 \begin{code}
@@ -261,7 +261,7 @@ module Printer where
 \end{code}
 %<*freshprint>
 \begin{code}
- fresh : ∀ σ → M (Name σ (σ ∷ Γ))
+ fresh : ∀ σ → Fresh (Name σ (σ ∷ Γ))
  fresh σ = do
    names ← get
    put (tail names)

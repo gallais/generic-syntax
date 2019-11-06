@@ -367,13 +367,15 @@ They already are.
 * [ ] p. 19: Earlier uses of copatterns did them as prefix projections,
       Fig. 30 uses postfix.
 
-* [ ] p. 19: The sentence starting with "Hence, we can then implement..."
+* [X] p. 19: The sentence starting with "Hence, we can then implement..."
       trails off at a colon without ever being finished.
 
-* [ ] p. 20: The name M referred to here is defined on page 6. It would be
+* [X] p. 20: The name M referred to here is defined on page 6. It would be
       best to give it a more memorable name, but failing that, it would be
       good to have an explicit page reference for its binding site so
       readers can go remind themselves of what it means.
+
+Renamed to Fresh (+ added back link)
 
 * [ ] p. 20: Couldn't parse the sentence "Wrapper it is Thinnable, and fresh
       (defined in Fig. 6) is the proof that we can generate placeholder
