@@ -155,6 +155,7 @@ Moggi's ML.
 
 Not actually stdlib but good point: we should explain that just like we
 need \_--Env, we also need Rel
+Explained All too
 
 * [ ] I did not understand some of the terminology used in section 9.1,
       e.g. what does it mean for two objects to be 'synchronized'? And

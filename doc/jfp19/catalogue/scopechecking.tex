@@ -18,18 +18,40 @@ come back to typechecking with a concrete example in section~\ref{section:typech
 and then discuss related future work in the conclusion.
 
 Our scope checker will be a function taking two explicit arguments: a name for
-each variable in scope \AB{Γ}, a raw term for a syntax description \AB{d} and
-either fail (the Monad \AF{M} granting us the ability to fail is made explicit
-in Figure~\ref{fig:scopemonad}) or return a well scoped and sorted term for
-that description.
+each variable in scope \AB{Γ} and a raw term for a syntax description \AB{d}.
+It will either fail (the Monad \AF{M} granting us the ability to fail is made
+explicit in Figure~\ref{fig:scopemonad}) or return a well scoped and sorted
+term for that description.
 
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Scopecheck.tex]{totmtype}
 \end{agdasnippet}
 
-\paragraph{Raw Terms} We can obtain \AF{Names} by reusing the standard library's
-\AF{All}, a predicate transformer making sure a predicate holds of all the element
-of a list. The definition of \AF{WithNames} is analogous to \AF{Pieces} in the
+\revb{
+\paragraph{Scope} We can obtain \AF{Names}, the datastructure associating to
+each variable in scope its raw name as a string by reusing the standard library's
+\AD{All}. The inductive family \AD{All} is a predicate transformer making sure a
+predicate holds of all the element of a list. It is defined in a style common in
+Agda: because \AD{All}'s constructors are in one to one correspondence with that
+of its index type (\AD{List} \AB{A}), the same name are reused: \AIC{[]} is the
+name of the proof that \AB{P} trivially holds of all the elements in the empty
+list \AIC{[]}; similarly \AIC{\_∷\_} is the proof that provided that \AB{P} holds
+of the element \AB{a} on the one hand and of the elements of the list \AB{as}
+on the other then it holds of all the elements of the list (\AB{a} \AIC{∷} \AB{as}).
+
+\begin{figure}[h]
+\begin{minipage}[t]{0.6\textwidth}
+\ExecuteMetaData[Stdlib.tex]{all}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+  \ExecuteMetaData[Generic/Scopecheck.tex]{names}
+\end{minipage}
+\caption{Associating a raw string to each variable in scope}
+\end{figure}
+}
+
+\paragraph{Raw terms}
+The definition of \AF{WithNames} is analogous to \AF{Pieces} in the
 previous section: we expect \AF{Names} for the newly bound variables.
 Terms in the raw syntax then leverage these definitions: they are either a variable
 i.e. a \AD{String} potentially accompanied by some extra information \AB{E} (typically
@@ -37,12 +59,7 @@ a position in a file) or a ``layer'' of raw term where subterms are raw terms wi
 names for the newly-bound variables.
 
 \begin{figure}[h]
-\begin{minipage}[t]{0.35\textwidth}
-  \ExecuteMetaData[Generic/Scopecheck.tex]{names}
-\end{minipage}
-\begin{minipage}[t]{0.55\textwidth}
-  \ExecuteMetaData[Generic/Scopecheck.tex]{withnames}
-\end{minipage}
+\ExecuteMetaData[Generic/Scopecheck.tex]{withnames}
 \ExecuteMetaData[Generic/Scopecheck.tex]{raw}
 \caption{Names and Raw Terms}
 \end{figure}
