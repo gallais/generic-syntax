@@ -52,11 +52,13 @@ on the other then it holds of all the elements of the list (\AB{a} \AIC{∷} \AB
 
 \paragraph{Raw terms}
 The definition of \AF{WithNames} is analogous to \AF{Pieces} in the
-previous section: we expect \AF{Names} for the newly bound variables.
-Terms in the raw syntax then leverage these definitions: they are either a variable
-i.e. a \AD{String} potentially accompanied by some extra information \AB{E} (typically
-a position in a file) or a ``layer'' of raw term where subterms are raw terms with
-names for the newly-bound variables.
+previous section: we expect \AF{Names} for the newly bound
+variables. Terms in the raw syntax then leverage these
+definitions. They are either a variables or another ``layer'' of raw
+terms. Variables \AIC{'var} carry a \AD{String} and potentially some
+extra information \AB{E} (typically a position in a file). The other
+constructor \AIC{'con} carries a layer of raw terms where subterms are
+raw terms equiped with names for any newly-bound variables.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Scopecheck.tex]{withnames}

@@ -383,8 +383,10 @@ They already are.
 
 * [X] p.22: "consist in type checking" -> "consists of type checking"
 
-* [ ] p. 23: The sentence "Terms in the raw syntax ..." was a bit hard to
+* [X] p. 23: The sentence "Terms in the raw syntax ..." was a bit hard to
       follow. Consider more commas, or breaking it in two.
+
+broken up into three.
 
 * [ ] p.23: I-dec could use a description/definition in the text
 
