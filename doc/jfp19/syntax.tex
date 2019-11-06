@@ -1369,11 +1369,34 @@ traversals, it also allows them to give abstract proof frameworks for
 simulation or fusion lemmas. Their idea naturally extends to our generic
 presentation of semantics for all syntaxes.
 
-The most important concept in this section is the \emph{relator} (\AF{⟦} \AB{d} \AF{⟧ᴿ}),
-a relation transformer which characterises structurally equal layers such that their
-substructures are themselves related by the relation it is passed as an
-argument. It inherits a lot of its relational arguments' properties: whenever
-\AB{R} is reflexive (respectively symmetric or transitive) so is {(\AF{⟦} \AB{d} \AF{⟧ᴿ} \AB{R})}.\label{lem:zipstable}
+\subsection{Relation Transformers}
+
+In our exploration of generic proofs about the behaviour of various \AR{Semantics},
+we are going to need to lift relations on values and computations to relations on
+\AF{Kripke} function spaces or on \AB{d}-shaped terms whose subterms have been
+evaluated already. We introduce these two key relation transformers here.
+
+\paragraph{Kripke relator}
+We assume that we have two types of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}
+as well as a relation \AB{𝓥ᴿ} for pairs of such values, and two types of computations
+\AB{𝓒ᴬ} and \AB{𝓒ᴮ} whose notion of relatedness is given by \AB{𝓒ᴿ}. We can define
+\AF{Kripkeᴿ} relating Kripke functions of type
+{(\AF{Kripke} \AB{𝓥ᴬ} \AB{𝓒ᴬ})} and {(\AF{Kripke} \AB{𝓥ᴮ} \AB{𝓒ᴮ})}
+respectively by stating that they send related inputs
+to related outputs. We use the relation transformer \AF{All} which lifts a relation
+on values to one on environments in a pointwise manner.
+
+\begin{figure}[h]
+ \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}
+\caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
+\end{figure}
+
+\paragraph{Desc relator}
+The relator (\AF{⟦} \AB{d} \AF{⟧ᴿ}) is a relation transformer which characterises
+structurally equal layers such that their substructures are themselves related
+by the relation it is passed as an argument. It inherits a lot of its relational
+arguments' properties: whenever \AB{R} is reflexive (respectively symmetric or
+transitive) so is {(\AF{⟦} \AB{d} \AF{⟧ᴿ} \AB{R})}.\label{lem:zipstable}
 
 It is defined by induction on the description and case analysis on the two
 layers which are meant to be equal:
@@ -1404,34 +1427,56 @@ on more advanced use-cases.
 
 \subsection{Simulation Lemma}\label{section:simulation}
 
-A constraint mentioning the relator appears naturally when we want to say that a
-semantics can simulate another one. Given a relation \AB{𝓥ᴿ} connecting values
-in \AB{𝓥ᴬ} and \AB{𝓥ᴮ}, and a relation \AB{𝓒ᴿ} connecting computations in
-\AB{𝓒ᴬ} and \AB{𝓒ᴮ}, we can define \AF{Kripkeᴿ} relating values
-\AF{Kripke} \AB{𝓥ᴬ} \AB{𝓒ᴬ} and \AF{Kripke} \AB{𝓥ᴮ} \AB{𝓒ᴮ}
-by stating that they send related inputs to related outputs. We use
-the relation transformer \AF{∀[\_]} which lifts a relation on values
-to one on environments in a pointwise manner.
+\revb{
+A constraint mentioning both relation transformers appears naturally when we want to
+say that a semantics can simulate another one. For instance, renaming is simulated
+by substitution: we simply have to restrict ourselves to environments mapping variables
+to terms which happen to be variables.
+More generally, given a semantics \AB{𝓢ᴬ} with values \AB{𝓥ᴬ} and computations
+\AB{𝓒ᴬ} and a semantics \AB{𝓢ᴮ} with values \AB{𝓥ᴮ} and computations \AB{𝓒ᴮ},
+we want to establish the constraints under which these two semantics yield
+related computations provided they were called with environments of related values.
 
-\begin{figure}[h]
- \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}
-\caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
-\end{figure}
+These constraints are packaged in a record type called \AR{Simulation} and
+parametrised over the semantics as well as the notion of relatedness used
+for values (given by a relation \AB{𝓥ᴿ}) and computations
+(given by a relation \AB{𝓒ᴿ}).
 
-We can then combine \AF{⟦\_⟧ᴿ} and \AF{Kripkeᴿ} to express the idea
-that two semantic objects of respective types
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Simulation.tex]{recsim}
+\end{agdasnippet}
+
+The two first constraints are self-explanatory: the operations
+\ARF{th\textasciicircum{}𝓥} and \ARF{var} defined by each semantics
+should be compatible with the notions of relatedness used for values and computations.
+
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Simulation.tex]{thR}
+\end{agdasnippet}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Simulation.tex]{varR}
+\end{agdasnippet}
+
+The third constraint is similarly simple: the algebras (\ARF{alg}) should take
+related recursively evaluated subterms of respective types
 \AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥ᴬ} \AB{𝓒ᴬ}) and
-\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥ᴮ} \AB{𝓒ᴮ}) are
-synchronised. The simulation constraint on the algebras for two \semrec{}
-then becomes: given synchronized objects, the algebras should yield
-related computations. Together with self-explanatory constraints on
-\ARF{var} and \ARF{th\textasciicircum{}𝓥}, this constitutes the whole \AR{Simulation}
-constraint, as show in Figure~\ref{fig:genericsim}.
+\AF{⟦} \AB{d} \AF{⟧} (\AF{Kripke} \AB{𝓥ᴮ} \AB{𝓒ᴮ}) to related computations.
+The difficuly is in defining an appropriate notion of relatedness \AF{bodyᴿ}
+for these recursively evaluated subterms.
 
-\begin{figure}[h]
-\ExecuteMetaData[Generic/Simulation.tex]{recsim1}
-\caption{A Generic Notion of Simulation}\label{fig:genericsim}
-\end{figure}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Simulation.tex]{algR}
+\end{agdasnippet}
+
+We can combine \AF{⟦\_⟧ᴿ} and \AF{Kripkeᴿ} to express the idea that two recursively
+evaluated subterms are related whenever they have an equal shape (which means their
+Kripke functions can be grouped in pairs) and that all the pairs of Kripke function
+spaces take related inputs to related outputs.
+
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Simulation.tex]{bodyR}
+\end{agdasnippet}
+}
 
 The fundamental lemma of simulations is a generic theorem showing that for
 each pair of \semrec{} respecting the \AR{Simulation} constraint, we
@@ -1444,12 +1489,12 @@ and \AD{Size}s play a crucial role in ensuring that the function is indeed total
 \caption{Fundamental Lemma of \AR{Simulation}s}
 \end{figure}
 
-Instantiating this generic simulation lemma, we can for instance get
-that renaming and substitution are extensional (given extensionally
-equal environments they produce syntactically equal terms), or that
-renaming is a special case of substitution. Of course these results
-are not new but having them generically over all syntaxes with binding
-is convenient. We experience this first hand when tackling the
+Instantiating this generic simulation lemma, we can for instance prove
+that renaming is a special case of substitution, or that renaming and
+substitution are extensional \revc{i.e. that given environments equal in
+a pointwise manner they produce syntactically equal terms}. Of course these
+results are not new but having them generically over all syntaxes with
+binding is convenient. We experience this first hand when tackling the
 POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where \AF{rensub} was actually needed.
 
 \begin{figure}[h]

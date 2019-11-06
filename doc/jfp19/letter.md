@@ -6,6 +6,16 @@ the reviewer that motivated the change:
 * red   for reviewer 2
 * green for reviewer 3
 
+# Major changes
+
+* We have introduced a section 9.1 on relation transformers featuring
+  `Kripkeᴿ` (formerly introduced in the Simulation section) and the
+  relator.
+
+* We have drastically reorganised the Simulation section, removed old
+  terminology (such as 'synchronized') that reviewer 2 noticed, and
+  introduced `bodyᴿ`.
+
 # Clarifications
 
 > Later on in the conclusion you mention Kaiser, Schaëffer and Starks's remark

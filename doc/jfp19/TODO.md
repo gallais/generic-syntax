@@ -123,7 +123,7 @@ removed.
 Dealt with this one case. Need an additional reading of the **whole**
 paper to detect all occurences of similar problems.
 
-* [ ] In the definition of elaboration in section 7.4, the letter Γ is
+* [X] In the definition of elaboration in section 7.4, the letter Γ is
       used both for a List of modes and for a Typing. Although both are
       similar, it would be less confusing if they would use a different
       symbol.
@@ -157,7 +157,7 @@ Not actually stdlib but good point: we should explain that just like we
 need \_--Env, we also need Rel
 Explained All too
 
-* [ ] I did not understand some of the terminology used in section 9.1,
+* [X] I did not understand some of the terminology used in section 9.1,
       e.g. what does it mean for two objects to be 'synchronized'? And
       what does it mean for two environments to be 'extensionally equal'?
 
