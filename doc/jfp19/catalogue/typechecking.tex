@@ -90,7 +90,7 @@ to be returned in case of success.
 We have defined a bidirectional typechecker for this simple language by
 leveraging the \semrec{} framework. We can readily run it on closed terms
 using the \AF{closed} corollary defined in Figure~\ref{fig:evalclosed}
-and (defining \AB{β} to be {(\AB{α} \AIC{`→} \AB{α})}) infer the type of
+and (defining \AB{β} to be {(\AIC{α} \AIC{`→} \AIC{α})}) infer the type of
 the expression {(λx. x : β → β) (λx. x)}.
 
 \begin{figure}[h!]

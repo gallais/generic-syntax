@@ -403,7 +403,7 @@ broken up into three.
       checkable into inferrable terms is not widespread - consider
       explaining it here.
 
-* [ ] p.25: The alphas toward the bottom of the page should be in
+* [X] p.25: The alphas toward the bottom of the page should be in
       constructor font (green)
 
 * [X] p.26: "During typechecking we generate at the same time an
