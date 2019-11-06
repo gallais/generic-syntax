@@ -227,7 +227,7 @@ see above.
 Cf. clarification in letter.md. Do we want to include this discussion
 somewhere in the paper? Certainly not on page 3!
 
-* [ ] p.4: The line "We use Agda's" seems to be a part of the paragraph
+* [X] p.4: The line "We use Agda's" seems to be a part of the paragraph
       prior to the example of _-Scoped, so it should not be indented.
 
 * [ ] p.4: Here's a chance to explain the naming conventions. The _-Scoped
