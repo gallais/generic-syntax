@@ -22,6 +22,11 @@
   'pack (Semantics.var S)' for some Semantics S, should we name this object,
   as 'the identity Relator' or some such?
 
+* [ ] Check Pierce and Turner's 'Local type Inference' (is cut explicitly considered?)
+
+* [ ] Check Pfenning/Lovas, Pfenning/Dunfield, and Zeilberger (taken from
+  Pfenning ICFP 2007) for potential cut-related comments.
+
 # Review 1 main questions / comments
 
 
