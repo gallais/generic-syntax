@@ -246,7 +246,7 @@ somewhere in the paper? Certainly not on page 3!
       adding an explanation of why it was chosen to help readers remember
       its meaning later on.
 
-* [ ] p.5: The claim that these notations are more readable is not
+* [X] p.5: The claim that these notations are more readable is not
       immediately clear from this page, but it does seem to be the case
       later on, with the exception of the somewhat confusing turnstile
       notation.
@@ -275,11 +275,11 @@ nature of the definition, I would happily write
 
  \Gamma \Vdash[ V ] \Delta for (\Gamma -Env) V \Delta
 
-and specilaise, where needed, eg V = Var. 
+and specilaise, where needed, eg V = Var.
 
-Any takers? 
+Any takers?
 
-* [ ] p6: Missing comma after "Thinnables" on the last line
+* [X] p6: Missing comma after "Thinnables" on the last line
 
 * [ ] p7: Fig. 2 is in a float, which means that the figure is
       left-justified. This looks very different from the Thinning definition
@@ -359,7 +359,7 @@ They already are.
       statement in addition to the encoding in Agda. This would make it much
       easier to figure out.
 
-* [ ] p. 18: There is a sentence "We immediately introduce a corollary ...",
+* [X] p. 18: There is a sentence "We immediately introduce a corollary ...",
       but it's not clear where that happens. This corollary should be in the
       text, rather than in a float on the next page, and it should also have
       an English statement that readers can compare to the Agda.
