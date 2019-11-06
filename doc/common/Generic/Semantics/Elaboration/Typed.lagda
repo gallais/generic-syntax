@@ -43,15 +43,15 @@ private
 \end{code}
 %<*fromtyping>
 \begin{code}
-fromTyping : Typing ms → List Type
-fromTyping []       = []
-fromTyping (σ ∷ Γ)  = σ ∷ fromTyping Γ
+⌞_⌟ : Typing ms → List Type
+⌞ []     ⌟ = []
+⌞ σ ∷ Γ  ⌟ = σ ∷ ⌞ Γ ⌟
 \end{code}
 %</fromtyping>
 %<*elab>
 \begin{code}
 Elab : Type ─Scoped → Type → (ms : List Mode) → Typing ms → Set
-Elab T σ _ Γ = T σ (fromTyping Γ)
+Elab T σ _ Γ = T σ ⌞ Γ ⌟
 \end{code}
 %</elab>
 %<*elabmode>
@@ -82,12 +82,12 @@ fromVar (s v) = there (fromVar v)
 coth^Typing : Typing ns → Thinning ms ns → Typing ms
 coth^Typing Δ ρ = All.tabulate (λ x∈Γ → All.lookup Δ (fromVar (lookup ρ (toVar x∈Γ))))
 
-lookup-fromVar : ∀ Δ (v : Var m ms) → Var (All.lookup Δ (fromVar v)) (fromTyping Δ)
+lookup-fromVar : ∀ Δ (v : Var m ms) → Var (All.lookup Δ (fromVar v)) ⌞ Δ ⌟
 lookup-fromVar (_ ∷ _) z     = z
 lookup-fromVar (_ ∷ _) (s v) = s (lookup-fromVar _ v)
 
 erase^coth : ∀ ms Δ (ρ : Thinning ms ns) →
-             Var σ (fromTyping (coth^Typing Δ ρ)) → Var σ (fromTyping Δ)
+             Var σ ⌞ coth^Typing Δ ρ ⌟ → Var σ ⌞ Δ ⌟
 erase^coth []       Δ ρ ()
 erase^coth (m ∷ ms) Δ ρ z     = lookup-fromVar Δ (lookup ρ z)
 erase^coth (m ∷ ms) Δ ρ (s v) = erase^coth ms Δ (select extend ρ) v

@@ -11,8 +11,13 @@ our internal language.
 Before we can jump right in, we need to set the stage: a \AR{Semantics} for a
 \AF{Bidi} term will involve ({\AD{Mode} \AF{─Scoped}}) notions of values and
 computations but an \AF{STLC} term is ({\AD{Type} \AF{─Scoped}}). We first
-introduce a \AF{Typing} associating types to each of the modes in scope, together
-with \AF{fromTyping} extracting the context thus defined.
+introduce a \AF{Typing} associating types to each of the modes in scope,
+together with an erasure function \AF{⌞\_⌟} extracting the context of types
+implicitly defined by such a \AF{Typing}.
+\revb{
+We will systematically distinguish contexts of modes (typically named \AB{ms})
+and their associated typings (typically named \AB{Γ}).
+}
 
 \begin{figure}[h]
 \begin{minipage}[t]{0.4\textwidth}
