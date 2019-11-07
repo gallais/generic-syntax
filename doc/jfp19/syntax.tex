@@ -341,15 +341,10 @@ As the context argument comes second in the definition of \AF{\_─Scoped}, we
 can readily use these combinators to thread, modify, or quantify over the
 scope when defining such families:
 
-%\begin{center}
-\begin{minipage}[t]{0.35\textwidth}
-\ExecuteMetaData[Data/Var.tex]{var}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.55\textwidth}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{tm}
-\end{minipage}
-%\caption{Scope Aware Variables and Simply Typed λ-Terms\label{scoped-untyped}}
-%\end{center}
+\begin{figure}[h]
+  \ExecuteMetaData[Data/Var.tex]{var}
+  \caption{Scope and Kind Aware de Bruijn Indices}
+\end{figure}
 
 The inductive family \AD{Var} represents well scoped and well kinded
 de Bruijn indices. Its \AIC{z} (for zero) constructor refers to the
@@ -365,6 +360,17 @@ respectively normalise to:
 \end{center}
 We will reuse the \AD{Var} family to represent variables in all the
 syntaxes defined in this paper.
+
+\begin{figure}[h]
+  \begin{minipage}{0.4\textwidth}
+    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{type}
+  \end{minipage}
+  \begin{minipage}{0.5\textwidth}
+    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{tm}
+  \end{minipage}
+\caption{Simple Types and Intrinsically Typed definition of STLC}
+\label{fig:intrinsic-stlc}
+\end{figure}
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch and Reus'
 intrinsically typed representation of the simply typed λ-calculus,
@@ -1002,29 +1008,32 @@ Application and λ-abstraction behave as expected, with the important
 observation that λ-abstraction binds an \AIC{Infer}rable term. The two
 remaining constructors correspond to changes of direction: one can freely
 \AIC{Emb}bed inferrable terms as checkable ones whereas we require a type
-annotation when forming a \AIC{Cut}.
+annotation when forming a \AIC{Cut} (we reuse the notion of \AD{Type} introduced
+in Figure~\ref{fig:intrinsic-stlc}).
 
 \begin{figure}[h]
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}[t]{0.4\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{tagmode}
 \end{minipage}\hfill
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{desc}
 \end{minipage}
   \caption{Description for the bidirectional STLC}
 \end{figure}
 
-\paragraph{Intrinsically typed STLC}\label{par:intrinsicSTLC} In the typed case, we are back to two
+\paragraph{Intrinsically typed STLC}\label{par:intrinsicSTLC}
+In the typed case (for the same notion of \AD{Type} defined in
+Figure~\ref{fig:intrinsic-stlc}, we are back to two
 constructors: the terms are fully annotated and therefore it is not necessary
 to distinguish between \AD{Mode}s anymore. We need our tags to carry extra
 information about the types involved so we use once more and ad-hoc datatype
 \AD{`STLC}, and define its decoding \AD{STLC} by a pattern-matching λ-expression.
 
 \begin{figure}[h]
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}[t]{0.4\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{tag}
 \end{minipage}\hfill
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{desc}
 \end{minipage}
   \caption{Description for the intrinsically typed STLC}

@@ -396,7 +396,7 @@ broken up into three.
 
       also "bi-sorted" -> "bisorted"
 
-* [ ] p.25: The constructor name alpha didn't get mentioned before this
+* [X] p.25: The constructor name alpha didn't get mentioned before this
       page. Consider including a definition of Type somewhere.
 
 * [X] p.25: "check the input type is" -> "check that the input type is"

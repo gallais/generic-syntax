@@ -20,7 +20,7 @@ infixr 3 _`→_
 %<*type>
 \begin{code}
 data Type : Set where
-  α    : Type
+  α     : Type
   _`→_  : Type → Type → Type
 \end{code}
 %</type>
