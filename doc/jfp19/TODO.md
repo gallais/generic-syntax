@@ -417,7 +417,7 @@ broken up into three.
       like the variable T has type (Type -Scoped) in the code, but the rest
       confused me.
 
-* [ ] p.27: "do-notation" should be singular, not plural (do a search of thea
+* [X] p.27: "do-notation" should be singular, not plural (do a search of the
       article)
 
 * [X] p.27: The overloading in the definition of isArrow is confusing. Could
