@@ -39,7 +39,7 @@ UnLet : Semantics (d `+ Let) (Tm d ∞) (Tm d ∞)
 Semantics.th^𝓥  UnLet = th^Tm
 Semantics.var   UnLet = id
 Semantics.alg   UnLet = case (Semantics.alg Sub) $ λ where
- (`IN' e t) →  extract t (ε ∙ e)
+ (`let' e `in' t) →  extract t (ε ∙ e)
 \end{code}
 %</unletcode>
 \begin{code}

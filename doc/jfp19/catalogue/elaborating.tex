@@ -130,8 +130,8 @@ together.
 \paragraph{Embedding of \AD{Infer} into \AD{Check}} For the change of direction
 \AIC{Emb} we not only want to check that the inferred type and the type candidate
 are equal: we need to cast the internal term labelled with the inferred type to
-match the type candidate. Luckily, Agda's dependent \AK{do}-notations make once
-again our job easy: when we make the pattern \AIC{refl} explicit, the equality holds
+match the type candidate. Luckily, Agda's dependent \AK{do}-notations make our
+job easy once again: when we make the pattern \AIC{refl} explicit, the equality holds
 in the rest of the block.
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{emb}

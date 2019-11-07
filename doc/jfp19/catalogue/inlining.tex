@@ -49,7 +49,8 @@ therefore only contribute once to the running total. We define the \AF{control}
 combinator in Figure~\ref{fig:combinatorscount} precisely to explicitly handle this
 subtle case.
 
-The first step is to introduce the \AD{Counter} additive monoid. Addition will
+The first step is to introduce the \AD{Counter} additive monoid
+(cf. Figure~\ref{fig:countermonoid}). Addition will
 allow us to combine counts coming from different subterms: if any of the two
 counters is \AIC{zero} then we return the other, otherwise we know we have
 \AIC{many} occurences.
@@ -62,16 +63,19 @@ counters is \AIC{zero} then we return the other, otherwise we know we have
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{addition}
 \end{minipage}
 \caption{The (\AD{Counter}, \AIC{zero}, \AF{\_+\_}) additive monoid}
+\label{fig:countermonoid}
 \end{figure}
 
-The annotation process can be described as a variation on the \AF{Let} syntax
-extension of Section~\ref{section:letbinding}, attaching a \AD{Counter} to
-each \AF{Let} node. That is to say, a function computing a
+The syntax extension \AF{CLet} defined in Figure~\ref{fig:cletdef} is
+a variation on the \AF{Let} syntax extension of Section~\ref{section:letbinding},
+attaching a \AD{Counter} to each \AF{Let} node. The annotation process
+can then be described as a function computing a
 {(\AB{d} \AF{`+} \AF{CLet})} term from a {(\AB{d} \AF{`+} \AF{Let})} one.
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Syntax/LetCounter.tex]{clet}
-\caption{Counted Lets}
+  \caption{Counted Lets}
+  \label{fig:cletdef}
 \end{figure}
 
 We keep a tally of the usage information for the variables in scope. This

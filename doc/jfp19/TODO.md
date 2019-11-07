@@ -428,10 +428,10 @@ No. But added an explanation.
 * [ ] p. 28: What is bind again? The code b (bind Infer) (epsilon dot var_0)
       (sigma :: Gamma) tau was pretty opaque.
 
-* [ ] p. 28: Consider the phrasing "Luckily, Agda's dependent do-notation
+* [X] p. 28: Consider the phrasing "Luckily, Agda's dependent do-notation
       makes our job easy once again:".
 
-* [ ] p.29: The patterns `IN and `IN' were difficult to distinguish at first
+* [X] p.29: The patterns `IN and `IN' were difficult to distinguish at first
 
 * [X] p.30: In figure 51, what is "pack"?
 
@@ -463,16 +463,16 @@ done (also spotted by reviewer 1).
 * [X] p.39: "and decision procedure can be defined" -> "and decision
       procedures can be defined"
 
-
-
 * [X] p.39: The code in figure 72 is the first time the articule used lambda
       as an argument without either using $ or parentheses. When that's
       paired up with the where syntax, consider some extraneous parentheses.
 
 done
 
-* [ ] p.40: What does it mean to have a module definition inside a record?
+* [X] p.40: What does it mean to have a module definition inside a record?
       Please explain this.
+
+fixed by splitting up the definition of Simulation.
 
 * [X] p.40: Break the sentence at "; which we have experience" and write "We
       experience this first hand when tackling..." as a new sentence.
@@ -519,10 +519,12 @@ rendered as inline code.
 
 Fair enough. Also added a discussion of Cheney.
 
-* [ ] p.47: The vertical gap above 10.5 is very large.
+* [X] p.47: The vertical gap above 10.5 is very large.
 
-* [ ] p.47: Why are Pickering et al cited for Agda's pattern synonyms?
+* [X] p.47: Why are Pickering et al cited for Agda's pattern synonyms?
       Haskell's are much younger, and what's described in the cited paper.
+
+Asked Adam at last SPLS, it is true that Agda's came first.
 
 * [X] p.47: "but also sum" -> "but also sums"
 

@@ -33,8 +33,8 @@ module _ {I : Set} where
 %</letcode>
 %<*letpattern>
 \begin{code}
-pattern `IN' e t = (_ , e , t , refl)
-pattern `IN  e t = `con (`IN' e t)
+pattern `let'_`in'_  e t = (_ , e , t , refl)
+pattern `let_`in_    e t = `con (`let' e `in' t)
 \end{code}
 %</letpattern>
 
