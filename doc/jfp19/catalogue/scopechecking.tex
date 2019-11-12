@@ -83,11 +83,13 @@ caused the failure and the extra data of type \AB{E} that accompanied it.
 \caption{Error Type and Scope Checking Monad}\label{fig:scopemonad}
 \end{figure}
 
-Equipped with these notions, we can write down the type of \AF{toVar}
-which tackles the core of the problem: variable resolution. Given a string
-corresponding to a variable's name and provided that we have names for the
-variables in the ambient scope and know the sort the variable needs to be
-we can either fail or return a well scoped and well sorted \AD{Var}.
+Equipped with these notions, we can write down the type of \AF{toVar} which
+tackles the core of the problem: variable resolution. \revc{The function takes a
+string and a sort as well the names and sorts of the variables in the ambient
+scope. Provided that we have a function \AB{\_≟I\_} to decide equality on sorts,
+we can check whether the string corresponds to an existing variable and whether
+that binding is of the right sort. Thus we either fail or return a well scoped
+and well sorted \AD{Var}.}
 
 If the ambient scope is empty then we can only fail with an \AIC{OutOfScope} error.
 Alternatively, if the variable's name corresponds to that of the first one

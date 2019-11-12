@@ -90,7 +90,7 @@ All of these technical details are however outside the scope of this paper.
 > generic) version of NbE by using either a Delay monad or define a
 > suitable domain directly using domain theory.
 
-Formalising enough domain theory to achieve this goal is outside the goal
+Formalising enough domain theory to achieve this goal is outside the scope
 of this paper. We have conducted experiments with an approach inspired by
 step-indexed relations and tried to define a ℕ-indexed version of the domain
 by recursion over the number of steps. This approach generated huge Agda

@@ -413,7 +413,7 @@ Renamed to Fresh (+ added back link)
 
 broken up into three.
 
-* [ ] p.23: I-dec could use a description/definition in the text
+* [X] p.23: I-dec could use a description/definition in the text
 
 * [X] p.24: "bi-directional" shouldn't be hyphenated
 

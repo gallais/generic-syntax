@@ -6,7 +6,7 @@ open import Relation.Binary.PropositionalEquality
 
 open import Generic.Syntax
 
-module Generic.Scopecheck {E I : Set} (I-dec : Decidable {A = I} _≡_) where
+module Generic.Scopecheck {E I : Set} (_≟I_ : Decidable {A = I} _≡_) where
 
 open import Category.Monad
 
@@ -84,7 +84,7 @@ instance _ =  rawIApplicative
 \begin{code}
 toVar : E → String → ∀ σ Γ → Names Γ → M (Var σ Γ)
 toVar e x σ [] [] = inj₁ (OutOfScope , e , x)
-toVar e x σ (τ ∷ Γ) (y ∷ scp) with x ≟ y | I-dec σ τ
+toVar e x σ (τ ∷ Γ) (y ∷ scp) with x ≟ y | σ ≟I τ
 ... | yes _  | yes refl  = inj₂ z
 ... | yes _  | no ¬eq    = inj₁ (WrongSort σ τ ¬eq , e , x)
 ... | no ¬p  | _         = s <$> toVar e x σ Γ scp
