@@ -149,7 +149,7 @@ is to use an inductive type:
   \begin{array}{l}
     \AK{data}\;\AD{Lam} : \AD{Set}\;\AK{where} \\
     \quad\begin{array}{@{}lll}
-           \AIC{`var} &:& \mathbb{N} \to \AD{Lam} \\
+           \AIC{`var} &:& \AD{ℕ} \to \AD{Lam} \\
            \AIC{`lam} &:& \AD{Lam} \to \AD{Lam} \\
            \AIC{`app} &:& \AD{Lam} \to \AD{Lam} \to \AD{Lam}
     \end{array}
@@ -188,9 +188,9 @@ $1 + (\_)$ extends the running scope with an extra variable.
   \begin{array}{l}
     \AK{data}\;\AD{Lam} : \AD{Set} \to \AD{Set}\;\AK{where} \\
     \quad\begin{array}{@{}lll}
-           \AIC{`var} &:& X \to \AD{Lam}\,X \\
-           \AIC{`lam} &:& \AD{Lam}\;(\AD{1+} X) \to \AD{Lam}\,X \\
-           \AIC{`app} &:& \AD{Lam}\;X \to \AD{Lam}\;X \to \AD{Lam}\;X
+           \AIC{`var} &:& \AB{X} \to \AD{Lam}\;\AB{X} \\
+           \AIC{`lam} &:& \AD{Lam}\;(\AD{1+} \AB{X}) \to \AD{Lam}\;\AB{X} \\
+           \AIC{`app} &:& \AD{Lam}\;\AB{X} \to \AD{Lam}\;\AB{X} \to \AD{Lam}\;\AB{X}
     \end{array}
   \end{array}
 \end{displaymath}
@@ -301,7 +301,7 @@ in Section~\ref{section:semantics}.
 % All the definitions are polymorphic in the index type
 % (called \AB{A} in Figure~\ref{figure:indexed}).
 
-\begin{center}
+\begin{figure}[h]
 \begin{minipage}{0.4\textwidth}
  \ExecuteMetaData[Stdlib.tex]{arrow}
 \end{minipage}\hfill
@@ -315,8 +315,8 @@ in Section~\ref{section:semantics}.
 \begin{minipage}{0.5\textwidth}
  \ExecuteMetaData[Stdlib.tex]{forall}
 \end{minipage}
-%\caption{Combinators to build indexed Sets}\label{figure:indexed}
-\end{center}
+\caption{Combinators to build indexed Sets}\label{figure:indexed}
+\end{figure}
 
 We lift the function space pointwise with \AF{\_⇒\_}, silently
 threading the underlying scope. The \AF{\_⊢\_} makes explicit the
