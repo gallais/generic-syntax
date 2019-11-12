@@ -535,7 +535,9 @@ of semantics for our scope- and type- safe language. Provided that a set of
 constraints on two ({\AF{Type} \AF{─Scoped}}) \AB{𝓥} and \AB{𝓒} is
 satisfied, we will obtain a traversal of the following type:
 
+\begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semtype}
+\end{agdasnippet}
 
 Broadly speaking, a semantics turns our deeply embedded abstract syntax
 trees into the shallow embedding of the corresponding parametrised higher
@@ -547,8 +549,15 @@ of a choice of values \AB{𝓥} and computations \AB{𝓒}. A semantics must
 satisfy constraints on the notions of values \AB{𝓥} and computations \AB{𝓒}
 at hand.
 
+\revc{In the following paragraphs, we interleave the definition of the record
+of constraints \semrec{} with explanations of our choices. It is important
+to understand that all of the indented Agda snippets are part of the record's
+definition. Some correspond to record fields (highlighted in \ARF{pink})
+while others are mere auxiliary definitions (highlighted in \AF{blue}) as
+permitted by Agda.}
+\begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsemtype}\label{section:lamsem}
-
+\end{agdasnippet}
 First of all, values \AB{𝓥} should be \AF{Thinnable} so that \semfun{} may push
 the environment under binders.
 \revc{We call this constraint \ARF{th\textasciicircum{}𝓥},
@@ -558,8 +567,10 @@ We use this convention consistently throughout the paper, using names
 such as \AF{vl\textasciicircum{}Tm} for the proof that terms are
 \AR{VarLike}}.}
 
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{thV}
-
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{thV}
+\end{agdasnippet}
 This constraint allows us to define \AF{extend}, the generalisation of the two
 auxiliary definitions we used in Figure~\ref{figure:rensubACMM} without showing
 their definitions. It takes a context extension from \AB{Δ} to \AB{Θ} in the
@@ -571,9 +582,10 @@ values.
 % declarations and auxiliary definitions that may depend on the so-far already
 % declared fields.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{extend}
-
-
+\end{agdasnippet}
 Second, the set of computations needs to be closed under various
 combinators which are the semantical counterparts of the language's
 constructors.
@@ -581,14 +593,18 @@ For instance in the variable case we obtain a value from the evaluation
 environment but we need to return a computation. This means that values
 should embed into computations.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{var}
-
+\end{agdasnippet}
 The semantical counterpart of application is an operation that takes a
 representation of a function and a representation of an argument and
 produces a representation of the result.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{app}
-
+\end{agdasnippet}
 The interpretation of the λ-abstraction is of particular interest:
 it is a variant on the Kripke function space one can find in normalisation
 by evaluation~\cite{berger1991inverse,berger1993program,CoqDybSK,coquand2002formalised}.
@@ -596,8 +612,10 @@ In all possible thinnings of the scope at hand, it promises
 to deliver a computation whenever it is provided with a value for its newly
 bound variable. This is concisely expressed by the constraint's type:
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{lam}
-
+\end{agdasnippet}
 
 %\begin{figure}[h]
 %\ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsem}
@@ -1467,9 +1485,11 @@ The two first constraints are self-explanatory: the operations
 should be compatible with the notions of relatedness used for values and computations.
 
 \begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{thR}
 \end{agdasnippet}
 \begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{varR}
 \end{agdasnippet}
 
@@ -1481,6 +1501,7 @@ The difficuly is in defining an appropriate notion of relatedness \AF{bodyᴿ}
 for these recursively evaluated subterms.
 
 \begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{algR}
 \end{agdasnippet}
 
@@ -1490,6 +1511,7 @@ Kripke functions can be grouped in pairs) and that all the pairs of Kripke funct
 spaces take related inputs to related outputs.
 
 \begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{bodyR}
 \end{agdasnippet}
 }
@@ -1582,8 +1604,9 @@ respectively; \AB{𝓥ᴿ} relates pairs of values \AB{𝓥ᴮ} and \AB{𝓥ᴬ�
 and \AB{𝓒ᴿ}, our notion of equivalence for evaluation results, relates pairs
 of computation in \AB{𝓒ᴮ} and \AB{𝓒ᴬᴮ}.
 
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Fusion.tex]{fusionrec}
-
+\end{agdasnippet}
 The first obstacle we face is the formal definition of ``running \AB{𝓢ᴮ}
 after \AB{𝓢ᴬ}'': for this statement to make sense, the result of running
 \AB{𝓢ᴬ} ought to be a term. Or rather, we ought to be able to extract a
@@ -1594,23 +1617,29 @@ this function will be the identity. Nothing prevents proofs, such as the
 idempotence of NbE, which use a bona fide reification function that extracts
 terms from model values.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{reify}
-
+\end{agdasnippet}
 Then, we have to think about what happens when going under a binder: \AB{𝓢ᴬ}
 will produce a \AF{Kripke} function space where a syntactic
 value is required. Provided that \AB{𝓥ᴬ} is \AR{VarLike}, we can make use of \AF{reify}
 to get a \AF{Scope} back. Hence the second constraint.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{vlV}
-
+\end{agdasnippet}
 Still thinking about going under binders: if three evaluation environments
 \AB{ρᴬ} in {(\AB{Γ} \AR{─Env}) \AB{𝓥ᴬ} \AB{Δ}}, \AB{ρᴮ} in
 {(\AB{Δ} \AR{─Env}) \AB{𝓥ᴮ} \AB{Θ}}, and \AB{ρᴬᴮ} in {(\AB{Γ} \AR{─Env}) \AB{𝓥ᴬᴮ} \AB{Θ}}
 are related by \AB{𝓔ᴿ} and we are given a thinning \AB{σ} from \AB{Θ} to \AB{Ω}
 then \AB{ρᴬ}, the thinned \AB{ρᴮ} and the thinned \AB{ρᴬᴮ} should still be related.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{thV}
-
+\end{agdasnippet}
 Remembering that \AF{\_>>\_} is used in the definition of \AF{body} (Figure~\ref{def:body}) to
 combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
 {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}} into one of type
@@ -1620,16 +1649,20 @@ as an extra precondition that the values \AB{ρᴮ} and \AB{ρᴬᴮ} are extend
 with are related according to \AB{𝓥ᴿ}. Lastly, for all the types to match up,
 \AB{ρᴬ} has to be extended with placeholder variables.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{appendR}
-
+\end{agdasnippet}
 We finally arrive at the constraints focusing on the semantical counterparts
 of the terms' constructors. Each constraint essentially states that evaluating
 a term with \AB{𝓢ᴬ}, reifying the result and running \AB{𝓢ᴮ} is equivalent to
 using \AB{𝓢ᴬᴮ} straight away. This can be made formal by defining the following
 relation \AF{𝓡}.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{crel}
-
+\end{agdasnippet}
 When evaluating a variable, on the one hand \AB{𝓢ᴬ}
 will look up its meaning in the evaluation environment, turn the resulting value into
 a computation which will get reified and then the result will be evaluated with \AB{𝓢ᴮ}.
@@ -1637,8 +1670,10 @@ Provided that all three evaluation environments are related by \AB{𝓔ᴿ} this
 be equivalent to looking up the value in \AB{𝓢ᴬᴮ}'s environment and turning it into a
 computation. Hence the constraint \ARF{varᴿ}:
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{varR}
-
+\end{agdasnippet}
 The case of the algebra follows a similar idea albeit being more complex:
 a term gets evaluated using \AB{𝓢ᴬ} and to be able to run \AB{𝓢ᴮ}
 afterwards we need to recover a piece of syntax. This is possible if the
@@ -1649,7 +1684,10 @@ related via {\AF{⟦} \AB{d} \AF{⟧ᴿ} (\AF{Kripkeᴿ} \AB{𝓥ᴿ} \AB{𝓒�
 of running \AB{𝓢ᴬᴮ} on the original term, the \ARF{algᴿ} constraint states
 that the two evaluations yield related computations.
 
+\begin{agdasnippet}
+\addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{algR}
+\end{agdasnippet}
 
 \subsubsection{The Fundamental Lemma of Fusion}
 

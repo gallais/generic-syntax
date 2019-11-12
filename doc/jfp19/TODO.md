@@ -303,7 +303,7 @@ SOLUTION: use the new agdasnippet environment for non-figure code blocks.
 
 They already are.
 
-* [ ] p8, code: the code on page 8 seems to be mostly part of the record
+* [X] p8, code: the code on page 8 seems to be mostly part of the record
       Semantics, but this took some reverse engineering. Can the fields be
       indented, as they would be in Agda? And are definitions like extend
       (e.g. manifest fields) allowed as part of a record? If so, say so, and
