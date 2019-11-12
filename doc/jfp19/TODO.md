@@ -290,6 +290,8 @@ Any takers?
       capitalization with respect to the main text.
 
 SOLUTION: use the new agdasnippet environment for non-figure code blocks.
+Need an additional reading of the **whole** paper to detect all occurences
+of similar problems.
 
 * [ ] p7: Fig 2 uses copatterns. These are introduced and cited much later
       in the article, but they're used here. Please move their introduction
