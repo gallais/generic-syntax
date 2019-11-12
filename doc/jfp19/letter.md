@@ -83,6 +83,20 @@ maps f (r : rs) = map f r : maps f rs
 
 All of these technical details are however outside the scope of this paper.
 
+> For the generic version of NbE in section 7.7, currently the
+> positivity checker has to be disabled. However (as the paper also
+> notes) this can destroy the soundness of Agda's theory. Thus I
+> wonder whether it would be possible to provide a safe (but still
+> generic) version of NbE by using either a Delay monad or define a
+> suitable domain directly using domain theory.
+
+Formalising enough domain theory to achieve this goal is outside the goal
+of this paper. We have conducted experiments with an approach inspired by
+step-indexed relations and tried to define a ℕ-indexed version of the domain
+by recursion over the number of steps. This approach generated huge Agda
+computations and we were not able to normalise even the most simple of toy
+examples.
+
 # Debatted points
 
 * We have added a paragraph explaining the programming style

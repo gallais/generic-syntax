@@ -139,7 +139,7 @@ Moggi's ML.
       omitted from the paper intentionally, it would help to give at least
       its type signature.
 
-* [ ] For the generic version of NbE in section 7.7, currently the
+* [X] For the generic version of NbE in section 7.7, currently the
       positivity checker has to be disabled. However (as the paper also
       notes) this can destroy the soundness of Agda's theory. Thus I
       wonder whether it would be possible to provide a safe (but still
