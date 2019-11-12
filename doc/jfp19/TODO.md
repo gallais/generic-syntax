@@ -17,7 +17,7 @@
       - explain why `extract` and the *singleton* environment `ε • t`
         are used.
 
-* [ ] add `Rel`'s definition and introduce `packᴿ λ _ → refl` as `reflᴿ`.
+* [X] add `Rel`'s definition and introduce `packᴿ λ _ → refl` as `reflᴿ`.
   by analogy with other instances of 'pack var', 'pack id', ... ie
   'pack (Semantics.var S)' for some Semantics S, should we name this object,
   as 'the identity Relator' or some such?
@@ -46,7 +46,7 @@ it).
 
 Craig cites Pfenning's 15-312 lecture notes, "Foundations of
 Programming Languages" (2004) in his forthcoming PhD thesis. I've
-added that to the bib. 
+added that to the bib.
 
 # Review 1 main questions / comments
 
@@ -167,7 +167,7 @@ Moggi's ML.
       generic) version of NbE by using either a Delay monad or define a
       suitable domain directly using domain theory.
 
-* [ ] Currently the paper requires some knowledge of Agda's standard
+* [X] Currently the paper requires some knowledge of Agda's standard
       library to understand completely. For example, I had to look up the
       definition of Rel and rel which are used in section 9.1. It would
       improve the paper if it either explained these concepts or at least

@@ -424,7 +424,7 @@ highlights the common structure between \AF{ren} and \AF{sub} which we will expl
 later in this section, particularly in Section~\ref{section:lamsem}
 where we define an abstract notion of semantics and the corresponding generic traversal.
 
-\subsection{A Generic Notion of Environments}
+\subsection{A Generic Notion of Environments}\label{sec:genenvironment}
 
 Both renaming and substitution are defined in terms of \emph{environments}
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ}} that describe how to associate a value \AB{𝓥}
@@ -1366,7 +1366,6 @@ in Section~\ref{section:nbyeval}.
 \input{catalogue/inlining.tex}
 \input{catalogue/normalising.tex}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OTHER OPPORTUNITIES FOR GENERIC PROGRAMMING
 
@@ -1397,16 +1396,66 @@ on syntaxes too, sometimes with more informative types.
 In ACMM~\citeyear{allais2017type} we have
 already shown that, for the simply typed λ-calculus, introducing an abstract
 notion of Semantics not only reveals the shared structure of common
-traversals, it also allows them to give abstract proof frameworks for
-simulation or fusion lemmas. Their idea naturally extends to our generic
+traversals, it also allows us to give abstract proof frameworks for
+simulation or fusion lemmas. This idea naturally extends to our generic
 presentation of semantics for all syntaxes.
 
-\subsection{Relation Transformers}
+
+\subsection{Relations and Relation Transformers}
 
 In our exploration of generic proofs about the behaviour of various \AR{Semantics},
-we are going to need to lift relations on values and computations to relations on
-\AF{Kripke} function spaces or on \AB{d}-shaped terms whose subterms have been
-evaluated already. We introduce these two key relation transformers here.
+we are going to need to manipulate relations between distinct notions of values or
+computations. In this section, we introduce the notion of relation we are going to
+use as well as these two key relation transformers.
+
+\revb{
+In Section~\ref{sec:genenvironment} we introduced a generic notion of well typed
+and scoped environment as a function from variables to values. Its formal definition
+is given in Figure~\ref{fig:environment} as a record type. This record wrapper helps
+Agda's type inference reconstruct the type family of values whenever it is passed an
+environment.
+
+For the same reason, we will use a record wrapper for the concrete implementation of
+our notion of relation over (I \AF{─Scoped}) families. A \AR{Rel}ation between two
+such families \AB{T} and \AB{U} is a function which to any \AB{σ} and \AB{Γ} associates
+a relation between (\AB{T} \AB{σ} \AB{Γ}) and (\AB{U} \AB{σ} \AB{Γ}). Our first example
+of such a relation is \AF{Eqᴿ} the equality relation between an (\AB{I}\AF{─Scoped})
+Family \AB{T} and itself.
+
+\begin{figure}[h]
+\begin{minipage}[t]{0.65\textwidth}
+  \ExecuteMetaData[Data/Relation.tex]{rel}
+\end{minipage}
+\begin{minipage}[t]{0.25\textwidth}
+  \ExecuteMetaData[Data/Relation.tex]{eqR}
+\end{minipage}
+\caption{Relation Between \AB{I}\AF{─Scoped} Families and Equality Example}
+\label{fig:reldef}
+\end{figure}
+}
+
+Once we know what relations are, we are going to have to lift relations on values
+and computations to relations on environments, \AF{Kripke} function spaces or
+on \AB{d}-shaped terms whose subterms have been evaluated already.
+This is what the rest of this section focuses on.
+
+\paragraph{Environment relator}
+Provided a relation \AB{𝓥ᴿ} for notions of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}, by
+pointwise lifting we can define a relation {(\AR{All} \AB{𝓥ᴿ} \AB{Γ})} on
+\AB{Γ}-environments of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ} respectively. We once more
+use a record wrapper simply to facilitate Agda's job when reconstructing
+implicit arguments.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Data/Relation.tex]{all}
+\caption{Relating \AB{Γ}-Environments in a Pointwise Manner}
+\end{figure}
+
+The first example of two environment being related is the trivial proof \AF{reflᴿ}
+that for any environment \AB{ρ}, {(\AR{All} \AF{Eqᴿ} \AB{Γ} \AB{ρ} \AB{ρ})}.
+The combinators we introduced to build environments (\AF{ε}, \AF{\_∙\_}, etc.)
+have natural relational counterparts. We reuse the same names for them, simply
+appending an \AF{ᴿ} suffix.
 
 \paragraph{Kripke relator}
 We assume that we have two types of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}
@@ -1415,8 +1464,8 @@ as well as a relation \AB{𝓥ᴿ} for pairs of such values, and two types of co
 \AF{Kripkeᴿ} relating Kripke functions of type
 {(\AF{Kripke} \AB{𝓥ᴬ} \AB{𝓒ᴬ})} and {(\AF{Kripke} \AB{𝓥ᴮ} \AB{𝓒ᴮ})}
 respectively by stating that they send related inputs
-to related outputs. We use the relation transformer \AF{All} which lifts a relation
-on values to one on environments in a pointwise manner.
+to related outputs. We use the relation transformer \AF{All} defined in the previous
+paragraph.
 
 \begin{figure}[h]
  \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}

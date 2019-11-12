@@ -19,6 +19,7 @@ private
     I : Set
     σ : I
     T U : I ─Scoped
+    𝓥ᴬ 𝓥ᴮ : I ─Scoped
     Γ Δ : List I
 
 \end{code}
@@ -35,9 +36,10 @@ open Rel public
 \end{code}
 %<*all>
 \begin{code}
-record All (𝓡 : Rel T U) Γ (ρᵀ : (Γ ─Env) T Δ) (ρᵁ : (Γ ─Env) U Δ) : Set where
+record All  (𝓥ᴿ : Rel 𝓥ᴬ 𝓥ᴮ) (Γ : List I)
+            (ρᴬ : (Γ ─Env) 𝓥ᴬ Δ) (ρᴮ : (Γ ─Env) 𝓥ᴮ Δ) : Set where
   constructor packᴿ
-  field lookupᴿ : (k : Var σ Γ) → rel 𝓡 σ (lookup ρᵀ k) (lookup ρᵁ k)
+  field lookupᴿ : ∀ k → rel 𝓥ᴿ σ (lookup ρᴬ k) (lookup ρᴮ k)
 \end{code}
 %</all>
 \begin{code}
@@ -81,17 +83,26 @@ module _ {T U : I ─Scoped} {𝓡 : Rel T U} where
            All 𝓡 Γ ρᵀ ρᵁ → All 𝓡 Γ (fᵀ <$> ρᵀ) (fᵁ <$> ρᵁ)
   lookupᴿ (F <$>ᴿ ρ) k = F (lookupᴿ ρ k)
 
-module _ {A : I ─Scoped} where
+module _ {T : I ─Scoped} where
 
   private
     variable
-      ρ : (Γ ─Env) A Δ
+      ρ : (Γ ─Env) T Δ
 
-  Eqᴿ : Rel A A
+\end{code}
+%<*eqR>
+\begin{code}
+  Eqᴿ : Rel T T
   rel Eqᴿ i = _≡_
-
+\end{code}
+%</eqR>
+%<*reflR>
+\begin{code}
   reflᴿ : All Eqᴿ Γ ρ ρ
   lookupᴿ reflᴿ k = refl
+\end{code}
+%</reflR>
+\begin{code}
 
 module _ {A B : I ─Scoped} where
 
