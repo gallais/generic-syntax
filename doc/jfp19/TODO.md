@@ -435,7 +435,7 @@ broken up into three.
       expression's type ..." -> "During typechecking we simultaneously
       generate an expression's type ..."
 
-* [ ] p.26: Couldn't parse "We can then explain what it means for
+* [X] p.26: Couldn't parse "We can then explain what it means for
       elaboration to target T a (Type -Scoped) at a type sigma:". It looks
       like the variable T has type (Type -Scoped) in the code, but the rest
       confused me.

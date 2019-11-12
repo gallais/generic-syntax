@@ -29,21 +29,23 @@ and their associated typings (typically named \AB{Γ}).
 \caption{Typing: From Contexts of \AD{Mode}s to Contexts of \AD{Type}s\label{fig:typingmodes}}
 \end{figure}
 
-We can then explain what it means for elaboration to target \AB{T} a
-({\AD{Type} \AF{─Scoped}}) at a type \AB{σ}: provided a list of modes and a
-corresponding \AF{Typing}, we should get a \AB{T} of type \AB{σ} in the
-typing context induced by that \AF{Typing}.
+\revc{
+We can then explain what it means for an elaboration process to produce a
+term of the ({\AD{Type} \AF{─Scoped}}) family \AB{T}. Provided a type
+\AB{σ} and a context of modes \AB{ms}, for any typing \AB{Γ} of this context
+of mode, we should get a value of type {(\AB{T} \AB{σ} \AF{⌞} \AB{Γ} \AF{⌟})}.
+}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elab}
 \caption{Elaboration of a Scoped Family}
 \end{figure}
 
-Our first example of an elaboration function is our notion of environment values.
+Our first example of an elaboration process is our notion of environment values.
 To each variable in scope of mode \AIC{Infer} we associate an elaboration function
 targeting \AD{Var}. In other words: our values are all in scope i.e. provided any
-typing of the scope, we can assuredly return a type together with a variable of
-that type.
+typing of the scope of modes, we can assuredly return a type together with a
+variable of that type.
 
 \begin{figure}[h!]
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{varmode}
