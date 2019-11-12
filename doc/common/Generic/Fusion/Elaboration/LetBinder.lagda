@@ -39,7 +39,7 @@ module _ {I : Set} {d : Desc I} where
  RenUnLet : Fusion (d `+ Let) Ren UnLet UnLet
             (λ Γ Δ ρ₁ ρ₂ → All Eqᴿ Γ (select ρ₁ ρ₂)) Eqᴿ Eqᴿ
  RenUnLet = FusProp.ren-sem (d `+ Let) UnLet $ λ where
-   (false , `IN' e t) ρᴿ (refl , refl , eq^e , eq^t , _) → eq^t (pack id) (εᴿ ∙ᴿ eq^e)
+   (false , `let' e `in' t) ρᴿ (refl , refl , eq^e , eq^t , _) → eq^t (pack id) (εᴿ ∙ᴿ eq^e)
    (true , t)         ρᴿ zp → cong `con $ proj₂-eq $
      Relator.reifyᴿ Eqᴿ (d `+ Let) (Simulation.reifyᴿ Eqᴿ Eqᴿ (vl^Refl vl^Tm)) zp
 
@@ -152,7 +152,7 @@ module _ {I : Set} {d : Desc I} where
     ∎
  Fusion._>>ᴿ_   SubUnLet {ρᴬ = ρ₁} = subBodyEnv UnLet RenUnLet (λ σ t → refl) ρ₁
  Fusion.varᴿ  SubUnLet = λ ρᴿ → lookupᴿ ρᴿ
- Fusion.algᴿ  SubUnLet ρᴿ (false , `IN' e t) (refl , refl , eq^e , eq^t , _)
+ Fusion.algᴿ  SubUnLet ρᴿ (false , `let' e `in' t) (refl , refl , eq^e , eq^t , _)
    = eq^t (pack id) (εᴿ ∙ᴿ eq^e)
  Fusion.algᴿ  SubUnLet {ρᴬ = ρ₁} {ρᴮ = ρ₂} {ρᴬᴮ = ρ₃} ρᴿ (true , t) eq^t
    = cong `con $ begin
