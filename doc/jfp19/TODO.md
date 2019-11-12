@@ -355,7 +355,7 @@ They already are.
 
 * [X] p.16: "records explicitly the change" -> "explicitly records the change"
 
-* [ ] p.16: Here's another name with a ^ in it, still unexplained
+* [X] p.16: Here's another name with a ^ in it, still unexplained
 
 * [ ] p. 17: When something is called a lemma, it should have an English
       statement in addition to the encoding in Agda. This would make it much
@@ -379,7 +379,7 @@ They already are.
 
 Renamed to Fresh (+ added back link)
 
-* [ ] p. 20: Couldn't parse the sentence "Wrapper it is Thinnable, and fresh
+* [X] p. 20: Couldn't parse the sentence "Wrapper it is Thinnable, and fresh
       (defined in Fig. 6) is the proof that we can generate placeholder
       values thanks to the name supply."
 
