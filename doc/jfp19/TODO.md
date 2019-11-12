@@ -22,10 +22,31 @@
   'pack (Semantics.var S)' for some Semantics S, should we name this object,
   as 'the identity Relator' or some such?
 
-* [ ] Check Pierce and Turner's 'Local type Inference' (is cut explicitly considered?)
+* [X] Check Pierce and Turner's 'Local type Inference' (is cut explicitly considered?)
 
-* [ ] Check Pfenning/Lovas, Pfenning/Dunfield, and Zeilberger (taken from
+It is not, because substitution is taken as folded into the (very
+baroque) ML(F-sub)-style instantiation rules for polytypes, and the
+application rule; in inference mode, all of this is hidden in the
+constraint solving algorithm. *All* term constructors have an infer-
+and check-mode rule, so it is evident that they hadn't quite grokked
+the proof-theoretic apsects of bidirectionality at that point. Pierce,
+however, notes that bidirectional approaches are/were 'folklore', and
+indeed that John Reynolds had introduced him to the main idea already
+in 1988 (!).
+
+* [X] Check Pfenning/Lovas, Pfenning/Dunfield, and Zeilberger (taken from
   Pfenning ICFP 2007) for potential cut-related comments.
+
+I find substitution/cut both in Pfenning/Dunfield, "Tridirectional..."
+(where the extra 'direction' is to account for the intersection/union
+structure on top of mere subtyping), and in Pfenning/Lovas, but not
+obviously also in Zeilberger (and while this latter's citation of
+Lengrand/Dyckhoff might yield something, I see no point in pursuing
+it).
+
+Craig cites Pfenning's 15-312 lecture notes, "Foundations of
+Programming Languages" (2004) in his forthcoming PhD thesis. I've
+added that to the bib. 
 
 # Review 1 main questions / comments
 
@@ -275,7 +296,7 @@ nature of the definition, I would happily write
 
  \Gamma \Vdash[ V ] \Delta for (\Gamma -Env) V \Delta
 
-and specilaise, where needed, eg V = Var.
+and specialise, where needed, eg V = Var.
 
 Any takers?
 
