@@ -114,7 +114,7 @@ This extension is too young (and we have not yet proven it equivalent to
 our usual notion of semantics) so we should probably not include it in the
 paper.
 
-# Debatted points
+# Debated points
 
 * We have added a paragraph explaining the programming style
   which led us to pick the same name for the arrow constructor
@@ -133,6 +133,6 @@ and added a discussion of the possible extensions this works suggests.
 * Hatcliff and Danvy's ``A generic account of continuation-passing styles''
 
 While reformulating the reference to our previous work that was done in
-3rd person (due to ICFP double blind constraints) we expandend on the
+3rd person (due to ICFP double blind constraints) we expanded on the
 CPS translation. The hope is that readers will get a clearer sense of
 whether they want to look into it.
