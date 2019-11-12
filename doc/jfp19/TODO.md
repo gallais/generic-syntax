@@ -49,7 +49,7 @@
   theory with functional extensionality built-in and not bother with this.
   Maybe the point you make is also about higher-order functions?
 
-* [ ] Suspended substitutions are hard, but I'm missing the other direction:
+* [X] Suspended substitutions are hard, but I'm missing the other direction:
   generic implementations of lifting and substitution in the more
   space-efficient fashion which does not carry a substitution everywhere
   but only a lifting index and does the de Bruijn arithmetic at the

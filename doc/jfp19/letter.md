@@ -97,6 +97,23 @@ by recursion over the number of steps. This approach generated huge Agda
 computations and we were not able to normalise even the most simple of toy
 examples.
 
+> generic implementations of lifting and substitution in the more
+> space-efficient fashion which does not carry a substitution everywhere
+> but only a lifting index and does the de Bruijn arithmetic at the
+> variable sites only.
+
+Based on the ideas developped in ``Everybody's Got To Be Somewhere''
+(McBride, 2018) and prompted by this remark, we were able to implement a
+refactored version of sem which does not retraverse its environment every
+time it pushes it under a binder. This works by reifying the pattern
+``weakening the existing environment and extending it with new values''
+and can be seen here:
+https://github.com/gallais/generic-syntax/commit/97eb75906d04ec8fafbb45efb144d90fa05a6c09
+
+This extension is too young (and we have not yet proven it equivalent to
+our usual notion of semantics) so we should probably not include it in the
+paper.
+
 # Debatted points
 
 * We have added a paragraph explaining the programming style
