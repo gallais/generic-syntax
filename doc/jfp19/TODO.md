@@ -1,9 +1,11 @@
 # James McKinna's remarks (with gallais' spin on them)
 
-* [ ] The text uses copatterns to define an η-expansion of
+* [X] The text uses copatterns to define an η-expansion of
   'pack s', but it is this later which is used in running text to
   describe the term. Can we reconcile this copattern vs. constructor
   terminology somehow?
+
+See also paragraph after Environments are defined. (revc)
 
 * [X] Add ticked pattern synonyms for list and define foldr using
   them on page 13
@@ -314,12 +316,14 @@ SOLUTION: use the new agdasnippet environment for non-figure code blocks.
 Need an additional reading of the **whole** paper to detect all occurences
 of similar problems.
 
-* [ ] p7: Fig 2 uses copatterns. These are introduced and cited much later
+* [X] p7: Fig 2 uses copatterns. These are introduced and cited much later
       in the article, but they're used here. Please move their introduction
       to the first place they're used. Copatterns are also used in both
       prefix notation and with the dotted projection notation - picking one
       and explaining it clearly would increase the accessibility of the
       paper to non-Agda-experts.
+
+Fixed. (See below also)
 
 * [X] p8: The uses of script V and script C at the top of the page should be
       after their introductions halfway down the page.
@@ -471,9 +475,11 @@ no
 * [X] p.35: "much of the standard traversals" -> "many of the standard
       traversals" (because "traversal" is grammatically countable)
 
-* [ ] p.36: Copattern matching is introduced here, after it's been used
+* [X] p.36: Copattern matching is introduced here, after it's been used
       numerous times already. Also, more extraneous parentheses in the
       citations.
+
+Fixed: as early as Figure 4 now. 
 
 * [X] p.37: "premisse" -> "premise"
 
