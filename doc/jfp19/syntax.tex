@@ -450,15 +450,15 @@ That is, when defining an environment \AB{\(\rho\)}, we may either use
 the constructor \AIC{pack}, packaging a function \AB{r} as an
 environment {\AB{\(\rho\)}~=~\AIC{pack}~\AB{r}}, or else define
 \AB{\(\rho\)} in terms of the underlying function obtained from it by
-projecting out the (in this case, unique) \AF{lookup} field, as
-{\AF{lookup}~\AB{\(\rho\)}~=~\AB{r}}. Examples of definition in this
+projecting out the (in this case, unique) \ARF{lookup} field, as
+{\ARF{lookup}~\AB{\(\rho\)}~=~\AB{r}}. Examples of definition in this
 style are given in Figure~\ref{fig:thincomb} below, and throughout the
 rest of the paper. A value of a record type with more than one field
 requires each of its fields to be given, either by a named constructor
 (or else Agda's default \AgdaKeyword{record} syntax), or in copattern
 style. By analogy with record/object syntax in other languages, Agda
 further supports `dot' notation, so that an equivalent definition here
-could be expressed as {\AB{\(\rho\)}~.\AF{lookup}~=~\AB{r}}.
+could be expressed as {\AB{\(\rho\)}~.\ARF{lookup}~=~\AB{r}}.
 %%%
 }
 
@@ -1354,7 +1354,7 @@ respectively).
   %%%
   Similarly, in the \AD{Tm} case, we can show \AF{base} \AF{vl\textasciicircum{}Tm}
   extensionally equal to the identity environment \AF{id\textasciicircum{}Tm} 
-  given by {\AF{lookup} \AF{id\textasciicircum{}Tm} = \AIC{`var}},  
+  given by {\ARF{lookup} \AF{id\textasciicircum{}Tm} = \AIC{`var}},  
   which associates each variable to itself (seen as a term). 
 } 
 Using these definitions, we can then implement \AF{reify} as in
