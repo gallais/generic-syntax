@@ -446,19 +446,19 @@ structure (using a record helps Agda's type inference reconstruct the type famil
 As with (all) other record structures defined in this paper, we are able
 to profit from Agda's \emph{copattern} syntax, as introduced in
 \cite{abel2013copatterns} and showcased in \cite{thibodeau2016case}.
-That is, when defining an environment \AB{\rho}, we may either make use
+That is, when defining an environment \AB{\(\rho\)}, we may either make use
 of the constructor \AF{pack}, packaging a function \AB{r} as an
-environment \(\AB{\rho} = \AF{pack} \AB{r}\), or else define \AB{\rho}
+environment {\AB{\(\rho\)} = \AF{pack} \AB{r}}, or else define \AB{\(\rho\)}
 in terms of the underlying function obtained from it by projecting out
-the (in this case, unique) \AF{lookup} field, as \(\AF{lookup} \AB{\rho}
-= \AB{r}\). Examples of definition in this style are given in
+the (in this case, unique) \AF{lookup} field, as {\AF{lookup} \AB{\(\rho\)}
+= \AB{r}}. Examples of definition in this style are given in
 Figure~\ref{fig:thincomb} below, and throughout the rest of the
 paper. Where a record type has more than one field, in order to define
 an instance of the type, we need to specify each of its fields in
 copattern style. By analogy with record/object syntax in other
 languages, Agda further supports `dot' notation, so that an equivalent
-definition here could be expressed as \(\AB{\rho} .\AF{lookup} =
-\AB{r}\).  }
+definition here could be expressed as {\AB{\(\rho\)} .\AF{lookup} =
+\AB{r}}.  }
 %%%
 
 As we have already observed, the definitions of renaming and substitution have very
