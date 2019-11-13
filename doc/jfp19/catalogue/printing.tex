@@ -58,9 +58,12 @@ the type we expect.
 
 Otherwise we proceed in a manner reminiscent of the pure reification function
 defined in Figure~\ref{fig:genericreify}. We start by generating an environment
-of names for the newly-bound variables by using the fact that \AF{M} composed
+of names for the newly-bound variables by using the fact that \AF{Fresh} composed
 with \AF{Name} is \AR{VarLike} together with the fact that environments are
-traversable~\cite{mcbride_paterson_2008}. We then run the \AF{Kripke} function
+Traversable~\cite{mcbride_paterson_2008}, %%%
+and thus admit the standard Haskell-like \AF{mapA} and \AF{sequenceA}
+traversals. %%%
+We then run the \AF{Kripke} function
 on these names to obtain the string representation of the subterm. We finally
 return the names we used together with this string.
 

@@ -419,7 +419,9 @@ Renamed to Fresh (+ added back link)
       (defined in Fig. 6) is the proof that we can generate placeholder
       values thanks to the name supply."
 
-* [ ] p.21: A sentence each describing mapA and sequenceA would be useful here.
+* [X] p.21: A sentence each describing mapA and sequenceA would be useful here.
+
+Done by amplifying the McBride and Patterson Traversable reference. 
 
 * [X] p.22: "consist in type checking" -> "consists of type checking"
 
