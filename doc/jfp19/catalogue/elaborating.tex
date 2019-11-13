@@ -114,12 +114,13 @@ with the internal function applied to the internal argument.
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{app}
 \end{agdasnippet}
-\paragraph{λ-abstraction} For the λ-abstraction case, we start by checking that
-the type candidate is an \AD{Arrow}. We can then elaborate the body of the lambda
-in a context extended with one \AIC{Infer} variable assigned an inference function
-thanks to the auxiliary function \AF{var₀}. From this we get an internal term
-corresponding to the body of the λ-abstraction and conclude by returning it wrapped
-in a \AIC{`lam} constructor.
+\paragraph{λ-abstraction} For the λ-abstraction case, we start by
+checking that the type candidate \AB{arr} is an \AD{Arrow}. We can
+then elaborate the body \AB{b} of the lambda in a context extended
+(using \AF{bind}) with one \AIC{Infer} variable assigned an inference
+function thanks to the auxiliary function \AF{var₀}. From this we get
+an internal term \AB{B} corresponding to the body of the λ-abstraction and
+conclude by returning it wrapped in a \AIC{`lam} constructor.
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{lam}
 \end{agdasnippet}

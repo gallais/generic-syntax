@@ -386,17 +386,24 @@ They already are.
 
 * [X] p.16: Here's another name with a ^ in it, still unexplained
 
-* [ ] p. 17: When something is called a lemma, it should have an English
+* [X] p. 17: When something is called a lemma, it should have an English
       statement in addition to the encoding in Agda. This would make it much
       easier to figure out.
+
+This *looks* to have been fixed, at least for the Fundamental Lemma
+(page numbering is adrift from original submission, as am I). However,
+should it be "takes a \AR{Semantics}" rather than "takes a semantics"
+now (p. 19, Subsection 6.1)?
 
 * [X] p. 18: There is a sentence "We immediately introduce a corollary ...",
       but it's not clear where that happens. This corollary should be in the
       text, rather than in a float on the next page, and it should also have
       an English statement that readers can compare to the Agda.
 
-* [ ] p. 19: Earlier uses of copatterns did them as prefix projections,
-      Fig. 30 uses postfix.
+* [X] p. 19: Earlier uses of copatterns did them as prefix projections,
+      Fig. 30 uses postfix. 
+
+tackled in introduction, as above. 
 
 * [X] p. 19: The sentence starting with "Hence, we can then implement..."
       trails off at a colon without ever being finished.
@@ -456,8 +463,11 @@ broken up into three.
 
 No. But added an explanation.
 
-* [ ] p. 28: What is bind again? The code b (bind Infer) (epsilon dot var_0)
+* [X] p. 28: What is bind again? The code b (bind Infer) (epsilon dot var_0)
       (sigma :: Gamma) tau was pretty opaque.
+
+Added some explanatory wording, essentially doing pattern-matching in
+the text to help the reader identify what's going on in the Agda. 
 
 * [X] p. 28: Consider the phrasing "Luckily, Agda's dependent do-notation
       makes our job easy once again:".
