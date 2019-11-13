@@ -18,7 +18,7 @@ open import Function
 
 open import Data.Var
 open import Data.Var.Varlike
-open import Data.Environment using (Kripke; th^Var; ε; _∙_; extend)
+open import Data.Environment using (Kripke; th^Var; ε; _∙_; identity; extend; extract)
 open import Generic.Syntax.LetCounter
 open import Generic.Syntax.LetBinder
 open import Generic.Semantics
@@ -75,7 +75,7 @@ annotate : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ CLet) ∞ σ Γ
 \end{code}
 %</annotatetype>
 \begin{code}
-annotate t = let (t' , _) = Semantics.semantics Annotate (base vl^Var) t in t'
+annotate t = let (t' , _) = Semantics.semantics Annotate identity t in t' -- vs. (base vl^Tm)
 \end{code}
 \end{AgdaSuppressSpace}
 \end{AgdaAlign}
@@ -88,7 +88,7 @@ Semantics.var   Inline = id
 Semantics.alg   Inline = λ where
   (true , t)                       → `con (true , fmap d (reify vl^Tm) t)
   (false , many , στ , e , b , eq) → `con (false , στ , e , b extend (ε ∙ `var z) , eq)
-  (false , _ , στ , e , b , refl)  → b (base vl^Var) (ε ∙ e)
+  (false , _ , στ , e , b , refl)  → extract b (ε ∙ e) -- cf Semantics.alg UnLet
 
 inline : Tm (d `+ CLet) ∞ σ Γ → Tm (d `+ Let) ∞ σ Γ
 inline = Semantics.semantics Inline id^Tm 
