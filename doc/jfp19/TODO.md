@@ -7,6 +7,10 @@
 
 See also paragraph after Environments are defined. (revc)
 
+Also: Generic/Semantics/Syntactic.lagda adds a definition,
+inlined in text, of id^Tm, which is then used in
+Generic/Semantics/Elaboration/Let*.lagda
+
 * [X] Add ticked pattern synonyms for list and define foldr using
   them on page 13
 

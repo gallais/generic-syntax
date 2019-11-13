@@ -91,7 +91,7 @@ Semantics.alg   Inline = λ where
   (false , _ , στ , e , b , refl)  → b (base vl^Var) (ε ∙ e)
 
 inline : Tm (d `+ CLet) ∞ σ Γ → Tm (d `+ Let) ∞ σ Γ
-inline = Semantics.semantics Inline (base vl^Tm)
+inline = Semantics.semantics Inline id^Tm 
 
 inline-affine : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ Let) ∞ σ Γ
 inline-affine = inline ∘′ annotate

@@ -30,5 +30,5 @@ module _ {I : Set} {d : Desc I} where
        (es , t , refl) → t $$ es
 
   unLets : ∀[ Tm (d `+ Lets) i σ ⇒ Tm d _ σ ]
-  unLets = Semantics.semantics UnLets (pack `var)
+  unLets = Semantics.semantics UnLets id^Tm 
 \end{code}

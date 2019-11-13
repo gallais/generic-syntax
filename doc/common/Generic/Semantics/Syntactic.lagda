@@ -86,6 +86,9 @@ VarLikeᴿ.thᴿ   vl^VarTm = λ σ → cong (ren σ)
 reify^Tm : ∀ Δ → ∀[ Kripke (Tm d ∞) (Tm d ∞) Δ σ ⇒ (Δ ++_) ⊢ Tm d ∞ σ ]
 reify^Tm Δ = reify vl^Tm Δ _
 
+id^Tm : (Γ ─Env) (Tm d ∞) Γ
+lookup id^Tm = `var
+
 lookup-base^Tm : (k : Var σ Γ) → lookup (base vl^Tm) k ≡ `var k
 lookup-base^Tm z                              = refl
 lookup-base^Tm (s k) rewrite lookup-base^Tm k = refl

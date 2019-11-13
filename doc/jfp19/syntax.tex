@@ -1350,9 +1350,15 @@ respectively).
   by combining the use of placeholder values and thinnings.
   In the \AD{Var} case these very general definitions respectively specialise
   to the identity renaming for a context \AB{Γ} and the injection of \AB{Γ}
-  fresh variables to the right or the left of an ambient context \AB{Δ}.
-}
-Using these definitions, we can then implement \AF{reify} as in Figure~\ref{fig:genericreify}.
+  fresh variables to the right or the left of an ambient context \AB{Δ}. 
+  %%%
+  Similarly, in the \AD{Tm} case, we can show \AF{base} \AF{vl\textasciicircum{}Tm}
+  extensionally equal to the identity environment \AF{id\textasciicircum{}Tm} 
+  given by {\AF{lookup} \AF{id\textasciicircum{}Tm} = \AIC{`var}},  
+  which associates each variable to itself (seen as a term). 
+} 
+Using these definitions, we can then implement \AF{reify} as in
+Figure~\ref{fig:genericreify}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{reify}

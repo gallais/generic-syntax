@@ -51,6 +51,6 @@ unLet ρ t = Semantics.semantics UnLet ρ t
 %<*unlet>
 \begin{code}
 unlet : ∀[ Tm (d `+ Let) ∞ σ ⇒ Tm d ∞ σ ]
-unlet = Semantics.semantics UnLet (pack `var)
+unlet = Semantics.semantics UnLet id^Tm 
 \end{code}
 %</unlet>
