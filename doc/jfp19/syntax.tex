@@ -694,8 +694,8 @@ thinning embedding \AB{$\Gamma$} into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
 \label{section:printing}
 We also include the definition of a basic printer relying on a name supply to
 highlight the fact that computations can very well be effectful. \revc{The ability
-to generate fresh names is given to us by a monad that we decide to call \AF{Fresh}.
-Concretely, \AF{Fresh} is implemented as an instance of the state monad where
+to generate fresh names is given to us by a monad that here we decide to call \AF{Fresh}.
+Concretely, \AF{Fresh} is implemented as an instance of the State monad where
 the state is a stream of distinct strings.}.
 The \AF{Printing} semantics is defined by using \AF{Name}s (i.e. \AD{String}s)
 as values and \AF{Printer}s (i.e. monadic actions in \AF{Fresh} returning a \AD{String})
@@ -737,17 +737,17 @@ environment and \AF{return} it immediately.
 \end{agdasnippet}
 }
 
-To print an application, we produce a string representation of the term in
-function position, then one of its argument and combine them by putting the
+To print an application, we produce a string representation, \AB{f}, of the term in
+function position, then one, \AB{t}, of its argument and combine them by putting the
 argument between parentheses.
 
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printapp}
 \end{agdasnippet}
 
-To print a λ-abstraction, we start by generating a fresh name for the
-newly-bound variable, use that name to generate a string representing the
-body of the function to which we prepend a ``λ'' binding the fresh name.
+To print a λ-abstraction, we start by generating a fresh name, \AB{x}, for the
+newly-bound variable, use that name to generate a string \AB{b} representing the
+body of the function to which we prepend a ``λ'' binding the name \AB{x}.
 
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printlam}
@@ -815,7 +815,7 @@ one can obtain this way. In this section we recall the main aspects
 of this construction we are interested in to build up our generic
 representation of syntaxes with binding.
 
-The first component of CDMM's universe's definition is an inductive type of
+The first component of the definition of CDMM's universe (Figure~\ref{figure:desc}) is an inductive type of
 \AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to $\Set{}^I$.
 \revc{
 These functors correspond to \AB{I}-indexed containers of \AB{J}-indexed
@@ -946,7 +946,7 @@ weakening.
 
 \section{A Universe of Scope Safe and Well Kinded Syntaxes}\label{section:universe}
 
-Our universe of scope safe and well kinded syntaxes follows the same principle
+Our universe of scope safe and well kinded syntaxes (defined in Figures~\ref{fig:Desc},~\ref{figure:syntaxmeaning})  follows the same principle
 as CDMM's universe of datatypes, except that we are not building endofunctors on
 \AS{Set} any more but rather on {\AB{I} \AF{─Scoped}}. We now think of the index
 type \AB{I} as the sorts
@@ -1181,8 +1181,8 @@ simply typed λ-calculus in Section~\ref{section:primer-program},
 we can define a generic notion of
 semantics for all syntax descriptions. It is once more parametrised
 by two \AB{I}\AF{─Scoped} families \AB{𝓥} and \AB{𝓒} corresponding
-respectively to values associated to bound variables and
-computations delivered by evaluating terms. These two families
+respectively to \emph{values} associated to bound variables and
+\emph{computations} delivered by evaluating terms. These two families
 have to abide by three constraints:
 \begin{itemize}
 \item{\ARF{th\textasciicircum{}𝓥}} Values should be thinnable so that we can push the
@@ -1204,7 +1204,7 @@ have to abide by three constraints:
 Here we crucially use the fact that the meaning of a description is
 defined in terms of a function interpreting substructures which has
 the type \AF{List} \AB{I} \AS{→} \AB{I}\AF{─Scoped}, i.e. that gets access
-to the current scope but also the exact list of the newly bound variables' kinds.
+to the current scope but also the exact list of the kinds of the newly bound variables.
 We define a function \AF{Kripke} by case analysis on the number of newly bound
 variables. It is essentially a subcomputation waiting for a value associated to
 each one of the fresh variables.
@@ -1241,7 +1241,7 @@ values to variables, it associates computations to terms.
 We can now define the type of the fundamental lemma (called \semfun{}) which
 takes a semantics and returns a function from environments to computations.
 It is defined mutually with a
-function \AF{body} turning syntactic binders into semantics binders: to
+function \AF{body} turning syntactic binders into semantic binders: to
 each de Bruijn \AF{Scope} (i.e. a substructure in a potentially extended
 context) it associates a \AF{Kripke} (i.e. a subcomputation expecting a
 value for each newly bound variable).
@@ -1330,7 +1330,7 @@ and reifying the bodies of binders.
 
 The reification process mentioned in the definition of renaming and
 substitution can be implemented generically for \semrec{} families
-which have \AR{VarLike} values, i.e.  values which are thinnable and
+which have \AR{VarLike} values, i.e.  values which are \AF{Thinnable} and
 such that we can craft placeholder values in non-empty contexts. It is
 almost immediate that both \AD{Var} and \AD{Tm} are \AR{VarLike} (with
 proofs \AF{vl\textasciicircum{}Var} and \AF{vl\textasciicircum{}Tm},
