@@ -10,7 +10,6 @@ open import Data.List.Base as L hiding ([_])
 open import Function
 
 open import Data.Var hiding (_<$>_)
-open import Data.Var.Varlike
 open import Data.Environment
 open import Generic.Semantics
 
@@ -30,7 +29,7 @@ binders : ∀ Δ σ →
           Kripke (const ∘′ V) (const ∘′ PHOAS d ∞) Δ σ Γ →
           LAMBS (PHOAS d ∞) Δ σ []
 binders []        i kr = kr
-binders Δ@(_ ∷ _) i kr = λ vs → kr (base vl^Var) (id <$> vs)
+binders Δ@(_ ∷ _) i kr = λ vs → kr identity (id <$> vs)
 
 toPHOAS : Semantics d (const ∘′ V) (const ∘′ PHOAS d ∞)
 Semantics.th^𝓥  toPHOAS = λ v _ → v

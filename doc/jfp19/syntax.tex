@@ -544,7 +544,7 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 \ExecuteMetaData[Data/Environment.tex]{thBox}
 \end{minipage}
 
-\caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable.}
+\caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable. \label{fig:Thinnable}}
 \end{figure}
 
 \subsection{A Generic Notion of Semantics}
@@ -682,7 +682,7 @@ have already proven that they are thinnable.
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsub}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsubfun}
 \end{minipage}
-\caption{Renaming and Substitution as Instances of \semrec{}}
+\caption{Renaming and Substitution as Instances of \semrec{}\label{fig:SemInstances}}
 \end{figure}
 
 In both cases we use (\AF{extend}) defined in Figure~\ref{fig:thincomb} as
@@ -883,7 +883,7 @@ programming over all the functors one can obtain as the meaning of a description
 
 \begin{figure}[h]
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{fmap}
-\caption{Action on Morphisms of the Functor corresponding to a \AF{Desc}ription}
+\caption{Action on Morphisms of the Functor corresponding to a \AF{Desc}ription\label{fig:fmapD}}
 \end{figure}
 
 All the functors obtained as meanings of \AD{Desc}riptions are strictly
@@ -966,7 +966,7 @@ Figures~\ref{figure:syntaxmeaning}, \ref{figure:debruijnscope} and \ref{figure:f
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Syntax.tex]{desc}
-\caption{Syntax Descriptions}
+\caption{Syntax Descriptions\label{fig:Desc}}
 \end{figure}
 
 The meaning function \AF{⟦\_⟧} we associate to a description follows closely
@@ -1033,7 +1033,7 @@ distinguish the two constructors.
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{ULC}
-  \caption{Description for the Untyped λ-calculus}
+  \caption{Description for the Untyped λ-calculus\label{fig:descUTLC}}
 \end{figure}
 
 \paragraph{Bidirectional STLC}\label{par:bidirectional} Our second example is a
@@ -1056,7 +1056,7 @@ in Figure~\ref{fig:intrinsic-stlc}).
 \begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{desc}
 \end{minipage}
-  \caption{Description for the bidirectional STLC}
+  \caption{Description for the bidirectional STLC\label{fig:descBidiSTLC}}
 \end{figure}
 
 \paragraph{Intrinsically typed STLC}\label{par:intrinsicSTLC}
@@ -1074,7 +1074,7 @@ information about the types involved so we use once more and ad-hoc datatype
 \begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{desc}
 \end{minipage}
-  \caption{Description for the intrinsically typed STLC}
+  \caption{Description for the intrinsically typed STLC\label{fig:descSTLC}}
 \end{figure}
 
 For convenience we use Agda's pattern synonyms corresponding to the
@@ -1097,7 +1097,7 @@ for the two extreme examples, the definition for \AF{Bidi} are similar.
 \begin{minipage}{0.50\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{patST}
 \end{minipage}
-\caption{Respective Pattern Synonyms for \AF{UTLC} and \AF{STLC}.}
+\caption{Respective Pattern Synonyms for \AF{UTLC} and \AF{STLC}. \label{fig:patsLC}}
 \end{figure}
 
 As a usage example of these pattern synonyms, we define the identity
@@ -1198,7 +1198,7 @@ have to abide by three constraints:
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{semantics}
-\caption{A Generic Notion of Semantics}
+\caption{A Generic Notion of Semantics\label{defn:Semantics}}
 \end{figure}
 
 Here we crucially use the fact that the meaning of a description is
@@ -1219,7 +1219,7 @@ each one of the fresh variables.
 
 \begin{figure}[h]
 \ExecuteMetaData[Data/Environment.tex]{kripke}
-\caption{Substructures as either Computations or Kripke Function Spaces}
+\caption{Substructures as either Computations or Kripke Function Spaces\label{defn:Kripke}}
 \end{figure}
 
 It is once more the case that the abstract notion of Semantics comes
@@ -1248,7 +1248,7 @@ value for each newly bound variable).
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Semantics.tex]{semtype}
-\caption{Statement of the Fundamental Lemma of \semrec{}}
+\caption{Statement of the Fundamental Lemma of \semrec{}\label{defn:semantics}}
 \end{figure}
 
 The proof of \semfun{} is straightforward now that we have clearly
@@ -1325,7 +1325,7 @@ and reifying the bodies of binders.
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{substitution}
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{sub}
 \end{minipage}
-\caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding}
+\caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding\label{defn:Ren-Sub}}
 \end{figure}
 
 The reification process mentioned in the definition of renaming and
@@ -1338,7 +1338,7 @@ respectively).
 
 \begin{figure}[h]
 \ExecuteMetaData[Data/Var/Varlike.tex]{varlike}
-\caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values}
+\caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values\label{fig:VarLike}}
 \end{figure}
 
 \label{sec:varlike:base}
@@ -1457,7 +1457,7 @@ Family \AB{T} and itself.
 \begin{minipage}[t]{0.25\textwidth}
   \ExecuteMetaData[Data/Relation.tex]{eqR}
 \end{minipage}
-\caption{Relation Between \AB{I}\AF{─Scoped} Families and Equality Example}
+\caption{Relation Between \AB{I}\AF{─Scoped} Families and Equality Example\label{ex:fam-eq}}
 \label{fig:reldef}
 \end{figure}
 }
@@ -1476,7 +1476,7 @@ implicit arguments.
 
 \begin{figure}[h]
   \ExecuteMetaData[Data/Relation.tex]{all}
-\caption{Relating \AB{Γ}-Environments in a Pointwise Manner}
+\caption{Relating \AB{Γ}-Environments in a Pointwise Manner\label{defn:Env-rel}}
 \end{figure}
 
 The first example of two environment being related is the trivial proof \AF{reflᴿ}
@@ -1497,7 +1497,7 @@ paragraph.
 
 \begin{figure}[h]
  \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}
-\caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs}
+\caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs\label{fig:Kripke-rel}}
 \end{figure}
 
 \paragraph{Desc relator}
@@ -1522,7 +1522,7 @@ layers which are meant to be equal:
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Relator.tex]{ziptype}
-\caption{Relator: Characterising Structurally Equal Values with Related Substructures}
+\caption{Relator: Characterising Structurally Equal Values with Related Substructures\label{fig:zip-rel}}
 \end{figure}
 
 If we were to take a fixpoint of \AF{⟦\_⟧ᴿ}, we could obtain a structural
@@ -1599,7 +1599,7 @@ and \AD{Size}s play a crucial role in ensuring that the function is indeed total
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Simulation.tex]{simbody}
-\caption{Fundamental Lemma of \AR{Simulation}s}
+\caption{Fundamental Lemma of \AR{Simulation}s\label{defn:Simulation}}
 \end{figure}
 
 Instantiating this generic simulation lemma, we can for instance prove
@@ -1613,7 +1613,7 @@ POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where \AF{rensub} was ac
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensub}
 \ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensubfun}
-\caption{Renaming as a Substitution via Simulation}
+\caption{Renaming as a Substitution via Simulation\label{defn:RenSub}}
 \end{figure}
 
 When studying specific languages, new opportunities to deploy the
@@ -1775,7 +1775,7 @@ counterpart for \semrec{}'s \AF{body}'s action on \AR{Scope}s.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
-\caption{Fundamental Lemma of \AR{Fusion}}
+\caption{Fundamental Lemma of \AR{Fusion}\label{defn:Fusion}}
 \end{figure}
 
 \subsubsection{Instances of Fusion}
@@ -1789,7 +1789,7 @@ renaming has been applied to the environment.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Fusion/Syntactic.tex]{subren}
-\caption{A Corollary: Substitution-Renaming Fusion}
+\caption{A Corollary: Substitution-Renaming Fusion\label{defn:SubRen-Fusion}}
 \end{figure}
 
 Another corollary of the fundamental lemma of fusion is the observation that
@@ -1827,7 +1827,7 @@ was defined to express. Hence the following coinductive relation.
 
 \begin{figure}[h]
  \ExecuteMetaData[Generic/Bisimilar.tex]{bisim}
-\caption{Generic Notion of Bisimilarity for Co-finite Trees}
+\caption{Generic Notion of Bisimilarity for Co-finite Trees\label{defn:bisimilar}}
 \end{figure}
 
 We can then prove by coinduction that this generic definition always gives

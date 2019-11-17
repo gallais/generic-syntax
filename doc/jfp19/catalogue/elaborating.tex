@@ -82,7 +82,7 @@ really easy. For the arrow type, we introduce a family \AD{Arrow} constraining t
 shape of its index to be an arrow type and redefine \AF{isArrow} as a \emph{view} targeting
 this inductive family~\cite{DBLP:conf/popl/Wadler87,DBLP:journals/jfp/McBrideM04}.
 \revc{
-We purposefully overload the constructor of the \AD{isArrow} family by calling
+We deliberately overload the constructor of the \AD{isArrow} family by calling
 it \AIC{\_`→\_}. This means that the proof that a given type has the shape
 {(\AB{σ} \AIC{`→} \AB{τ})} is literally written {(\AB{σ} \AIC{`→} \AB{τ})}.
 This allows us to specify \emph{in the type} whether we want to work with the
@@ -150,7 +150,7 @@ previous combinators. \revb{
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elaborate}
-  \caption{\AF{Elaborate}, the elaboration semantics}
+  \caption{\AF{Elaborate}, the elaboration semantics\label{defn:Elaborate}}
 \end{figure}
 
 }

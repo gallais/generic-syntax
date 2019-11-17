@@ -24,7 +24,7 @@ is the disjoint sum of two descriptions defined in Figure~\ref{figure:descsum}):
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letpattern}
 \end{minipage}
-\caption{Description of a single let binding, associated pattern synonyms}
+\caption{Description of a single let binding, associated pattern synonyms\label{defn:letD}}
 \end{figure}
 
 This description states that a let-binding node stores a pair of types
@@ -56,7 +56,7 @@ environment.
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unletcode}
-\caption{Desugaring as a \AR{Semantics}}
+\caption{Desugaring as a \AR{Semantics}\label{defn:UnLet}}
 \end{figure}
 
 The process of removing let binders is then kickstarted with the placeholder
@@ -65,7 +65,7 @@ of type {(\AB{Γ} \AR{─Env}) (\AD{Tm} \AB{d} ∞) \AB{Γ}}.
 
 \begin{figure}[h]
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unlet}
-\caption{Specialising \AF{semantics} with an environment of placeholder values}
+\caption{Specialising \AF{semantics} with an environment of placeholder values\label{defn:unlet}}
 \end{figure}
 
 In less than 10 lines of code we have defined a generic extension of
