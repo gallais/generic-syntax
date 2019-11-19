@@ -434,9 +434,7 @@ structure (using a record helps Agda's type inference reconstruct the type famil
 \AB{𝓥} of values for us):
 
 \begin{figure}[h]
-\begin{center}
 \ExecuteMetaData[Data/Environment.tex]{env}
-\end{center}
 \caption{Well Typed and Scoped Environments of Values}\label{fig:environment}
 \end{figure}
 
@@ -452,7 +450,7 @@ environment {\AB{\(\rho\)}~=~\AIC{pack}~\AB{r}}, or else define
 \AB{\(\rho\)} in terms of the underlying function obtained from it by
 projecting out the (in this case, unique) \ARF{lookup} field, as
 {\ARF{lookup}~\AB{\(\rho\)}~=~\AB{r}}. Examples of definition in this
-style are given in Figure~\ref{fig:thincomb} below, and throughout the
+style are given in Figure~\ref{fig:baseenv} below, and throughout the
 rest of the paper. A value of a record type with more than one field
 requires each of its fields to be given, either by a named constructor
 (or else Agda's default \AK{record} syntax), or in copattern
@@ -461,6 +459,21 @@ further supports `dot' notation, so that an equivalent definition here
 could be expressed as {\AB{\(\rho\)}~.\ARF{lookup}~=~\AB{r}}.
 %%%
 }
+
+We can readily define some basic building blocks for environments.
+The empty environment (\AF{ε}) is implemented by remarking that there
+can be no variable of type {(\AD{Var} \AB{σ} \AIC{[]})} and to correspondingly
+dismiss the case with the impossible pattern \AS{()}. The function \AF{\_∙\_}
+extends an existing environment with a new value.
+
+\begin{figure}[h]
+\begin{minipage}[t]{0.3\textwidth}
+\ExecuteMetaData[Data/Environment.tex]{empty}
+\end{minipage}\begin{minipage}[t]{0.6\textwidth}
+\ExecuteMetaData[Data/Environment.tex]{extension}
+\end{minipage}
+\caption{Combinators to Build Environments}\label{fig:baseenv}
+\end{figure}
 
 As we have already observed, the definitions of renaming and substitution have very
 similar structure. Abstracting away this shared structure would allow for these

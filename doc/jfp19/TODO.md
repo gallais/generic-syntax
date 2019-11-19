@@ -17,7 +17,7 @@ Generic/Semantics/Elaboration/Let*.lagda
 * [X] Use a pattern-matching let in the definition of annotate
   instead of proj1
 
-* [ ] norm^LC should use a locally defined `fire` function in the
+* [X] norm^LC should use a locally defined `fire` function in the
   `(APP' (LAM f) t)`. Introducing this `fire` is a great opportunity
   to: - show its type
       - explain why `extract` and the *singleton* environment `ε • t`

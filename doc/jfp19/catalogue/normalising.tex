@@ -52,21 +52,39 @@ anything else.
 \end{figure}
 
 Using this setup, we can write a normaliser for the untyped λ-calculus
-by simply providing an algebra. We start by defining two patterns for
-semantical values: one for application and the other for lambda abstraction.
+by providing an algebra. The key observation that allows us to implement
+this algebra is that we can turn a Kripke function (\AB{f}) mapping values
+of type \AB{σ} to computations of type \AB{τ} into an Agda function from
+values of type \AB{σ} to computations of type \AB{τ}. This is witnessed
+by the application function (\AF{\_\$\$\_}) defined in Figure~\ref{fig:kripkeapp}:
+we first use \AF{extract} (defined in Figure~\ref{fig:Thinnable}) to obtain
+a function taking \AB{𝓥}-environments to computations. We then use the
+combinators defined in Figure~\ref{fig:baseenv} to manufacture the singleton
+environment {(\AF{ε} \AB{∙} \AB{t})} containing the value \AB{t} of type
+\AB{σ}.
+
+\begin{figure}[h]
+  \ExecuteMetaData[Generic/Examples/NbyE.tex]{app}
+\caption{Applying a Kripke Function to an argument}\label{fig:kripkeapp}
+\end{figure}
+
+We now define two patterns for semantical values: one for application and
+the other for lambda abstraction. This should make the case of interest of
+our algebra (a function applied to an argument) fairly readable.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbepatterns}
 \caption{Pattern synonyms for UTLC-specific \AD{Dm} values}
 \end{figure}
 
-We then define the algebra by case analysis: if the node at hand is an
-application and its first component evaluates to a lambda, we fire it.
-Otherwise we have either a stuck application or a lambda, in other words
-we already have a value and can simply return it using \AIC{C}.
+We finally define the algebra by case analysis: if the node at hand is an
+application and its first component evaluates to a lambda, we have can apply
+the function to its argument using \AF{\_\$\$\_}. Otherwise we have either a
+stuck application or a lambda, in other words we already have a value and can
+simply return it using \AIC{C}.
 
 \begin{figure}[h]
-\ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
+  \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
 \caption{Normalisation by Evaluation for the Untyped λ-Calculus}
 \end{figure}
 
