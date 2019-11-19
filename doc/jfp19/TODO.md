@@ -246,7 +246,7 @@ see above.
 
 * [X] p.2, last line: "Fusable" should probably be "fusible"
 
-* [ ] p.3: This page states that the techniques are language-independent,
+* [X] p.3: This page states that the techniques are language-independent,
       requiring only inductive families, but it seems to me that the use of
       sized types is a key part of making the fixed point construction go
       through. Is that not the case?
