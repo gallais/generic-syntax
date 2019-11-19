@@ -290,7 +290,7 @@ somewhere in the paper? Certainly not on page 3!
       ordinary parentheses were used. Not everyone who works with dependent
       types is a major Haskell user.
 
-* [ ] p6: The notation (Γ -Env) Var Δ was a source of confusion,
+* [X] p6: The notation (Γ -Env) Var Δ was a source of confusion,
       initially. It seems to mix postfix and ordinary notation. Why can't
       Env just come first?
 
