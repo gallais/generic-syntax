@@ -130,7 +130,7 @@ removed.
 
 # Review 2 "opportunities for improvement
 
-* [ ] Since the 'variable' feature of Agda is quite new and the paper
+* [X] Since the 'variable' feature of Agda is quite new and the paper
       makes heavy use of it, perhaps it would help to add a short
       explanation of which variable declarations are used (e.g. "We use σ
       for variables of type Type and Γ for variables of type List Type").
@@ -278,7 +278,7 @@ somewhere in the paper? Certainly not on page 3!
       later on, with the exception of the somewhat confusing turnstile
       notation.
 
-* [ ] p.5: In the definition of Var, small sigma occurs free. This is
+* [X] p.5: In the definition of Var, small sigma occurs free. This is
       usually not allowed in Agda. In the online code, this is done with a
       "variable" declaration - please consider putting this declaration in
       the article as well, or at least having a table with the corresponding

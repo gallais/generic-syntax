@@ -194,6 +194,19 @@ $1 + (\_)$ extends the running scope with an extra variable.
     \end{array}
   \end{array}
 \end{displaymath}
+
+\revb{
+\paragraph{Implicit generalisation of variables in Agda} The careful
+reader may have noticed that we use a seemingly out-ot-scope variable
+\AB{X} of type \AF{Set}. The latest version of Agda allows us to declare
+variables that the system should implicitly quantify over if it happens
+to find them used in types. This allows us to lighten the presentation
+by omitting a large number of prenex quantifiers. The reader will hopefully
+be familiar enough with ML-style polymorphic types that this will
+seem natural to them.
+}
+
+
 The $\mathit{Lam}$ type is now a family of types, indexed by the set
 of variables in scope. Thus, the context for each represented term has
 been made visible to the type system, and the types enforce that only
