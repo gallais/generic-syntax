@@ -195,7 +195,7 @@ Explained All too
       developing machine-checked such implementations and proofs" looks
       weird, maybe it's better to reword it in some other way?
 
-* [ ] In the related work on alternative approaches via code generation
+* [X] In the related work on alternative approaches via code generation
       (section 10.4), it would be interesting to also compare to the ott
       tool for mechanized metatheory.
 
