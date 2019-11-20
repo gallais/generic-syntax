@@ -39,7 +39,7 @@ pattern APP' f t = (true , f , t , refl)
 \end{code}
 %<*app>
 \begin{code}
-_$$_ : ∀[ Kripke 𝓥 𝓒 (σ ∷ []) τ ⇒ 𝓥 σ ⇒ 𝓒 τ ]
+_$$_ : ∀[ Kripke 𝓥 𝓒 (σ ∷ []) τ ⇒ (𝓥 σ ⇒ 𝓒 τ) ]
 f $$ t = extract f (ε ∙ t)
 \end{code}
 %</app>

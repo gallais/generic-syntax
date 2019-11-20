@@ -19,7 +19,7 @@ and then discuss related future work in the conclusion.
 
 Our scope checker will be a function taking two explicit arguments: a name for
 each variable in scope \AB{Γ} and a raw term for a syntax description \AB{d}.
-It will either fail (the Monad \AF{M} granting us the ability to fail is made
+It will either fail (the Monad \AF{Fail} granting us the ability to fail is made
 explicit in Figure~\ref{fig:scopemonad}) or return a well scoped and sorted
 term for that description.
 
@@ -70,7 +70,7 @@ raw terms equiped with names for any newly-bound variables.
 evidently a name can be out of scope but it is also possible that it may be
 associated to a variable of the wrong sort. We define an enumerating type
 covering these two cases. The scope checker will return a computation in the
-Monad \AF{M} thus allowing us to fail and return an error, the string that
+Monad \AF{Fail} thus allowing us to fail and return an error, the string that
 caused the failure and the extra data of type \AB{E} that accompanied it.
 
 \begin{figure}[h]
@@ -79,6 +79,7 @@ caused the failure and the extra data of type \AB{E} that accompanied it.
 \end{minipage}
 \begin{minipage}[t]{0.4\textwidth}
   \ExecuteMetaData[Generic/Scopecheck.tex]{monad}
+  \ExecuteMetaData[Generic/Scopecheck.tex]{fail}
 \end{minipage}
 \caption{Error Type and Scope Checking Monad}\label{fig:scopemonad}
 \end{figure}
@@ -103,8 +104,8 @@ down the scope and use \AIC{s} to lift the result to the full scope.
 \end{figure}
 
 Scope checking an entire term then amounts to lifting this action on
-variables to an action on terms. The error Monad \AF{M} is by definition
-an Applicative and by design our terms are
+variables to an action on terms. The error Monad \AF{Fail} is by
+definition an Applicative and by design our terms are
 Traversable~\cite{bird_paterson_1999,DBLP:journals/jfp/GibbonsO09}.
 The action on term is defined mutually with the action on scopes.
 As we can see in the second equation for \AF{toScope}, thanks to the

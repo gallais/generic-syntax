@@ -39,7 +39,7 @@ open import Generic.Semantics
 \end{code}
 %<*vlmname>
 \begin{code}
-vl^FreshName : VarLike {I} (λ σ → Fresh ∘ (Name σ))
+vl^FreshName : VarLike (λ (σ : I) → Fresh ∘ (Name σ))
 vl^FreshName = record
   { th^𝓥  = th^Functor functor^M th^Wrap
   ; new   = fresh _

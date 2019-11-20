@@ -16,6 +16,7 @@ open import Data.List.Relation.Unary.All as All using (All; _∷_)
 open import Data.List.Relation.Unary.All.Properties renaming (++⁻ʳ to drop)
 open import Function
 
+open import Relation.Unary
 open import Data.Var
 open import Data.Var.Varlike
 open import Data.Environment using (Kripke; th^Var; ε; _∙_; identity; extend; extract)
@@ -71,11 +72,11 @@ Semantics.alg    Annotate = λ where
 \begin{AgdaSuppressSpace}
 %<*annotatetype>
 \begin{code}
-annotate : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ CLet) ∞ σ Γ
+annotate : ∀[ Tm (d `+ Let) ∞ σ ⇒ Tm (d `+ CLet) ∞ σ ]
 \end{code}
 %</annotatetype>
 \begin{code}
-annotate t = let (t' , _) = Semantics.semantics Annotate identity t in t' -- vs. (base vl^Tm)
+annotate t = let (t' , _) = Semantics.semantics Annotate identity t in t'
 \end{code}
 \end{AgdaSuppressSpace}
 \end{AgdaAlign}

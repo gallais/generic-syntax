@@ -6,7 +6,7 @@ to automatically generate common traversals for every inductive type
 they define. Recalling that generic programming is normal programming
 over a universe in a dependently typed
 language~\cite{DBLP:conf/ifip2-1/AltenkirchM02}, we ought to be able to
-deliver similar functionalities.
+deliver similar functionalities for syntaxes with binding.
 
 We will focus in this section on the definition of an equality test. The
 techniques used in this concrete example are general enough that they also
@@ -80,7 +80,7 @@ The constructor \AIC{`σ} for descriptions gives us the ability to store
 values of any \AF{Set} in terms. For some of these \AF{Set}s (e.g.
 {(\AD{ℕ} → \AD{ℕ})}), equality is not decidable. As a consequence
 our decision procedure will be conditioned to the satisfaction of a
-certain set of \AF{Constraints} which we can compute from the \AD{Descr}
+certain set of \AF{Constraints} which we can compute from the \AD{Desc}
 itself, as show in Figure~\ref{fig:eqconstraints}. We demand that we are
 able to decide equality for all of the \AF{Set}s mentioned in a description.
 

@@ -30,10 +30,11 @@ and their associated typings (typically named \AB{Γ}).
 \end{figure}
 
 \revc{
-We can then explain what it means for an elaboration process to produce a
-term of the ({\AD{Type} \AF{─Scoped}}) family \AB{T}. Provided a type
-\AB{σ} and a context of modes \AB{ms}, for any typing \AB{Γ} of this context
-of mode, we should get a value of type {(\AB{T} \AB{σ} \AF{⌞} \AB{Γ} \AF{⌟})}.
+We can then explain what it means for an elaboration process of type \AB{σ}
+in a context of modes \AB{ms} to produce a term of the
+({\AD{Type} \AF{─Scoped}}) family \AB{T}: for any typing \AB{Γ} of this
+context of modes, we should get a value of type
+{(\AB{T} \AB{σ} \AF{⌞} \AB{Γ} \AF{⌟})}.
 }
 
 \begin{figure}[H]
@@ -102,9 +103,11 @@ with the added confidence that ours are guaranteed to be total.
 \end{figure}
 
 We now have all the basic pieces and can start writing elaboration code. We
-once more start by dealing with each constructor in isolation before putting
-everything together to get a \AR{Semantics}. These steps are very similar to
-the ones in the previous section.
+will use lowercase letter for terms in \AF{Bidi} and uppercase ones for their
+elaborated counterparts in \AF{STLC}. We once more start by dealing with each
+constructor in isolation before putting everything together to get a
+\AR{Semantics}. These steps are very similar to the ones in the previous
+section.
 
 \paragraph{Application} In the application case, we start by elaborating the
 function and we get its type together with its internal representation. We then
@@ -116,9 +119,9 @@ with the internal function applied to the internal argument.
 \end{agdasnippet}
 \paragraph{λ-abstraction} For the λ-abstraction case, we start by
 checking that the type candidate \AB{arr} is an \AD{Arrow}. We can
-then elaborate the body \AB{b} of the lambda in a context extended
-(using \AF{bind}) with one \AIC{Infer} variable assigned an inference
-function thanks to the auxiliary function \AF{var₀}. From this we get
+then elaborate the body \AB{b} of the lambda in a context of modes extended
+with one \AIC{Infer} variable, and the corresponding \AF{Typing} extended
+with the function's domain. From this we get
 an internal term \AB{B} corresponding to the body of the λ-abstraction and
 conclude by returning it wrapped in a \AIC{`lam} constructor.
 \begin{agdasnippet}
@@ -159,7 +162,7 @@ We can once more define a specialised version of the traversal induced by this
 \AR{Semantics} for closed terms: not only can we give a (trivial) initial
 environment (using the \AF{closed} corollary defined in Figure~\ref{fig:evalclosed})
 but we can also give a (trivial) initial \AF{Typing}. This leads to the
-following definitions:
+definitions in Figure~\ref{fig:typedelaboration}.
 
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -169,6 +172,7 @@ following definitions:
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{type-}
 \end{minipage}
 \caption{Evidence-producing Type (Checking / Inference) Function}
+\label{fig:typedelaboration}
 \end{figure}
 
 Revisiting the example introduced in Section~\ref{section:typechecking},

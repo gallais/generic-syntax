@@ -141,7 +141,7 @@ removed.
       7.4. Is there a particular reason for using Maybe instead of a more
       informative Either here?
 
-* [ ] Since the paper is quite long, it would help the reader to provide
+* [X] Since the paper is quite long, it would help the reader to provide
       pointers to where concepts are defined, especially when it is more
       than one section ago since they were used. For example, 'case' from
       section 5 is used in the definition of UnLet in section 7.5, and
@@ -308,7 +308,7 @@ Any takers?
 
 * [X] p6: Missing comma after "Thinnables" on the last line
 
-* [ ] p7: Fig. 2 is in a float, which means that the figure is
+* [X] p7: Fig. 2 is in a float, which means that the figure is
       left-justified. This looks very different from the Thinning definition
       earlier on the page, which is centered. There's a repeated issue in
       the article where there seems to be no pattern governing which code

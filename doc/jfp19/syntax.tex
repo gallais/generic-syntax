@@ -111,7 +111,7 @@ substitution, and desugaring of let binders generically, for
 Our implementation language is
 Agda~\cite{norell2009dependently}. However, our techniques are
 language independent: any dependently typed language at least as
-powerful as Martin-L\"of Type Theory\cite{martin1982constructive}
+powerful as Martin-L\"of Type Theory~\cite{martin1982constructive}
 equipped with inductive families~\cite{dybjer1994inductive} such as
 Coq~\cite{Coq:manual}, Lean~\cite{DBLP:conf/cade/MouraKADR15} or
 Idris~\cite{brady2013idris} ought to do.
@@ -207,11 +207,11 @@ seem natural to them.
 }
 
 
-The $\mathit{Lam}$ type is now a family of types, indexed by the set
+The \AD{Lam} type is now a family of types, indexed by the set
 of variables in scope. Thus, the context for each represented term has
 been made visible to the type system, and the types enforce that only
 variables that have been explicitly declared can be referenced in the
-$\mathsf{`var}$ constructor. We have made illegal terms
+\AIC{`var} constructor. We have made illegal terms
 unrepresentable.
 
 
@@ -231,17 +231,18 @@ unrepresentable.
 %    \mathit{Lam} = \mu F \in \Set{}^{\Set{}}.
 %    \lambda X \!\in\! \Set{}.\; X + (F(X) \times F(X)) + F(1 + X)
 % \]
-Since `Lam' is defined to be a function $\AD{Set} \to \AD{Set}$, it
+Since \AD{Lam} is defined to be a function $\AD{Set} \to \AD{Set}$, it
 makes sense to ask whether it is also a functor and a monad. Indeed it
 is, as Altenkirch and Reus showed. The functorial action corresponds
 to renaming, the monadic `return' corresponds to the use of variables
-(the $\mathsf{`var}$ constructor), and the monadic `bind' corresponds
+(the \AIC{`var} constructor), and the monadic `bind' corresponds
 to substitution. The functor and monad laws correspond to well known
 properties from the equational theories of renaming and
 substitution. We will revisit these properties, for our whole universe
 of syntax with binding, in Section~\ref{section:fusion}.
 
-\paragraph{A Mechanized and Typed Variant of Altenkirch and Reus' Calculus.}\label{section:mech-reus}
+\paragraph{A Typed Variant of Altenkirch and Reus' Calculus}
+\label{section:mech-reus}
 
 There is no reason to restrict this technique to inductive families
 indexed by $\Set{}$. The more general case of inductive families in
@@ -343,10 +344,10 @@ indexed Set into a Set by implicitly quantifying over the index.
 Lastly, \AF{const} is the constant combinator, which ignores the
 index.
 
-We make \AF{⇒} associate to the right as one would expect and give it the
+We make \AF{\_⇒\_} associate to the right as one would expect and give it the
 highest precedence level as it is the most used combinator. These combinators
 lead to more readable type declarations.  For instance, the compact expression
-\AF{∀[} \AIC{s} \AF{⊢} (\AF{const} \AB{P} \AF{⇒} \AB{Q}) \AF{⇒} \AB{R} \AF{]}
+\AF{∀[} (\AF{const} \AB{P} \AF{⇒} \AIC{s} \AF{⊢} \AB{Q}) \AF{⇒} \AB{R} \AF{]}
 desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} \AS{→} \AB{Q} (\AIC{s} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
@@ -359,7 +360,7 @@ scope when defining such families, as for example in Figure~\ref{fig:Var}.
   \caption{Scope and Kind Aware de Bruijn Indices\label{fig:Var}}
 \end{figure}
 
-The inductive family \AD{Var} represents well scoped and well kinded
+The inductive family \AD{Var} represents well scoped and well sorted
 de Bruijn indices. Its \AIC{z} (for zero) constructor refers to the
 nearest binder in a non-empty scope. The \AIC{s} (for successor)
 constructor lifts a a variable in a given scope to the extended scope
@@ -367,9 +368,12 @@ where an extra variable has been bound. Both of the constructors'
 types have been written using the combinators defined above.  They
 respectively normalise to:
 \begin{center}
-  \AIC{z} : {\AS{∀} \AB{σ} \AB{Γ} \AS{→} \AD{Var} \AB{σ} (\AB{σ} \AIC{::} \AB{Γ})}
+  \AIC{z} : {\AS{∀} \{\AB{σ} \AB{Γ}\}
+            \AS{→} \AD{Var} \AB{σ} (\AB{σ} \AIC{::} \AB{Γ})}
   \qquad
-  \AIC{s} : {\AS{∀} \AB{σ} \AB{τ} \AB{Γ} → \AD{Var} \AB{σ} \AB{Γ} \AS{→} \AD{Var} \AB{σ} (\AB{τ} \AIC{::} \AB{Γ})}
+  \AIC{s} : {\AS{∀} \{\AB{σ} \AB{τ} \AB{Γ}\}
+            \AS{→} \AD{Var} \AB{σ} \AB{Γ}
+            \AS{→} \AD{Var} \AB{σ} (\AB{τ} \AIC{::} \AB{Γ})}
 \end{center}
 We will reuse the \AD{Var} family to represent variables in all the
 syntaxes defined in this paper.
@@ -415,7 +419,8 @@ are the two typical examples that are required for almost all
 syntaxes. Now that well typedness and well scopedness are enforced
 statically, all of these traversals have to be implemented in a type
 and scope safe manner.  These constraints show up in the types of
-renaming and substitution: % defined as follows:
+renaming and substitution defined in Figure~\ref{figure:rensubACMM}.
+% defined as follows:
 
 \begin{figure}[h]
 \begin{minipage}{0.50\textwidth}
@@ -439,12 +444,14 @@ where we define an abstract notion of semantics and the corresponding generic tr
 
 \subsection{A Generic Notion of Environments}\label{sec:genenvironment}
 
-Both renaming and substitution are defined in terms of \emph{environments}
-{(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ}} that describe how to associate a value \AB{𝓥}
-(variables for renaming, terms for substitution) well scoped and typed in \AB{Δ}
-to every entry in \AB{Γ}. Environments are defined as the following record
-structure (using a record helps Agda's type inference reconstruct the type family
-\AB{𝓥} of values for us):
+Both renaming and substitution are defined in terms of \emph{environments}.
+We typically call \AB{Γ}-environment an environment that associates values
+to each variable in \AB{Γ}. This informs our notation choice: we write
+{((\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Δ})} for an environment that associates
+a value \AB{𝓥} (variables for renaming, terms for substitution) well scoped
+and typed in \AB{Δ} to every entry in \AB{Γ}. Formally, we have the following
+record structure (using a record helps Agda's type inference reconstruct the
+type family \AB{𝓥} of values for us):
 
 \begin{figure}[h]
 \ExecuteMetaData[Data/Environment.tex]{env}
@@ -473,11 +480,15 @@ could be expressed as {\AB{\(\rho\)}~.\ARF{lookup}~=~\AB{r}}.
 %%%
 }
 
-We can readily define some basic building blocks for environments.
-The empty environment (\AF{ε}) is implemented by remarking that there
-can be no variable of type {(\AD{Var} \AB{σ} \AIC{[]})} and to correspondingly
-dismiss the case with the impossible pattern \AS{()}. The function \AF{\_∙\_}
-extends an existing environment with a new value.
+We can readily define some basic building blocks for environments in
+Figure~\ref{fig:baseenv}. The empty environment (\AF{ε}) is implemented
+by remarking that there can be no variable of type
+{(\AD{Var} \AB{σ} \AIC{[]})} and to correspondingly dismiss the case with
+the impossible pattern \AS{()}. The function \AF{\_∙\_} extends an existing
+\AB{Γ}-environment with a new value of type \AB{σ} thus returning a
+{(\AB{σ} \AIC{∷} \AB{Γ})}-environment. We also include the definition
+of \AF{\_<\$>\_}, which lifts in a pointwise manner a function acting
+on values into a function acting on environment of such values.
 
 \begin{figure}[h]
 \begin{minipage}[t]{0.3\textwidth}
@@ -485,6 +496,7 @@ extends an existing environment with a new value.
 \end{minipage}\begin{minipage}[t]{0.6\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{extension}
 \end{minipage}
+\ExecuteMetaData[Data/Environment.tex]{envmap}
 \caption{Combinators to Build Environments}\label{fig:baseenv}
 \end{figure}
 
@@ -578,7 +590,7 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 As we show in our previous work (ACMM)~\citeyear{allais2017type},
 equipped with these new notions we can define an abstract concept
 of semantics for our scope- and type- safe language. Provided that a set of
-constraints on two ({\AF{Type} \AF{─Scoped}}) \AB{𝓥} and \AB{𝓒} is
+constraints on two ({\AF{Type} \AF{─Scoped}}) families \AB{𝓥} and \AB{𝓒} is
 satisfied, we will obtain a traversal of the following type:
 
 \begin{agdasnippet}
@@ -618,8 +630,9 @@ such as \AF{vl\textasciicircum{}Tm} for the proof that terms are
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{thV}
 \end{agdasnippet}
 This constraint allows us to define \AF{extend}, the generalisation of the two
-auxiliary definitions we used in Figure~\ref{figure:rensubACMM} without showing
-their definitions. It takes a context extension from \AB{Δ} to \AB{Θ} in the
+auxiliary definitions we used in Figure~\ref{figure:rensubACMM}, in terms of
+the building blocks introduced in Figure~\ref{fig:baseenv}.
+It takes a context extension from \AB{Δ} to \AB{Θ} in the
 form of a thinning, an existing evaluation environment mapping \AB{Γ} variables
 to \AB{Δ} values and a value living in the extended context \AB{Θ} and returns
 an evaluation environment mapping ({\AB{σ} \AIC{∷} \AB{Γ}}) variables to \AB{Θ}
@@ -715,14 +728,14 @@ In both cases we use (\AF{extend}) defined in Figure~\ref{fig:thincomb} as
 (\AIC{pack} \AIC{s}) (where \AIC{pack} is the constructor for environments and
 \AIC{s}, defined in Section \ref{section:mech-reus}, is the function lifting an
 existing de Bruijn variable into an extended scope) as the definition of the
-thinning embedding \AB{$\Gamma$} into {\AB{$\sigma$} \AIC{::} \AB{$\Gamma$}}.
+thinning embedding \AB{Γ} into {(\AB{σ} \AIC{∷} \AB{Γ}}.
 
 \label{section:printing}
 We also include the definition of a basic printer relying on a name supply to
 highlight the fact that computations can very well be effectful. \revc{The ability
 to generate fresh names is given to us by a monad that here we decide to call \AF{Fresh}.
 Concretely, \AF{Fresh} is implemented as an instance of the State monad where
-the state is a stream of distinct strings.}.
+the state is a stream of distinct strings.}
 The \AF{Printing} semantics is defined by using \AF{Name}s (i.e. \AD{String}s)
 as values and \AF{Printer}s (i.e. monadic actions in \AF{Fresh} returning a \AD{String})
 as computations. We use a \AR{Wrap}per with a type and a context as phantom types
@@ -810,7 +823,7 @@ environments are distinct from their type of computations.
 
 All of these examples are already described at length by ACMM~\citeyear{allais2017type}
 so we will not spend any
-more time on them. They have also obtained the simulation and fusion
+more time on them. In ACMM we have also obtained the simulation and fusion
 theorems demonstrating that these traversals are well behaved as
 corollaries of more general results expressed in terms of \semfun{}.
 We will come back to this in Section~\ref{section:simulation}.
@@ -954,10 +967,12 @@ for a universe of data types with binding, so in the next section we will see ho
 to extend CDMM's approach to include binding.
 
 The functor underlying any well scoped and sorted syntax can be coded as some
-{\AD{Desc} (I \AR{$\times$} \AD{List} I) (I \AR{$\times$} \AD{List} I)}, with the
+{\AD{Desc} (\AB{I} \AR{×} \AD{List} \AB{I}) (\AB{I} \AR{×} \AD{List} \AB{I})},
+ with the
 free monad construction from CDMM uniformly adding the variable case. Whilst a
 good start, \AD{Desc} treats its index types as unstructured, so this construction
-is blind to what makes the {\AD{List} I} index a \emph{scope}. The resulting
+is blind to what makes the {\AD{List} \AB{I}} index a \emph{scope}.
+The resulting
 `bind' operator demands a function which maps variables in \emph{any} sort and
 scope to terms in the \emph{same} sort and scope. However, the behaviour we need
 is to preserve sort while mapping between specific source and target scopes which
@@ -974,8 +989,8 @@ weakening.
 
 Our universe of scope safe and well kinded syntaxes (defined in Figures~\ref{fig:Desc},~\ref{figure:syntaxmeaning})  follows the same principle
 as CDMM's universe of datatypes, except that we are not building endofunctors on
-\AS{Set} any more but rather on {\AB{I} \AF{─Scoped}}. We now think of the index
-type \AB{I} as the sorts
+$\Set{}^I$ any more but rather on {\AB{I} \AF{─Scoped}}. We now think of the
+index type \AB{I} as the sorts
 used to distinguish terms in our embedded language. The \AIC{`$\sigma$} and
 \AIC{`∎} constructors are as in the CDMM \AD{Desc} type, and are used to
 represent data and index constraints respectively.
@@ -1050,8 +1065,9 @@ the variable case will be added by the free monad construction so we only
 have to describe the other constructors.
 
 
-\paragraph{Untyped λ-calculus} For the untyped case, the lack of
-type translates to picking unit as our notion of sort. We have two possible
+\paragraph{Un(i)typed λ-calculus} For the untyped case, the lack of
+type translates to picking the unit type (\AR{⊤}) as our notion of sort.
+We have two possible
 constructors: application where we have two substructures which do not bind
 any extra argument and λ-abstraction which has exactly one substructure
 with precisely one extra bound variable. A single \AD{Bool}ean is enough to
@@ -1087,7 +1103,7 @@ in Figure~\ref{fig:intrinsic-stlc}).
 
 \paragraph{Intrinsically typed STLC}\label{par:intrinsicSTLC}
 In the typed case (for the same notion of \AD{Type} defined in
-Figure~\ref{fig:intrinsic-stlc}, we are back to two
+Figure~\ref{fig:intrinsic-stlc}), we are back to two
 constructors: the terms are fully annotated and therefore it is not necessary
 to distinguish between \AD{Mode}s anymore. We need our tags to carry extra
 information about the types involved so we use once more and ad-hoc datatype
@@ -1127,8 +1143,9 @@ for the two extreme examples, the definition for \AF{Bidi} are similar.
 \end{figure}
 
 As a usage example of these pattern synonyms, we define the identity
-function in all three languages in Figure~\ref{fig:identity}. The code
-is virtually the same except for \AF{Bidi} which explicitly records 
+function in all three languages in Figure~\ref{fig:identity}, using the
+same caret-based naming convention we introduced earlier. The code
+is virtually the same except for \AF{Bidi} which explicitly records
 the change of direction from \AIC{Check} to \AIC{Infer}.
 
 \begin{figure}[h]
@@ -1334,7 +1351,8 @@ When dealing with the body of a binder, we `reify' the \AF{Kripke} function by
 evaluating it in an extended context and feeding it placeholder values corresponding to
 the extra variables introduced by that context. This is reminiscent both of what we
 did in Section~\ref{section:primer-program} and the definition of reification in
-the setting of normalisation by evaluation (see e.g. Coquand's work~\citeyear{coquand2002formalised}).
+the setting of normalisation by evaluation
+(see e.g. Catarina Coquand's formal development~\citeyear{coquand2002formalised}).
 
 Substitution is defined in a similar manner with \AD{Tm} as both
 values and computations. Of the two constraints applying to terms as
@@ -1369,7 +1387,7 @@ respectively).
 
 \label{sec:varlike:base}
 \reva{Given a proof that \AB{𝓥} is \AR{VarLike}, we can manufacture
-  several useful \AB{𝓥}-environments. We provide users with
+  several useful environments of values \AB{𝓥}. We provide users with
   \AF{base} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Γ}},
   \AF{fresh\textsuperscript{r}} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})}
   and \AF{fresh\textsuperscript{l}} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Γ} \AF{++} \AB{Δ})}
@@ -1474,7 +1492,7 @@ our notion of relation over (I \AF{─Scoped}) families. A \AR{Rel}ation between
 such families \AB{T} and \AB{U} is a function which to any \AB{σ} and \AB{Γ} associates
 a relation between (\AB{T} \AB{σ} \AB{Γ}) and (\AB{U} \AB{σ} \AB{Γ}). Our first example
 of such a relation is \AF{Eqᴿ} the equality relation between an (\AB{I}\AF{─Scoped})
-Family \AB{T} and itself.
+family \AB{T} and itself.
 
 \begin{figure}[h]
 \begin{minipage}[t]{0.65\textwidth}
@@ -1505,11 +1523,12 @@ implicit arguments.
 \caption{Relating \AB{Γ}-Environments in a Pointwise Manner\label{defn:Env-rel}}
 \end{figure}
 
-The first example of two environment being related is the trivial proof \AF{reflᴿ}
-that for any environment \AB{ρ}, {(\AR{All} \AF{Eqᴿ} \AB{Γ} \AB{ρ} \AB{ρ})}.
-The combinators we introduced to build environments (\AF{ε}, \AF{\_∙\_}, etc.)
-have natural relational counterparts. We reuse the same names for them, simply
-appending an \AF{ᴿ} suffix.
+The first example of two environment being related is \AF{reflᴿ} that, to any
+environment \AB{ρ} associates a trivial proof of the statement
+{(\AR{All} \AF{Eqᴿ} \AB{Γ} \AB{ρ} \AB{ρ})}.
+The combinators we introduced in Figure~\ref{fig:baseenv} to build environments
+(\AF{ε}, \AF{\_∙\_}, etc.) have natural relational counterparts. We reuse the same
+names for them, simply appending an \AF{ᴿ} suffix.
 
 \paragraph{Kripke relator}
 We assume that we have two types of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}
@@ -1563,10 +1582,10 @@ on more advanced use-cases.
 \subsection{Simulation Lemma}\label{section:simulation}
 
 \revb{
-A constraint mentioning both relation transformers appears naturally when we want to
-say that a semantics can simulate another one. For instance, renaming is simulated
-by substitution: we simply have to restrict ourselves to environments mapping variables
-to terms which happen to be variables.
+A constraint mentioning all three relation transformers appears naturally when
+we want to say that a semantics can simulate another one. For instance, renaming
+is simulated by substitution: we simply have to restrict ourselves to environments
+mapping variables to terms which happen to be variables.
 More generally, given a semantics \AB{𝓢ᴬ} with values \AB{𝓥ᴬ} and computations
 \AB{𝓒ᴬ} and a semantics \AB{𝓢ᴮ} with values \AB{𝓥ᴮ} and computations \AB{𝓒ᴮ},
 we want to establish the constraints under which these two semantics yield
@@ -1619,8 +1638,9 @@ spaces take related inputs to related outputs.
 
 The fundamental lemma of simulations is a generic theorem showing that for
 each pair of \semrec{} respecting the \AR{Simulation} constraint, we
-get related computations given environments of related input values. This
-theorem is once more mutually proven with a statement about \AF{Scope}s,
+get related computations given environments of related input values.
+In Figure~\ref{defn:Simulation}, this theorem is once more mutually
+proven with a statement about \AF{Scope}s,
 and \AD{Size}s play a crucial role in ensuring that the function is indeed total.
 
 \begin{figure}[h]
@@ -1634,7 +1654,8 @@ substitution are extensional \revc{i.e. that given environments equal in
 a pointwise manner they produce syntactically equal terms}. Of course these
 results are not new but having them generically over all syntaxes with
 binding is convenient. We experience this first hand when tackling the
-POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where \AF{rensub} was actually needed.
+POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where
+\AF{rensub} (defined in Figure~\ref{defn:RenSub}) was actually needed.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensub}
@@ -1644,13 +1665,14 @@ POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where \AF{rensub} was ac
 
 When studying specific languages, new opportunities to deploy the
 fundamental lemma of simulations arise. Our solution to the POPLMark
-Reloaded challenge for instance describes the fact that {\AF{sub} \AB{$\rho$} \AB{t}}
-reduces to {\AF{sub} \AB{$\rho$'} \AB{t}} whenever for all \AB{v},
+Reloaded challenge for instance describes the fact that
+{(\AF{sub} \AB{$\rho$} \AB{t})}
+reduces to {(\AF{sub} \AB{$\rho$'} \AB{t})} whenever for all \AB{v},
 \AB{$\rho$}(\AB{v}) reduces to \AB{$\rho$'}(\AB{v}) as a \AR{Simulation}.
 The main theorem (strong normalisation of STLC via a logical relation)
 is itself an instance of (the unary version of) the simulation lemma.
 
-The Simulation proof framework is the simplest example of the abstract
+The \AR{Simulation} proof framework is the simplest example of the abstract
 proof frameworks introduced in ACMM~\citeyear{allais2017type}. We also
 explain how a similar framework can be defined
 for fusion lemmas and deploy it for the renaming-substitution interactions
@@ -1687,7 +1709,7 @@ As all of these statements have precisely the same structure, we can
 once more devise a framework which will, provided that its constraints are
 satisfied, prove a generic fusion lemma.
 
-Fusion is more involved than simulation so we will step through
+Fusion is more involved than simulation; we will once more step through
 each one of the constraints individually, trying to give the reader an intuition
 for why they are shaped the way they are.
 
@@ -1748,7 +1770,8 @@ combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
 constraint stating that \AF{\_>>\_} is compatible with \AB{𝓔ᴿ}. We demand
 as an extra precondition that the values \AB{ρᴮ} and \AB{ρᴬᴮ} are extended
 with are related according to \AB{𝓥ᴿ}. Lastly, for all the types to match up,
-\AB{ρᴬ} has to be extended with placeholder variables.
+\AB{ρᴬ} has to be extended with placeholder variables which is possible because
+we have already insisted on \AB{𝓥ᴬ} being \AR{VarLike}.
 
 \begin{agdasnippet}
 \addtolength{\leftskip}{\parindent}
@@ -1996,7 +2019,7 @@ to draft possible theoretical foundations for Autosubst, a so-far untrusted
 set of tactics. The paper is based on a specific syntax: well scoped call-by-value
 System F. In contrast, our effort has been here to carve out
 a precise universe of syntaxes with binding and give a systematic account
-of their semantics and proofs.
+of these syntaxes' semantics and proofs.
 
 Keuchel, Weirich, and Schrijvers' Needle~\citeyear{needleandknot} is a code
 generator written in Haskell producing syntax-specific Coq modules

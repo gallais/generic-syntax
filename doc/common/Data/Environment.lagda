@@ -49,10 +49,13 @@ Thinning Γ Δ = (Γ ─Env) Var Δ
 lookup ε ()
 \end{code}
 %</empty>
+%<*envmap>
 \begin{code}
-
 _<$>_ : (∀ {i} → 𝓥 i Δ → 𝓦 i Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
 lookup (f <$> ρ) k = f (lookup ρ k)
+\end{code}
+%</envmap>
+\begin{code}
 
 data Split (i : I) Γ Δ : Var i (Γ ++ Δ) → Set where
   inj₁ : (k : Var i Γ) → Split i Γ Δ (injectˡ Δ k)

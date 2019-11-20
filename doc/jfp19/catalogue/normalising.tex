@@ -26,9 +26,9 @@ an error token because the evaluation of untyped programs may go wrong.
 \end{figure}
 
 This datatype definition is utterly unsafe. The more conservative
-user will happily restrict themselves to typed settings where the
-domain can be defined as a logical predicate or opt instead for
-a step-indexed approach.
+user will happily restrict themselves to particular syntaxes where
+the typed settings allows for domain to be defined as a logical
+predicate or opt instead for a step-indexed approach.
 
 But this domain does make it possible to define a generic \AF{nbe}
 semantics which, given a term, produces a value in the reflexive
@@ -53,12 +53,12 @@ anything else.
 
 Using this setup, we can write a normaliser for the untyped λ-calculus
 by providing an algebra. The key observation that allows us to implement
-this algebra is that we can turn a Kripke function (\AB{f}) mapping values
+this algebra is that we can turn a Kripke function, \AB{f}, mapping values
 of type \AB{σ} to computations of type \AB{τ} into an Agda function from
 values of type \AB{σ} to computations of type \AB{τ}. This is witnessed
 by the application function (\AF{\_\$\$\_}) defined in Figure~\ref{fig:kripkeapp}:
 we first use \AF{extract} (defined in Figure~\ref{fig:Thinnable}) to obtain
-a function taking \AB{𝓥}-environments to computations. We then use the
+a function taking environments of values to computations. We then use the
 combinators defined in Figure~\ref{fig:baseenv} to manufacture the singleton
 environment {(\AF{ε} \AB{∙} \AB{t})} containing the value \AB{t} of type
 \AB{σ}.
@@ -78,7 +78,7 @@ our algebra (a function applied to an argument) fairly readable.
 \end{figure}
 
 We finally define the algebra by case analysis: if the node at hand is an
-application and its first component evaluates to a lambda, we have can apply
+application and its first component evaluates to a lambda, we can apply
 the function to its argument using \AF{\_\$\$\_}. Otherwise we have either a
 stuck application or a lambda, in other words we already have a value and can
 simply return it using \AIC{C}.
@@ -90,10 +90,12 @@ simply return it using \AIC{C}.
 
 We have not used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
 (by disabling totality checking we have lost all guarantees of the sort) we know
-we will get a term in normal form. See for instance this untyped yet normalising
+we will get a term in normal form. See for instance in
+Figure~\ref{fig:normuntyped} the evaluation of an untyped yet normalising
 term: {(λx. x) ((λx. x) (λx. x))} normalises to {(λx. x)}.
 
 \begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{example}
 \caption{Example of a normalising untyped term}
+\label{fig:normuntyped}
 \end{figure}

@@ -150,8 +150,8 @@ record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
 %</rsem>
 %<*extend>
 \begin{code}
-  extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
-  extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
+  extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → ((σ ∷ Γ) ─Env) 𝓥 Θ
+  extend σ ρ v = ((λ t → th^𝓥 t σ) <$> ρ) ∙ v
 \end{code}
 %</extend>
 %<*sem>

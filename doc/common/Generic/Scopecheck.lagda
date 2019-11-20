@@ -31,6 +31,7 @@ private
     σ : I
     Γ Δ : List I
     i : Size
+    A : Set
 
 \end{code}
 %<*names>
@@ -69,12 +70,17 @@ private
 \end{code}
 %<*monad>
 \begin{code}
- M : Set → Set
- M A = (Error × E × String) ⊎ A
+ Fail : Set → Set
+ Fail A = (Error × E × String) ⊎ A
 \end{code}
 %</monad>
+%<*fail>
 \begin{code}
-
+ fail : Error → E → String → Fail A
+ fail err e str = inj₁ (err , e , str)
+\end{code}
+%</fail>
+\begin{code}
 open RawMonad (SC.monad (Error × E × String) zero)
 
 instance _ =  rawIApplicative
@@ -82,11 +88,11 @@ instance _ =  rawIApplicative
 \end{code}
 %<*toVar>
 \begin{code}
-toVar : E → String → ∀ σ Γ → Names Γ → M (Var σ Γ)
-toVar e x σ [] [] = inj₁ (OutOfScope , e , x)
+toVar : E → String → ∀ σ Γ → Names Γ → Fail (Var σ Γ)
+toVar e x σ [] [] = fail OutOfScope e x
 toVar e x σ (τ ∷ Γ) (y ∷ scp) with x ≟ y | σ ≟I τ
-... | yes _  | yes refl  = inj₂ z
-... | yes _  | no ¬eq    = inj₁ (WrongSort σ τ ¬eq , e , x)
+... | yes _  | yes refl  = pure z
+... | yes _  | no ¬eq    = fail (WrongSort σ τ ¬eq) e x
 ... | no ¬p  | _         = s <$> toVar e x σ Γ scp
 \end{code}
 %</toVar>
@@ -98,11 +104,11 @@ module _ {d : Desc I} where
 \begin{AgdaSuppressSpace}
 %<*totmtype>
 \begin{code}
- toTm     : Names Γ → Raw d i σ → M (Tm d i σ Γ)
+ toTm     : Names Γ → Raw d i σ → Fail (Tm d i σ Γ)
 \end{code}
 %</totmtype>
 \begin{code}
- toScope  : Names Γ → ∀ Δ σ → WithNames (Raw d i) Δ σ [] → M (Scope (Tm d i) Δ σ Γ)
+ toScope  : Names Γ → ∀ Δ σ → WithNames (Raw d i) Δ σ [] → Fail (Scope (Tm d i) Δ σ Γ)
 
  toTm scp (`var e v)  = `var <$> toVar e v _ _ scp
  toTm scp (`con b)    = `con <$> mapA d (toScope scp) b

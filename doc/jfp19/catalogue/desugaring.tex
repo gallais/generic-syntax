@@ -12,19 +12,20 @@ an existing language.
 Let bindings allow the user to avoid repeating themselves by naming
 sub-expressions and then using these names to refer to the associated
 terms. Preprocessors adding these types of mechanisms to existing
-languages (from C to CSS) are rather popular. We introduce a
-description of \AD{Let}-bindings which can be used to extend any
-language description \AB{d} to \AB{d} \AF{`+} \AF{Let} (where \AF{`+}
-is the disjoint sum of two descriptions defined in Figure~\ref{figure:descsum}):
+languages (from C to CSS) are rather popular. In Figure~\ref{defn:letD},
+we introduce a description \AD{Let} which can be used to extend any
+language description \AB{d} to a language with let-bindings
+(\AB{d} \AF{`+} \AF{Let}).
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letcode}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letpattern}
 \end{minipage}
-\caption{Description of a single let binding, associated pattern synonyms\label{defn:letD}}
+\caption{Description of a single let binding, associated pattern synonyms
+  \label{defn:letD}}
 \end{figure}
 
 This description states that a let-binding node stores a pair of types
@@ -50,7 +51,7 @@ in the environment and computations are both let-free terms. The algebra
 of the semantics can be defined by parts thanks to \AF{case}, the eliminator
 for \AF{\_`+\_} defined in Figure~\ref{figure:descsum}:
 the old constructors are kept the same by
-interpreting them using the generic \AF{Substitution} algebra;
+interpreting them using the generic substitution algebra (\AF{Sub});
 whilst the let-binder precisely provides the extra value to be added to the
 environment.
 
