@@ -6,5 +6,5 @@ A self-contained repository for the paper [A Scope-and-Type Safe Universe of Syn
 [![Travis Status](https://api.travis-ci.org/gallais/generic-syntax.svg?branch=master)](https://travis-ci.org/gallais/generic-syntax)
 
 To check this development, you'll need:
-* Agda 2.6.0
-* Agda's Standard Library 1.0
+* Agda 2.6.0.1
+* Agda's Standard Library 1.2
