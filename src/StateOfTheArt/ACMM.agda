@@ -17,7 +17,7 @@ private
 infixr 3 _`→_
 
 data Type : Set where
-  α    : Type
+  α     : Type
   _`→_  : Type → Type → Type
 
 private
@@ -103,8 +103,8 @@ record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
 
     lam   : ∀[ □ (𝓥 σ ⇒ 𝓒 τ) ⇒ 𝓒 (σ `→ τ) ]
 
-  extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → (σ ∷ Γ ─Env) 𝓥 Θ
-  extend σ ρ v = (λ t → th^𝓥 t σ) <$> ρ ∙ v
+  extend : Thinning Δ Θ → (Γ ─Env) 𝓥 Δ → 𝓥 σ Θ → ((σ ∷ Γ) ─Env) 𝓥 Θ
+  extend σ ρ v = ((λ t → th^𝓥 t σ) <$> ρ) ∙ v
 
   semantics : (Γ ─Env) 𝓥 Δ → (Lam σ Γ → 𝓒 σ Δ)
 
@@ -145,8 +145,8 @@ module Printer where
  open import Codata.Stream as Stream using (Stream; _∷_; head; tail)
  open RawMonadState (StateMonadState (Stream String _))
 
- M : Set → Set
- M = State (Stream String _)
+ Fresh : Set → Set
+ Fresh = State (Stream String _)
 
  record Wrap (A : Set) (σ : I) (Γ : List I) : Set where
    constructor MkW; field getW : A
@@ -157,7 +157,7 @@ module Printer where
  Name = Wrap String
 
  Printer : I ─Scoped
- Printer = Wrap (M String)
+ Printer = Wrap (Fresh String)
 
 
  th^Wrap : Thinnable {I} (Wrap A σ)
@@ -168,21 +168,32 @@ module Printer where
 
  open E hiding (_>>_)
 
- fresh : ∀ σ → M (Name σ (σ ∷ Γ))
+ fresh : ∀ σ → Fresh (Name σ (σ ∷ Γ))
  fresh σ = do
    names ← get
    put (tail names)
    pure (MkW (head names))
 
  Printing : Semantics Name Printer
- Printing = record
-   { th^𝓥  =  th^Wrap
-   ; var   =  map^Wrap return
-   ; app   =  λ mf mt → MkW $ getW mf >>= λ f → getW mt >>= λ t →
-              return $ f ++ " (" ++ t ++ ")"
-   ; lam   =  λ {σ} mb → MkW $ fresh σ >>= λ x →
-              getW (mb extend x) >>= λ b →
-              return $ "λ" ++ getW x ++ ". " ++ b }
+ Printing = record { th^𝓥 = th^Wrap; var = var; app = app; lam = lam }
+
+  where
+
+   var : ∀[ Name σ ⇒ Printer σ ]
+   var = map^Wrap return
+
+   app : ∀[ Printer (σ `→ τ) ⇒ Printer σ ⇒ Printer τ ]
+   app mf mt = MkW do
+     f ← getW mf
+     t ← getW mt
+     return (f ++ " (" ++ t ++ ")")
+
+   lam : ∀[ □ (Name σ ⇒ Printer τ) ⇒ Printer (σ `→ τ) ]
+   lam {σ} mb = MkW do
+     x ← fresh σ
+     b ← getW (mb extend x)
+     return ("λ" ++ getW x ++ ". " ++ b)
+
 
  open import Data.List.NonEmpty as List⁺ using (List⁺; _∷_)
  open import Codata.Thunk using (force)
@@ -200,25 +211,38 @@ module Printer where
        $′ Stream.map alphabetWithSuffix
        $′ "" ∷ λ where .force → Stream.map NatShow.show allNats
 
-open Printer using (Printing)
+open Printer using (getW; Printing; Name; names)
+open Semantics
 
-print : (σ : Type) → Lam σ [] → String
-print _ t = proj₁ $ Printer.getW (Semantics.semantics Printing {Δ = []} (pack λ ()) t) Printer.names
+print : Lam σ [] → String
+print t = proj₁ (getW printer names) where
 
-_ : print (α `→ α) (`lam (`var z)) ≡ "λa. a"
+  empty : ([] ─Env) Name []
+  empty = ε
+
+  printer = semantics Printing empty t
+
+_ : print {α `→ α} (`lam (`var z)) ≡ "λa. a"
 _ = refl
 
-module _ {σ τ : Type} where
+module Fig1 {σ τ : Type} where
 
 
   apply : Lam ((σ `→ τ) `→ (σ `→ τ)) []
-  apply =  `lam {- f -} $ `lam {- x -}
-        $  `app (`var (s z) {- f -}) (`var z {- x -})
+  apply =  `lam {- f -} (`lam {- x -}
+           (`app (`var (s z) {- f -}) (`var z {- x -})))
+
+module Print {σ τ : Type} where
 
 
-  _ : print _ apply ≡ "λa. λb. a (b)"
+  apply : Lam ((σ `→ τ) `→ (σ `→ τ)) []
+  apply = `lam (`lam (`app (`var (s z)) (`var z)))
+
+  _ : print apply ≡ "λa. λb. a (b)"
   _ = refl
 
 
-_ : print ((α `→ α) `→ (α `→ α)) (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z))))) ≡ "λa. λb. a (a (b))"
+_ : print {(α `→ α) `→ (α `→ α)}
+          (`lam (`lam (`app (`var (s z)) (`app (`var (s z)) (`var z)))))
+  ≡ "λa. λb. a (a (b))"
 _ = refl

@@ -36,7 +36,7 @@ UnLet : Semantics (d `+ Let) (Tm d ∞) (Tm d ∞)
 Semantics.th^𝓥  UnLet = th^Tm
 Semantics.var   UnLet = id
 Semantics.alg   UnLet = case (Semantics.alg Sub) $ λ where
- (`IN' e t) →  extract t (ε ∙ e)
+ (`let' e `in' t) →  extract t (ε ∙ e)
 
 
 unLet : (Γ ─Env) (Tm d ∞) Δ → Tm (d `+ Let) s σ Γ → Tm d ∞ σ Δ
@@ -44,4 +44,4 @@ unLet ρ t = Semantics.semantics UnLet ρ t
 
 
 unlet : ∀[ Tm (d `+ Let) ∞ σ ⇒ Tm d ∞ σ ]
-unlet = Semantics.semantics UnLet (pack `var)
+unlet = Semantics.semantics UnLet id^Tm 

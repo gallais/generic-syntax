@@ -10,6 +10,7 @@ open import Data.Var.Varlike using (VarLike; base)
 open import Data.Relation
 open import Relation.Unary
 open import Data.Environment
+open import Function using (flip)
 open import Generic.Syntax
 
 private
@@ -53,6 +54,16 @@ record Semantics (d : Desc I) (𝓥 𝓒 : I ─Scoped) : Set where
 
  body ρ []       i t = semantics ρ t
  body ρ (_ ∷ _)  i t = λ σ vs → semantics (vs >> th^Env th^𝓥 ρ σ) t
+
+ ◇-sem  : (Γ ─◇Env) 𝓥 Δ → (Γ ─Comp) 𝓒 Δ
+ ◇-body : (Γ ─◇Env) 𝓥 Δ → ∀ Θ σ →
+          Scope (Tm d s) Θ σ Γ → Kripke 𝓥 𝓒 Θ σ Δ
+
+ ◇-sem ρ (`var k) = var (DI.run th^𝓥 (slookup ρ k))
+ ◇-sem ρ (`con t) = alg (fmap d (◇-body ρ) t)
+
+ ◇-body ρ []        i t = ◇-sem ρ t
+ ◇-body ρ Δ@(_ ∷ _) i t = λ σ vs → ◇-sem (Δ ⊣ vs ,, ρ ◃ σ) t
 
  closed : TM d σ → 𝓒 σ []
  closed = semantics ε

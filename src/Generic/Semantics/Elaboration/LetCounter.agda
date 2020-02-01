@@ -15,9 +15,10 @@ open import Data.List.Relation.Unary.All as All using (All; _∷_)
 open import Data.List.Relation.Unary.All.Properties renaming (++⁻ʳ to drop)
 open import Function
 
+open import Relation.Unary
 open import Data.Var
 open import Data.Var.Varlike
-open import Data.Environment using (Kripke; th^Var; ε; _∙_; extend)
+open import Data.Environment using (Kripke; th^Var; ε; _∙_; identity; extend; extract)
 open import Generic.Syntax.LetCounter
 open import Generic.Syntax.LetBinder
 open import Generic.Semantics
@@ -51,9 +52,9 @@ Semantics.alg    Annotate = λ where
   (true , t)    → let (t' , c)   = mapA d reify^Count t in `con (true , t') , c
   (false , et)  → let (et' , c)  = clet et in `con (false , et') , c
 
-annotate : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ CLet) ∞ σ Γ
+annotate : ∀[ Tm (d `+ Let) ∞ σ ⇒ Tm (d `+ CLet) ∞ σ ]
 
-annotate = proj₁ ∘ Semantics.semantics Annotate (base vl^Var)
+annotate t = let (t' , _) = Semantics.semantics Annotate identity t in t'
 
 
 Inline : Semantics (d `+ CLet) (Tm (d `+ Let) ∞) (Tm (d `+ Let) ∞)
@@ -62,10 +63,10 @@ Semantics.var   Inline = id
 Semantics.alg   Inline = λ where
   (true , t)                       → `con (true , fmap d (reify vl^Tm) t)
   (false , many , στ , e , b , eq) → `con (false , στ , e , b extend (ε ∙ `var z) , eq)
-  (false , _ , στ , e , b , refl)  → b (base vl^Var) (ε ∙ e)
+  (false , _ , στ , e , b , refl)  → extract b (ε ∙ e) -- cf Semantics.alg UnLet
 
 inline : Tm (d `+ CLet) ∞ σ Γ → Tm (d `+ Let) ∞ σ Γ
-inline = Semantics.semantics Inline (base vl^Tm)
+inline = Semantics.semantics Inline id^Tm 
 
 inline-affine : Tm (d `+ Let) ∞ σ Γ → Tm (d `+ Let) ∞ σ Γ
 inline-affine = inline ∘′ annotate

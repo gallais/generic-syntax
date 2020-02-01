@@ -1,6 +1,7 @@
 module Stdlib where
 
 open import Data.Product
+open import Data.List.Base
 
 private
 
@@ -21,3 +22,21 @@ _⇒_ : (P Q : A → Set) → (A → Set)
 
 _⊢_ : (A → B) → (B → Set) → (A → Set)
 (f ⊢ P) x = P (f x)
+
+
+
+
+data ⊥ : Set where
+
+
+
+
+data Dec (P : Set) : Set where
+  yes  : P        → Dec P
+  no   : (P → ⊥)  → Dec P
+
+
+
+data All (P : A → Set) : List A → Set where
+  []   : All P []
+  _∷_  : ∀ {a as} → P a → All P as → All P (a ∷ as)

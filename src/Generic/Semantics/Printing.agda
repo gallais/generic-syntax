@@ -15,7 +15,7 @@ open import Relation.Unary
 -- We reuse Name, Printer, M, fresh, and names from the STLC printing example
 
 open import StateOfTheArt.ACMM using (module Printer)
-open Printer using (M; Wrap; Name; Printer; MkW; getW; map^Wrap; th^Wrap; fresh; names)
+open Printer using (Fresh; Wrap; Name; Printer; MkW; getW; map^Wrap; th^Wrap; fresh; names)
 
 private
   variable
@@ -36,8 +36,8 @@ open import Generic.Syntax hiding (sequenceA)
 open import Generic.Semantics
 
 
-vl^MName : VarLike {I} (λ σ → M ∘ (Name σ))
-vl^MName = record
+vl^FreshName : VarLike (λ (σ : I) → Fresh ∘ (Name σ))
+vl^FreshName = record
   { th^𝓥  = th^Functor functor^M th^Wrap
   ; new   = fresh _
   }
@@ -54,12 +54,12 @@ Pieces : List I → I ─Scoped
 Pieces []  i Γ = String
 Pieces Δ   i Γ = (Δ ─Env) Name (Δ ++ Γ) × String
 
-reify^M : ∀ Δ i → Kripke Name Printer Δ i Γ → M (Pieces Δ i Γ)
+reify^Pieces : ∀ Δ i → Kripke Name Printer Δ i Γ → Fresh (Pieces Δ i Γ)
 
-reify^M []         i p  = getW p
+reify^Pieces []         i p  = getW p
 
-reify^M Δ@(_ ∷ _)  i f  = do
-  ρ ← sequenceA (freshˡ vl^MName _)
+reify^Pieces Δ@(_ ∷ _)  i f  = do
+  ρ ← sequenceA (freshˡ vl^FreshName _)
   b ← getW (f (freshʳ vl^Var Δ) ρ)
   return (ρ , b)
 
@@ -85,7 +85,7 @@ module _ {d : Desc I} where
   Printing : Display d → Semantics d Name Printer
   Printing dis .th^𝓥  = th^Wrap
   Printing dis .var   = map^Wrap return
-  Printing dis .alg   = λ v → MkW $ dis <$> mapA d reify^M v
+  Printing dis .alg   = λ v → MkW $ dis <$> mapA d reify^Pieces v
 
     where open Generic.Syntax
           open ST
@@ -101,8 +101,8 @@ module _ {d : Desc I} where
   print : Display d → Tm d i σ Γ → String
 
   print dis t = proj₁ (printer names) where
-    printer : M String
+    printer : Fresh String
     printer = do
-      init ← sequenceA (base vl^MName)
+      init ← sequenceA (base vl^FreshName)
       getW (Semantics.semantics (Printing dis) init t)
 

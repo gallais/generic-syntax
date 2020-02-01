@@ -21,24 +21,33 @@ private
     d : Desc I
     i : Size
 
-Constraint : Desc I → Set
-Constraint (`σ A d)   = ((a b : A) → Dec (a ≡ b))
-                      × (∀ a → Constraint (d a))
-Constraint (`X _ _ d) = Constraint d
-Constraint (`∎ _)     = ⊤
+
+
+Constraints : Desc I → Set
+Constraints (`σ A d)    = ((a b : A) → Dec (a ≡ b)) × (∀ a → Constraints (d a))
+Constraints (`X _ _ d)  = Constraints d
+Constraints (`∎ _)      = ⊤
+
+
 
 eq^Var : (v w : Var σ Γ) → Dec (v ≡ w)
-eq^Var z     z     = yes refl
-eq^Var z     (s w) = no (λ ())
-eq^Var (s v) z     = no (λ ())
-eq^Var (s v) (s w) with eq^Var v w
+
+eq^Var z      (s w)  = no (λ ())
+eq^Var (s v)  z      = no (λ ())
+
+eq^Var z      z      = yes refl
+
+eq^Var (s v)  (s w)  with eq^Var v w
 ... | yes p = yes (cong s p)
 ... | no ¬p = no λ where refl → ¬p refl
 
-module _ (eq^d : Constraint d) where
+
+module _ (eq^d : Constraints d) where
+
 
   eq^Tm : (t u : Tm d i σ Γ) → Dec (t ≡ u)
-  eq^⟦⟧ : ∀ e → Constraint e → (b c : ⟦ e ⟧ (Scope (Tm d i)) σ Γ) → Dec (b ≡ c)
+  eq^⟦⟧ : ∀ e → Constraints e → (b c : ⟦ e ⟧ (Scope (Tm d i)) σ Γ) → Dec (b ≡ c)
+
 
 
   eq^Tm (`var v) (`con c) = no (λ ())

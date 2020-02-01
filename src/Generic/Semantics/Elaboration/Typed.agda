@@ -9,7 +9,7 @@ open import Data.Bool
 open import Data.Product as Prod
 open import Data.List hiding ([_] ; lookup)
 open import Data.List.Relation.Unary.All as All hiding (lookup)
-open import Data.Maybe as Maybe
+open import Data.Maybe as Maybe using (Maybe; nothing; just)
 open import Category.Monad
 import Data.Maybe.Categorical as MC
 open RawMonad (MC.monad {Level.zero})
@@ -36,12 +36,12 @@ private
     m : Mode
     ms ns : List Mode
 
-fromTyping : Typing ms → List Type
-fromTyping []       = []
-fromTyping (σ ∷ Γ)  = σ ∷ fromTyping Γ
+⌞_⌟ : Typing ms → List Type
+⌞ []     ⌟ = []
+⌞ σ ∷ Γ  ⌟ = σ ∷ ⌞ Γ ⌟
 
 Elab : Type ─Scoped → Type → (ms : List Mode) → Typing ms → Set
-Elab T σ _ Γ = T σ (fromTyping Γ)
+Elab T σ _ Γ = T σ ⌞ Γ ⌟
 
 Elab- : Mode ─Scoped
 Elab- Check  ms = ∀ Γ → (σ : Type) → Maybe (Elab (Tm STLC ∞) σ ms Γ)
@@ -64,12 +64,12 @@ fromVar (s v) = there (fromVar v)
 coth^Typing : Typing ns → Thinning ms ns → Typing ms
 coth^Typing Δ ρ = All.tabulate (λ x∈Γ → All.lookup Δ (fromVar (lookup ρ (toVar x∈Γ))))
 
-lookup-fromVar : ∀ Δ (v : Var m ms) → Var (All.lookup Δ (fromVar v)) (fromTyping Δ)
+lookup-fromVar : ∀ Δ (v : Var m ms) → Var (All.lookup Δ (fromVar v)) ⌞ Δ ⌟
 lookup-fromVar (_ ∷ _) z     = z
 lookup-fromVar (_ ∷ _) (s v) = s (lookup-fromVar _ v)
 
 erase^coth : ∀ ms Δ (ρ : Thinning ms ns) →
-             Var σ (fromTyping (coth^Typing Δ ρ)) → Var σ (fromTyping Δ)
+             Var σ ⌞ coth^Typing Δ ρ ⌟ → Var σ ⌞ Δ ⌟
 erase^coth []       Δ ρ ()
 erase^coth (m ∷ ms) Δ ρ z     = lookup-fromVar Δ (lookup ρ z)
 erase^coth (m ∷ ms) Δ ρ (s v) = erase^coth ms Δ (select extend ρ) v
@@ -125,10 +125,12 @@ Elaborate : Semantics Bidi Var- Elab-
 Elaborate .th^𝓥  = th^Var-
 Elaborate .var   = λ where (`var infer) Γ → just (map₂ `var (infer Γ))
 Elaborate .alg   = λ where
-  (PATTERNS.`app' f t)  → app f t
-  (PATTERNS.`lam' b)    → lam b
-  (PATTERNS.`emb' t)    → emb t
-  (PATTERNS.`cut' σ t)  → cut σ t
+  (`app' f t)  → app f t
+  (`lam' b)    → lam b
+  (`emb' t)    → emb t
+  (`cut' σ t)  → cut σ t
+
+    where open PATTERNS
 
 Type- : Mode → Set
 Type- Check  = ∀ σ → Maybe (TM STLC σ)

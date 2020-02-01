@@ -5,7 +5,7 @@ module Generic.Semantics.Elaboration.State where
 open import Data.Product
 open import Data.List.Base as L hiding (lookup)
 open import Relation.Binary.PropositionalEquality
-open import Function
+open import Function.Base
 
 open import Data.Var as V
 open import Data.Var.Varlike
