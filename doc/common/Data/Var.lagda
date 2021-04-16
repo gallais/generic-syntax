@@ -12,7 +12,7 @@ module Data.Var where
 
 open import Data.Sum hiding (map)
 open import Data.List.Base hiding ([_]; _─_)
-open import Data.List.All using (All ; _∷_)
+open import Data.List.Relation.Unary.All using (All ; _∷_)
 open import Relation.Unary
 open import Function.Base
 open import Agda.Builtin.Equality
