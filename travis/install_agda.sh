@@ -1,5 +1,5 @@
 #!/bin/sh
-AGDA_VERSION=2.6.0
+AGDA_VERSION=2.6.1.3
 
 if ! type "agda" > /dev/null || [ ! `agda -V | sed "s/[^2]*//"` = "$AGDA_VERSION" ]; then
   cabal update
@@ -10,8 +10,8 @@ fi
 mkdir -p $HOME/.agda
 cp libraries $HOME/.agda/
 cd $HOME/.agda/
-wget https://github.com/agda/agda-stdlib/archive/v1.0.tar.gz
-tar -xvzf v1.0.tar.gz
+wget https://github.com/agda/agda-stdlib/archive/v1.5.tar.gz
+tar -xvzf v1.5.tar.gz
 cd -
 
 # mkdir -p $HOME/.agda

@@ -29,7 +29,7 @@ script:
   - cp travis/Makefile src/
   - cd src/
   - make
-  - agda --html Data/Environment.agda	
+  - agda --html Data/Environment.agda
   - agda --html Generic.agda
   - agda --html TableOfContent.agda
   - cd ../
