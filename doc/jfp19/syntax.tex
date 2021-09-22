@@ -1219,7 +1219,7 @@ and how to use the \semrec{} framework to elaborate them away.
 %% GENERIC SEMANTICS
 
 
-\section{Generic Scope Safe and Well Kinded Programs for Syntaxes}\label{section:semantics}
+\section{Generic scope-safe and well sorted programs for syntaxes}\label{section:semantics}
 
 Based on the \semrec{} type we defined for the specific example of the
 simply typed λ-calculus in Section~\ref{section:primer-program},
@@ -1241,10 +1241,10 @@ have to abide by three constraints:
       by the \AF{Kripke} type-valued function defined below) into computations
 \end{itemize}
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Semantics.tex]{semantics}
-\caption{A Generic Notion of Semantics\label{defn:Semantics}}
-\end{figure}
+%\caption{A Generic Notion of Semantics\label{defn:Semantics}}
+\end{center}
 
 Here we crucially use the fact that the meaning of a description is
 defined in terms of a function interpreting substructures which has
@@ -1254,7 +1254,7 @@ We define a function \AF{Kripke} by case analysis on the number of newly bound
 variables. It is essentially a subcomputation waiting for a value associated to
 each one of the fresh variables.
 \begin{itemize}
-\item If it's $0$ we expect the substructure to be a computation corresponding
+\item If it is $0$ we expect the substructure to be a computation corresponding
     to the result of the evaluation function's recursive call;
   \item But if there are newly bound variables then we expect to have a function
     space. In any context extension, it will take an environment of values for
@@ -1262,10 +1262,10 @@ each one of the fresh variables.
     evaluation of the body of the binder.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Data/Environment.tex]{kripke}
-\caption{Substructures as either Computations or Kripke Function Spaces\label{defn:Kripke}}
-\end{figure}
+%\caption{Substructures as either Computations or Kripke Function Spaces\label{defn:Kripke}}
+\end{center}
 
 It is once more the case that the abstract notion of Semantics comes
 with a fundamental lemma: all \AB{I} \AF{─Scoped} families \AB{𝓥} and
@@ -1281,7 +1281,7 @@ values to variables, it associates computations to terms.
 %\caption{\AF{\_─Comp}: Associating Computations to Terms}
 %\end{figure}
 
-\subsection{Fundamental Lemma of Semantics}
+\subsection{Fundamental lemma of semantics}\label{sec:fundamentallemma}
 
 We can now define the type of the fundamental lemma (called \semfun{}) which
 takes a semantics and returns a function from environments to computations.
@@ -1291,12 +1291,12 @@ each de Bruijn \AF{Scope} (i.e. a substructure in a potentially extended
 context) it associates a \AF{Kripke} (i.e. a subcomputation expecting a
 value for each newly bound variable).
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Semantics.tex]{semtype}
-\caption{Statement of the Fundamental Lemma of \semrec{}\label{defn:semantics}}
-\end{figure}
+%\caption{Statement of the Fundamental Lemma of \semrec{}\label{defn:semantics}}
+\end{center}
 
-The proof of \semfun{} is straightforward now that we have clearly
+The \semfun{} proof is straightforward now that we have clearly
 identified the problem structure and the constraints we need to enforce.
 If the term considered is a variable, we lookup the associated value in
 the evaluation environment and turn it into a computation using \ARF{var}.
@@ -1304,10 +1304,10 @@ If it is a non variable constructor then we call \AF{fmap} to evaluate the
 substructures using \AF{body} and then call the \ARF{alg}ebra to combine
 these results.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Semantics.tex]{semproof}
-\caption{Proof of the Fundamental Lemma of \semrec{} -- \semfun{}}
-\end{figure}
+%\caption{Proof of the Fundamental Lemma of \semrec{} -- \semfun{}}
+\end{center}
 
 The auxiliary lemma \AF{body} distinguishes two cases. If no new
 variable has been bound in the recursive substructure, it is
@@ -1318,10 +1318,10 @@ substructure in the thinned and extended evaluation environment
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}}
 produces an environment {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Semantics.tex]{bodyproof}
-\caption{Proof of the Fundamental Lemma of \semrec{} -- \AF{body}}\label{def:body}
-\end{figure}
+%\caption{Proof of the Fundamental Lemma of \semrec{} -- \AF{body}}\label{def:body}
+\end{center}
 
 Given that \AF{fmap} introduces one level of indirection between the
 recursive calls and the subterms they are acting upon, the fact
@@ -1330,18 +1330,18 @@ getting the termination checker to see that our proof is indeed
 well founded.
 
 We immediately introduce \AF{closed}, a corollary of the fundamental lemma of
-semantics for the special cases of closed terms in Figure~\ref{fig:evalclosed}.
+semantics for the special cases of closed terms.
+\begin{center}
+\ExecuteMetaData[Generic/Semantics.tex]{closed}
+%\caption{Corollary: evaluation of closed terms}\label{fig:evalclosed}
+\end{center}
 Given a \AR{Semantics} with value type \AB{𝓥} and computation type \AB{𝓒},
 we can evaluate a closed term of type \AB{σ} and obtain a computation of
 type {(\AB{𝓒} \AB{σ} \AIC{[]})} by kickstarting the evaluation with an
 empty environment.
 
-\begin{figure}[h]
-\ExecuteMetaData[Generic/Semantics.tex]{closed}
-\caption{Corollary: evaluation of closed terms}\label{fig:evalclosed}
-\end{figure}
 
-\subsection{Our First Generic Programs: Renaming and Substitution}%
+\subsection{Our first generic programs: renaming and substitution}%
 \label{section:renandsub}
 
 Similarly to ACMM~\citeyear{allais2017type} renaming can be defined generically
@@ -1362,7 +1362,7 @@ values, the first one corresponds to renaming and the second
 one is trivial. The algebra is once more defined by using \AF{fmap}
 and reifying the bodies of binders.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{renaming}
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{ren}
@@ -1371,8 +1371,8 @@ and reifying the bodies of binders.
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{substitution}
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{sub}
 \end{minipage}
-\caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding\label{defn:Ren-Sub}}
-\end{figure}
+%\caption{Generic Renaming and Substitution for All Scope Safe Syntaxes with Binding\label{defn:Ren-Sub}}
+\end{center}
 
 The reification process mentioned in the definition of renaming and
 substitution can be implemented generically for \semrec{} families
@@ -1382,10 +1382,10 @@ almost immediate that both \AD{Var} and \AD{Tm} are \AR{VarLike} (with
 proofs \AF{vl\textasciicircum{}Var} and \AF{vl\textasciicircum{}Tm},
 respectively).
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Data/Var/Varlike.tex]{varlike}
-\caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values\label{fig:VarLike}}
-\end{figure}
+%\caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values\label{fig:VarLike}}
+\end{center}
 
 \label{sec:varlike:base}
 \reva{Given a proof that \AB{𝓥} is \AR{VarLike}, we can manufacture
@@ -1403,13 +1403,12 @@ respectively).
   given by {\ARF{lookup} \AF{id\textasciicircum{}Tm} = \AIC{`var}},  
   which associates each variable to itself (seen as a term). 
 } 
-Using these definitions, we can then implement \AF{reify} as in
-Figure~\ref{fig:genericreify}.
+Using these definitions, we can then implement \AF{reify} as follows:
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Data/Var/Varlike.tex]{reify}
-\caption{Generic Reification thanks to \AR{VarLike} Values}\label{fig:genericreify}
-\end{figure}
+%\caption{Generic Reification thanks to \AR{VarLike} Values}\label{fig:genericreify}
+\end{center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1765,7 +1764,7 @@ then \AB{ρᴬ}, the thinned \AB{ρᴮ} and the thinned \AB{ρᴬᴮ} should sti
 \addtolength{\leftskip}{\parindent}
 \ExecuteMetaData[Generic/Fusion.tex]{thV}
 \end{agdasnippet}
-Remembering that \AF{\_>>\_} is used in the definition of \AF{body} (Figure~\ref{def:body}) to
+Remembering that \AF{\_>>\_} is used in the definition of \AF{body} (Section~\ref{sec:fundamentallemma}) to
 combine two disjoint environments {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and
 {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}} into one of type
 {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}, we mechanically need a

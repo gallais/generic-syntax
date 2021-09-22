@@ -56,7 +56,7 @@ the type we expect.
 \end{agdasnippet}
 
 Otherwise we proceed in a manner reminiscent of the pure reification function
-defined in Figure~\ref{fig:genericreify}. We start by generating an environment
+defined at the end of Section~\ref{section:renandsub}. We start by generating an environment
 of names for the newly-bound variables by using the fact that \AF{Fresh} composed
 with \AF{Name} is \AR{VarLike} together with the fact that environments are
 Traversable~\cite{mcbride_paterson_2008}, %%%
@@ -111,7 +111,7 @@ together.
 
 As always, these functions are readily executable and we can check
 their behaviour by writing tests. First, we print the identity function
-defined in Figure~\ref{fig:identity}
+defined in Section~\ref{section:universe}
 in an empty context and verify that we do obtain the string \AStr{"λa. a"}.
 Next, we print an open term in a context of size two and can immediately
 observe that names are generated for the free variables first, and then the
