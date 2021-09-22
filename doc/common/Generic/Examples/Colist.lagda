@@ -47,14 +47,24 @@ pattern ↶_ k      = `var k
 \end{code}
 %</zeroones>
 
+\begin{code}
+mutual
+\end{code}
+
 %<*zeroones2>
 \begin{code}
-01⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
-10⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
-01⋯ .force = false , 0 , 10⋯ , refl
-10⋯ .force = false , 1 , 01⋯ , refl
+ 01⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
+ 01⋯ .force = false , 0 , 10⋯ , refl
 \end{code}
 %</zeroones2>
+
+%<*zeroones3>
+\begin{code}
+ 10⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
+ 10⋯ .force = false , 1 , 01⋯ , refl
+\end{code}
+%</zeroones3>
+
 
 \begin{code}
 `1∷2∷3 : TM (CListD ℕ) tt

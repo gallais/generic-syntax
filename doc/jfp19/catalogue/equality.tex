@@ -1,4 +1,4 @@
-\subsection{Generic Decidable Equality for Terms}
+\subsection{Generic decidable equality for terms}
 
 Haskell programmers are used to receiving help from the `deriving'
 mechanism~\cite{DBLP:journals/entcs/HinzeJ00,DBLP:conf/haskell/MagalhaesDJL10}
@@ -23,20 +23,20 @@ with two constructors: a \AF{Set} \AB{P} is decidable if we can either say
 the negation of \AB{P} (here, a proof that \AB{P} implies the empty type
 \AD{⊥}).
 
-\begin{figure}[h]
+\begin{minipage}{\textwidth}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Stdlib.tex]{bottom}
 \end{minipage}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Stdlib.tex]{dec}
 \end{minipage}
-\caption{Empty Type and Decidability as an Inductive Family}
-\end{figure}
+%\caption{Empty Type and Decidability as an Inductive Family}
+\end{minipage}
 
 To get acquainted with these new notions we can start by proving that equality
 of variables is decidable.
 
-\subsubsection{Deciding Variable Equality}
+\subsubsection{Deciding variable equality}
 
 The type of the decision procedure for equality of variables is as follows:
 given any two variables (of the same type, in the same context), the set of
@@ -74,20 +74,20 @@ contradiction by injectivity of the constructor \AIC{s}.
 \ExecuteMetaData[Generic/Equality.tex]{eqVarYesS}
 \end{agdasnippet}
 
-\subsubsection{Deciding Term Equality}
+\subsubsection{Deciding term equality}
 
 The constructor \AIC{`σ} for descriptions gives us the ability to store
 values of any \AF{Set} in terms. For some of these \AF{Set}s (e.g.
 {(\AD{ℕ} → \AD{ℕ})}), equality is not decidable. As a consequence
 our decision procedure will be conditioned to the satisfaction of a
 certain set of \AF{Constraints} which we can compute from the \AD{Desc}
-itself, as show in Figure~\ref{fig:eqconstraints}. We demand that we are
+itself. We demand that we are
 able to decide equality for all of the \AF{Set}s mentioned in a description.
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{constraints}
-\caption{Constraints Necessary for Decidable Equality}\label{fig:eqconstraints}
-\end{figure}
+%\caption{Constraints Necessary for Decidable Equality}\label{fig:eqconstraints}
+\end{agdasnippet}
 
 Remembering that our descriptions are given a semantics as a big right-nested
 product terminated by an equality constraint, we realise that proving decidable
@@ -107,10 +107,10 @@ and using either \AF{eq\textasciicircum{}Var} or \AF{eq\textasciicircum{}⟦⟧}
 otherwise. The latter is defined by induction over \AB{e}. The somewhat
 verbose definitions are not enlightening so we leave them out here.
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{eqTmType}
-\caption{Type of Decidable Equality for Terms and Bodies}\label{fig:eqtype}
-\end{figure}
+%\caption{Type of Decidable Equality for Terms and Bodies}\label{fig:eqtype}
+\end{agdasnippet}
 
 We now have an informative decision procedure for equality between terms
 provided that the syntax they belong to satisfies a set of constraints.
