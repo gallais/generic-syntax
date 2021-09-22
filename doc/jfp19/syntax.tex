@@ -1170,7 +1170,7 @@ the change of direction from \AIC{Check} to \AIC{Infer}.
 \end{center}
 
 
-\paragraph{Common Combinators and Their Properties.}\label{desccomb}
+\paragraph{A sum combinator for syntaxes.}\label{desccomb}
 
 The definition of \AF{UTLC} is the third time (the first and second
 times being the definition of \AF{listD} and \AF{vecD} in
@@ -1180,10 +1180,10 @@ with an appropriate eliminator \AF{case} which, given two methods,
 picks the one corresponding to the chosen branch.
 
 \begin{center}
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}[t]{0.35\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{descsum}
 \end{minipage}\hfill
-\begin{minipage}{0.55\textwidth}
+\begin{minipage}[t]{0.55\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
 %\caption{Descriptions are closed under Sum}\label{figure:descsum}
@@ -1210,7 +1210,7 @@ picks the one corresponding to the chosen branch.
 % \end{figure}
 
 A concrete use case for this combinator will be given in
-section~\ref{section:letbinding}
+Section~\ref{section:letbinding}
 where we explain how to seamlessly enrich an existing syntax with let-bindings
 and how to use the \semrec{} framework to elaborate them away.
 
