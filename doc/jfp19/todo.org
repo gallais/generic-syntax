@@ -1,0 +1,10 @@
+* TODO Full stops after paragraph titles
+* DONE Scope- type-
+* DONE Figures
+* DONE Ornaments
+* TODO Richard Eisenberg: Stitch reference
+* DONE grep ly- *.tex catalogue/*.tex
+* DONE grep kind
+* TODO Acknowledgements
+* TODO Affiliations / emails
+* TODO General bibliography cleaning
