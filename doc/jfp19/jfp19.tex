@@ -22,7 +22,7 @@
 \renewcommand{\cite}[1]{(\oldcite{#1})}
 
 \newenvironment{agdasnippet}[1][0]
- {\small\ifx{#1}\undefined
+ {\ifx{#1}\undefined
    \centering
   \else
   \fi
@@ -36,26 +36,26 @@
 \usepackage[xcolor]{changebar}
 
 %% colored changebar for different reviewers
-\newcommand{\reva}[1]{%
-  \cbcolor{blue}
-  \begin{changebar}
-    #1
-  \end{changebar}%
-  }%
+\newcommand{\reva}[1]{#1}%
+  % \cbcolor{blue}
+  % \begin{changebar}
+  %   #1
+  % \end{changebar}%
+  % }%
 
-\newcommand{\revb}[1]{%
-  \cbcolor{red}
-  \begin{changebar}
-    #1
-  \end{changebar}%
-  }%
+\newcommand{\revb}[1]{#1}%
+  % \cbcolor{red}
+  % \begin{changebar}
+  %   #1
+  % \end{changebar}%
+  % }%
 
-\newcommand{\revc}[1]{%
-	\cbcolor{green}
-	\begin{changebar}
-		#1
-	\end{changebar}%
-}%
+\newcommand{\revc}[1]{#1}%
+% 	\cbcolor{green}
+% 	\begin{changebar}
+% 		#1
+% 	\end{changebar}%
+% }%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -63,8 +63,8 @@
 \setlength\mathindent{0em}
 
 \title
-  [A Type and Scope Safe Universe of Syntaxes with Binding]
-  {A Type and Scope Safe Universe of Syntaxes with Binding: Their Semantics and Proofs}
+  [A type- and scope-safe universe of syntaxes with binding]
+  {A type- and scope-safe universe of syntaxes with binding: their semantics and proofs}
 
 \author[G. Allais et al.]
   {GUILLAUME ALLAIS, ROBERT ATKEY\\

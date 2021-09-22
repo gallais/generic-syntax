@@ -6,8 +6,7 @@ is an instance of ACMM's notion of \semrec{}. We will now show that this
 observation can be generalised to arbitrary syntaxes with binding. Unlike
 renaming or substitution, this generic program will require user guidance:
 there is no way for us to guess how an encoded term should be printed. We
-can however take care of the name generation (using the monad \AF{Fresh}
-introduced in Figure~\ref{fig:fresh}), deal with variable binding,
+can however take care of the name generation (using the \AF{Fresh} monad from Page~\pageref{section:printing}), deal with variable binding,
 and implement the traversal generically. We want our printer to have type:
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Printing.tex]{printtype}
@@ -33,7 +32,7 @@ That is to say:
 The key observation that will help us define a generic printer is that
 \AF{Fresh} composed with \AR{Name} is \AR{VarLike}. Indeed, as the composition
 of a functor and a trivially thinnable \AR{Wrap}per, \AF{Fresh} is \AF{Thinnable},
-and \AF{fresh} (defined in Figure~\ref{fig:fresh}) is the proof that we
+and \AF{fresh} (defined on Page~\pageref{section:printing}) is the proof that we
 can generate placeholder values thanks to the name supply.
 
 \begin{agdasnippet}

@@ -139,7 +139,7 @@ related work in Section~\ref{section:related-work}.
 %% SCOPE SAFE TERMS
 
 
-\section{A Primer on Scope And Sort Safe Terms}\label{section:primer-term}
+\section{A primer on scope- and sort-safe terms}\label{section:primer-term}
 
 \paragraph{From Inductive Types to Inductive Families for Abstract
   Syntax} A reasonable way to represent the abstract syntax of the
@@ -172,7 +172,7 @@ either have dangling pointers or point to the wrong thing.
 
 To improve on this situation, previous authors have proposed to use
 the host language's type system to make the implicit context explicit,
-and to enforce well scopedness of variables. Scope safe terms follow
+and to enforce well-scopedness of variables. Scope-safe terms follow
 the discipline that every variable is either bound by some binder or
 is explicitly accounted for in a context. Bellegarde and
 Hook~\citeyear{BELLEGARDE1994287}, Bird and
@@ -197,7 +197,7 @@ $1 + (\_)$ extends the running scope with an extra variable.
 
 \revb{
 \paragraph{Implicit generalisation of variables in Agda} The careful
-reader may have noticed that we use a seemingly out-ot-scope variable
+reader may have noticed that we use a seemingly out-of-scope variable
 \AB{X} of type \AF{Set}. The latest version of Agda allows us to declare
 variables that the system should implicitly quantify over if it happens
 to find them used in types. This allows us to lighten the presentation
@@ -241,7 +241,7 @@ properties from the equational theories of renaming and
 substitution. We will revisit these properties, for our whole universe
 of syntax with binding, in Section~\ref{section:fusion}.
 
-\paragraph{A Typed Variant of Altenkirch and Reus' Calculus}
+\paragraph{A Typed Variant of Altenkirch and Reus' Calculus.}
 \label{section:mech-reus}
 
 There is no reason to restrict this technique to inductive families
@@ -253,7 +253,7 @@ monads~\citeyear{Altenkirch2010, JFR4389}.
 We pick as our index type $J$ the category whose objects are
 inhabitants of \AD{List} \AB{I} (\AB{I} is a parameter of the
 construction) and whose morphisms are thinnings (permutations that may
-forget elements, see Section~\ref{def:thinning}).  Values of type
+forget elements, we give the definition in Section~\ref{sec:genenvironment}).  Values of type
 \AD{List} \AB{I} are intended to represent the list of the sorts (or
 kinds, or types, depending on the application) of the de Bruijn
 variables in scope. We can recover an unsorted approach by picking $I$
@@ -261,13 +261,13 @@ to be the unit type.  Given this sorted setting, our functors take an
 extra $I$ argument corresponding to the sort of the expression being
 built. This is captured by the large type \AB{I}
 \AF{─Scoped}:% = $I$ $\to$ \AD{List} $I$ $\to$ \AF{Set}.
-%
-\begin{agdasnippet}
+
+\begin{minipage}{\textwidth}
 \ExecuteMetaData[Data/Var.tex]{scoped}
 %\caption{Type of Well \AB{I}-Kinded and Well Scoped Families}
-\end{agdasnippet}
+\end{minipage}
 %
-We use Agda's mixfix operator notation where underscores denote
+We use Agda's mixfix operator notation, where underscores denote
 argument positions.
 
 To lighten the presentation, we exploit the observation that the
@@ -309,29 +309,30 @@ than \AB{lamₑ} as the inference rule for λ-abstraction in STLC.
 }
 
 This observation that an ambient context is either passed around as is
-or extended for subterms is critical to our whole approach to syntax with binding,
-and will arise again in our generic formulation of syntax traversals
-in Section~\ref{section:semantics}.
+or extended for subterms is critical to our whole approach to syntax
+with binding, and will arise again in our generic formulation of
+syntax traversals in Section~\ref{section:semantics}. To facilitate
+this, we make use of the following combinators for building indexed
+sets:
 % All the definitions are polymorphic in the index type
 % (called \AB{A} in Figure~\ref{figure:indexed}).
-
-\begin{figure}[h]
+\begin{mathpar}
 \begin{minipage}{0.4\textwidth}
  \ExecuteMetaData[Stdlib.tex]{arrow}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
  \ExecuteMetaData[Stdlib.tex]{adjust}
 \end{minipage}
-\newline
+% \newline
+
 \begin{minipage}{0.4\textwidth}
  \ExecuteMetaData[Stdlib.tex]{constant}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
  \ExecuteMetaData[Stdlib.tex]{forall}
 \end{minipage}
-\caption{Combinators to build indexed Sets}\label{figure:indexed}
-\end{figure}
-
+%\caption{Combinators to build indexed Sets}\label{figure:indexed}
+\end{mathpar}
 We lift the function space pointwise with \AF{\_⇒\_}, silently
 threading the underlying scope. The \AF{\_⊢\_} makes explicit the
 \emph{adjustment} made to the index by a function, a generalisation
@@ -351,14 +352,16 @@ lead to more readable type declarations.  For instance, the compact expression
 desugars to the more verbose type
 \AS{∀} \{\AB{i}\} \AS{→} (\AB{P} \AS{→} \AB{Q} (\AIC{s} \AB{i})) \AS{→} \AB{R} \AB{i}.
 
-As the context argument comes second in the definition of \AF{\_─Scoped}, we
-can readily use these combinators to thread, modify, or quantify over the
-scope when defining such families, as for example in Figure~\ref{fig:Var}. 
+As the context argument comes second in the definition of
+\AF{\_─Scoped}, we can readily use these combinators to thread,
+modify, or quantify over the scope when defining such families, as for
+example in this datatype for scope and kind aware de Bruijn indices:
+%Figure~\ref{fig:Var}. 
 
-\begin{figure}[h]
+\begin{minipage}{\textwidth}
   \ExecuteMetaData[Data/Var.tex]{var}
-  \caption{Scope and Kind Aware de Bruijn Indices\label{fig:Var}}
-\end{figure}
+  %\caption{Scope and Kind Aware de Bruijn Indices\label{fig:Var}}
+\end{minipage}
 
 The inductive family \AD{Var} represents well scoped and well sorted
 de Bruijn indices. Its \AIC{z} (for zero) constructor refers to the
@@ -376,18 +379,18 @@ respectively normalise to:
             \AS{→} \AD{Var} \AB{σ} (\AB{τ} \AIC{::} \AB{Γ})}
 \end{center}
 We will reuse the \AD{Var} family to represent variables in all the
-syntaxes defined in this paper.
-
-\begin{figure}[h]
-  \begin{minipage}{0.4\textwidth}
+syntaxes defined in this paper. We start with the simply typed
+$\lambda$-calculus (STLC):
+\begin{center}
+  \begin{minipage}[t]{0.4\textwidth}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{type}
   \end{minipage}
-  \begin{minipage}{0.5\textwidth}
+  \begin{minipage}[t]{0.5\textwidth}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{tm}
   \end{minipage}
-\caption{Simple Types and Intrinsically Typed definition of STLC}
-\label{fig:intrinsic-stlc}
-\end{figure}
+% \caption{Simple Types and Intrinsically Typed definition of STLC}
+% \label{fig:intrinsic-stlc}
+\end{center}
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch and Reus'
 intrinsically typed representation of the simply typed λ-calculus,
@@ -395,11 +398,11 @@ where \AD{Type} is the Agda type of simple types.  We can readily
 write well scoped-and-typed terms such as e.g. application, a closed
 term of type {((\AB{σ} \AIC{`→} \AB{τ}) \AIC{`→} (\AB{σ} \AIC{`→}
   \AB{τ}))} (\AC{\{-} and \AC{-\}} delimit comments meant to help the
-reader see which binder the de Bruijn indices are referring too):
+reader see to which binders each de Bruijn index refers):
 
 %\begin{figure}[h]
 \begin{center}
-  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}\label{figure:apply}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}%\label{figure:apply}
 \end{center}
 %\caption{Example of a well scoped-and-typed term in \AD{Lam}}
 %\end{figure}
@@ -442,7 +445,7 @@ highlights the common structure between \AF{ren} and \AF{sub} which we will expl
 later in this section, particularly in Section~\ref{section:lamsem}
 where we define an abstract notion of semantics and the corresponding generic traversal.
 
-\subsection{A Generic Notion of Environments}\label{sec:genenvironment}
+\subsection{A generic notion of environments}\label{sec:genenvironment}
 
 Both renaming and substitution are defined in terms of \emph{environments}.
 We typically call \AB{Γ}-environment an environment that associates values
@@ -453,35 +456,43 @@ and typed in \AB{Δ} to every entry in \AB{Γ}. Formally, we have the following
 record structure (using a record helps Agda's type inference reconstruct the
 type family \AB{𝓥} of values for us):
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Data/Environment.tex]{env}
-\caption{Well Typed and Scoped Environments of Values}\label{fig:environment}
-\end{figure}
+%\caption{Well Typed and Scoped Environments of Values}\label{fig:environment}
+\end{center}
 
 \revc{
 %%% 2019-11-12
-\paragraph{Record syntax in Agda}
-As with (all) other record structures defined in this paper, we are able
-to profit from Agda's \emph{copattern} syntax, as introduced in
+\paragraph{Environments as records in Agda.}
+As with (all) other record structures defined in this paper, we are
+able to profit from Agda's \emph{copattern} syntax, as introduced in
 \cite{abel2013copatterns} and showcased in \cite{thibodeau2016case}.
 That is, when defining an environment \AB{\(\rho\)}, we may either use
 the constructor \AIC{pack}, packaging a function \AB{r} as an
 environment {\AB{\(\rho\)}~=~\AIC{pack}~\AB{r}}, or else define
 \AB{\(\rho\)} in terms of the underlying function obtained from it by
 projecting out the (in this case, unique) \ARF{lookup} field, as
-{\ARF{lookup}~\AB{\(\rho\)}~=~\AB{r}}. Examples of definition in this
-style are given in Figure~\ref{fig:baseenv} below, and throughout the
-rest of the paper. A value of a record type with more than one field
-requires each of its fields to be given, either by a named constructor
-(or else Agda's default \AK{record} syntax), or in copattern
-style. By analogy with record/object syntax in other languages, Agda
-further supports `dot' notation, so that an equivalent definition here
-could be expressed as {\AB{\(\rho\)}~.\ARF{lookup}~=~\AB{r}}.
+{\ARF{lookup}~\AB{\(\rho\)}~=~\AB{r}}. A value of a record type with
+more than one field requires each of its fields to be given, either by
+a named constructor (or else Agda's default \AK{record} syntax), or in
+copattern style. By analogy with record/object syntax in other
+languages, Agda further supports `dot' notation, so that an equivalent
+definition here could be expressed as
+{\AB{\(\rho\)}~.\ARF{lookup}~=~\AB{r}}.
 %%%
 }
 
-We can readily define some basic building blocks for environments in
-Figure~\ref{fig:baseenv}. The empty environment (\AF{ε}) is implemented
+We can readily define some basic building blocks for environments:
+\begin{center}
+\begin{minipage}[t]{0.3\textwidth}
+\ExecuteMetaData[Data/Environment.tex]{empty}
+\end{minipage}\begin{minipage}[t]{0.6\textwidth}
+\ExecuteMetaData[Data/Environment.tex]{extension}
+\end{minipage}
+\ExecuteMetaData[Data/Environment.tex]{envmap}
+%\caption{Combinators to Build Environments}\label{fig:baseenv}
+\end{center}
+The empty environment (\AF{ε}) is implemented
 by remarking that there can be no variable of type
 {(\AD{Var} \AB{σ} \AIC{[]})} and to correspondingly dismiss the case with
 the impossible pattern \AS{()}. The function \AF{\_∙\_} extends an existing
@@ -489,16 +500,6 @@ the impossible pattern \AS{()}. The function \AF{\_∙\_} extends an existing
 {(\AB{σ} \AIC{∷} \AB{Γ})}-environment. We also include the definition
 of \AF{\_<\$>\_}, which lifts in a pointwise manner a function acting
 on values into a function acting on environment of such values.
-
-\begin{figure}[h]
-\begin{minipage}[t]{0.3\textwidth}
-\ExecuteMetaData[Data/Environment.tex]{empty}
-\end{minipage}\begin{minipage}[t]{0.6\textwidth}
-\ExecuteMetaData[Data/Environment.tex]{extension}
-\end{minipage}
-\ExecuteMetaData[Data/Environment.tex]{envmap}
-\caption{Combinators to Build Environments}\label{fig:baseenv}
-\end{figure}
 
 As we have already observed, the definitions of renaming and substitution have very
 similar structure. Abstracting away this shared structure would allow for these
@@ -512,32 +513,32 @@ but also normalisation by evaluation, printing with names or CPS conversion
 as various instances of a more general traversal. As we will show in Section~\ref{section:typechecking},
 typechecking in the style of Atkey~\citeyear{atkey2015algebraic} also
 fits in that framework. To make sense of this body of work, we
-need to introduce three new notions: \AF{Thinning}, a generalisation of
-renaming; \AF{Thinnable}s, which are types that permit thinning; and the
-\AF{□} functor, which freely adds Thinnability to any indexed type.
+need to introduce three new notions below: \AF{Thinning}, a generalisation of
+renaming; the
+\AF{□} functor, which freely adds the ability to absorb \AF{Thinning}s to any indexed type; and \AF{Thinnable}s, which are \AF{□}-coalgebras, i.e., types that permit thinning.
 %%%
 We use \AF{□}, and our compact notation for the indexed function space
 between indexed types, to crisply encapsulate the additional quantification
 over environment extensions which is typical of Kripke semantics.
 %%%
-\begin{figure}[h]
-\ExecuteMetaData[Data/Environment.tex]{thinning}
-\caption{Thinnings: A Special Case of Environments}
-\label{def:thinning}
-\end{figure}
 
-\paragraph{The Special Case of Thinnings} \AF{Thinning}s subsume more
-structured notions such as the Category of
+\paragraph{The special case of thinnings.} 
+\begin{displaymath}
+  \begin{minipage}{0.5\linewidth}
+    \ExecuteMetaData[Data/Environment.tex]{thinning}
+  \end{minipage}
+% \caption{Thinnings: A Special Case of Environments}
+% \label{def:thinning}
+\end{displaymath}
+\AF{Thinning}s subsume more structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
-Embeddings~\cite{chapman2009type}, cf. Figure~\ref{fig:thincomb} for
-some examples of combinators. In particular, they do not prevent the
+Embeddings~\cite{chapman2009type}. In particular, they do not prevent the
 user from defining arbitrary permutations or from introducing contractions
 although we will not use such instances. However, such extra flexibility
 will not get in our way, and permits a representation as a function space
 which grants us monoid laws ``for free'' as per Jeffrey's
-observation~\citeyear{jeffrey2011assoc}.
-
-\begin{figure}[h]
+observation~\citeyear{jeffrey2011assoc}. We define the following identity, extend and (generalised) transitivity combinators for \AF{Thinning}s:
+\begin{center}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Data/Environment.tex]{identity}
 \end{minipage}
@@ -545,26 +546,13 @@ observation~\citeyear{jeffrey2011assoc}.
   \ExecuteMetaData[Data/Environment.tex]{extend}
 \end{minipage}
   \ExecuteMetaData[Data/Environment.tex]{select}
-\caption{Identity Thinning, context extension, and (generalised) transitivity}\label{fig:thincomb}
-\end{figure}
+%\caption{Identity Thinning, context extension, and (generalised) transitivity}\label{fig:thincomb}
+\end{center}
 
 
-The \AF{□} combinator turns any (\AD{List} \AB{I})-indexed Set into one that can
-absorb thinnings. This is accomplished by abstracting over all possible thinnings
-from the current scope, akin to an S4-style necessity modality. The axioms of S4
-modal logic incite us to observe that the functor \AF{□} is a comonad: \AF{extract}
-applies the identity \AF{Thinning} to its argument, and \AF{duplicate} is obtained
-by composing the two \AF{Thinning}s we are given. The expected laws hold trivially
-thanks to Jeffrey's trick mentioned above.
-
-The notion of \AF{Thinnable} is the property of being stable under thinnings;
-in other words \AF{Thinnable}s are the coalgebras of \AF{□}.
-It is a crucial property for values to have if one wants to be able to push
-them under binders. From the comonadic structure we get that
-the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
-\AF{Thinnable} one.
-
-\begin{figure}[h]
+Next, the \AF{□} combinator turns any (\AD{List} \AB{I})-indexed Set into one that can
+absorb thinnings.
+\begin{center}
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{box}
 \end{minipage}\hfill
@@ -582,19 +570,32 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 \ExecuteMetaData[Data/Environment.tex]{thBox}
 \end{minipage}
 
-\caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable. \label{fig:Thinnable}}
-\end{figure}
+%\caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable. \label{fig:Thinnable}}
+\end{center}
+This is accomplished by abstracting over all possible thinnings
+from the current scope, akin to an S4-style necessity modality. The axioms of S4
+modal logic incite us to observe that the functor \AF{□} is a comonad: \AF{extract}
+applies the identity \AF{Thinning} to its argument, and \AF{duplicate} is obtained
+by composing the two \AF{Thinning}s we are given. The expected laws hold trivially
+thanks to Jeffrey's trick mentioned above.
+
+The notion of \AF{Thinnable} is the property of being stable under thinnings;
+in other words \AF{Thinnable}s are the coalgebras of \AF{□}.
+It is a crucial property for values to have if one wants to be able to push
+them under binders. From the comonadic structure we get that
+the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
+\AF{Thinnable} one.
 
 \subsection{A Generic Notion of Semantics}
 
-As we show in our previous work (ACMM)~\citeyear{allais2017type},
+As we show in our previous work \cite{allais2017type}, which we will refer to mnemonically as ACMM, once
 equipped with these new notions we can define an abstract concept
 of semantics for our scope- and type- safe language. Provided that a set of
 constraints on two ({\AF{Type} \AF{─Scoped}}) families \AB{𝓥} and \AB{𝓒} is
 satisfied, we will obtain a traversal of the following type:
 
 \begin{agdasnippet}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semtype}
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semtype}  
 \end{agdasnippet}
 
 Broadly speaking, a semantics turns our deeply embedded abstract syntax
@@ -613,6 +614,8 @@ to understand that all of the indented Agda snippets are part of the record's
 definition. Some correspond to record fields (highlighted in \ARF{pink})
 while others are mere auxiliary definitions (highlighted in \AF{blue}) as
 permitted by Agda.}
+
+
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{rsemtype}\label{section:lamsem}
 \end{agdasnippet}
@@ -631,7 +634,7 @@ such as \AF{vl\textasciicircum{}Tm} for the proof that terms are
 \end{agdasnippet}
 This constraint allows us to define \AF{extend}, the generalisation of the two
 auxiliary definitions we used in Figure~\ref{figure:rensubACMM}, in terms of
-the building blocks introduced in Figure~\ref{fig:baseenv}.
+the building blocks introduced in Section~\ref{sec:genenvironment}.
 It takes a context extension from \AB{Δ} to \AB{Θ} in the
 form of a thinning, an existing evaluation environment mapping \AB{Γ} variables
 to \AB{Δ} values and a value living in the extended context \AB{Θ} and returns
@@ -690,52 +693,59 @@ definition to be specialised and brought into scope for any instance of
 We thus realise the promise made earlier, namely that any given
 {\semrec{} \AB{𝓥} \AB{𝓒}} induces
 a function which, given a value in \AB{𝓥} for each variable in scope,
-transforms a  \AD{Lam} term into a computation \AB{𝓒}.
+transforms a  \AD{Lam} term into a computation \AB{𝓒}. This function is the proof of the Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}:
+\begin{center}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{sem}
+\end{center}
 
-\begin{figure}[h]
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{sem}
-\caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}}\label{figure:fdmlamsem}
-\end{figure}
+% \begin{figure}[h]
+% \caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}}\label{figure:fdmlamsem}
+% \end{figure}
 
 \subsection{Instances of \AR{Semantics}}
 
-\revc{
 Recall that each \AR{Semantics} is parametrised by two families: \AB{𝓥}
 and \AB{𝓒}. During the evaluation of a term, variables are replaced by
 values of type \AB{𝓥} and the overall result is a computation of type \AB{𝓒}.
-Coming back to renaming and substitution, we see that they both fit in the
-\semrec{} framework. The family \AB{𝓥} of values is respectively the family
+Coming back to renaming and substitution:
+\begin{center}
+  \begin{minipage}{0.6\textwidth}
+    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semrenfun}
+    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsubfun}
+  \end{minipage}
+\end{center}
+we see that they both fit in the
+\semrec{} framework:
+\begin{center}
+  \begin{minipage}{0.5\linewidth}
+    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semren}
+  \end{minipage}%
+  \begin{minipage}{0.5\linewidth}
+    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsub}
+  \end{minipage}
+\end{center}
+The family \AB{𝓥} of values is respectively the family
 of variables for renaming, and the family of λ-terms for substitution.
 In both cases \AB{𝓒} is the family of λ-terms because the result of the
 operation will be a term.
-} We notice that the definition of substitution depends on
+We notice that the definition of substitution depends on
 the definition of renaming: to be able to push terms under binder, we need to
 have already proven that they are thinnable.
-
-\begin{figure}[h]
-\begin{minipage}{0.5\textwidth}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semren}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semrenfun}
-\end{minipage}\hfill
-\begin{minipage}{0.5\textwidth}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsub}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsubfun}
-\end{minipage}
-\caption{Renaming and Substitution as Instances of \semrec{}\label{fig:SemInstances}}
-\end{figure}
-
-In both cases we use (\AF{extend}) defined in Figure~\ref{fig:thincomb} as
-(\AIC{pack} \AIC{s}) (where \AIC{pack} is the constructor for environments and
-\AIC{s}, defined in Section \ref{section:mech-reus}, is the function lifting an
-existing de Bruijn variable into an extended scope) as the definition of the
-thinning embedding \AB{Γ} into {(\AB{σ} \AIC{∷} \AB{Γ}}.
+In both cases we use \AF{extend} defined in Section~\ref{sec:genenvironment} as the definition of the
+thinning which embeds \AB{Γ} into {(\AB{σ} \AIC{∷} \AB{Γ})}.
 
 \label{section:printing}
-We also include the definition of a basic printer relying on a name supply to
-highlight the fact that computations can very well be effectful. \revc{The ability
-to generate fresh names is given to us by a monad that here we decide to call \AF{Fresh}.
-Concretely, \AF{Fresh} is implemented as an instance of the State monad where
-the state is a stream of distinct strings.}
+We also include the definition of a basic printer relying on a name
+supply to highlight the fact that computations can very well be
+effectful. The ability to generate fresh names is given to us by a
+monad that here we decide to call \AF{Fresh}. Concretely, \AF{Fresh} is implemented as an instance of the State monad where
+the state is a stream of distinct strings:
+\begin{center}
+  \begin{minipage}{0.5\textwidth}
+    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{monad}
+  \end{minipage}
+\end{center}
+
 The \AF{Printing} semantics is defined by using \AF{Name}s (i.e. \AD{String}s)
 as values and \AF{Printer}s (i.e. monadic actions in \AF{Fresh} returning a \AD{String})
 as computations. We use a \AR{Wrap}per with a type and a context as phantom types
@@ -743,12 +753,9 @@ in order to help Agda's inference propagate the appropriate constraints. We defi
 a function \AF{fresh} that fetches a name from the name supply and makes sure it is
 not available anymore.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}{0.6\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{valprint}
-\end{minipage}
-\begin{minipage}{0.3\textwidth}
-  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{monad}
 \end{minipage}
 
 \begin{minipage}{0.45\textwidth}
@@ -758,8 +765,8 @@ not available anymore.
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{freshprint}
 \end{minipage}
-\caption{Wrapper and fresh name generation}\label{fig:fresh}
-\end{figure}
+%\caption{Wrapper and fresh name generation}\label{fig:fresh}
+\end{center}
 
 \revc{The wrapper \AR{Wrap} does not depend on the scope \AB{Γ} so it is
 automatically a thinnable functor, that is to say that we have the (used
@@ -792,25 +799,25 @@ body of the function to which we prepend a ``λ'' binding the name \AB{x}.
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printlam}
 \end{agdasnippet}
 
-Putting all of these pieces together, we get the \AF{Printing} semantics
-shown in Figure~\ref{fig:printing}.
+Putting all of these pieces together, we get the \AF{Printing} semantics:
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}
-\caption{Printing as an instance of \semrec{}}\label{fig:printing}
-\end{figure}
+%\caption{Printing as an instance of \semrec{}}\label{fig:printing}
+\end{center}
 
-We show how one can use this newly-defined semantics to implement \AF{print},
+We show how one can use this newly defined semantics to implement \AF{print},
 a printer for closed terms assuming that we have already defined \AF{names},
 a stream of distinct strings used as our name supply. We show the result of
-running \AF{print} on the term \AF{apply} (first introduced in
-Figure~\ref{figure:apply}).
+running \AF{print} on the term \AF{apply}.
 
+\noindent
 \begin{minipage}[t]{0.5\textwidth}
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{print}
 \end{agdasnippet}
 \end{minipage}
+\quad
 \begin{minipage}[t]{0.4\textwidth}
 \begin{agdasnippet}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{applyprint}
@@ -819,7 +826,7 @@ Figure~\ref{figure:apply}).
 
 Both printing and renaming highlight the importance of distinguishing
 values and computations: the type of values in their respective
-environments are distinct from their type of computations.
+environments is distinct from their type of computations.
 
 All of these examples are already described at length by ACMM~\citeyear{allais2017type}
 so we will not spend any
@@ -842,7 +849,7 @@ datatypes.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DATATYPES
 
-\section{A Primer on Universes of Data Types}\label{section:data}
+\section{A primer on universes of data types}\label{section:data}
 
 Chapman, Dagand, McBride and Morris (CDMM)~\citeyear{Chapman:2010:GAL:1863543.1863547}
 defined a universe of data types inspired by Dybjer and Setzer's
@@ -854,7 +861,7 @@ one can obtain this way. In this section we recall the main aspects
 of this construction we are interested in to build up our generic
 representation of syntaxes with binding.
 
-The first component of the definition of CDMM's universe (Figure~\ref{figure:desc}) is an inductive type of
+The first component of the definition of CDMM's universe (defined below) is an inductive type of
 \AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to $\Set{}^I$.
 \revc{
 These functors correspond to \AB{I}-indexed containers of \AB{J}-indexed
@@ -875,16 +882,18 @@ The recursive function \AF{⟦\_⟧} makes the interpretation of the
 descriptions formal. Interpretation of descriptions give rise
 right-nested tuples terminated by equality constraints.
 
-\begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[StateOfTheArt/CDMM.tex]{desc}
-\end{minipage}\hfill
-\begin{minipage}{0.45\textwidth}
-\ExecuteMetaData[StateOfTheArt/CDMM.tex]{interp}
+\noindent
+\begin{minipage}{\textwidth}
+  \begin{minipage}{0.51\textwidth}
+    \noindent
+    \ExecuteMetaData[StateOfTheArt/CDMM.tex]{desc}
+  \end{minipage}\quad
+  \begin{minipage}{0.4\textwidth}
+    \ExecuteMetaData[StateOfTheArt/CDMM.tex]{interp}
+  \end{minipage}
+% \caption{Datatype Descriptions and their Meaning as Functors}
+% \label{figure:desc}
 \end{minipage}
-\caption{Datatype Descriptions and their Meaning as Functors}
-\label{figure:desc}
-\end{figure}
 
 These constructors give the programmer the ability to build up the data
 types they are used to. For instance, the functor corresponding
@@ -892,13 +901,13 @@ to lists of elements in $A$ stores a \AD{Bool}ean which stands for whether
 the current node is the empty list or not. Depending on its value, the
 rest of the description is either the ``stop'' token or a pair of an element
 in $A$ and a recursive substructure i.e. the tail of the list. The \AD{List} type
-is unindexed, we represent the lack of an index with the unit type \AD{$\top$}
+being unindexed, we represent the lack of an index with the unit type \AD{$\top$}
 whose unique inhabitant is \AIC{tt}.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{listD}
-\caption{The Description of the base functor for \AD{List} \AB{A}}\label{figure:listD}
-\end{figure}
+%\caption{The Description of the base functor for \AD{List} \AB{A}}\label{figure:listD}
+\end{center}
 
 Indices can be used to enforce invariants. For example, the type {\AD{Vec} \AB{A} \AB{n}}
 of length-indexed lists. It has the same structure as the definition of \AF{listD}.
@@ -908,10 +917,10 @@ non-empty one in which case we store a natural number \AB{n}, the head of type
 \AB{A} and a tail of size \AB{n} (and the branch's index is enforced to be
 \AIC{suc} \AB{n}).
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{vecD}
-\caption{The Description of the base functor for \AD{Vec} \AB{A} \AB{n}}\label{figure:vecD}
-\end{figure}
+%\caption{The Description of the base functor for \AD{Vec} \AB{A} \AB{n}}\label{figure:vecD}
+\end{center}
 
 The payoff for encoding our datatypes as descriptions is that we can define
 generic programs for whole classes of data types. The decoding function \AF{⟦\_⟧}
@@ -920,17 +929,16 @@ recursion over a code \AB{d}. It describes the action of the functor correspondi
 to \AB{d} over morphisms in $\Set{}^J$. This is the first example of generic
 programming over all the functors one can obtain as the meaning of a description.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{fmap}
-\caption{Action on Morphisms of the Functor corresponding to a \AF{Desc}ription\label{fig:fmapD}}
-\end{figure}
+%\caption{Action on Morphisms of the Functor corresponding to a \AF{Desc}ription\label{fig:fmapD}}
+\end{center}
 
 All the functors obtained as meanings of \AD{Desc}riptions are strictly
 positive. So we can build the least fixpoint of the ones that are endofunctors
 (i.e. the ones for which $I$ equals $J$). This fixpoint is called \AD{μ}
 and its iterator is given by the definition of \AF{fold} \AB{d}%%%
-\footnote{\textbf{NB}
-In Figure~\ref{figure:datamu} the \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
+\footnote{The \AD{Size}~\cite{DBLP:journals/corr/abs-1012-4896} index added
 to the inductive definition of \AD{μ} plays a crucial role in getting the
 termination checker to see that \AF{fold} is a total function.
 % Sized types are outside the scope of this paper; describing them in
@@ -938,19 +946,20 @@ termination checker to see that \AF{fold} is a total function.
 }
 .
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{mu}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{fold}
-\caption{Least Fixpoint of an Endofunctor and Corresponding Generic Fold}\label{figure:datamu}
-\end{figure}
+%\caption{Least Fixpoint of an Endofunctor and Corresponding Generic Fold}\label{figure:datamu}
+\end{center}
 
-We can see in Figure~\ref{fig:list} that we can recover the types we are
-used to thanks to this least fixpoint. Pattern synonyms let us hide away
-the encoding: users can use them to pattern-match on lists and Agda
+This least fixpoint allows us to recover the data types we would
+otherwise declare recursively and generatively. Pattern synonyms let us hide away the
+encoding: users can use them to pattern-match on lists and Agda
 conveniently resugars them when displaying a goal. Finally, we can get
-our hands on the types' eliminators by instantiating the generic \AF{fold}.
+our hands on the types' eliminators by instantiating the generic
+\AF{fold}:
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{list}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{nilcons}
@@ -958,8 +967,8 @@ our hands on the types' eliminators by instantiating the generic \AF{fold}.
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{foldr}
 \end{minipage}
-\caption{List, its constructors, and eliminator\label{fig:list}}
-\end{figure}
+%\caption{List, its constructors, and eliminator\label{fig:list}}
+\end{center}
 
 The CDMM approach therefore allows us to generically define iteration principles
 for all data types that can be described. These are exactly the features we desire
@@ -1058,7 +1067,7 @@ the parallel substitution \AF{sub}) in the next section.
 
 Coming back to our original examples, we now have the ability to give
 codes for the well scoped untyped λ-calculus and, just as well,
-the intrinsically typed simply typed λ-calculus. We add a third
+the intrinsically typed STLC. We add a third
 example to showcase the whole spectrum of syntaxes: a well scoped and
 well sorted but not well typed bidirectional language. In all examples,
 the variable case will be added by the free monad construction so we only
@@ -1073,10 +1082,10 @@ any extra argument and λ-abstraction which has exactly one substructure
 with precisely one extra bound variable. A single \AD{Bool}ean is enough to
 distinguish the two constructors.
 
-\begin{figure}[h]
+\begin{center}
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{ULC}
-  \caption{Description for the Untyped λ-calculus\label{fig:descUTLC}}
-\end{figure}
+  %\caption{Description for the Untyped λ-calculus\label{fig:descUTLC}}
+\end{center}
 
 \paragraph{Bidirectional STLC}\label{par:bidirectional} Our second example is a
 bidirectional~\cite{pierce2000local} language hence the introduction of a
@@ -1089,35 +1098,34 @@ observation that λ-abstraction binds an \AIC{Infer}rable term. The two
 remaining constructors correspond to changes of direction: one can freely
 \AIC{Emb}bed inferrable terms as checkable ones whereas we require a type
 annotation when forming a \AIC{Cut} (we reuse the notion of \AD{Type} introduced
-in Figure~\ref{fig:intrinsic-stlc}).
+in the STLC example at the end of Section~\ref{section:primer-term}). % Figure~\ref{fig:intrinsic-stlc}).
 
-\begin{figure}[h]
-\begin{minipage}[t]{0.4\textwidth}
+\begin{center}
+\begin{minipage}[t]{0.35\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{tagmode}
-\end{minipage}\hfill
+\end{minipage}\quad
 \begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{desc}
 \end{minipage}
-  \caption{Description for the bidirectional STLC\label{fig:descBidiSTLC}}
-\end{figure}
+%  \caption{Description for the bidirectional STLC\label{fig:descBidiSTLC}}
+\end{center}
 
 \paragraph{Intrinsically typed STLC}\label{par:intrinsicSTLC}
-In the typed case (for the same notion of \AD{Type} defined in
-Figure~\ref{fig:intrinsic-stlc}), we are back to two
+In the typed case (for the same notion of \AD{Type}), we are back to two
 constructors: the terms are fully annotated and therefore it is not necessary
 to distinguish between \AD{Mode}s anymore. We need our tags to carry extra
 information about the types involved so we use once more and ad-hoc datatype
 \AD{`STLC}, and define its decoding \AD{STLC} by a pattern-matching λ-expression.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}[t]{0.4\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{tag}
-\end{minipage}\hfill
+\end{minipage}\quad
 \begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{desc}
 \end{minipage}
-  \caption{Description for the intrinsically typed STLC\label{fig:descSTLC}}
-\end{figure}
+ % \caption{Description for the intrinsically typed STLC\label{fig:descSTLC}}
+\end{center}
 
 For convenience we use Agda's pattern synonyms corresponding to the
 original constructors in Section \ref{section:mech-reus}. These
@@ -1483,7 +1491,7 @@ use as well as these two key relation transformers.
 \revb{
 In Section~\ref{sec:genenvironment} we introduced a generic notion of well typed
 and scoped environment as a function from variables to values. Its formal definition
-is given in Figure~\ref{fig:environment} as a record type. This record wrapper helps
+is given as a record type. This record wrapper helps
 Agda's type inference reconstruct the type family of values whenever it is passed an
 environment.
 
@@ -1526,7 +1534,7 @@ implicit arguments.
 The first example of two environment being related is \AF{reflᴿ} that, to any
 environment \AB{ρ} associates a trivial proof of the statement
 {(\AR{All} \AF{Eqᴿ} \AB{Γ} \AB{ρ} \AB{ρ})}.
-The combinators we introduced in Figure~\ref{fig:baseenv} to build environments
+The combinators we introduced in Section~\ref{sec:genenvironment} to build environments
 (\AF{ε}, \AF{\_∙\_}, etc.) have natural relational counterparts. We reuse the same
 names for them, simply appending an \AF{ᴿ} suffix.
 

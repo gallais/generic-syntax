@@ -57,9 +57,9 @@ this algebra is that we can turn a Kripke function, \AB{f}, mapping values
 of type \AB{σ} to computations of type \AB{τ} into an Agda function from
 values of type \AB{σ} to computations of type \AB{τ}. This is witnessed
 by the application function (\AF{\_\$\$\_}) defined in Figure~\ref{fig:kripkeapp}:
-we first use \AF{extract} (defined in Figure~\ref{fig:Thinnable}) to obtain
-a function taking environments of values to computations. We then use the
-combinators defined in Figure~\ref{fig:baseenv} to manufacture the singleton
+we first use \AF{extract}, defined in Section~\ref{sec:genenvironment}, to obtain
+a function taking environments of values to computations. We then use the environment building
+combinators defined there to manufacture the singleton
 environment {(\AF{ε} \AB{∙} \AB{t})} containing the value \AB{t} of type
 \AB{σ}.
 
