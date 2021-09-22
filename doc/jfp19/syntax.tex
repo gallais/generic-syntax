@@ -994,9 +994,9 @@ weakening.
 %% UNIVERSE OF SYNTAXES
 
 
-\section{A Universe of Scope Safe and Well Kinded Syntaxes}\label{section:universe}
+\section{A universe of scope-safe and well sorted syntaxes}\label{section:universe}
 
-Our universe of scope safe and well kinded syntaxes (defined in Figures~\ref{fig:Desc},~\ref{figure:syntaxmeaning})  follows the same principle
+Our universe of scope-safe and well sorted syntaxes follows the same principle
 as CDMM's universe of datatypes, except that we are not building endofunctors on
 $\Set{}^I$ any more but rather on {\AB{I} \AF{─Scoped}}. We now think of the
 index type \AB{I} as the sorts
@@ -1010,26 +1010,26 @@ is that the
 \AIC{`X} constructor
 is now augmented with an additional {\AD{List} \AB{I}} argument that describes
 the new binders that are brought into scope at this recursive position. This
-list of the kinds of the newly-bound variables will play a crucial role when
-defining the description's semantics as a binding structure in
-Figures~\ref{figure:syntaxmeaning}, \ref{figure:debruijnscope} and \ref{figure:freemonad}.
+list of the sorts of the newly bound variables will play a crucial role when
+defining the description's semantics as a binding structure below. % in
+% Figures~\ref{figure:syntaxmeaning}, \ref{figure:debruijnscope} and \ref{figure:freemonad}.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Syntax.tex]{desc}
-\caption{Syntax Descriptions\label{fig:Desc}}
-\end{figure}
+%\caption{Syntax Descriptions\label{fig:Desc}}
+\end{center}
 
 The meaning function \AF{⟦\_⟧} we associate to a description follows closely
 its CDMM equivalent. It only departs from it in the \AIC{`X} case and the fact
 it is not an endofunctor on \AB{I} \AF{─Scoped}; it is more general than that.
 The function takes an \AB{X} of type {\AD{List} \AB{I} $\rightarrow$ \AB{I} \AD{─Scoped}}
 to interpret {\AIC{`X} \AB{Δ} \AB{j}} (i.e. substructures of sort \AB{j} with
-newly-bound variables in \AB{Δ}) in an ambient scope \AB{Γ} as {\AB{X} \AB{Δ} \AB{j} \AB{Γ}}.
+newly bound variables in \AB{Δ}) in an ambient scope \AB{Γ} as {\AB{X} \AB{Δ} \AB{j} \AB{Γ}}.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Syntax.tex]{interp}
-\caption{Descriptions' Meanings}\label{figure:syntaxmeaning}
-\end{figure}
+%\caption{Descriptions' Meanings}\label{figure:syntaxmeaning}
+\end{center}
 
 The astute reader may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $\Gamma$; however
 refactoring \AF{⟦\_⟧} to use the partially applied $X\,\_\,\_\,\Gamma$ following
@@ -1045,10 +1045,10 @@ of type \AD{List} \AB{I} \AS{→} \AB{I} \AF{─Scoped} by appending the two
 its action on morphisms is given by a function \AF{fmap} defined by induction over
 the description just as in Section~\ref{section:data}.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Syntax.tex]{scope}
-\caption{De Bruijn Scopes}\label{figure:debruijnscope}
-\end{figure}
+%\caption{De Bruijn Scopes}\label{figure:debruijnscope}
+\end{center}
 
 The endofunctors thus defined are strictly positive and we can take their fixpoints.
 As we want to define the terms of a language with variables, instead of
@@ -1060,10 +1060,10 @@ the parallel substitution \AF{sub}) in the next section.
 % We have once more a \AD{Size} index to get all the benefits of type
 % based termination checking.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Syntax.tex]{mu}
-\caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}\label{figure:freemonad}
-\end{figure}
+%\caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}\label{figure:freemonad}
+\end{center}
 
 Coming back to our original examples, we now have the ability to give
 codes for the well scoped untyped λ-calculus and, just as well,
@@ -1074,7 +1074,7 @@ the variable case will be added by the free monad construction so we only
 have to describe the other constructors.
 
 
-\paragraph{Un(i)typed λ-calculus} For the untyped case, the lack of
+\paragraph{Un(i)typed λ-calculus (UTLC).} For the untyped case, the lack of
 type translates to picking the unit type (\AR{⊤}) as our notion of sort.
 We have two possible
 constructors: application where we have two substructures which do not bind
@@ -1087,7 +1087,7 @@ distinguish the two constructors.
   %\caption{Description for the Untyped λ-calculus\label{fig:descUTLC}}
 \end{center}
 
-\paragraph{Bidirectional STLC}\label{par:bidirectional} Our second example is a
+\paragraph{Bidirectional STLC.}\label{par:bidirectional} Our second example is a
 bidirectional~\cite{pierce2000local} language hence the introduction of a
 notion of \AD{Mode}: each term is either part of the \AIC{Infer} or
 \AIC{Check} fraction of the language. This language has four constructors
@@ -1114,13 +1114,13 @@ in the STLC example at the end of Section~\ref{section:primer-term}). % Figure~\
 In the typed case (for the same notion of \AD{Type}), we are back to two
 constructors: the terms are fully annotated and therefore it is not necessary
 to distinguish between \AD{Mode}s anymore. We need our tags to carry extra
-information about the types involved so we use once more and ad-hoc datatype
+information about the types involved so we use once more an ad-hoc datatype
 \AD{`STLC}, and define its decoding \AD{STLC} by a pattern-matching λ-expression.
 
 \begin{center}
 \begin{minipage}[t]{0.4\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{tag}
-\end{minipage}\quad
+\end{minipage}\qquad
 \begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{desc}
 \end{minipage}
@@ -1140,60 +1140,54 @@ language currently does not allow the user to specify type annotations
 for pattern synonyms. We only include examples of pattern synonyms
 for the two extreme examples, the definition for \AF{Bidi} are similar.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}{0.40\textwidth}
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCpat}
-\end{minipage}\hspace{2em}
+\end{minipage}\hspace{2.5em}
 \begin{minipage}{0.50\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{patST}
 \end{minipage}
-\caption{Respective Pattern Synonyms for \AF{UTLC} and \AF{STLC}. \label{fig:patsLC}}
-\end{figure}
+%\caption{Respective Pattern Synonyms for \AF{UTLC} and \AF{STLC}. \label{fig:patsLC}}
+\end{center}
 
 As a usage example of these pattern synonyms, we define the identity
-function in all three languages in Figure~\ref{fig:identity}, using the
+function in all three languages, using the
 same caret-based naming convention we introduced earlier. The code
 is virtually the same except for \AF{Bidi} which explicitly records
 the change of direction from \AIC{Check} to \AIC{Infer}.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}{0.28\textwidth}
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCid}
-\end{minipage}\hfill
+\end{minipage}\quad
 \begin{minipage}{0.30\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{BDid}
-\end{minipage}\hfill
+\end{minipage}\quad
 \begin{minipage}{0.32\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{STid}
 \end{minipage}
-\caption{Identity function in all three languages}\label{fig:identity}
-\end{figure}
+%\caption{Identity function in all three languages}\label{fig:identity}
+\end{center}
 
-It is the third time (the first and second times being the definition of
-\AF{listD} and \AF{vecD} in Figure~\ref{figure:listD} and \ref{figure:vecD})
-that we use a \AF{Bool} to distinguish between two constructors. In order
-to avoid re-encoding the same logic,
-the next section introduces combinators demonstrating that
-descriptions are closed under finite sums.
 
 \paragraph{Common Combinators and Their Properties.}\label{desccomb}
 
-As seen previously, we can use a dependent pair whose first component
-is a \AF{Bool}ean to take the coproduct of two descriptions: depending
-on the value of the first component, we will return one or the other.
-We can abstract this common pattern as a combinator \AF{\_`+\_} together
-with an appropriate eliminator \AF{case} which, given two continuations,
+The definition of \AF{UTLC} is the third time (the first and second
+times being the definition of \AF{listD} and \AF{vecD} in
+Section~\ref{section:data}) that we use a \AF{Bool} to distinguish
+between two constructors. We can abstract this common pattern as a combinator \AF{\_`+\_} together
+with an appropriate eliminator \AF{case} which, given two methods,
 picks the one corresponding to the chosen branch.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}{0.35\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{descsum}
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
-\caption{Descriptions are closed under Sum}\label{figure:descsum}
-\end{figure}
+%\caption{Descriptions are closed under Sum}\label{figure:descsum}
+\end{center}
 
 % Closure under product does not hold in general. Indeed, the
 % equality constraints introduced by the two end tokens of two
