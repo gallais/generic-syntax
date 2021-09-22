@@ -412,7 +412,7 @@ reader see to which binders each de Bruijn index refers):
 %% SCOPE SAFE PROGRAMS
 
 
-\section{A Primer on Type and Scope Safe Programs}\label{section:primer-program}
+\section{A primer on type- and scope-safe programs}\label{section:primer-program}
 
 The scope- and type- safe representation described in the previous
 section is naturally only a start. Once the programmer has access to a
@@ -422,19 +422,18 @@ are the two typical examples that are required for almost all
 syntaxes. Now that well typedness and well scopedness are enforced
 statically, all of these traversals have to be implemented in a type
 and scope safe manner.  These constraints show up in the types of
-renaming and substitution defined in Figure~\ref{figure:rensubACMM}.
-% defined as follows:
+renaming and substitution defined as follows:
 
-\begin{figure}[h]
+\begin{minipage}{\textwidth}
 \begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{ren}
 \end{minipage}\hfill
 \begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{sub}
 \end{minipage}
-\caption{Type and Scope Preserving Renaming and Substitution}
-\label{figure:rensubACMM}
-\end{figure}
+% \caption{Type and Scope Preserving Renaming and Substitution}
+% \label{figure:rensubACMM}
+\end{minipage}
 
 We have intentionally hidden technical details behind some auxiliary definitions
 left abstract here: \AF{var} and \AF{extend}. Their implementations are distinct
@@ -632,13 +631,15 @@ such as \AF{vl\textasciicircum{}Tm} for the proof that terms are
 \addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{thV}
 \end{agdasnippet}
-This constraint allows us to define \AF{extend}, the generalisation of the two
-auxiliary definitions we used in Figure~\ref{figure:rensubACMM}, in terms of
-the building blocks introduced in Section~\ref{sec:genenvironment}.
-It takes a context extension from \AB{Δ} to \AB{Θ} in the
-form of a thinning, an existing evaluation environment mapping \AB{Γ} variables
-to \AB{Δ} values and a value living in the extended context \AB{Θ} and returns
-an evaluation environment mapping ({\AB{σ} \AIC{∷} \AB{Γ}}) variables to \AB{Θ}
+This constraint allows us to define \AF{extend}, the generalisation of
+the two auxiliary definitions we used when defining \AF{ren} and
+\AF{sub} at the start of Section~\ref{section:primer-program}, in
+terms of the building blocks introduced in
+Section~\ref{sec:genenvironment}.  It takes a context extension from
+\AB{Δ} to \AB{Θ} in the form of a thinning, an existing evaluation
+environment mapping \AB{Γ} variables to \AB{Δ} values and a value
+living in the extended context \AB{Θ} and returns an evaluation
+environment mapping ({\AB{σ} \AIC{∷} \AB{Γ}}) variables to \AB{Θ}
 values.
 % When defining a record in Agda, we are allowed to interleave field
 % declarations and auxiliary definitions that may depend on the so-far already
@@ -1464,24 +1465,23 @@ on syntaxes too, sometimes with more informative types.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GENERIC PROOFS
 
-\section{Building Generic Proofs about Generic Programs}
+\section{Building generic proofs about generic programs}
 
 In ACMM~\citeyear{allais2017type} we have
 already shown that, for the simply typed λ-calculus, introducing an abstract
-notion of Semantics not only reveals the shared structure of common
+notion of \AF{Semantics} not only reveals the shared structure of common
 traversals, it also allows us to give abstract proof frameworks for
 simulation or fusion lemmas. This idea naturally extends to our generic
 presentation of semantics for all syntaxes.
 
 
-\subsection{Relations and Relation Transformers}
+\subsection{Relations and relation transformers}
 
 In our exploration of generic proofs about the behaviour of various \AR{Semantics},
 we are going to need to manipulate relations between distinct notions of values or
 computations. In this section, we introduce the notion of relation we are going to
 use as well as these two key relation transformers.
 
-\revb{
 In Section~\ref{sec:genenvironment} we introduced a generic notion of well typed
 and scoped environment as a function from variables to values. Its formal definition
 is given as a record type. This record wrapper helps
@@ -1495,34 +1495,33 @@ a relation between (\AB{T} \AB{σ} \AB{Γ}) and (\AB{U} \AB{σ} \AB{Γ}). Our fi
 of such a relation is \AF{Eqᴿ} the equality relation between an (\AB{I}\AF{─Scoped})
 family \AB{T} and itself.
 
-\begin{figure}[h]
+\begin{minipage}{\textwidth}
 \begin{minipage}[t]{0.65\textwidth}
   \ExecuteMetaData[Data/Relation.tex]{rel}
 \end{minipage}
 \begin{minipage}[t]{0.25\textwidth}
   \ExecuteMetaData[Data/Relation.tex]{eqR}
 \end{minipage}
-\caption{Relation Between \AB{I}\AF{─Scoped} Families and Equality Example\label{ex:fam-eq}}
-\label{fig:reldef}
-\end{figure}
-}
+% \caption{Relation Between \AB{I}\AF{─Scoped} Families and Equality Example\label{ex:fam-eq}}
+% \label{fig:reldef}
+\end{minipage}
 
 Once we know what relations are, we are going to have to lift relations on values
 and computations to relations on environments, \AF{Kripke} function spaces or
 on \AB{d}-shaped terms whose subterms have been evaluated already.
 This is what the rest of this section focuses on.
 
-\paragraph{Environment relator}
+\paragraph{Environment relator.}
 Provided a relation \AB{𝓥ᴿ} for notions of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}, by
 pointwise lifting we can define a relation {(\AR{All} \AB{𝓥ᴿ} \AB{Γ})} on
 \AB{Γ}-environments of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ} respectively. We once more
 use a record wrapper simply to facilitate Agda's job when reconstructing
 implicit arguments.
 
-\begin{figure}[h]
+\begin{agdasnippet}
   \ExecuteMetaData[Data/Relation.tex]{all}
-\caption{Relating \AB{Γ}-Environments in a Pointwise Manner\label{defn:Env-rel}}
-\end{figure}
+%\caption{Relating \AB{Γ}-Environments in a Pointwise Manner\label{defn:Env-rel}}
+\end{agdasnippet}
 
 The first example of two environment being related is \AF{reflᴿ} that, to any
 environment \AB{ρ} associates a trivial proof of the statement
@@ -1531,7 +1530,7 @@ The combinators we introduced in Section~\ref{sec:genenvironment} to build envir
 (\AF{ε}, \AF{\_∙\_}, etc.) have natural relational counterparts. We reuse the same
 names for them, simply appending an \AF{ᴿ} suffix.
 
-\paragraph{Kripke relator}
+\paragraph{Kripke relator.}
 We assume that we have two types of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}
 as well as a relation \AB{𝓥ᴿ} for pairs of such values, and two types of computations
 \AB{𝓒ᴬ} and \AB{𝓒ᴮ} whose notion of relatedness is given by \AB{𝓒ᴿ}. We can define
@@ -1541,12 +1540,12 @@ respectively by stating that they send related inputs
 to related outputs. We use the relation transformer \AF{All} defined in the previous
 paragraph.
 
-\begin{figure}[h]
+\begin{agdasnippet}
  \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}
-\caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs\label{fig:Kripke-rel}}
-\end{figure}
+%\caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs\label{fig:Kripke-rel}}
+\end{agdasnippet}
 
-\paragraph{Desc relator}
+\paragraph{Desc relator.}
 The relator (\AF{⟦} \AB{d} \AF{⟧ᴿ}) is a relation transformer which characterises
 structurally equal layers such that their substructures are themselves related
 by the relation it is passed as an argument. It inherits a lot of its relational
@@ -1566,10 +1565,10 @@ layers which are meant to be equal:
     the rest of the layers are related by (\AF{⟦} \AB{d} \AB{a} \AF{⟧ᴿ} \AB{R})
 \end{itemize}
 
-\begin{figure}[h]
+\begin{agdasnippet}
  \ExecuteMetaData[Generic/Relator.tex]{ziptype}
-\caption{Relator: Characterising Structurally Equal Values with Related Substructures\label{fig:zip-rel}}
-\end{figure}
+%\caption{Relator: Characterising Structurally Equal Values with Related Substructures\label{fig:zip-rel}}
+\end{agdasnippet}
 
 If we were to take a fixpoint of \AF{⟦\_⟧ᴿ}, we could obtain a structural
 notion of equality for terms which we could prove equivalent to propositional
@@ -1580,7 +1579,7 @@ on more advanced use-cases.
 %% SIMULATION
 
 
-\subsection{Simulation Lemma}\label{section:simulation}
+\subsection{Simulation lemma}\label{section:simulation}
 
 \revb{
 A constraint mentioning all three relation transformers appears naturally when
@@ -1640,29 +1639,30 @@ spaces take related inputs to related outputs.
 The fundamental lemma of simulations is a generic theorem showing that for
 each pair of \semrec{} respecting the \AR{Simulation} constraint, we
 get related computations given environments of related input values.
-In Figure~\ref{defn:Simulation}, this theorem is once more mutually
+This theorem is once more mutually
 proven with a statement about \AF{Scope}s,
 and \AD{Size}s play a crucial role in ensuring that the function is indeed total.
 
-\begin{figure}[h]
+\begin{agdasnippet}
+  \addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{simbody}
-\caption{Fundamental Lemma of \AR{Simulation}s\label{defn:Simulation}}
-\end{figure}
+%\caption{Fundamental Lemma of \AR{Simulation}s\label{defn:Simulation}}
+\end{agdasnippet}
 
 Instantiating this generic simulation lemma, we can for instance prove
 that renaming is a special case of substitution, or that renaming and
-substitution are extensional \revc{i.e. that given environments equal in
+substitution are extensional, \revc{i.e. that given environments equal in
 a pointwise manner they produce syntactically equal terms}. Of course these
 results are not new but having them generically over all syntaxes with
-binding is convenient. We experience this first hand when tackling the
+binding is convenient. We experienced this first hand when tackling the
 POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where
-\AF{rensub} (defined in Figure~\ref{defn:RenSub}) was actually needed.
+\AF{rensub} was actually needed.
 
-\begin{figure}[h]
-\ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensub}
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensubfun}
-\caption{Renaming as a Substitution via Simulation\label{defn:RenSub}}
-\end{figure}
+\ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensub}
+%\caption{Renaming as a Substitution via Simulation\label{defn:RenSub}}
+\end{agdasnippet}
 
 When studying specific languages, new opportunities to deploy the
 fundamental lemma of simulations arise. Our solution to the POPLMark
@@ -1685,7 +1685,7 @@ this more complex example for all syntaxes definable in our framework.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% FUSION
 
-\subsection{Fusion Lemma}\label{section:fusion}
+\subsection{Fusion lemma}\label{section:fusion}
 
 Results that can be reformulated as the ability to fuse two traversals
 obtained as \semrec{} into one abound. When claiming that \AF{Tm} is
@@ -1714,7 +1714,7 @@ Fusion is more involved than simulation; we will once more step through
 each one of the constraints individually, trying to give the reader an intuition
 for why they are shaped the way they are.
 
-\subsubsection{The Fusion Constraints}
+\subsubsection{The fusion constraints}
 
 The notion of fusion is defined for a triple of \AR{Semantics}; each \AB{𝓢ⁱ}
 being defined for values in \AB{𝓥ⁱ} and computations in \AB{𝓒ⁱ}. The
@@ -1814,7 +1814,7 @@ that the two evaluations yield related computations.
 \ExecuteMetaData[Generic/Fusion.tex]{algR}
 \end{agdasnippet}
 
-\subsubsection{The Fundamental Lemma of Fusion}
+\subsubsection{The fundamental lemma of fusion}
 
 This set of constraints is enough to prove a fundamental lemma of \AR{Fusion}
 stating that from a triple of related environments, one gets a pair of related
@@ -1823,12 +1823,12 @@ computations: the composition of \AB{𝓢ᴬ} and \AB{𝓢ᴮ} on one hand and
 counterpart for \semrec{}'s \AF{body}'s action on \AR{Scope}s.
 % and the \AD{Size} indices make the proof modular.
 
-\begin{figure}[h]
+\begin{agdasnippet}
  \ExecuteMetaData[Generic/Fusion.tex]{fusiontype}
-\caption{Fundamental Lemma of \AR{Fusion}\label{defn:Fusion}}
-\end{figure}
+%\caption{Fundamental Lemma of \AR{Fusion}\label{defn:Fusion}}
+\end{agdasnippet}
 
-\subsubsection{Instances of Fusion}
+\subsubsection{Instances of fusion}
 
 A direct consequence of this result is the four lemmas collectively stating
 that any pair of renamings and / or substitutions can be fused together to
@@ -1837,10 +1837,10 @@ substitution (in all the other cases). One such example is the fusion of
 substitution followed by renaming into a single substitution where the
 renaming has been applied to the environment.
 
-\begin{figure}[h]
+\begin{agdasnippet}
  \ExecuteMetaData[Generic/Fusion/Syntactic.tex]{subren}
-\caption{A Corollary: Substitution-Renaming Fusion\label{defn:SubRen-Fusion}}
-\end{figure}
+%\caption{A Corollary: Substitution-Renaming Fusion\label{defn:SubRen-Fusion}}
+\end{agdasnippet}
 
 Another corollary of the fundamental lemma of fusion is the observation that
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} make: \emph{assuming
@@ -1864,7 +1864,7 @@ counter-example.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BISIMILARITY
 
-\subsection{Definition of Bisimilarity for Co-finite Objects}
+\subsection{Definition of bisimilarity for co-finite objects}
 
 Although we were able to use propositional equality when studying
 syntactic traversals working on terms, it is not the appropriate
@@ -1875,22 +1875,22 @@ if their top layers have the same shape and their substructures are
 themselves bisimilar. This is precisely the type of relation \AF{⟦\_⟧ᴿ}
 was defined to express. Hence the following coinductive relation.
 
-\begin{figure}[h]
+\begin{agdasnippet}
  \ExecuteMetaData[Generic/Bisimilar.tex]{bisim}
-\caption{Generic Notion of Bisimilarity for Co-finite Trees\label{defn:bisimilar}}
-\end{figure}
+%\caption{Generic Notion of Bisimilarity for Co-finite Trees\label{defn:bisimilar}}
+\end{agdasnippet}
 
 We can then prove by coinduction that this generic definition always gives
 rise to an equivalence relation by using the relator's stability properties
 (if \AB{R} is reflexive / symmetric / transitive then so is {(\AF{⟦} \AB{d} \AF{⟧ᴿ} \AB{R})}
 mentioned in Section~\ref{lem:zipstable}.
 
-\begin{center}
+\begin{agdasnippet}
 %\begin{figure}[h]
  \ExecuteMetaData[Generic/Bisimilar.tex]{eqrel}
 % \caption{Bisimilarity is an Equivalence Relation}
 % \end{figure}
-\end{center}
+\end{agdasnippet}
 
 This definition can be readily deployed to prove e.g. that the unfolding
 of \AF{01↺} defined in Section~\ref{def:colist} is indeed bisimilar to \AF{01⋯}
@@ -1900,12 +1900,12 @@ pick the same constructor (a cons cell), the second that they carry the
 same natural number, and we can conclude by an appeal to the coinduction
 hypothesis.
 
-\begin{center}
+\begin{agdasnippet}
 %\begin{figure}[h]
 \ExecuteMetaData[Generic/Examples/Colist.tex]{bisim01}
 %\caption{The unfolding of \AF{01↺} is bisimilar to the direct-style \AF{01⋯}}
 %\end{figure}
-\end{center}
+\end{agdasnippet}
 
 
 %\section{Fully Worked-out Example}
@@ -1915,9 +1915,9 @@ hypothesis.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RELATED WORK
 
-\section{Related Work}\label{section:related-work}
+\section{Related work}\label{section:related-work}
 
-\subsection{Variable Binding} The representation of variable binding
+\subsection{Variable binding} The representation of variable binding
 in formal systems has been a hot topic for decades. Part of the purpose
 of the first POPLMark challenge~\citeyear{poplmark} was to explore and
 compare various methods.
@@ -1934,7 +1934,7 @@ of \AD{Desc}riptions corresponding to Chlipala's Parametric Higher-Order
 Abstract Syntax~\citeyear{DBLP:conf/icfp/Chlipala08} and we would be interested
 to see what the appropriate notion of \AD{Semantics} is for this representation.
 
-\subsection{Alternative Binding Structures} The binding structure we
+\subsection{Alternative binding structures} The binding structure we
 present here is based on a flat, lexical scoping strategy. There are
 other strategies and it would be interesting to see whether
 our approach could be reused in these cases.
@@ -1980,7 +1980,7 @@ to nodes above them but also across from them in the cyclic tree. Capturing
 this class of inductive types as a set of syntaxes with binding and writing
 generic programs over them is still an open problem.
 
-\subsection{Semantics of Syntaxes with Binding} An early foundational study
+\subsection{Semantics of syntaxes with binding} An early foundational study
 of a general \emph{semantic} framework for signatures with binding, algebras
 for such signatures, and initiality of the term algebra, giving rise to a
 categorical `program' for substitution and proofs of its properties, was given
@@ -2002,7 +2002,7 @@ appear to make fewer commitments as to functoriality, thinnability, etc. in our
 specification of semantics, with such properties typically being \emph{provable}
 as a further instance of our framework.
 
-\subsection{Meta-Theory Automation via Tactics and Code Generation} The
+\subsection{Meta-theory automation via tactics and code generation} The
 tediousness of repeatedly
 proving similar statements has unsurprisingly led to various attempts at
 automating the pain away via either code generation or the definition of
@@ -2026,7 +2026,7 @@ Keuchel, Weirich, and Schrijvers' Needle~\citeyear{needleandknot} is a code
 generator written in Haskell producing syntax-specific Coq modules
 implementing common traversals and lemmas about them.
 
-\subsection{Universes of Syntaxes with Binding} Keeping in mind Altenkirch
+\subsection{Universes of syntaxes with binding} Keeping in mind Altenkirch
 and McBride's observation that generic programming is everyday programming
 in dependently-typed languages~\citeyear{DBLP:conf/ifip2-1/AltenkirchM02}, we can naturally
 expect generic, provably sound, treatments of these notions in tools such as
@@ -2063,7 +2063,7 @@ for defining new well scoped-and-typed semantics and proving their properties.
 
 Érdi~\citeyear{gergodraft} defines a universe inspired by a first draft of this
 paper and gives three different interpretations (raw, scoped and typed syntax)
-related via erasure. He provides scope- and type- preserving renaming and
+related via erasure. He provides scope- and type-preserving renaming and
 substitution as well as various generic proofs that they are well behaved but
 offers neither a generic notion of semantics, nor generic proof frameworks.
 
@@ -2071,7 +2071,7 @@ Copello~\citeyear{copello2017} works with \emph{named} binders and
 defines nominal techniques (e.g. name swapping) and ultimately $\alpha$-equivalence
 over a universe of regular trees with binders inspired by Morris'~\citeyear{morris-regulartt}.
 
-\subsection{Fusion of Successive Traversals}
+\subsection{Fusion of successive traversals}
 
 The careful characterisation of the successive recursive traversals which can be
 fused together into a single pass in a semantics-preserving way is not new. This
@@ -2093,7 +2093,7 @@ rely on similar generic proofs that these transformations are meaning-preserving
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION
 
-\section{Conclusion and Future Work}
+\section{Conclusion and future work}
 
 Recalling our earlier work~\citeyear{allais2017type}
 we have started from an example of a scope- and type- safe language (the simply typed
@@ -2131,14 +2131,14 @@ in other domains by seeing our syntaxes with binding as potentially cyclic
 terms. Their unfolding is a non-standard semantics and we provide the
 user with a generic notion of bisimilarity to reason about them.
 
-\subsection{Limitations of the Current Framework}
+\subsection{Limitations of the current framework}
 
 Although quite versatile already our current framework has some limitations
 which suggest avenues for future work. We list these limitations from easiest
 to hardest to resolve. Remember that each modification to the universe of
 syntaxes needs to be given an appropriate semantics.
 
-\paragraph{Closure under Products} Our current universe of descriptions is
+\paragraph{Closure under products.} Our current universe of descriptions is
 closed under sums as demonstrated in Section~\ref{desccomb}. It is however
 not closed under products: two arbitrary right-nested products conforming
 to a description may disagree on the sort of the term they are constructing.
@@ -2147,7 +2147,7 @@ constructors is computed (à la Dagand \citeyear{DBLP:phd/ethos/Dagand13} where,
 for instance, the \AIC{`lam} constructor is only offered if the input sort is
 a function type) would not suffer from this limitation.
 
-\paragraph{Unrestricted Variables} Our current notion of variable can be used
+\paragraph{Unrestricted variables.} Our current notion of variable can be used
 to form a term of any kind. We remarked in Sections~\ref{section:typechecking}
 and \ref{section:elaboration} that in some languages we want to restrict this
 ability to one kind in particular. In that case, we wanted users to only be able
@@ -2156,18 +2156,18 @@ time being we made do by restricting the environment values our \AR{Semantics}
 use to a subset of the kinds: terms with variables of the wrong kind will not be
 given a semantics.
 
-\paragraph{Flat Binding Structure} Our current setup limits us to flat binding
+\paragraph{Flat binding structure.} Our current setup limits us to flat binding
 structures: variable and binder share the same kinds. This prevents us from
 representing languages with binding patterns, for instance pattern-matching
 let-binders which can have arbitrarily nested patterns taking pairs apart.
 
-\paragraph{Closure under Derivation} One-hole contexts play a major role in the
+\paragraph{Closure under derivation.} One-hole contexts play a major role in the
 theory of programming languages. Just like the one-hole context of a datatype is
 a datatype~\cite{DBLP:journals/fuin/AbbottAMG05}, we would like our universe to
 be closed under derivatives so that the formalisation of e.g. evaluation contexts
 could benefit directly from the existing machinery.
 
-\paragraph{Closure under Closures} Jander's work on formalising and certifying
+\paragraph{Closure under closures.} Jander's work on formalising and certifying
 continuation passing style transformations~\cite{Jander:Thesis:2019}
 highlighted the need for a notion of syntaxes with closures. Recalling
 that our notion of Semantics is always compatible with precomposition

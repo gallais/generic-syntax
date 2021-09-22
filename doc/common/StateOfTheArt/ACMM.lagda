@@ -51,7 +51,8 @@ module Renaming where
 \end{code}
 %<*ren>
 \begin{code}
- ren : (Γ ─Env) Var Δ → Lam σ Γ → Lam σ Δ
+ ren : (Γ ─Env) Var Δ →
+       Lam σ Γ → Lam σ Δ
  ren ρ (`var k)    = varᵣ (lookup ρ k)
  ren ρ (`app f t)  = `app (ren ρ f) (ren ρ t)
  ren ρ (`lam b)    = `lam (ren (extendᵣ ρ) b)
@@ -67,7 +68,8 @@ module Substitution where
 \end{code}
 %<*sub>
 \begin{code}
- sub : (Γ ─Env) Lam Δ → Lam σ Γ → Lam σ Δ
+ sub : (Γ ─Env) Lam Δ →
+       Lam σ Γ → Lam σ Δ
  sub ρ (`var k)    = varₛ (lookup ρ k)
  sub ρ (`app f t)  = `app (sub ρ f) (sub ρ t)
  sub ρ (`lam b)    = `lam (sub (extendₛ ρ) b)
