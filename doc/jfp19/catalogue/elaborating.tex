@@ -1,4 +1,4 @@
-\subsection{An Algebraic Approach to Elaboration}\label{section:elaboration}
+\subsection{An algebraic approach to elaboration}\label{section:elaboration}
 
 Instead of generating a type or checking that a candidate will do, we
 can use our language of \AD{Desc}riptions to define not only an
@@ -14,33 +14,29 @@ computations but an \AF{STLC} term is ({\AD{Type} \AF{─Scoped}}). We first
 introduce a \AF{Typing} associating types to each of the modes in scope,
 together with an erasure function \AF{⌞\_⌟} extracting the context of types
 implicitly defined by such a \AF{Typing}.
-\revb{
 We will systematically distinguish contexts of modes (typically named \AB{ms})
 and their associated typings (typically named \AB{Γ}).
-}
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}[t]{0.4\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{typing}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{fromtyping}
 \end{minipage}
-\caption{Typing: From Contexts of \AD{Mode}s to Contexts of \AD{Type}s\label{fig:typingmodes}}
-\end{figure}
+%\caption{Typing: From Contexts of \AD{Mode}s to Contexts of \AD{Type}s\label{fig:typingmodes}}
+\end{center}
 
-\revc{
 We can then explain what it means for an elaboration process of type \AB{σ}
 in a context of modes \AB{ms} to produce a term of the
 ({\AD{Type} \AF{─Scoped}}) family \AB{T}: for any typing \AB{Γ} of this
 context of modes, we should get a value of type
 {(\AB{T} \AB{σ} \AF{⌞} \AB{Γ} \AF{⌟})}.
-}
 
-\begin{figure}[H]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elab}
-\caption{Elaboration of a Scoped Family}
-\end{figure}
+%\caption{Elaboration of a Scoped Family}
+\end{agdasnippet}
 
 Our first example of an elaboration process is our notion of environment values.
 To each variable in scope of mode \AIC{Infer} we associate an elaboration function
@@ -48,20 +44,20 @@ targeting \AD{Var}. In other words: our values are all in scope i.e. provided an
 typing of the scope of modes, we can assuredly return a type together with a
 variable of that type.
 
-\begin{figure}[h!]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{varmode}
-\caption{Values as Elaboration Functions for Variables\label{fig:elabvalues}}
-\end{figure}
+%\caption{Values as Elaboration Functions for Variables\label{fig:elabvalues}}
+\end{agdasnippet}
 
 We can for instance prove that we have such an inference function for a newly-bound
 variable of mode \AIC{Infer}: given that the context has been extended with a variable
 of mode \AIC{Infer}, the \AF{Typing} must also have been extended with a type \AB{σ}.
 We can return that type paired with the variable \AIC{z}.
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{var0}
-\caption{Inference Function for the 0-th Variable\label{fig:elabvar0}}
-\end{figure}
+%\caption{Inference Function for the 0-th Variable\label{fig:elabvar0}}
+\end{agdasnippet}
 
 The computations are a bit more tricky. On the one hand, if we are in checking mode
 then we expect that for any typing of the scope of modes and any type candidate we
@@ -69,10 +65,10 @@ can \AD{Maybe} return a term at that type in the induced context. On the other h
 in the inference mode we expect that given any typing of the scope, we can \AD{Maybe}
 return a type together with a term at that type in the induced context.
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elabmode}
-\caption{Computations as \AD{Mode}-indexed Elaboration Functions\label{fig:elabcomputations}}
-\end{figure}
+%\caption{Computations as \AD{Mode}-indexed Elaboration Functions\label{fig:elabcomputations}}
+\end{agdasnippet}
 
 Because we are now writing a typechecker which returns evidence of its claims, we need
 more informative variants of the equality and \AF{isArrow} checks. In the equality
@@ -82,7 +78,6 @@ Agda's support for (dependent!) \AK{do}-notation makes writing the check
 really easy. For the arrow type, we introduce a family \AD{Arrow} constraining the
 shape of its index to be an arrow type and redefine \AF{isArrow} as a \emph{view} targeting
 this inductive family~\cite{DBLP:conf/popl/Wadler87,DBLP:journals/jfp/McBrideM04}.
-\revc{
 We deliberately overload the constructor of the \AD{isArrow} family by calling
 it \AIC{\_`→\_}. This means that the proof that a given type has the shape
 {(\AB{σ} \AIC{`→} \AB{τ})} is literally written {(\AB{σ} \AIC{`→} \AB{τ})}.
@@ -90,17 +85,16 @@ This allows us to specify \emph{in the type} whether we want to work with the
 full set of values in \AD{Type} or only the subset corresponding to function
 types and to then proceed to write the same programs a Haskell programmers would,
 with the added confidence that ours are guaranteed to be total.
-}
 
-\begin{figure}[h]
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}{\textwidth}
+\begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{equal}
 \end{minipage}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{arrow}
 \end{minipage}
-\caption{Informative Equality Check and Arrow View\label{fig:informativecheck}}
-\end{figure}
+%\caption{Informative Equality Check and Arrow View\label{fig:informativecheck}}
+\end{minipage}
 
 We now have all the basic pieces and can start writing elaboration code. We
 will use lowercase letter for terms in \AF{Bidi} and uppercase ones for their
@@ -149,31 +143,29 @@ yield any additional insight so we leave it out here. The semantical counterpart
 variables (\ARF{var}) is fairly straightforward: provided a \AF{Typing}, we run the
 inference and touch it up to return a term rather than a mere variable. Finally we
 define the algebra (\ARF{alg}) by pattern-matching on the constructor and using our
-previous combinators. \revb{
+previous combinators.
 
-\begin{figure}[h]
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{elaborate}
-  \caption{\AF{Elaborate}, the elaboration semantics\label{defn:Elaborate}}
-\end{figure}
-
-}
+%  \caption{\AF{Elaborate}, the elaboration semantics\label{defn:Elaborate}}
+\end{agdasnippet}
 
 We can once more define a specialised version of the traversal induced by this
 \AR{Semantics} for closed terms: not only can we give a (trivial) initial
 environment (using the \AF{closed} corollary defined in Section~\ref{sec:fundamentallemma})
-but we can also give a (trivial) initial \AF{Typing}. This leads to the
-definitions in Figure~\ref{fig:typedelaboration}.
+but we can also give a (trivial) initial \AF{Typing}. This leads to these
+definitions:
 
-\begin{figure}[h]
+\begin{minipage}{\textwidth}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{typemode}
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{type-}
 \end{minipage}
-\caption{Evidence-producing Type (Checking / Inference) Function}
-\label{fig:typedelaboration}
-\end{figure}
+% \caption{Evidence-producing Type (Checking / Inference) Function}
+% \label{fig:typedelaboration}
+\end{minipage}
 
 Revisiting the example introduced in Section~\ref{section:typechecking},
 we can check that elaborating the expression {(λx. x : β → β) (λx. x)}
@@ -181,6 +173,6 @@ yields the type {β} together with the term {(λx. x) (λx. x)} in internal
 syntax. Type annotations have disappeared in the internal syntax as all
 the type invariants are enforced intrinsically.
 
-\begin{figure}[h]
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{example}
-\end{figure}
+\end{agdasnippet}

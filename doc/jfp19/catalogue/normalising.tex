@@ -1,4 +1,4 @@
-\subsection{(Unsafe) Normalisation by Evaluation}\label{section:nbyeval}
+\subsection{(Unsafe) Normalisation by evaluation}\label{section:nbyeval}
 
 A key type of traversal we have not studied yet is a language's
 evaluator. Our universe of syntaxes with binding does not impose
@@ -12,18 +12,17 @@ The clear connection between the \AF{Kripke} functional space
 characteristic of our semantics and the one that shows up in
 normalisation by evaluation suggests we ought to manage to
 give an unsafe generic framework for normalisation by evaluation.
-By temporarily \textbf{disabling Agda's positivity checker},
-we can define a generic reflexive domain \AD{Dm}
-(cf. Figure~\ref{fig:reflexivedomain}) in which to
+By temporarily disabling Agda's positivity checker,
+we can define a generic reflexive domain \AD{Dm} in which to
 interpret our syntaxes. It has three constructors corresponding
 respectively to a free variable, a constructor's counterpart where
 scopes have become \AF{Kripke} functional spaces on \AD{Dm} and
 an error token because the evaluation of untyped programs may go wrong.
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/NbyE.tex]{domain}
-\caption{Generic Reflexive Domain}\label{fig:reflexivedomain}
-\end{figure}
+%\caption{Generic Reflexive Domain}\label{fig:reflexivedomain}
+\end{agdasnippet}
 
 This datatype definition is utterly unsafe. The more conservative
 user will happily restrict themselves to particular syntaxes where
@@ -46,36 +45,36 @@ know what the binders are supposed to represent: they may
 stand for λ-abstractions, $\Sigma$-types, fixpoints, or
 anything else.
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/NbyE.tex]{nbe-setup}
-\caption{Generic Normalisation by Evaluation Framework\label{defn:NbE}}
-\end{figure}
+%\caption{Generic Normalisation by Evaluation Framework\label{defn:NbE}}
+\end{agdasnippet}
 
 Using this setup, we can write a normaliser for the untyped λ-calculus
 by providing an algebra. The key observation that allows us to implement
 this algebra is that we can turn a Kripke function, \AB{f}, mapping values
 of type \AB{σ} to computations of type \AB{τ} into an Agda function from
 values of type \AB{σ} to computations of type \AB{τ}. This is witnessed
-by the application function (\AF{\_\$\$\_}) defined in Figure~\ref{fig:kripkeapp}:
+by the application function (\AF{\_\$\$\_}):
 we first use \AF{extract}, defined in Section~\ref{sec:genenvironment}, to obtain
 a function taking environments of values to computations. We then use the environment building
 combinators defined there to manufacture the singleton
 environment {(\AF{ε} \AB{∙} \AB{t})} containing the value \AB{t} of type
 \AB{σ}.
 
-\begin{figure}[h]
+\begin{agdasnippet}[h]
   \ExecuteMetaData[Generic/Examples/NbyE.tex]{app}
-\caption{Applying a Kripke Function to an argument}\label{fig:kripkeapp}
-\end{figure}
+%\caption{Applying a Kripke Function to an argument}\label{fig:kripkeapp}
+\end{agdasnippet}
 
 We now define two patterns for semantical values: one for application and
 the other for lambda abstraction. This should make the case of interest of
 our algebra (a function applied to an argument) fairly readable.
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbepatterns}
-\caption{Pattern synonyms for UTLC-specific \AD{Dm} values}
-\end{figure}
+%\caption{Pattern synonyms for UTLC-specific \AD{Dm} values}
+\end{agdasnippet}
 
 We finally define the algebra by case analysis: if the node at hand is an
 application and its first component evaluates to a lambda, we can apply
@@ -83,19 +82,18 @@ the function to its argument using \AF{\_\$\$\_}. Otherwise we have either a
 stuck application or a lambda, in other words we already have a value and can
 simply return it using \AIC{C}.
 
-\begin{figure}[h]
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
-\caption{Normalisation by Evaluation for the Untyped λ-Calculus}
-\end{figure}
+%\caption{Normalisation by Evaluation for the Untyped λ-Calculus}
+\end{agdasnippet}
 
 We have not used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
 (by disabling totality checking we have lost all guarantees of the sort) we know
-we will get a term in normal form. See for instance in
-Figure~\ref{fig:normuntyped} the evaluation of an untyped yet normalising
-term: {(λx. x) ((λx. x) (λx. x))} normalises to {(λx. x)}.
+we will get a term in normal form. For instance, we can evaluate an untyped yet normalising
+term {(λx. x) ((λx. x) (λx. x))} that normalises to {(λx. x)}:
 
-\begin{figure}[h]
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Examples/NbyE.tex]{example}
-\caption{Example of a normalising untyped term}
-\label{fig:normuntyped}
-\end{figure}
+% \caption{Example of a normalising untyped term}
+% \label{fig:normuntyped}
+\end{agdasnippet}

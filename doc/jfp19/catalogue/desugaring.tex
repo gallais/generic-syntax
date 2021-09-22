@@ -1,4 +1,4 @@
-\subsection{Sugar and Desugaring as a Semantics}\label{section:letbinding}
+\subsection{Sugar and desugaring as a semantics}\label{section:letbinding}
 
 One of the advantages of having a universe of programming language
 descriptions is the ability to concisely define an \emph{extension}
@@ -12,21 +12,21 @@ an existing language.
 Let bindings allow the user to avoid repeating themselves by naming
 sub-expressions and then using these names to refer to the associated
 terms. Preprocessors adding these types of mechanisms to existing
-languages (from C to CSS) are rather popular. In Figure~\ref{defn:letD},
-we introduce a description \AD{Let} which can be used to extend any
-language description \AB{d} to a language with let-bindings
-(\AB{d} \AF{`+} \AF{Let}).
+languages (from C to CSS) are rather popular. We introduce a
+description \AD{Let} which can be used to extend any language
+description \AB{d} to a language with let-bindings (\AB{d} \AF{`+}
+\AF{Let}).
 
-\begin{figure}[h]
+\begin{minipage}{\textwidth}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letcode}
 \end{minipage}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letpattern}
 \end{minipage}
-\caption{Description of a single let binding, associated pattern synonyms
-  \label{defn:letD}}
-\end{figure}
+% \caption{Description of a single let binding, associated pattern synonyms
+%   \label{defn:letD}}
+\end{minipage}
 
 This description states that a let-binding node stores a pair of types
 \AB{$\sigma$} and \AB{$\tau$} and two subterms. First comes the let-bound
@@ -55,19 +55,19 @@ interpreting them using the generic substitution algebra (\AF{Sub});
 whilst the let-binder precisely provides the extra value to be added to the
 environment.
 
-\begin{figure}[h]
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unletcode}
-\caption{Desugaring as a \AR{Semantics}\label{defn:UnLet}}
-\end{figure}
+%\caption{Desugaring as a \AR{Semantics}\label{defn:UnLet}}
+\end{agdasnippet}
 
 The process of removing let binders is then kickstarted with the placeholder
 environment \AF{id\textasciicircum{}Tm}~=~\AIC{pack}~\AIC{`var} 
 of type {(\AB{Γ} \AR{─Env}) (\AD{Tm} \AB{d} ∞) \AB{Γ}}. 
 
-\begin{figure}[h]
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unlet}
-\caption{Specialising \AF{semantics} with an environment of placeholder values\label{defn:unlet}}
-\end{figure}
+%\caption{Specialising \AF{semantics} with an environment of placeholder values\label{defn:unlet}}
+\end{agdasnippet}
 
 In less than 10 lines of code we have defined a generic extension of
 syntaxes with binding together with a semantics which corresponds

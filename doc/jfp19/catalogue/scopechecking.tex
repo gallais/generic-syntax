@@ -1,4 +1,4 @@
-\subsection{Writing a Generic Scope Checker}\label{section:genericscoping}
+\subsection{Writing a generic scope checker}\label{section:genericscoping}
 
 Converting terms in the internal syntax to strings which can in turn be
 displayed in a terminal or an editor window is only part of a compiler's
@@ -17,18 +17,18 @@ variables are represented as strings into a well scoped syntax. We will
 come back to typechecking with a concrete example in section~\ref{section:typechecking}
 and then discuss related future work in the conclusion.
 
-Our scope checker will be a function taking two explicit arguments: a name for
-each variable in scope \AB{Γ} and a raw term for a syntax description \AB{d}.
-It will either fail (the Monad \AF{Fail} granting us the ability to fail is made
-explicit in Figure~\ref{fig:scopemonad}) or return a well scoped and sorted
-term for that description.
+Our scope checker will be a function taking two explicit arguments: a
+name for each variable in scope \AB{Γ} and a raw term for a syntax
+description \AB{d}.  It will either fail (the Monad \AF{Fail} granting
+us the ability to fail is defined below) or return a well scoped and
+sorted term for that description.
 
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Scopecheck.tex]{totmtype}
 \end{agdasnippet}
 
-\revb{
-\paragraph{Scope} We can obtain \AF{Names}, the datastructure associating to
+
+\paragraph{Scope.} We can obtain \AF{Names}, the datastructure associating to
 each variable in scope its raw name as a string by reusing the standard library's
 \AD{All}. The inductive family \AD{All} is a predicate transformer making sure a
 predicate holds of all the element of a list. It is defined in a style common in
@@ -39,18 +39,17 @@ list \AIC{[]}; similarly \AIC{\_∷\_} is the proof that provided that \AB{P} ho
 of the element \AB{a} on the one hand and of the elements of the list \AB{as}
 on the other then it holds of all the elements of the list (\AB{a} \AIC{∷} \AB{as}).
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}[t]{0.6\textwidth}
 \ExecuteMetaData[Stdlib.tex]{all}
 \end{minipage}
 \begin{minipage}[t]{0.3\textwidth}
   \ExecuteMetaData[Generic/Scopecheck.tex]{names}
 \end{minipage}
-\caption{Associating a raw string to each variable in scope}
-\end{figure}
-}
+%\caption{Associating a raw string to each variable in scope}
+\end{center}
 
-\paragraph{Raw terms}
+\paragraph{Raw terms.}
 The definition of \AF{WithNames} is analogous to \AF{Pieces} in the
 previous section: we expect \AF{Names} for the newly bound
 variables. Terms in the raw syntax then leverage these
@@ -58,22 +57,22 @@ definitions. They are either a variables or another ``layer'' of raw
 terms. Variables \AIC{'var} carry a \AD{String} and potentially some
 extra information \AB{E} (typically a position in a file). The other
 constructor \AIC{'con} carries a layer of raw terms where subterms are
-raw terms equiped with names for any newly-bound variables.
+raw terms equiped with names for any newly bound variables.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Scopecheck.tex]{withnames}
 \ExecuteMetaData[Generic/Scopecheck.tex]{raw}
-\caption{Names and Raw Terms}
-\end{figure}
+%\caption{Names and Raw Terms}
+\end{center}
 
-\paragraph{Error Handling} Various things can go wrong during scope checking:
+\paragraph{Error handling.} Various things can go wrong during scope checking:
 evidently a name can be out of scope but it is also possible that it may be
 associated to a variable of the wrong sort. We define an enumerating type
 covering these two cases. The scope checker will return a computation in the
 Monad \AF{Fail} thus allowing us to fail and return an error, the string that
 caused the failure and the extra data of type \AB{E} that accompanied it.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}[t]{0.5\textwidth}
   \ExecuteMetaData[Generic/Scopecheck.tex]{error}
 \end{minipage}
@@ -81,16 +80,16 @@ caused the failure and the extra data of type \AB{E} that accompanied it.
   \ExecuteMetaData[Generic/Scopecheck.tex]{monad}
   \ExecuteMetaData[Generic/Scopecheck.tex]{fail}
 \end{minipage}
-\caption{Error Type and Scope Checking Monad}\label{fig:scopemonad}
-\end{figure}
+%\caption{Error Type and Scope Checking Monad}\label{fig:scopemonad}
+\end{center}
 
 Equipped with these notions, we can write down the type of \AF{toVar} which
-tackles the core of the problem: variable resolution. \revc{The function takes a
+tackles the core of the problem: variable resolution. The function takes a
 string and a sort as well the names and sorts of the variables in the ambient
 scope. Provided that we have a function \AB{\_≟I\_} to decide equality on sorts,
 we can check whether the string corresponds to an existing variable and whether
 that binding is of the right sort. Thus we either fail or return a well scoped
-and well sorted \AD{Var}.}
+and well sorted \AD{Var}.
 
 If the ambient scope is empty then we can only fail with an \AIC{OutOfScope} error.
 Alternatively, if the variable's name corresponds to that of the first one
@@ -98,10 +97,10 @@ in scope we check that the sorts match up and either return \AIC{z} or fail
 with a \AIC{WrongSort} error. Otherwise we look for the variable further
 down the scope and use \AIC{s} to lift the result to the full scope.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Scopecheck.tex]{toVar}
-\caption{Variable Resolution}
-\end{figure}
+%\caption{Variable Resolution}
+\end{center}
 
 Scope checking an entire term then amounts to lifting this action on
 variables to an action on terms. The error Monad \AF{Fail} is by
@@ -112,7 +111,7 @@ As we can see in the second equation for \AF{toScope}, thanks to the
 definition of \AF{WithNames}, concrete names arrive just in time to
 check the subterm with newly-bound variables.
 
-\begin{figure}[h]
+\begin{center}
 \ExecuteMetaData[Generic/Scopecheck.tex]{scopecheck}
-\caption{Generic Scope Checking for Terms and Scopes}
-\end{figure}
+%\caption{Generic Scope Checking for Terms and Scopes}
+\end{center}

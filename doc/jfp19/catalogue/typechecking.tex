@@ -1,4 +1,4 @@
-\subsection{An Algebraic Approach to Typechecking}\label{section:typechecking}
+\subsection{An algebraic approach to typechecking}\label{section:typechecking}
 
 Following Atkey~\citeyear{atkey2015algebraic}, we can consider type checking
 and type inference as a possible semantics for a bidirectional~\cite{pierce2000local}
@@ -20,15 +20,15 @@ and generate helpful error messages pointing out where the type error occured. T
 interested reader can see a fine-grained analysis of type errors in the extended
 example of a typechecker in \citet{DBLP:journals/jfp/McBrideM04}.}
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}[t]{0.40\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{varmode}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.50\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typemode}
 \end{minipage}
-\caption{Var- and Type- Relations indexed by Mode}
-\end{figure}
+%\caption{Var- and Type- Relations indexed by Mode}
+\end{center}
 
 A change of direction from inferring to checking will require being able to check
 that two types agree so we introduce the function \AF{\_=?\_}. Similarly we will
@@ -36,15 +36,15 @@ sometimes expect a function type but may be handed anything so we will have to c
 with \AF{isArrow} that our candidate's head constructor is indeed an arrow, and
 collect the domain and codomain.
 
-\begin{figure}[h]
+\begin{center}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typeeq}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{isArrow}
 \end{minipage}
-\caption{Tests for \AD{Type} values}
-\end{figure}
+%\caption{Tests for \AD{Type} values}
+\end{center}
 
 We can now define typechecking as a \semrec{}. We describe the algorithm constructor
 by constructor; in the \AR{Semantics} definition (omitted here) the algebra will
@@ -53,14 +53,14 @@ following code, \AF{\_<\$\_} is, following classic Haskell notations, the functi
 which takes an \AB{A} and a {\AD{Maybe} \AB{B}} and returns a {\AD{Maybe} \AB{A}}
 which has the same structure as its second argument.
 
-\paragraph{Application} When facing an application: infer the type of the function,
+\paragraph{Application.} When facing an application: infer the type of the function,
 make sure it is an arrow type, check the argument at the domain's type and return
 the codomain.
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{app}
 \end{agdasnippet}
 %
-\paragraph{λ-abstraction} For a λ-abstraction: check that the input
+\paragraph{λ-abstraction.} For a λ-abstraction: check that the input
 type \AB{arr} is an arrow type and check the body \AB{b} at the
 codomain type in the extended environment (using \AF{bind}) where the
 newly-bound variable is of mode \AIC{Infer} and has the domain's type.
@@ -75,12 +75,12 @@ inferred type is equal to the expected one.
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{emb}
 \end{agdasnippet}
 %
-\paragraph{Cut: A \AD{Check} in an \AD{Infer} position} 
-\revc{So far, our bidirectional syntax only permits the construction
+\paragraph{Cut: A \AD{Check} in an \AD{Infer} position.} 
+So far, our bidirectional syntax only permits the construction
   of STLC terms in \emph{canonical
     form}~\cite{Pfenning:04,Dunfield:2004:TT:964001.964025}. In order to construct
   non-normal (redex) terms, whose semantics is given logically by the
-  `cut' rule, we need to reverse direction. } 
+  `cut' rule, we need to reverse direction.
 Our final semantic operation, \AF{cut}, 
 always comes with a type candidate against which to check the term and
 to be returned in case of success.
@@ -94,15 +94,20 @@ using the \AF{closed} corollary defined in Section~\ref{sec:fundamentallemma}
 and (defining \AF{β} to be {(\AIC{α} \AIC{`→} \AIC{α})}) infer the type of
 the expression {(λx. x : β → β) (λx. x)}.
 
-\begin{figure}[h!]
-\begin{minipage}{0.35\textwidth}
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{type-}
-\end{minipage}\hfill
-\begin{minipage}{0.55\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{example}
-\end{minipage}
-\caption{Type- Inference / Checking as a Semantics\label{defn:BidiSemantics}}
-\end{figure}
+\end{agdasnippet}
+
+% \begin{minipage}{0.6\textwidth}
+% \begin{minipage}{0.35\textwidth}
+  
+% \end{minipage}
+
+% \begin{minipage}{0.55\textwidth}
+% \end{minipage}
+% %\caption{Type- Inference / Checking as a Semantics\label{defn:BidiSemantics}}
+% \end{minipage}
 
 The output of this function is not very informative. As we will see shortly,
 there is nothing stopping us from moving away from a simple computation
