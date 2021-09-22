@@ -60,6 +60,7 @@ PAPER_DEPENDENCIES:=\
   latex/unicode.tex \
   latex/agda.sty \
   latex/main.bib \
+  latex/strings.bib
 
 SLIDES_DEPENDENCIES:=\
   latex/$(SLIDES).tex\
@@ -78,7 +79,7 @@ latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 latex/$(PAPER).pdf: $(PAPER_DEPENDENCIES)
 	cd latex; latexmk -pdf -bibtex $(PAPER).tex
 
-latex/main.bib: ../common/main.bib
+latex/%.bib: ../common/%.bib
 	@mkdir -p $(dir $@)
 	cp $< $@
 

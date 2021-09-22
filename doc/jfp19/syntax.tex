@@ -5,7 +5,7 @@
 \section{Introduction}
 
 In modern typed programming languages, programmers writing embedded
-DSLs~\cite{hudak1996building} and researchers formalising them can now
+Domain-Specific Languages (DSLs)~\cite{hudak1996building} and researchers formalising them can now
 use the host language's type system to help them. Using Generalised
 Algebraic Data Types (GADTs) or the more general indexed families of
 Type Theory~\cite{dybjer1994inductive} to represent syntax,
@@ -202,7 +202,7 @@ reader may have noticed that we use a seemingly out-of-scope variable
 variables that the system should implicitly quantify over if it happens
 to find them used in types. This allows us to lighten the presentation
 by omitting a large number of prenex quantifiers. The reader will hopefully
-be familiar enough with ML-style polymorphic types that this will
+be familiar enough with prenex polymorphic types in the style of Standard ML \cite{defnsml} that this will
 seem natural to them.
 }
 
@@ -278,8 +278,9 @@ convention (see e.g.~\citet{martin1982constructive}) of mentioning
 only context \emph{extensions} when presenting judgements.
 \revc{That is
 to say that we aim to write sequents with an \emph{implicit} ambient
-context. Concretely: we would rather use the rule \AB{appᵢ} than
-\AB{appₑ} as the inference rule for application in STLC.
+context. Concretely: in the simply typed
+$\lambda$-calculus (STLC) we would rather use the rule \AB{appᵢ} than
+\AB{appₑ} as the inference rule for application.
 
 \begin{mathpar}
 \inferrule{f : σ → τ \and t : σ}
@@ -355,7 +356,7 @@ desugars to the more verbose type
 As the context argument comes second in the definition of
 \AF{\_─Scoped}, we can readily use these combinators to thread,
 modify, or quantify over the scope when defining such families, as for
-example in this datatype for scope and kind aware de Bruijn indices:
+example in this datatype for scope- and sort-aware de Bruijn indices:
 %Figure~\ref{fig:Var}. 
 
 \begin{minipage}{\textwidth}
@@ -414,7 +415,7 @@ reader see to which binders each de Bruijn index refers):
 
 \section{A primer on type- and scope-safe programs}\label{section:primer-program}
 
-The scope- and type- safe representation described in the previous
+The type- and scope-safe representation described in the previous
 section is naturally only a start. Once the programmer has access to a
 good representation of the language they are interested in, they will
 want to write programs manipulating terms.  Renaming and substitution
@@ -508,7 +509,7 @@ move.
 Previous efforts in dependently typed
 programming~\cite{benton2012strongly,allais2017type}
 have achieved this goal and refactored renaming and substitution,
-but also normalisation by evaluation, printing with names or CPS conversion
+but also normalisation by evaluation, printing with names or continuation-passing style (CPS) conversion
 as various instances of a more general traversal. As we will show in Section~\ref{section:typechecking},
 typechecking in the style of Atkey~\citeyear{atkey2015algebraic} also
 fits in that framework. To make sense of this body of work, we
@@ -587,11 +588,13 @@ the \AF{□} combinator freely turns any (\AD{List} I)-indexed Set into a
 
 \subsection{A Generic Notion of Semantics}
 
-As we show in our previous work \cite{allais2017type}, which we will refer to mnemonically as ACMM, once
-equipped with these new notions we can define an abstract concept
-of semantics for our scope- and type- safe language. Provided that a set of
-constraints on two ({\AF{Type} \AF{─Scoped}}) families \AB{𝓥} and \AB{𝓒} is
-satisfied, we will obtain a traversal of the following type:
+As we showed in Allais, Chapman, McBride and McKinna
+\citeyear{allais2017type}, which we will refer to mnemonically as
+ACMM, once equipped with these new notions we can define an abstract
+concept of semantics for our type- and scope-safe language. Provided
+that a set of constraints on two ({\AF{Type} \AF{─Scoped}}) families
+\AB{𝓥} and \AB{𝓒} is satisfied, we will obtain a traversal of the
+following type:
 
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semtype}  
@@ -599,7 +602,7 @@ satisfied, we will obtain a traversal of the following type:
 
 Broadly speaking, a semantics turns our deeply embedded abstract syntax
 trees into the shallow embedding of the corresponding parametrised higher
-order abstract syntax term. We get a choice of useful scope- and type- safe
+order abstract syntax term. We get a choice of useful type- and scope-safe
 traversals by using different `host languages' for this shallow embedding.
 
 Semantics, specified in terms of a record \semrec{}, are defined in terms
@@ -793,7 +796,7 @@ argument between parentheses.
 \end{agdasnippet}
 
 To print a λ-abstraction, we start by generating a fresh name, \AB{x}, for the
-newly-bound variable, use that name to generate a string \AB{b} representing the
+newly bound variable, use that name to generate a string \AB{b} representing the
 body of the function to which we prepend a ``λ'' binding the name \AB{x}.
 
 \begin{agdasnippet}
@@ -1250,7 +1253,7 @@ have to abide by three constraints:
 Here we crucially use the fact that the meaning of a description is
 defined in terms of a function interpreting substructures which has
 the type \AF{List} \AB{I} \AS{→} \AB{I}\AF{─Scoped}, i.e. that gets access
-to the current scope but also the exact list of the kinds of the newly bound variables.
+to the current scope but also the exact list of the sorts of the newly bound variables.
 We define a function \AF{Kripke} by case analysis on the number of newly bound
 variables. It is essentially a subcomputation waiting for a value associated to
 each one of the fresh variables.
@@ -1259,7 +1262,7 @@ each one of the fresh variables.
     to the result of the evaluation function's recursive call;
   \item But if there are newly bound variables then we expect to have a function
     space. In any context extension, it will take an environment of values for
-    the newly-bound variables and produce a computation corresponding to the
+    the newly bound variables and produce a computation corresponding to the
     evaluation of the body of the binder.
 \end{itemize}
 
@@ -1968,7 +1971,7 @@ Many other opportunities to enrich the notion of binder in our library are
 highlighted by Cheney~\citeyear{DBLP:conf/icfp/Cheney05a}. As we have demonstrated
 in Sections~\ref{section:letbinding} and \ref{section:inlining} we can already
 handle let-bindings generically for all syntaxes. We are currently considering
-the modification of our system to handle deeply-nested patterns by removing the
+the modification of our system to handle deeply nested patterns by removing the
 constraint that the binders' and variables' sorts are identical. A notion of
 binding corresponding to hierarchical namespaces would be an exciting addition.
 
@@ -2028,7 +2031,7 @@ implementing common traversals and lemmas about them.
 
 \subsection{Universes of syntaxes with binding} Keeping in mind Altenkirch
 and McBride's observation that generic programming is everyday programming
-in dependently-typed languages~\citeyear{DBLP:conf/ifip2-1/AltenkirchM02}, we can naturally
+in dependently typed languages~\citeyear{DBLP:conf/ifip2-1/AltenkirchM02}, we can naturally
 expect generic, provably sound, treatments of these notions in tools such as
 Agda or Coq.
 
@@ -2038,7 +2041,7 @@ closed under products but also sums as long as the disjoint patterns bind the sa
 variables. They give their universe two distinct semantics: a first one based on well
 scoped de Bruijn indices and a second one based on Parametric Higher-Order Abstract
 Syntax (PHOAS)~\cite{DBLP:conf/icfp/Chlipala08} together with a generic conversion
-function from the de Bruijn syntax to the PHOAS one. Following McBride~\citeyear{mcbride2005type},
+function from the de Bruijn syntax to the PHOAS one. Following McBride's unpublished 2005 manuscript, which emerged as \cite{benton2012strongly},
 they implement both renaming and substitution in one fell swoop. They leave other
 opportunities for generic programming and proving to future work.
 
@@ -2063,7 +2066,7 @@ for defining new well scoped-and-typed semantics and proving their properties.
 
 Érdi~\citeyear{gergodraft} defines a universe inspired by a first draft of this
 paper and gives three different interpretations (raw, scoped and typed syntax)
-related via erasure. He provides scope- and type-preserving renaming and
+related via erasure. He provides type- and scope-preserving renaming and
 substitution as well as various generic proofs that they are well behaved but
 offers neither a generic notion of semantics, nor generic proof frameworks.
 
@@ -2096,7 +2099,7 @@ rely on similar generic proofs that these transformations are meaning-preserving
 \section{Conclusion and future work}
 
 Recalling our earlier work~\citeyear{allais2017type}
-we have started from an example of a scope- and type- safe language (the simply typed
+we have started from an example of a type- and scope-safe language (the simply typed
 λ-calculus), have studied common invariant preserving traversals and noticed their
 similarity. After introducing a notion of semantics and refactoring these traversals as
 instances of the same fundamental lemma, we have observed the tight
@@ -2105,7 +2108,7 @@ language.
 
 By extending a universe of datatype descriptions to support a notion of binding,
 we have given a generic presentation of syntaxes with binding. We then described
-a large class of scope- and type-safe generic programs acting on all of them.
+a large class of type- and scope-safe generic programs acting on all of them.
 We started with syntactic traversals such as renaming and substitution. We then
 demonstrated how to write a small compiler pipeline: scope checking, type checking
 and elaboration to a core language, desugaring of new constructors added by a language
@@ -2148,16 +2151,16 @@ for instance, the \AIC{`lam} constructor is only offered if the input sort is
 a function type) would not suffer from this limitation.
 
 \paragraph{Unrestricted variables.} Our current notion of variable can be used
-to form a term of any kind. We remarked in Sections~\ref{section:typechecking}
+to form a term of any sort. We remarked in Sections~\ref{section:typechecking}
 and \ref{section:elaboration} that in some languages we want to restrict this
-ability to one kind in particular. In that case, we wanted users to only be able
-to use variables at the kind \AIC{Infer} of our bidirectional language. For the
+ability to one sort in particular. In that case, we wanted users to only be able
+to use variables at the sort \AIC{Infer} of our bidirectional language. For the
 time being we made do by restricting the environment values our \AR{Semantics}
-use to a subset of the kinds: terms with variables of the wrong kind will not be
+use to a subset of the sorts: terms with variables of the wrong sort will not be
 given a semantics.
 
 \paragraph{Flat binding structure.} Our current setup limits us to flat binding
-structures: variable and binder share the same kinds. This prevents us from
+structures: variables and binders share the same sorts. This prevents us from
 representing languages with binding patterns, for instance pattern-matching
 let-binders which can have arbitrarily nested patterns taking pairs apart.
 
@@ -2168,7 +2171,7 @@ be closed under derivatives so that the formalisation of e.g. evaluation context
 could benefit directly from the existing machinery.
 
 \paragraph{Closure under closures.} Jander's work on formalising and certifying
-continuation passing style transformations~\cite{Jander:Thesis:2019}
+continuation-passing style transformations~\cite{Jander:Thesis:2019}
 highlighted the need for a notion of syntaxes with closures. Recalling
 that our notion of Semantics is always compatible with precomposition
 with a renaming~\cite{Kaiser-wsdebr} but not necessarily
@@ -2203,8 +2206,8 @@ future research.
   \cite{DBLP:journals/jfp/OHearn03}, or arbitrary algebraic structures
   \cite{DBLP:conf/rta/LicataSR17}, and in investigating what form a
   generic semantics for these syntaxes takes.
-\item An extension of McBride's theory of
-  ornaments~\citeyear{mcbride2010ornamental} could provide an
+\item An extension of Dagand and McBride's theory of
+  ornaments~\citeyear{DBLP:journals/jfp/DagandM14} could provide an
   appropriate framework to formalise and mechanise the connection
   between various languages, some being seen as refinements of
   others. This is particularly evident when considering the

@@ -92,8 +92,7 @@ to be expressed in types. Nevertheless, the programmer is still forced
 to write the same boilerplate over again for each new implementation
 of a scope safe operation (e.g., renaming, substitution, desugaring,
 printing, etc.), and then again for correctness proofs.
-
-We present\footnote{This paper is typeset in \AF{colour}.} an expressive universe of syntaxes with binding and
+We present an expressive universe of syntaxes with binding and
 demonstrate how to (1) implement scope safe traversals once and for
 all by generic programming; and (2) how to derive properties of these
 traversals by generic proving. Our universe description, generic
@@ -105,9 +104,21 @@ at \url{https://github.com/gallais/generic-syntax}.
 
 \input{syntax.tex}
 
+\section*{Acknowledgements}
+
+Atkey would like to acknowledge the support of EPSRC grant no. EP/XXXX.
+
+The authors would like to thank the ICFP and JFP reviewers for their
+useful comments, and the JFP editors for their patience.
+
+\section*{Conflicts of Interest}
+
+None.
+
+
 \renewcommand{\bibsection}{}
 \section*{References}
 \bibliographystyle{jfp}
-\bibliography{main}
+\bibliography{strings,main}
 
 \end{document}

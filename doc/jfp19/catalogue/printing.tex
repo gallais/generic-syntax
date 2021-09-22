@@ -22,7 +22,7 @@ names for the bound variables:
 Reusing the notion of \AR{Name} introduced in Section~\ref{section:printing},
 we can make \AF{Pieces} formal. A subterm has already been printed if we
 have a string representation of it together with an environment of \AR{Name}s
-we have attached to the newly-bound variables this structure contains.
+we have attached to the newly bound variables this structure contains.
 That is to say:
 %
 \begin{agdasnippet}
@@ -57,7 +57,7 @@ the type we expect.
 
 Otherwise we proceed in a manner reminiscent of the pure reification function
 defined at the end of Section~\ref{section:renandsub}. We start by generating an environment
-of names for the newly-bound variables by using the fact that \AF{Fresh} composed
+of names for the newly bound variables by using the fact that \AF{Fresh} composed
 with \AF{Name} is \AR{VarLike} together with the fact that environments are
 Traversable~\cite{mcbride_paterson_2008}, %%%
 and thus admit the standard Haskell-like \AF{mapA} and \AF{sequenceA}
