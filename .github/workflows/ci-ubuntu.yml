@@ -138,6 +138,7 @@ jobs:
 
       # Generate a fresh Everything.agda & index.agda and start building!
       - name: Build
+        shell: bash
         run: |
           cd doc/common
           echo "$PATH"
