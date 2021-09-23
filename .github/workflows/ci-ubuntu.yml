@@ -140,6 +140,7 @@ jobs:
       - name: Build
         run: |
           cd doc/common
+          echo "$PATH"
           AGDA="${{ env.AGDA }}" make || cat latex/Data/Environment.log
 
       # # Note that if you want to deploy html for different versions like the
