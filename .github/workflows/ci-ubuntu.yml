@@ -72,7 +72,7 @@ jobs:
       # The script won't be able to find Agda if we don't tell it to look at the
       # content of ~/.cabal/bin/
       - name: Put cabal programs in PATH
-        run: echo "~/.cabal/bin/" >> $GITHUB_PATH
+        run: echo "$HOME/.cabal/bin/" >> $GITHUB_PATH
 
 ########################################################################
 ## CACHING
@@ -138,7 +138,6 @@ jobs:
 
       # Generate a fresh Everything.agda & index.agda and start building!
       - name: Build
-        shell: bash
         run: |
           cd doc/common
           echo "$PATH"
