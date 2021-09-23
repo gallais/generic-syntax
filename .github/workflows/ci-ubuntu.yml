@@ -145,7 +145,7 @@ jobs:
           cd doc/common
           AGDA="${{ env.AGDA }}" make
           cd - && cd doc/jfp19
-          make
+          make || cat latex/jfp19.log
 
       # # Note that if you want to deploy html for different versions like the
       # # standard library does, you will need to be a bit more subtle in this
