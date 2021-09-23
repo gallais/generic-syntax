@@ -70,9 +70,9 @@ jobs:
           fi
 
       # The script won't be able to find Agda if we don't tell it to look at the
-      # content of ~/.cabal/bin
+      # content of ~/.cabal/bin/
       - name: Put cabal programs in PATH
-        run: echo "~/.cabal/bin" >> $GITHUB_PATH
+        run: echo "~/.cabal/bin/" >> $GITHUB_PATH
 
 ########################################################################
 ## CACHING
@@ -141,6 +141,7 @@ jobs:
         run: |
           cd doc/common
           echo "$PATH"
+          ls ~/.cabal/bin
           AGDA="${{ env.AGDA }}" make || cat latex/Data/Environment.log
 
       # # Note that if you want to deploy html for different versions like the
