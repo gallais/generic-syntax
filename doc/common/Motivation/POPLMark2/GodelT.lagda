@@ -66,7 +66,7 @@ private
     σ σ₁ σ₂ τ ν : Type
     ⊡ ⊡₁ ⊡₂ : Type
     Γ Δ : List Type
-    t t′ u u′ f g b b′ l m r s : Term σ Γ
+    t t′ u u′ f g b b′ l m r s ze ze′ su su′ : Term σ Γ
     ρ ρ' : (Γ ─Env) Term Δ
     i : Size
 
@@ -110,24 +110,24 @@ pattern `rec ze su t  = `con (`rec' ze su t)
 infix 3 _⊢_∋_↝_ _⊢_∋_↝⋆_
 data _⊢_∋_↝_ Γ : ∀ τ → Term τ Γ → Term τ Γ → Set where
 -- computational
-  β    : ∀ {σ τ} t (u : Term σ Γ) → Γ ⊢ τ ∋ `λ t `∙ u ↝ t [ u /0]
-  ι₁   : ∀ {σ τ ν} (t : Term σ Γ) l (r : Term ν (τ ∷ Γ)) → Γ ⊢ ν ∋ `case (`i₁ t) l r ↝ l [ t /0]
-  ι₂   : ∀ {σ τ ν} (t : Term τ Γ) (l : Term ν (σ ∷ Γ)) r → Γ ⊢ ν ∋ `case (`i₂ t) l r ↝ r [ t /0]
-  ιz   : ∀ {σ} ze su → Γ ⊢ σ ∋ `rec ze su `0 ↝ ze
-  ιs   : ∀ {σ} ze su t → Γ ⊢ σ ∋ `rec ze su (`1+ t) ↝ sub (base vl^Tm ∙ t ∙ `rec ze su t) su
+  β    : ∀ t (u : Term σ Γ) → Γ ⊢ τ ∋ `λ t `∙ u ↝ t [ u /0]
+  ι₁   : ∀ (t : Term σ Γ) l (r : Term ν (τ ∷ Γ)) → Γ ⊢ ν ∋ `case (`i₁ t) l r ↝ l [ t /0]
+  ι₂   : ∀ (t : Term τ Γ) (l : Term ν (σ ∷ Γ)) r → Γ ⊢ ν ∋ `case (`i₂ t) l r ↝ r [ t /0]
+  ιz   : ∀ ze su → Γ ⊢ σ ∋ `rec ze su `0 ↝ ze
+  ιs   : ∀ ze su t → Γ ⊢ σ ∋ `rec ze su (`1+ t) ↝ sub (base vl^Tm ∙ t ∙ `rec ze su t) su
 -- structural
-  [λ]  : ∀ {σ τ t u} → (σ ∷ Γ) ⊢ τ ∋ t ↝ u → Γ ⊢ σ ⇒ τ ∋ `λ t ↝ `λ u
-  [∙]₁ : ∀ {σ τ t u} f → Γ ⊢ σ ∋ t ↝ u → Γ ⊢ τ ∋ f `∙ t ↝ f `∙ u
-  [∙]₂ : ∀ {σ τ f g} → Γ ⊢ σ ⇒ τ ∋ f ↝ g → ∀ t → Γ ⊢ τ ∋ f `∙ t ↝ g `∙ t
-  [i₁] : ∀ {σ τ t u} → Γ ⊢ σ ∋ t ↝ u → Γ ⊢ σ + τ ∋ `i₁ t ↝ `i₁ u
-  [i₂] : ∀ {σ τ t u} → Γ ⊢ τ ∋ t ↝ u → Γ ⊢ σ + τ ∋ `i₂ t ↝ `i₂ u
-  [1+] : ∀ {t u} → Γ ⊢ ℕ ∋ t ↝ u → Γ ⊢ ℕ ∋ `1+ t ↝ `1+ u
-  [c]₁ : ∀ {σ τ ν t u} → Γ ⊢ σ + τ ∋ t ↝ u → ∀ l r → Γ ⊢ ν ∋ `case t l r ↝ `case u l r
-  [c]₂ : ∀ {σ τ ν l m} → ∀ t → σ ∷ Γ ⊢ ν ∋ l ↝ m → (r : Term ν (τ ∷ Γ)) → Γ ⊢ ν ∋ `case t l r ↝ `case t m r
-  [c]₃ : ∀ {σ τ ν r s} → ∀ t → (l : Term ν (σ ∷ Γ)) → τ ∷ Γ ⊢ ν ∋ r ↝ s → Γ ⊢ ν ∋ `case t l r ↝ `case t l s
-  [r]₁ : ∀ {σ ze ze′} → Γ ⊢ σ ∋ ze ↝ ze′ → ∀ su t → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze′ su t
-  [r]₂ : ∀ {σ su su′} ze → σ ∷ ℕ ∷ Γ ⊢ σ ∋ su ↝ su′ → ∀ t → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze su′ t
-  [r]₃ : ∀ {σ t t′} ze su → Γ ⊢ ℕ ∋ t ↝ t′ → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze su t′
+  [λ]  : (σ ∷ Γ) ⊢ τ ∋ t ↝ u → Γ ⊢ σ ⇒ τ ∋ `λ t ↝ `λ u
+  [∙]₁ : ∀ f → Γ ⊢ σ ∋ t ↝ u → Γ ⊢ τ ∋ f `∙ t ↝ f `∙ u
+  [∙]₂ : Γ ⊢ σ ⇒ τ ∋ f ↝ g → ∀ t → Γ ⊢ τ ∋ f `∙ t ↝ g `∙ t
+  [i₁] : Γ ⊢ σ ∋ t ↝ u → Γ ⊢ σ + τ ∋ `i₁ t ↝ `i₁ u
+  [i₂] : Γ ⊢ τ ∋ t ↝ u → Γ ⊢ σ + τ ∋ `i₂ t ↝ `i₂ u
+  [1+] : Γ ⊢ ℕ ∋ t ↝ u → Γ ⊢ ℕ ∋ `1+ t ↝ `1+ u
+  [c]₁ : Γ ⊢ σ + τ ∋ t ↝ u → ∀ l r → Γ ⊢ ν ∋ `case t l r ↝ `case u l r
+  [c]₂ : ∀ t → σ ∷ Γ ⊢ ν ∋ l ↝ m → (r : Term ν (τ ∷ Γ)) → Γ ⊢ ν ∋ `case t l r ↝ `case t m r
+  [c]₃ : ∀ t → (l : Term ν (σ ∷ Γ)) → τ ∷ Γ ⊢ ν ∋ r ↝ s → Γ ⊢ ν ∋ `case t l r ↝ `case t l s
+  [r]₁ : Γ ⊢ σ ∋ ze ↝ ze′ → ∀ su t → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze′ su t
+  [r]₂ : ∀ ze → σ ∷ ℕ ∷ Γ ⊢ σ ∋ su ↝ su′ → ∀ t → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze su′ t
+  [r]₃ : ∀ ze su → Γ ⊢ ℕ ∋ t ↝ t′ → Γ ⊢ σ ∋ `rec ze su t ↝ `rec ze su t′
 
 tgt : ∀ {Γ σ t u} → Γ ⊢ σ ∋ t ↝ u → Term σ Γ
 tgt {u = u} _ = u
@@ -139,7 +139,7 @@ _⊢_∋_↝⋆_ : ∀ Γ σ → Term σ Γ → Term σ Γ → Set
 -- Stability of Reduction under thinning and substitution
 -- (Stability of Typing is a consequence of Term being a typed syntax)
 
-th^↝ : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ ren ρ t ↝ ren ρ u
+th^↝ : ∀ ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ ren ρ t ↝ ren ρ u
 th^↝ ρ (β t u)        = subst (_ ⊢ _ ∋ ren ρ (`λ t `∙ u) ↝_) (renβ TermD t (ε ∙ u) ρ) (β _ _)
 th^↝ ρ (ι₁ t l r)     = subst (_ ⊢ _ ∋ ren ρ (`case (`i₁ t) l r) ↝_) (renβ TermD l (ε ∙ t) ρ) (ι₁ _ _ _)
 th^↝ ρ (ι₂ t l r)     = subst (_ ⊢ _ ∋ ren ρ (`case (`i₂ t) l r) ↝_) (renβ TermD r (ε ∙ t) ρ) (ι₂ _ _ _)
@@ -159,7 +159,7 @@ th^↝ ρ ([r]₂ ze c t)  = [r]₂ (ren ρ ze) (th^↝ _ c) (ren ρ t)
 th^↝ ρ ([r]₃ ze su c) = [r]₃ (ren ρ ze) (ren _ su) (th^↝ ρ c)
 
 -- Lemma 1.3
-sub^↝ : ∀ {σ Γ Δ t u} ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ sub ρ t ↝ sub ρ u
+sub^↝ : ∀ ρ → Γ ⊢ σ ∋ t ↝ u → Δ ⊢ σ ∋ sub ρ t ↝ sub ρ u
 sub^↝ ρ (β t u)        = subst (_ ⊢ _ ∋ sub ρ (`λ t `∙ u) ↝_) (subβ TermD t (ε ∙ u) ρ) (β _ _)
 sub^↝ ρ (ι₁ t l r)     = subst (_ ⊢ _ ∋ sub ρ (`case (`i₁ t) l r) ↝_) (subβ TermD l (ε ∙ t) ρ) (ι₁ _ _ _)
 sub^↝ ρ (ι₂ t l r)     = subst (_ ⊢ _ ∋ sub ρ (`case (`i₂ t) l r) ↝_) (subβ TermD r (ε ∙ t) ρ) (ι₂ _ _ _)
@@ -185,12 +185,12 @@ sub^↝ ρ ([r]₃ ze su r) = [r]₃ (sub ρ ze) (sub _ su) (sub^↝ ρ r)
 ↝⋆ᴿ : Rel Term Term
 rel ↝⋆ᴿ = _ ⊢_∋_↝⋆_
 
-[v↦t↝⋆t] : ∀ {Γ Δ} {ρ : (Γ ─Env) Term Δ} → R.All ↝⋆ᴿ Γ ρ ρ
+[v↦t↝⋆t] : ∀ {ρ : (Γ ─Env) Term Δ} → R.All ↝⋆ᴿ Γ ρ ρ
 lookupᴿ [v↦t↝⋆t] k = S.ε
 
 -- 1., 2., 3., 4.: cf. Star's gmap
 -- 5.
-sub^↝⋆ : ∀ {σ Γ Δ} (t : Term σ Γ) {ρ ρ′} →
+sub^↝⋆ : ∀ (t : Term σ Γ) {ρ ρ′} →
          R.All ↝⋆ᴿ Γ ρ ρ′ → Δ ⊢ σ ∋ sub ρ t ↝⋆ sub ρ′ t
 sub^↝⋆ t ρᴿ = Simulation.sim sim ρᴿ t where
 
