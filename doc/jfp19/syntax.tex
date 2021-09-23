@@ -141,7 +141,7 @@ related work in Section~\ref{section:related-work}.
 
 \section{A primer on scope- and sort-safe terms}\label{section:primer-term}
 
-\paragraph{From tnductive types to inductive families for abstract
+\paragraph{From inductive types to inductive families for abstract
   syntax.} A reasonable way to represent the abstract syntax of the
 untyped $\lambda$-calculus in a typed functional programming language
 is to use an inductive type:
@@ -356,7 +356,7 @@ As the context argument comes second in the definition of
 \AF{\_─Scoped}, we can readily use these combinators to thread,
 modify, or quantify over the scope when defining such families, as for
 example in this data type for scope- and sort-aware de Bruijn indices:
-%Figure~\ref{fig:Var}. 
+%Figure~\ref{fig:Var}.
 
 \begin{minipage}{\textwidth}
   \ExecuteMetaData[Data/Var.tex]{var}
@@ -521,7 +521,7 @@ between indexed types, to crisply encapsulate the additional quantification
 over environment extensions which is typical of Kripke semantics.
 %%%
 
-\paragraph{The special case of thinnings.} 
+\paragraph{The special case of thinnings.}
 \begin{displaymath}
   \begin{minipage}{0.5\linewidth}
     \ExecuteMetaData[Data/Environment.tex]{thinning}
@@ -596,7 +596,7 @@ that a set of constraints on two ({\AF{Type} \AF{─Scoped}}) families
 following type:
 
 \begin{agdasnippet}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semtype}  
+\ExecuteMetaData[StateOfTheArt/ACMM.tex]{semtype}
 \end{agdasnippet}
 
 Broadly speaking, a semantics turns our deeply embedded abstract syntax
@@ -1396,13 +1396,13 @@ respectively).
   by combining the use of placeholder values and thinnings.
   In the \AD{Var} case these very general definitions respectively specialise
   to the identity renaming for a context \AB{Γ} and the injection of \AB{Γ}
-  fresh variables to the right or the left of an ambient context \AB{Δ}. 
+  fresh variables to the right or the left of an ambient context \AB{Δ}.
   %%%
   Similarly, in the \AD{Tm} case, we can show \AF{base} \AF{vl\textasciicircum{}Tm}
-  extensionally equal to the identity environment \AF{id\textasciicircum{}Tm} 
-  given by {\ARF{lookup} \AF{id\textasciicircum{}Tm} = \AIC{`var}},  
-  which associates each variable to itself (seen as a term). 
-} 
+  extensionally equal to the identity environment \AF{id\textasciicircum{}Tm}
+  given by {\ARF{lookup} \AF{id\textasciicircum{}Tm} = \AIC{`var}},
+  which associates each variable to itself (seen as a term).
+}
 Using these definitions, we can then implement \AF{reify} as follows:
 
 \begin{center}
