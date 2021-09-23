@@ -1,4 +1,4 @@
-AGDA=agda-2.6.0.1 +RTS -M2G -H2G -A128M -RTS
+AGDA ?= agda-2.6.1.3 +RTS -M2G -H2G -A128M -RTS
 
 AGDA_FILES:=$(shell find . -name "*.lagda" -type f | sed 's|\./||g' | sort)
 AGDA_OUTPUT:=$(patsubst %.lagda,latex/%.tex,$(AGDA_FILES))

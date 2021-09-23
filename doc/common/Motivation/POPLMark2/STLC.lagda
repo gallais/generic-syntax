@@ -1,5 +1,5 @@
 \begin{code}
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 module Motivation.POPLMark2.STLC where
 
@@ -329,6 +329,7 @@ cut-∘C t (app c u) c′ = cong (_`∙ u) (cut-∘C t c c′)
 ∘Cᴿ <>              c′ᴿ = c′ᴿ
 ∘Cᴿ (app cᴿ tᴿ) c′ᴿ = app (∘Cᴿ cᴿ c′ᴿ) tᴿ
 
+{-# TERMINATING #-}
 -- Lemma 4.9
 β⁻¹^Closed-sn : ∀ {Γ ⊡ σ τ} c b u → (σ ∷ Γ) ⊢sn ⊡ ∋ b → Γ ⊢sn σ ∋ u →
                 Γ ⊢sn τ ∋ cut (b [ u /0]) c → Γ ∣ ⊡ ⊢sn τ ∋ c →

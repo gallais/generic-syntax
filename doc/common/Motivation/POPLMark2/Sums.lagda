@@ -1,5 +1,5 @@
 \begin{code}
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 module Motivation.POPLMark2.Sums where
 
@@ -23,7 +23,7 @@ open import Data.Sum as Sum
 open import Data.Product as Prod
 open import Agda.Builtin.List
 open import Data.Product
-open import Data.Star as S using (Star)
+open import Relation.Binary.Construct.Closure.ReflexiveTransitive as S using (Star)
 open import Function hiding (_∋_)
 open import Relation.Binary.PropositionalEquality hiding ([_]); open ≡-Reasoning
 
@@ -454,6 +454,7 @@ cut-∘C t (cas c l r) c′ = cong (λ t → `case t l r) (cut-∘C t c c′)
 ∘Cᴿ (app cᴿ tᴿ)       c′ᴿ = app (∘Cᴿ cᴿ c′ᴿ) tᴿ
 ∘Cᴿ (cas cᴿ lᴿ rᴿ)   c′ᴿ = cas (∘Cᴿ cᴿ c′ᴿ) lᴿ rᴿ
 
+{-# TERMINATING #-}
 -- Lemma 4.9
 -- 1.
 β⁻¹^Closed-sn : ∀ c b u → (σ ∷ Γ) ⊢sn ⊡ ∋ b → Γ ⊢sn σ ∋ u →
@@ -475,6 +476,7 @@ cut-∘C t (cas c l r) c′ = cong (λ t → `case t l r) (cut-∘C t c c′)
          Γ ⊢sn τ ∋ cut (`λ b `∙ u) c
 β⁻¹^sn b^sn u^sn c[b[u]]^sn c^sn = sn (β⁻¹^Closed-sn _ _ _ b^sn u^sn c[b[u]]^sn c^sn)
 
+{-# TERMINATING #-}
 -- 2.
 ι₁⁻¹^Closed-sn : ∀ c t l r → Γ ⊢sn σ ∋ t → (σ ∷ Γ) ⊢sn ⊡ ∋ l → (τ ∷ Γ) ⊢sn ⊡ ∋ r →
   Γ ⊢sn ν ∋ cut (l [ t /0]) c → Γ ∣ ⊡ ⊢sn ν ∋ c →
@@ -497,6 +499,7 @@ cut-∘C t (cas c l r) c′ = cong (λ t → `case t l r) (cut-∘C t c c′)
 ι₁⁻¹^sn c t l r t^sn l^sn r^sn c[l[t]]^sn c^sn =
   sn (ι₁⁻¹^Closed-sn c t l r t^sn l^sn r^sn c[l[t]]^sn c^sn)
 
+{-# TERMINATING #-}
 -- 3.
 ι₂⁻¹^Closed-sn : ∀ c t l r → Γ ⊢sn τ ∋ t → (σ ∷ Γ) ⊢sn ⊡ ∋ l → (τ ∷ Γ) ⊢sn ⊡ ∋ r →
   Γ ⊢sn ν ∋ cut (r [ t /0]) c → Γ ∣ ⊡ ⊢sn ν ∋ c →

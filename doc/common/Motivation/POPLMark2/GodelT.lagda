@@ -1,4 +1,5 @@
 \begin{code}
+{-# OPTIONS --safe --sized-types #-}
 module Motivation.POPLMark2.GodelT where
 
 open import Data.Var using (Var; _─Scoped; injectˡ; injectʳ)
@@ -21,7 +22,7 @@ open import Data.Sum as Sum
 open import Data.Product as Prod
 open import Data.List.Base hiding ([_] ; lookup)
 open import Data.Product
-open import Data.Star as S using (Star)
+open import Relation.Binary.Construct.Closure.ReflexiveTransitive as S using (Star)
 open import Function hiding (_∋_)
 open import Relation.Binary.PropositionalEquality hiding ([_]); open ≡-Reasoning
 
