@@ -1,0 +1,3 @@
+name: generic-syntax
+include: .
+depend: standard-library

@@ -12,7 +12,6 @@ open import Function
 open import Relation.Binary.PropositionalEquality hiding ([_])
 open ≡-Reasoning
 open import Data.List hiding ([_] ; lookup)
-open import Data.Star
 
 open import StateOfTheArt.ACMM using (Type; α; _`→_) public
 
