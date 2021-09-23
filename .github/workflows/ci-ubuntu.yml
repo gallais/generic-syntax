@@ -136,11 +136,11 @@ jobs:
       - name: Checkout generic-syntax
         uses: actions/checkout@v2
 
-      # # Generate a fresh Everything.agda & index.agda and start building!
-      # - name: Build
-      #   run: |
-      #     cd doc/common
-      #     AGDA=${{ env.AGDA }} make
+      # Generate a fresh Everything.agda & index.agda and start building!
+      - name: Build
+        run: |
+          cd doc/common
+          AGDA=${{ env.AGDA }} make
 
       # # Note that if you want to deploy html for different versions like the
       # # standard library does, you will need to be a bit more subtle in this
