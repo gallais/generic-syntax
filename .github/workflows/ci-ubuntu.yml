@@ -140,7 +140,7 @@ jobs:
       - name: Build
         run: |
           cd doc/common
-          AGDA="${{ env.AGDA }}" make || cat latex/Data/Environment.log
+          AGDA="${{ env.AGDA }}" make
 
       # # Note that if you want to deploy html for different versions like the
       # # standard library does, you will need to be a bit more subtle in this
