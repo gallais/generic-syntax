@@ -97,7 +97,7 @@ jobs:
 ########################################################################
 
       - name: Install dependencies
-        run: sudo apt-get install -y latexmk texlive-base
+        run: sudo apt-get install -y latexmk texlive-base texlive-plain-generic
 
       - name: Install ghc and cabal
         if: steps.cache-cabal.outputs.cache-hit != 'true'
