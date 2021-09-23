@@ -38,14 +38,14 @@ In a dependently typed language, a type may depend on a value which
 in the presence of let bindings may be a variable standing for an
 expression. The user naturally does not want it to make any difference
 whether they used a variable referring to a let-bound expression or
-the expression itself. Various typechecking strategies can accommodate
+the expression itself. Various type checking strategies can accommodate
 this expectation: in Coq~\cite{Coq:manual} let bindings are primitive
 constructs of the language and have their own typing and reduction
 rules whereas in Agda they are elaborated away to the core language
 by inlining.
 
 This latter approach to extending a language \AB{d} with let bindings
-by inlining them before typechecking can be implemented generically as
+by inlining them before type checking can be implemented generically as
 a semantics over (\AB{d} \AF{`+} \AF{Let}). For this semantics values
 in the environment and computations are both let-free terms. The algebra
 of the semantics can be defined by parts thanks to \AF{case}, the eliminator

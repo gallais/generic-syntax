@@ -90,10 +90,10 @@ maintain the correct behaviour of bound variables. Modern programming
 languages include features that enable constraints like scope safety
 to be expressed in types. Nevertheless, the programmer is still forced
 to write the same boilerplate over again for each new implementation
-of a scope safe operation (e.g., renaming, substitution, desugaring,
-printing, etc.), and then again for correctness proofs.
+of a scope-safe operation (e.g., renaming, substitution, desugaring,
+printing), and then again for correctness proofs.
 We present an expressive universe of syntaxes with binding and
-demonstrate how to (1) implement scope safe traversals once and for
+demonstrate how to (1) implement scope-safe traversals once and for
 all by generic programming; and (2) how to derive properties of these
 traversals by generic proving. Our universe description, generic
 traversals and proofs, and our examples have all been formalised in
@@ -106,10 +106,13 @@ at \url{https://github.com/gallais/generic-syntax}.
 
 \section*{Acknowledgements}
 
-Atkey would like to acknowledge the support of EPSRC grant no. EP/XXXX.
+Atkey acknowledges the support of EPSRC grant no. EP/T026960/1
+\emph{AISEC: AI Secure and Explainable by Construction}.
+
+JHM gratefully acknowledges the support of LFCS, School of Informatics, University of Edinburgh.
 
 The authors would like to thank the ICFP and JFP reviewers for their
-useful comments, and the JFP editors for their patience.
+useful comments, and the JFP editors and staff for their patience.
 
 \section*{Conflicts of Interest}
 

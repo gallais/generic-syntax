@@ -58,10 +58,10 @@ implement it by re-using the \AF{Substitution} semantics we already have.
 \end{minipage}
 
 However, one thing still out of our reach with our current tools is
-the underlying co-finite trees these finite objects are meant to
+the underlying cofinite trees these finite objects are meant to
 represent. We start by defining the coinductive type corresponding to
 them as the greatest fixpoint of a notion of layer. One layer of a
-co-finite tree is precisely given by the meaning of its description
+cofinite tree is precisely given by the meaning of its description
 where we completely ignore the binding structure. We show with
 \AF{01⋯} (mutually defined with \AF{10⋯}) the infinite list that
 corresponds to the unfolding of the example \AF{01↺} given above.
@@ -84,7 +84,7 @@ corresponds to the unfolding of the example \AF{01↺} given above.
 \end{minipage}
 
 We can then make the connection between potentially cyclic
-structures and the co-finite trees formal by giving an \AF{unfold}
+structures and the cofinite trees formal by giving an \AF{unfold}
 function which, given a closed term, produces its unfolding.
 The definition proceeds by unrolling the term's top layer and
 co-recursively unfolding all the subterms.

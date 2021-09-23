@@ -1,10 +1,29 @@
-* TODO Full stops after paragraph titles
+* DONE Full stops after paragraph titles
 * DONE Scope- type-
 * DONE Figures
 * DONE Ornaments
 * TODO Richard Eisenberg: Stitch reference
 * DONE grep ly- *.tex catalogue/*.tex
 * DONE grep kind
-* TODO Acknowledgements
+* TODO Acknowledgements [2/5]
+  - [X] Bob
+  - [X] James McK
+  - [ ] Conor
+  - [ ] James C
+  - [ ] gallais
 * TODO Affiliations / emails
-* TODO General bibliography cleaning
+  Conor: https://orcid.org/0000-0003-1487-0886
+  James C: https://orcid.org/0000-0001-9036-8252
+  James M: https://orcid.org/0000-0001-6745-2560  (Maybe)
+    dr. James McKinna
+    School of Mathematical and Computer Sciences
+    Heriot-Watt University, Edinburgh EH14 4AS
+    J.McKinna@hw.ac.uk
+* TODO General bibliography cleaning, following the JFP diff
+* DONE grep datatype
+* DONE Hyphenation, and other minor copyedits
+  - Yes: scope-safe, type-safe, sort-safe
+  - No: well scoped, well typed, well sorted, ill scoped, let binders, well known
+  - "associate to the right", NOT: "associate with the right"; in general "associate to", not "associate with"
+  - "type checking", "scope checking"
+  - "cofinite"

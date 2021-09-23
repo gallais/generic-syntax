@@ -3,7 +3,7 @@
 Instead of generating a type or checking that a candidate will do, we
 can use our language of \AD{Desc}riptions to define not only an
 untyped source language but also an intrinsically typed internal
-language. During typechecking we simultaneously generate an
+language. During type checking we simultaneously generate an
 expression's type and a well scoped and well typed term of that
 type. We use \AF{STLC} (defined in Section~\ref{par:intrinsicSTLC}) as
 our internal language.
@@ -70,7 +70,7 @@ return a type together with a term at that type in the induced context.
 %\caption{Computations as \AD{Mode}-indexed Elaboration Functions\label{fig:elabcomputations}}
 \end{agdasnippet}
 
-Because we are now writing a typechecker which returns evidence of its claims, we need
+Because we are now writing a type checker which returns evidence of its claims, we need
 more informative variants of the equality and \AF{isArrow} checks. In the equality
 checking case we want to get a proof of propositional equality but we only care
 about the successful path and will happily return \AIC{nothing} when failing.

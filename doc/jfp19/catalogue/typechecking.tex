@@ -1,4 +1,4 @@
-\subsection{An algebraic approach to typechecking}\label{section:typechecking}
+\subsection{An algebraic approach to type checking}\label{section:typechecking}
 
 Following Atkey~\citeyear{atkey2015algebraic}, we can consider type checking
 and type inference as a possible semantics for a bidirectional~\cite{pierce2000local}
@@ -9,7 +9,7 @@ a notion of \AD{Mode} to distinguish between terms for which we will be able to
 \AIC{Infer} the type and the ones for which we will have to \AIC{Check} a type
 candidate.
 
-The values stored in the environment of the typechecking function attach \AD{Type}
+The values stored in the environment of the type checking function attach \AD{Type}
 information to bound variables whose \AD{Mode} is \AIC{Infer}, guaranteeing no
 variable ever uses the \AIC{Check} mode. In contrast, the generated computations
 will, depending on the mode, either take a type candidate and \AIC{Check} it is
@@ -18,7 +18,7 @@ potentially failing so we use the \AD{Maybe} monad.
 \revb{In an actual compiler pipeline we would naturally use a different error monad
 and generate helpful error messages pointing out where the type error occured. The
 interested reader can see a fine-grained analysis of type errors in the extended
-example of a typechecker in \citet{DBLP:journals/jfp/McBrideM04}.}
+example of a type checker in \citet{DBLP:journals/jfp/McBrideM04}.}
 
 \begin{center}
 \begin{minipage}[t]{0.40\textwidth}
@@ -46,7 +46,7 @@ collect the domain and codomain.
 %\caption{Tests for \AD{Type} values}
 \end{center}
 
-We can now define typechecking as a \semrec{}. We describe the algorithm constructor
+We can now define type checking as a \semrec{}. We describe the algorithm constructor
 by constructor; in the \AR{Semantics} definition (omitted here) the algebra will
 simply perform a dispatch and pick the relevant auxiliary lemma. Note that in the
 following code, \AF{\_<\$\_} is, following classic Haskell notations, the function
@@ -88,7 +88,7 @@ to be returned in case of success.
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{cut}
 \end{agdasnippet}
 %
-We have defined a bidirectional typechecker for this simple language by
+We have defined a bidirectional type checker for this simple language by
 leveraging the \semrec{} framework. We can readily run it on closed terms
 using the \AF{closed} corollary defined in Section~\ref{sec:fundamentallemma}
 and (defining \AF{β} to be {(\AIC{α} \AIC{`→} \AIC{α})}) infer the type of
