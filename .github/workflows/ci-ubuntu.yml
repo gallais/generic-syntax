@@ -139,6 +139,7 @@ jobs:
       # Generate a fresh Everything.agda & index.agda and start building!
       - name: Build
         run: |
+          ls ~/.cabal/bin/
           cd doc/common
           AGDA="${{ env.AGDA }}" make
 
