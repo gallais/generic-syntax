@@ -1,8 +1,0 @@
-*.agdai
-*~
-*.log
-*.hash
-doc/latex/
-doc/latex-agda-output/
-*.o
-*.hi
