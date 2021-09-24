@@ -5,12 +5,12 @@
 * DONE Richard Eisenberg: Stitch reference
 * DONE grep ly- *.tex catalogue/*.tex
 * DONE grep kind
-* TODO Acknowledgements [2/5]
+* TODO Acknowledgements [3/5]
   - [X] Bob
   - [X] James McK
   - [ ] Conor
   - [ ] James C
-  - [ ] gallais
+  - [X] gallais
 * TODO Affiliations / emails
   Bob: https://orcid.org/0000-0002-4414-5047
   Guillaume: https://orcid.org/0000-0002-4091-657X
@@ -29,4 +29,4 @@
   - "associate to the right", NOT: "associate with the right"; in general "associate to", not "associate with"
   - "type checking", "scope checking"
   - "cofinite"
-* TODO PDF replacements in section headings
+* DONE PDF replacements in section headings
