@@ -12,10 +12,11 @@
   - [ ] James C
   - [ ] gallais
 * TODO Affiliations / emails
+  Bob: https://orcid.org/0000-0002-4414-5047
   Guillaume: https://orcid.org/0000-0002-4091-657X
   Conor: https://orcid.org/0000-0003-1487-0886
   James C: https://orcid.org/0000-0001-9036-8252
-  James M: https://orcid.org/0000-0001-6745-2560  (Maybe)
+  James M: https://orcid.org/0000-0001-6745-2560
     dr. James McKinna
     School of Mathematical and Computer Sciences
     Heriot-Watt University, Edinburgh EH14 4AS
