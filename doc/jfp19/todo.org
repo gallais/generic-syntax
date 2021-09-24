@@ -29,3 +29,4 @@
   - "associate to the right", NOT: "associate with the right"; in general "associate to", not "associate with"
   - "type checking", "scope checking"
   - "cofinite"
+* TODO PDF replacements in section headings
