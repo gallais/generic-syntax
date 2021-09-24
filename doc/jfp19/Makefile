@@ -54,8 +54,8 @@ PAPER_DEPENDENCIES:=\
   latex/catalogue/typechecking.tex\
   latex/catalogue/unrolling.tex\
   latex/catalogue/equality.tex\
-  latex/jfp1.cls \
-  latex/jfp.bst \
+  latex/jfp.cls \
+  latex/jfplike.bst \
   latex/commands.tex \
   latex/unicode.tex \
   latex/agda.sty \

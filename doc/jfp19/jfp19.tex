@@ -1,4 +1,4 @@
-\documentclass{jfp1}
+\documentclass{jfp}
 
 \usepackage{microtype}
 \usepackage{agda}
@@ -6,7 +6,6 @@
 \usepackage{stmaryrd}
 \usepackage{hyperref}
 \usepackage{natbib}
-\usepackage{todonotes}
 \DisableLigatures[>]{}
 \usepackage[T1]{fontenc}
 \usepackage{float}
@@ -60,26 +59,38 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % do not inden code blocks
-\setlength\mathindent{0em}
+%\setlength\mathindent{0em}
 
-\title
-  [A type- and scope-safe universe of syntaxes with binding]
-  {A type- and scope-safe universe of syntaxes with binding: their semantics and proofs}
-
-\author[G. Allais et al.]
-  {GUILLAUME ALLAIS, ROBERT ATKEY\\
-   University of Strathclyde (UK)\\
-   JAMES CHAPMAN\\
-   Input Output HK Ltd. (HK)\\
-   CONOR MCBRIDE\\
-   University of Strathclyde (UK)\\
-   JAMES MCKINNA\\
-   Heriot-Watt University (UK)
-  }
+%\author[G. Allais et al.]
 
 \begin{document}
 
-\maketitle
+\journaltitle{JFP}
+\cpr{Cambridge University Press}
+\doival{10.1017/xxxxx}
+
+\lefttitle{A type- and scope-safe universe of syntaxes with binding}
+\righttitle{Journal of Functional Programming}
+
+\totalpg{\pageref{lastpage01}}
+\jnlDoiYr{2021}
+
+\title{A type- and scope-safe universe of syntaxes with binding: their semantics and proofs}
+
+\begin{authgrp}
+  \author{Guillaume Allais}\\
+  \affiliation{University of St. Andrews (UK)}
+  \author{Robert Atkey}
+  \affiliation{University of Strathclyde (UK)}
+  \author{James Chapman}
+  \affiliation{Input Output HK Ltd. (HK)}
+  \author{Conor McBride}
+  \affiliation{University of Strathclyde (UK)}
+  \author{James McKinna}
+  \affiliation{Heriot-Watt University (UK)}
+\end{authgrp}
+
+
 \begin{abstract}
 Almost every programming language's syntax includes a notion of binder
 and corresponding bound occurrences, along with the accompanying
@@ -100,6 +111,8 @@ traversals and proofs, and our examples have all been formalised in
 Agda and are available in the accompanying material available online
 at \url{https://github.com/gallais/generic-syntax}.
 \end{abstract}
+
+\maketitle
 
 
 \input{syntax.tex}
@@ -127,7 +140,9 @@ None.
 
 \renewcommand{\bibsection}{}
 \section*{References}
-\bibliographystyle{jfp}
+\bibliographystyle{jfplike}
 \bibliography{strings,main}
+
+\label{lastpage01}
 
 \end{document}

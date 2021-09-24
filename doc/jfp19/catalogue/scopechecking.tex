@@ -28,7 +28,7 @@ sorted term for that description.
 \end{agdasnippet}
 
 
-\paragraph{Scope.} We can obtain \AF{Names}, the datastructure associating to
+\paragraph*{Scope} We can obtain \AF{Names}, the datastructure associating to
 each variable in scope its raw name as a string by reusing the standard library's
 \AD{All}. The inductive family \AD{All} is a predicate transformer making sure a
 predicate holds of all the element of a list. It is defined in a style common in
@@ -49,7 +49,7 @@ on the other then it holds of all the elements of the list (\AB{a} \AIC{∷} \AB
 %\caption{Associating a raw string to each variable in scope}
 \end{center}
 
-\paragraph{Raw terms.}
+\paragraph*{Raw terms}
 The definition of \AF{WithNames} is analogous to \AF{Pieces} in the
 previous section: we expect \AF{Names} for the newly bound
 variables. Terms in the raw syntax then leverage these
@@ -65,7 +65,7 @@ raw terms equiped with names for any newly bound variables.
 %\caption{Names and Raw Terms}
 \end{center}
 
-\paragraph{Error handling.} Various things can go wrong during scope checking:
+\paragraph*{Error handling} Various things can go wrong during scope checking:
 evidently a name can be out of scope but it is also possible that it may be
 associated to a variable of the wrong sort. We define an enumerating type
 covering these two cases. The scope checker will return a computation in the
