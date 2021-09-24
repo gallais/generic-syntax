@@ -75,7 +75,8 @@ module _ {d : Desc I} where
 
  toTm     : Names Γ → Raw d i σ → Fail (Tm d i σ Γ)
 
- toScope  : Names Γ → ∀ Δ σ → WithNames (Raw d i) Δ σ [] → Fail (Scope (Tm d i) Δ σ Γ)
+ toScope  : Names Γ → ∀ Δ σ → WithNames (Raw d i) Δ σ [] →
+            Fail (Scope (Tm d i) Δ σ Γ)
 
  toTm scp (`var e v)  = `var <$> toVar e v _ _ scp
  toTm scp (`con b)    = `con <$> mapA d (toScope scp) b

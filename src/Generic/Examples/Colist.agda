@@ -35,10 +35,13 @@ pattern ↶_ k      = `var k
 [0,1]  =  0 ∷ 1 ∷ []
 01↺    =  0 ∷ 1 ∷ ↶ s z
 
-01⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
-10⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
-01⋯ .force = false , 0 , 10⋯ , refl
-10⋯ .force = false , 1 , 01⋯ , refl
+mutual
+
+ 01⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
+ 01⋯ .force = false , 0 , 10⋯ , refl
+
+ 10⋯ : ∀ {s} → ∞Tm (CListD ℕ) s tt
+ 10⋯ .force = false , 1 , 01⋯ , refl
 
 `1∷2∷3 : TM (CListD ℕ) tt
 `1∷2∷3 = 1 ∷ 2 ∷ 3 ∷ []
