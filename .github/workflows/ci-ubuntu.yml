@@ -139,25 +139,26 @@ jobs:
       - name: Checkout generic-syntax
         uses: actions/checkout@v2
 
-      # Generate a fresh Everything.agda & index.agda and start building!
-      - name: Build
+      # Test code
+      - name: Build JFP paper
         run: |
           cd doc/common
           AGDA="${{ env.AGDA }}" make
           cd - && cd doc/jfp19
           make
+          cd -
 
-      # # Note that if you want to deploy html for different versions like the
-      # # standard library does, you will need to be a bit more subtle in this
-      # # step.
-      # - name: Generate HTML
-      #   run: |
-      #     ${{ env.AGDA }} --html --html-dir html index.agda
+      # Build doc
+      - name: Generate HTML
+        run: |
+          cd src/
+          ${{ env.AGDA }} --html --html-dir html Generic.agda
+          ${{ env.AGDA }} --html --html-dir html TableOfContent.agda
 
-      # - name: Deploy HTML
-      #   uses: JamesIves/github-pages-deploy-action@4.1.3
-      #   if: ${{ success() && env.AGDA_DEPLOY }}
+      - name: Deploy HTML
+        uses: JamesIves/github-pages-deploy-action@4.1.3
+        if: ${{ success() && env.AGDA_DEPLOY }}
 
-      #   with:
-      #     branch: gh-pages
-      #     folder: html
+        with:
+          branch: gh-pages
+          folder: html
