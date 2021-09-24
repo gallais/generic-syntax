@@ -2,7 +2,7 @@
 * DONE Scope- type-
 * DONE Figures
 * DONE Ornaments
-* TODO Richard Eisenberg: Stitch reference
+* DONE Richard Eisenberg: Stitch reference
 * DONE grep ly- *.tex catalogue/*.tex
 * DONE grep kind
 * TODO Acknowledgements [2/5]
