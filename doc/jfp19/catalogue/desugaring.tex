@@ -17,6 +17,7 @@ description \AD{Let} which can be used to extend any language
 description \AB{d} to a language with let-bindings (\AB{d} \AF{`+}
 \AF{Let}).
 
+\noindent
 \begin{minipage}{\textwidth}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letcode}
@@ -24,8 +25,6 @@ description \AB{d} to a language with let-bindings (\AB{d} \AF{`+}
 \begin{minipage}[t]{0.45\textwidth}
   \ExecuteMetaData[Generic/Syntax/LetBinder.tex]{letpattern}
 \end{minipage}
-% \caption{Description of a single let binding, associated pattern synonyms
-%   \label{defn:letD}}
 \end{minipage}
 
 This description states that a let-binding node stores a pair of types
@@ -57,7 +56,6 @@ environment.
 
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unletcode}
-%\caption{Desugaring as a \AR{Semantics}\label{defn:UnLet}}
 \end{agdasnippet}
 
 The process of removing let binders is then kickstarted with the placeholder
@@ -66,7 +64,6 @@ of type {(\AB{Γ} \AR{─Env}) (\AD{Tm} \AB{d} ∞) \AB{Γ}}.
 
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/LetBinder.tex]{unlet}
-%\caption{Specialising \AF{semantics} with an environment of placeholder values\label{defn:unlet}}
 \end{agdasnippet}
 
 In less than 10 lines of code we have defined a generic extension of

@@ -23,14 +23,14 @@ with two constructors: a \AF{Set} \AB{P} is decidable if we can either say
 the negation of \AB{P} (here, a proof that \AB{P} implies the empty type
 \AD{⊥}).
 
+\noindent
 \begin{minipage}{\textwidth}
-\begin{minipage}[t]{0.45\textwidth}
-  \ExecuteMetaData[Stdlib.tex]{bottom}
-\end{minipage}
-\begin{minipage}[t]{0.45\textwidth}
-  \ExecuteMetaData[Stdlib.tex]{dec}
-\end{minipage}
-%\caption{Empty Type and Decidability as an Inductive Family}
+  \begin{minipage}[t]{0.45\textwidth}
+    \ExecuteMetaData[Stdlib.tex]{bottom}
+  \end{minipage}
+  \begin{minipage}[t]{0.45\textwidth}
+    \ExecuteMetaData[Stdlib.tex]{dec}
+  \end{minipage}
 \end{minipage}
 
 To get acquainted with these new notions we can start by proving that equality
@@ -86,7 +86,6 @@ able to decide equality for all of the \AF{Set}s mentioned in a description.
 
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{constraints}
-%\caption{Constraints Necessary for Decidable Equality}\label{fig:eqconstraints}
 \end{agdasnippet}
 
 Remembering that our descriptions are given a semantics as a big right-nested
@@ -109,7 +108,6 @@ verbose definitions are not enlightening so we leave them out here.
 
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Equality.tex]{eqTmType}
-%\caption{Type of Decidable Equality for Terms and Bodies}\label{fig:eqtype}
 \end{agdasnippet}
 
 We now have an informative decision procedure for equality between terms

@@ -20,15 +20,15 @@ and generate helpful error messages pointing out where the type error occured. T
 interested reader can see a fine-grained analysis of type errors in the extended
 example of a type checker in \citet{DBLP:journals/jfp/McBrideM04}.
 
-\begin{center}
+\noindent
+\begin{minipage}{\textwidth}
 \begin{minipage}[t]{0.40\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{varmode}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.50\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typemode}
 \end{minipage}
-%\caption{Var- and Type- Relations indexed by Mode}
-\end{center}
+\end{minipage}
 
 A change of direction from inferring to checking will require being able to check
 that two types agree so we introduce the function \AF{\_=?\_}. Similarly we will
@@ -36,15 +36,15 @@ sometimes expect a function type but may be handed anything so we will have to c
 with \AF{isArrow} that our candidate's head constructor is indeed an arrow, and
 collect the domain and codomain.
 
-\begin{center}
-\begin{minipage}[t]{0.45\textwidth}
+\noindent
+\begin{minipage}{\textwidth}
+\begin{minipage}[t]{0.53\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{typeeq}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.45\textwidth}
+\end{minipage}
+\begin{minipage}[t]{0.46\textwidth}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{isArrow}
 \end{minipage}
-%\caption{Tests for \AD{Type} values}
-\end{center}
+\end{minipage}
 
 We can now define type checking as a \semrec{}. We describe the algorithm constructor
 by constructor; in the \AR{Semantics} definition (omitted here) the algebra will
@@ -98,16 +98,6 @@ the expression {(λx. x : β → β) (λx. x)}.
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{type-}
   \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{example}
 \end{agdasnippet}
-
-% \begin{minipage}{0.6\textwidth}
-% \begin{minipage}{0.35\textwidth}
-  
-% \end{minipage}
-
-% \begin{minipage}{0.55\textwidth}
-% \end{minipage}
-% %\caption{Type- Inference / Checking as a Semantics\label{defn:BidiSemantics}}
-% \end{minipage}
 
 The output of this function is not very informative. As we will see shortly,
 there is nothing stopping us from moving away from a simple computation

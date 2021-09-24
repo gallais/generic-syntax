@@ -20,8 +20,7 @@ scopes have become \AF{Kripke} functional spaces on \AD{Dm} and
 an error token because the evaluation of untyped programs may go wrong.
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Semantics/NbyE.tex]{domain}
-%\caption{Generic Reflexive Domain}\label{fig:reflexivedomain}
+  \ExecuteMetaData[Generic/Semantics/NbyE.tex]{domain}
 \end{agdasnippet}
 
 This data type definition is utterly unsafe. The more conservative
@@ -46,8 +45,7 @@ stand for λ-abstractions, $\Sigma$-types, fixpoints, or
 anything else.
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Semantics/NbyE.tex]{nbe-setup}
-%\caption{Generic Normalisation by Evaluation Framework\label{defn:NbE}}
+  \ExecuteMetaData[Generic/Semantics/NbyE.tex]{nbe-setup}
 \end{agdasnippet}
 
 Using this setup, we can write a normaliser for the untyped λ-calculus
@@ -62,9 +60,8 @@ combinators defined there to manufacture the singleton
 environment {(\AF{ε} \AB{∙} \AB{t})} containing the value \AB{t} of type
 \AB{σ}.
 
-\begin{agdasnippet}[h]
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Examples/NbyE.tex]{app}
-%\caption{Applying a Kripke Function to an argument}\label{fig:kripkeapp}
 \end{agdasnippet}
 
 We now define two patterns for semantical values: one for application and
@@ -72,8 +69,7 @@ the other for lambda abstraction. This should make the case of interest of
 our algebra (a function applied to an argument) fairly readable.
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Examples/NbyE.tex]{nbepatterns}
-%\caption{Pattern synonyms for UTLC-specific \AD{Dm} values}
+  \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbepatterns}
 \end{agdasnippet}
 
 We finally define the algebra by case analysis: if the node at hand is an
@@ -84,7 +80,6 @@ simply return it using \AIC{C}.
 
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Examples/NbyE.tex]{nbelc}
-%\caption{Normalisation by Evaluation for the Untyped λ-Calculus}
 \end{agdasnippet}
 
 We have not used the \AIC{⊥} constructor so \emph{if} the evaluation terminates
@@ -93,7 +88,5 @@ we will get a term in normal form. For instance, we can evaluate an untyped yet 
 term {(λx. x) ((λx. x) (λx. x))} that normalises to {(λx. x)}:
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Examples/NbyE.tex]{example}
-% \caption{Example of a normalising untyped term}
-% \label{fig:normuntyped}
+  \ExecuteMetaData[Generic/Examples/NbyE.tex]{example}
 \end{agdasnippet}

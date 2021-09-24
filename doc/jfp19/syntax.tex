@@ -313,23 +313,27 @@ this, we make use of the following combinators for building indexed
 sets:
 % All the definitions are polymorphic in the index type
 % (called \AB{A} in Figure~\ref{figure:indexed}).
-\begin{mathpar}
-\begin{minipage}{0.5\textwidth}
- \ExecuteMetaData[Stdlib.tex]{arrow}
-\end{minipage}\hfill
-\begin{minipage}{0.5\textwidth}
- \ExecuteMetaData[Stdlib.tex]{adjust}
+
+\noindent
+\begin{minipage}{\textwidth}
+  \begin{minipage}{0.5\textwidth}
+    \ExecuteMetaData[Stdlib.tex]{arrow}
+  \end{minipage}\hfill
+  \begin{minipage}{0.5\textwidth}
+    \ExecuteMetaData[Stdlib.tex]{adjust}
+  \end{minipage}
 \end{minipage}
 % \newline
 
-\begin{minipage}{0.5\textwidth}
- \ExecuteMetaData[Stdlib.tex]{constant}
-\end{minipage}\hfill
-\begin{minipage}{0.5\textwidth}
- \ExecuteMetaData[Stdlib.tex]{forall}
+\noindent
+\begin{minipage}{\textwidth}
+  \begin{minipage}{0.5\textwidth}
+    \ExecuteMetaData[Stdlib.tex]{constant}
+  \end{minipage}\hfill
+  \begin{minipage}{0.5\textwidth}
+    \ExecuteMetaData[Stdlib.tex]{forall}
+  \end{minipage}
 \end{minipage}
-%\caption{Combinators to build indexed Sets}\label{figure:indexed}
-\end{mathpar}
 We lift the function space pointwise with \AF{\_⇒\_}, silently
 threading the underlying scope. The \AF{\_⊢\_} makes explicit the
 \emph{adjustment} made to the index by a function, a generalisation
@@ -707,7 +711,7 @@ transforms a  \AD{Lam} term into a computation \AB{𝓒}. This function is the p
 % \caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}}\label{figure:fdmlamsem}
 % \end{figure}
 
-\subsection{Instances of \AR{Semantics}}
+\subsection{Instances of \texorpdfstring{\AR{Semantics}}{Semantics}}
 
 Recall that each \AR{Semantics} is parametrised by two families: \AB{𝓥}
 and \AB{𝓒}. During the evaluation of a term, variables are replaced by
@@ -1482,15 +1486,14 @@ a relation between (\AB{T} \AB{σ} \AB{Γ}) and (\AB{U} \AB{σ} \AB{Γ}). Our fi
 of such a relation is \AF{Eqᴿ} the equality relation between an (\AB{I}\AF{─Scoped})
 family \AB{T} and itself.
 
+\noindent
 \begin{minipage}{\textwidth}
-\begin{minipage}[t]{0.65\textwidth}
-  \ExecuteMetaData[Data/Relation.tex]{rel}
-\end{minipage}
-\begin{minipage}[t]{0.25\textwidth}
-  \ExecuteMetaData[Data/Relation.tex]{eqR}
-\end{minipage}
-% \caption{Relation Between \AB{I}\AF{─Scoped} Families and Equality Example\label{ex:fam-eq}}
-% \label{fig:reldef}
+  \begin{minipage}[t]{0.65\textwidth}
+    \ExecuteMetaData[Data/Relation.tex]{rel}
+  \end{minipage}
+  \begin{minipage}[t]{0.25\textwidth}
+    \ExecuteMetaData[Data/Relation.tex]{eqR}
+  \end{minipage}
 \end{minipage}
 
 Once we know what relations are, we are going to have to lift relations on values
@@ -1507,7 +1510,6 @@ implicit arguments.
 
 \begin{agdasnippet}
   \ExecuteMetaData[Data/Relation.tex]{all}
-%\caption{Relating \AB{Γ}-Environments in a Pointwise Manner\label{defn:Env-rel}}
 \end{agdasnippet}
 
 The first example of two environment being related is \AF{reflᴿ} that, to any
@@ -1528,8 +1530,7 @@ to related outputs. We use the relation transformer \AF{All} defined in the prev
 paragraph.
 
 \begin{agdasnippet}
- \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}
-%\caption{Relational Kripke Function Spaces: From Related Inputs to Related Outputs\label{fig:Kripke-rel}}
+  \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}
 \end{agdasnippet}
 
 \paragraph*{Desc relator}
@@ -1553,8 +1554,7 @@ layers which are meant to be equal:
 \end{itemize}
 
 \begin{agdasnippet}
- \ExecuteMetaData[Generic/Relator.tex]{ziptype}
-%\caption{Relator: Characterising Structurally Equal Values with Related Substructures\label{fig:zip-rel}}
+  \ExecuteMetaData[Generic/Relator.tex]{ziptype}
 \end{agdasnippet}
 
 If we were to take a fixpoint of \AF{⟦\_⟧ᴿ}, we could obtain a structural
@@ -1593,9 +1593,9 @@ should be compatible with the notions of relatedness used for values and computa
 \begin{agdasnippet}
 \addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{thR}
-\end{agdasnippet}
-\begin{agdasnippet}
-\addtolength{\leftskip}{\parindent}
+% \end{agdasnippet}
+% \begin{agdasnippet}
+% \addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{varR}
 \end{agdasnippet}
 
@@ -1631,7 +1631,6 @@ and \AD{Size}s play a crucial role in ensuring that the function is indeed total
 \begin{agdasnippet}
   \addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{simbody}
-%\caption{Fundamental Lemma of \AR{Simulation}s\label{defn:Simulation}}
 \end{agdasnippet}
 
 Instantiating this generic simulation lemma, we can for instance prove
@@ -1644,9 +1643,8 @@ POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where
 \AF{rensub} was actually needed.
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensubfun}
-\ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensub}
-%\caption{Renaming as a Substitution via Simulation\label{defn:RenSub}}
+  \ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensubfun}
+  \ExecuteMetaData[Generic/Simulation/Syntactic.tex]{rensub}
 \end{agdasnippet}
 
 When studying specific languages, new opportunities to deploy the

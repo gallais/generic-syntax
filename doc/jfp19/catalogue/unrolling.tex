@@ -23,16 +23,15 @@ respectively a finite list containing
 repeating the whole list again by referring to the first cons cell
 represented here by the de Bruijn variable 1 (i.e. \AIC{s} \AIC{z}).
 
+\noindent
 \begin{minipage}{\textwidth}
-\begin{minipage}{0.55\textwidth}
-  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistD}
-  \ExecuteMetaData[Generic/Examples/Colist.tex]{clistpat}
-\end{minipage}\hfill
-\begin{minipage}{0.35\textwidth}
-  \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones}
-\end{minipage}
-% \caption{Potentially Cyclic Lists: Description, Pattern Synonyms and Examples}
-% \label{fig:examplecyclic}
+  \begin{minipage}{0.55\textwidth}
+    \ExecuteMetaData[Generic/Examples/Colist.tex]{clistD}
+    \ExecuteMetaData[Generic/Examples/Colist.tex]{clistpat}
+  \end{minipage}
+  \begin{minipage}{0.35\textwidth}
+    \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones}
+  \end{minipage}
 \end{minipage}
 
 These finite representations are interesting in their own right
@@ -46,16 +45,19 @@ each free \AIC{`var} leaf. Noticing that \AF{plug}'s fundamental nature
 is that of substituting a term for each leaf, it makes sense to
 implement it by re-using the \AF{Substitution} semantics we already have.
 
-\begin{minipage}{\textwidth}
-\begin{minipage}{0.52\textwidth}
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Cofinite.tex]{plug}
-\end{minipage}
-\newline
-\begin{minipage}{0.43\textwidth}
   \ExecuteMetaData[Generic/Cofinite.tex]{unroll}
-\end{minipage}
-%\caption{Plug and Unroll: Exposing a Cyclic Tree's Top Layer}
-\end{minipage}
+\end{agdasnippet}
+
+% \begin{minipage}{\textwidth}
+% \begin{minipage}{0.52\textwidth}
+% \end{minipage}
+% \newline
+% \begin{minipage}{0.43\textwidth}
+% \end{minipage}
+% %\caption{Plug and Unroll: Exposing a Cyclic Tree's Top Layer}
+% \end{minipage}
 
 However, one thing still out of our reach with our current tools is
 the underlying cofinite trees these finite objects are meant to
@@ -69,15 +71,16 @@ corresponds to the unfolding of the example \AF{01↺} given above.
 %%%The definition proceeds by copattern-matching as introduced in
 %%%\cite{abel2013copatterns} and showcased in \cite{thibodeau2016case}.
 
+\noindent
 \begin{minipage}{\textwidth}
 %\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Cofinite.tex]{cotm}
   \newline
 %\end{minipage}\hfill
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones2}
-\end{minipage}\qquad
-\begin{minipage}{0.4\textwidth}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
   \ExecuteMetaData[Generic/Examples/Colist.tex]{zeroones3}
 \end{minipage}
 %\caption{Co-finite Trees: Definition and Example}
