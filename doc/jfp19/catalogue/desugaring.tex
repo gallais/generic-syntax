@@ -72,7 +72,7 @@ of type {(\AB{Γ} \AR{─Env}) (\AD{Tm} \AB{d} ∞) \AB{Γ}}.
 In less than 10 lines of code we have defined a generic extension of
 syntaxes with binding together with a semantics which corresponds
 to an elaborator translating away this new construct.
-\revb{In previous work~\cite{allais2017type}, we focused on STLC only
+In previous work~\cite{allais2017type}, we focused on STLC only
 and showed that it is similarly possible to implement a Continuation
 Passing Style transformation as the composition of two semantics
 à la Hatcliff and Danvy~\citeyear{hatcliff1994generic}.
@@ -80,7 +80,6 @@ The first semantics embeds STLC into Moggi's
 Meta-Language~\citeyear{DBLP:journals/iandc/Moggi91} and thus fixes
 an evaluation order. The second one translates Moggi's ML back into
 STLC in terms of explicit continuations with a fixed return type.
-}
 
 We have demonstrated how easily one can define extensions and combine
 them on top of a base language without having to reimplement common

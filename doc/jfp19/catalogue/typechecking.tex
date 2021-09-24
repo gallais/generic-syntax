@@ -15,10 +15,10 @@ variable ever uses the \AIC{Check} mode. In contrast, the generated computations
 will, depending on the mode, either take a type candidate and \AIC{Check} it is
 valid or \AIC{Infer} a type for their argument. These computations are always
 potentially failing so we use the \AD{Maybe} monad.
-\revb{In an actual compiler pipeline we would naturally use a different error monad
+In an actual compiler pipeline we would naturally use a different error monad
 and generate helpful error messages pointing out where the type error occured. The
 interested reader can see a fine-grained analysis of type errors in the extended
-example of a type checker in \citet{DBLP:journals/jfp/McBrideM04}.}
+example of a type checker in \citet{DBLP:journals/jfp/McBrideM04}.
 
 \begin{center}
 \begin{minipage}[t]{0.40\textwidth}

@@ -195,7 +195,6 @@ $1 + (\_)$ extends the running scope with an extra variable.
   \end{array}
 \end{displaymath}
 
-\revb{
 \paragraph*{Implicit generalisation of variables in Agda} The careful
 reader may have noticed that we use a seemingly out-of-scope variable
 \AB{X} of type \AF{Set}. The latest version of Agda allows us to declare
@@ -204,7 +203,6 @@ to find them used in types. This allows us to lighten the presentation
 by omitting a large number of prenex quantifiers. The reader will hopefully
 be familiar enough with prenex polymorphic types in the style of Standard ML \cite{defnsml} that this will
 seem natural to them.
-}
 
 
 The \AD{Lam} type is now a family of types, indexed by the set
@@ -275,7 +273,7 @@ application case) or extended (e.g. in the λ-abstraction case) by
 introducing combinators to build indexed types. We conform to the
 convention (see e.g.~\citet{martin1982constructive}) of mentioning
 only context \emph{extensions} when presenting judgements.
-\revc{That is
+That is
 to say that we aim to write sequents with an \emph{implicit} ambient
 context. Concretely: in the simply typed
 $\lambda$-calculus (STLC) we would rather use the rule \AB{appᵢ} than
@@ -306,7 +304,6 @@ than \AB{lamₑ} as the inference rule for λ-abstraction in STLC.
  {Γ ⊢ λx.t : σ → τ}
  {lamₑ}
 \end{mathpar}
-}
 
 This observation that an ambient context is either passed around as is
 or extended for subterms is critical to our whole approach to syntax
@@ -460,7 +457,6 @@ type family \AB{𝓥} of values for us):
 %\caption{Well Typed and Scoped Environments of Values}\label{fig:environment}
 \end{center}
 
-\revc{
 %%% 2019-11-12
 \paragraph*{Environments as records in Agda}
 As with (all) other record structures defined in this paper, we are
@@ -479,7 +475,6 @@ languages, Agda further supports `dot' notation, so that an equivalent
 definition here could be expressed as
 {\AB{\(\rho\)}~.\ARF{lookup}~=~\AB{r}}.
 %%%
-}
 
 We can readily define some basic building blocks for environments:
 \begin{center}
@@ -609,12 +604,12 @@ of a choice of values \AB{𝓥} and computations \AB{𝓒}. A semantics must
 satisfy constraints on the notions of values \AB{𝓥} and computations \AB{𝓒}
 at hand.
 
-\revc{In the following paragraphs, we interleave the definition of the record
+In the following paragraphs, we interleave the definition of the record
 of constraints \semrec{} with explanations of our choices. It is important
 to understand that all of the indented Agda snippets are part of the record's
 definition. Some correspond to record fields (highlighted in \ARF{pink})
 while others are mere auxiliary definitions (highlighted in \AF{blue}) as
-permitted by Agda.}
+permitted by Agda.
 
 
 \begin{agdasnippet}
@@ -622,12 +617,12 @@ permitted by Agda.}
 \end{agdasnippet}
 First of all, values \AB{𝓥} should be \AF{Thinnable} so that \semfun{} may push
 the environment under binders.
-\revc{We call this constraint \ARF{th\textasciicircum{}𝓥},
+We call this constraint \ARF{th\textasciicircum{}𝓥},
 using a caret to generate a mnemonic name: \ARF{th} refers to \emph{th}innable
 and \ARF{𝓥} clarifies the family which is proven to be thinnable\footnote{
 We use this convention consistently throughout the paper, using names
 such as \AF{vl\textasciicircum{}Tm} for the proof that terms are
-\AR{VarLike}}.}
+\AR{VarLike}}.
 
 \begin{agdasnippet}
 \addtolength{\leftskip}{\parindent}
@@ -687,12 +682,10 @@ bound variable. This is concisely expressed by the constraint's type:
 %\caption{Semantics for \AD{Lam}}\label{figure:lamsem}
 %\end{figure}
 
-\revc{
 Agda allows us to package the definition of the generic traversal function
 \semfun{} together with the fields of the record \semrec{}. This causes the
 definition to be specialised and brought into scope for any instance of
 \semrec{} the user will define.
-}
 We thus realise the promise made earlier, namely that any given
 {\semrec{} \AB{𝓥} \AB{𝓒}} induces
 a function which, given a value in \AB{𝓥} for each variable in scope,
@@ -771,7 +764,7 @@ not available anymore.
 %\caption{Wrapper and fresh name generation}\label{fig:fresh}
 \end{center}
 
-\revc{The wrapper \AR{Wrap} does not depend on the scope \AB{Γ} so it is
+The wrapper \AR{Wrap} does not depend on the scope \AB{Γ} so it is
 automatically a thinnable functor, that is to say that we have the (used
 but not shown here) definitions \AF{map\textasciicircum{}Wrap} witnessing
 the functoriality of \AR{Wrap} and \AF{th\textasciicircum{}Wrap} witnessing
@@ -784,7 +777,6 @@ environment and \AF{return} it immediately.
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printvar}
 \end{agdasnippet}
-}
 
 To print an application, we produce a string representation, \AB{f}, of the term in
 function position, then one, \AB{t}, of its argument and combine them by putting the
@@ -866,14 +858,12 @@ representation of syntaxes with binding.
 
 The first component of the definition of CDMM's universe (defined below) is an inductive type of
 \AD{Desc}riptions of strictly positive functors from $\Set{}^J$ to $\Set{}^I$.
-\revc{
 These functors correspond to \AB{I}-indexed containers of \AB{J}-indexed
 payloads. Keeping these index types distinct prevents mistaking one for the
 other when constructing the interpretation of descriptions. Later of course
 we can use these containers as the nodes of recursive datastructures by
 interpreting some payloads sorts as requests for
 subnodes~\cite{DBLP:journals/jfp/AltenkirchGHMM15}.
-}
 
 The inductive type of descriptions has three constructors:
 \AIC{`σ} to store data (the rest of
@@ -1388,7 +1378,7 @@ respectively).
 \end{center}
 
 \label{sec:varlike:base}
-\reva{Given a proof that \AB{𝓥} is \AR{VarLike}, we can manufacture
+Given a proof that \AB{𝓥} is \AR{VarLike}, we can manufacture
   several useful environments of values \AB{𝓥}. We provide users with
   \AF{base} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Γ}},
   \AF{fresh\textsuperscript{r}} of type {(\AB{Γ} \AR{─Env}) \AB{𝓥} (\AB{Δ} \AF{++} \AB{Γ})}
@@ -1402,7 +1392,6 @@ respectively).
   extensionally equal to the identity environment \AF{id\textasciicircum{}Tm}
   given by {\ARF{lookup} \AF{id\textasciicircum{}Tm} = \AIC{`var}},
   which associates each variable to itself (seen as a term).
-}
 Using these definitions, we can then implement \AF{reify} as follows:
 
 \begin{center}
@@ -1580,7 +1569,6 @@ on more advanced use cases.
 
 \subsection{Simulation lemma}\label{section:simulation}
 
-\revb{
 A constraint mentioning all three relation transformers appears naturally when
 we want to say that a semantics can simulate another one. For instance, renaming
 is simulated by substitution: we simply have to restrict ourselves to environments
@@ -1633,7 +1621,6 @@ spaces take related inputs to related outputs.
 \addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[Generic/Simulation.tex]{bodyR}
 \end{agdasnippet}
-}
 
 The fundamental lemma of simulations is a generic theorem showing that for
 each pair of \semrec{} respecting the \AR{Simulation} constraint, we
@@ -1650,8 +1637,8 @@ and \AD{Size}s play a crucial role in ensuring that the function is indeed total
 
 Instantiating this generic simulation lemma, we can for instance prove
 that renaming is a special case of substitution, or that renaming and
-substitution are extensional, \revc{i.e. that given environments equal in
-a pointwise manner they produce syntactically equal terms}. Of course these
+substitution are extensional, that is, that given environments equal in
+a pointwise manner they produce syntactically equal terms. Of course these
 results are not new but having them generically over all syntaxes with
 binding is convenient. We experienced this first hand when tackling the
 POPLMark Reloaded challenge~\citeyear{poplmarkreloaded} where
@@ -1845,14 +1832,12 @@ Another corollary of the fundamental lemma of fusion is the observation that
 Kaiser, Schäfer, and Stark~\citeyear{Kaiser-wsdebr} make: \emph{assuming
 functional extensionality}, all the ACMM~\citeyear{allais2017type} traversals
 are compatible with variable renaming.
-\reva{
 We reproduced this result generically for all syntaxes (see accompanying code).
 The need for functional extensionality arises in the proof when dealing with
 subterms which have extra bound variables. These terms are interpreted as
 Kripke functional spaces in the host language and we can only prove that they
 take equal inputs to equal outputs. An intensional notion of equality will
 simply not do here.
-}
 As a consequence, we refrain from using the generic result in practice when
 an axiom-free alternative is provable. Kaiser, Schäfer and Stark's observation
 naturally raises the question of whether the same semantics are also stable
@@ -1953,7 +1938,6 @@ of well scoped and typed deep embeddings to imperative languages.
 They showcase the core ideas of their work using STLC extended with references
 and then demonstrate that they can already handle a large subset of Middleweight
 Java.
-\revc{
 We have demonstrated that our framework could be used to define effectful
 semantics by choosing an appropriate monad stack~\cite{DBLP:journals/iandc/Moggi91}.
 This suggests we should be able to model STLC+Ref. It is however clear that
@@ -1961,7 +1945,6 @@ the scoping structures handled by scope graphs and frames are, in their full
 generality, out of reach for our framework. In constrast, our work shines by
 its generality: we define an entire universe of syntaxes and provide users
 with traversals and lemmas implemented \emph{once and for all}.
-}
 
 Many other opportunities to enrich the notion of binder in our library are
 highlighted by Cheney~\citeyear{DBLP:conf/icfp/Cheney05a}. As we have demonstrated
