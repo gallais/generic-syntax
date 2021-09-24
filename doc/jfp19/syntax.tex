@@ -260,9 +260,9 @@ extra $I$ argument corresponding to the sort of the expression being
 built. This is captured by the large type \AB{I}
 \AF{─Scoped}:% = $I$ $\to$ \AD{List} $I$ $\to$ \AF{Set}.
 
-\begin{minipage}{\textwidth}
+\begin{agdasnippet}
 \ExecuteMetaData[Data/Var.tex]{scoped}
-\end{minipage}
+\end{agdasnippet}
 %
 We use Agda's mixfix operator notation, where underscores denote
 argument positions.
@@ -314,7 +314,7 @@ sets:
 % All the definitions are polymorphic in the index type
 % (called \AB{A} in Figure~\ref{figure:indexed}).
 \begin{mathpar}
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.5\textwidth}
  \ExecuteMetaData[Stdlib.tex]{arrow}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
@@ -322,7 +322,7 @@ sets:
 \end{minipage}
 % \newline
 
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.5\textwidth}
  \ExecuteMetaData[Stdlib.tex]{constant}
 \end{minipage}\hfill
 \begin{minipage}{0.5\textwidth}
@@ -355,10 +355,10 @@ modify, or quantify over the scope when defining such families, as for
 example in this data type for scope- and sort-aware de Bruijn indices:
 %Figure~\ref{fig:Var}.
 
-\begin{minipage}{\textwidth}
+\begin{agdasnippet}
   \ExecuteMetaData[Data/Var.tex]{var}
   %\caption{Scope and Kind Aware de Bruijn Indices\label{fig:Var}}
-\end{minipage}
+\end{agdasnippet}
 
 The inductive family \AD{Var} represents well scoped and well sorted
 de Bruijn indices. Its \AIC{z} (for zero) constructor refers to the
@@ -378,16 +378,18 @@ respectively normalise to:
 We will reuse the \AD{Var} family to represent variables in all the
 syntaxes defined in this paper. We start with the simply typed
 $\lambda$-calculus (STLC):
-\begin{center}
+
+\noindent
+\begin{minipage}{0.99\textwidth}
   \begin{minipage}[t]{0.4\textwidth}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{type}
   \end{minipage}
-  \begin{minipage}[t]{0.5\textwidth}
+  \begin{minipage}[t]{0.59\textwidth}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{tm}
   \end{minipage}
 % \caption{Simple Types and Intrinsically Typed definition of STLC}
 % \label{fig:intrinsic-stlc}
-\end{center}
+\end{minipage}
 
 The \AD{Type} \AF{─Scoped} family \AD{Lam} is Altenkirch and Reus'
 intrinsically typed representation of the simply typed λ-calculus,
@@ -397,12 +399,9 @@ term of type {((\AB{σ} \AIC{`→} \AB{τ}) \AIC{`→} (\AB{σ} \AIC{`→}
   \AB{τ}))} (\AC{\{-} and \AC{-\}} delimit comments meant to help the
 reader see to which binders each de Bruijn index refers):
 
-%\begin{figure}[h]
-\begin{center}
-  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}%\label{figure:apply}
-\end{center}
-%\caption{Example of a well scoped-and-typed term in \AD{Lam}}
-%\end{figure}
+\begin{agdasnippet}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{apply}
+\end{agdasnippet}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -421,11 +420,12 @@ statically, all of these traversals have to be implemented in a type-
 and scope-safe manner.  These constraints show up in the types of
 renaming and substitution defined as follows:
 
-\begin{minipage}{\textwidth}
+\noindent
+\begin{minipage}{0.99\textwidth}
 \begin{minipage}{0.50\textwidth}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{ren}
 \end{minipage}\hfill
-\begin{minipage}{0.50\textwidth}
+\begin{minipage}{0.49\textwidth}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{sub}
 \end{minipage}
 % \caption{Type and Scope Preserving Renaming and Substitution}
@@ -452,10 +452,10 @@ and well typed in \AB{Δ} to every entry in \AB{Γ}. Formally, we have the follo
 record structure (using a record helps Agda's type inference reconstruct the
 type family \AB{𝓥} of values for us):
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[Data/Environment.tex]{env}
 %\caption{Well Typed and Scoped Environments of Values}\label{fig:environment}
-\end{center}
+\end{agdasnippet}
 
 %%% 2019-11-12
 \paragraph*{Environments as records in Agda}
@@ -477,15 +477,18 @@ definition here could be expressed as
 %%%
 
 We can readily define some basic building blocks for environments:
-\begin{center}
+
+\noindent
+\begin{minipage}{0.99\textwidth}
+  \centering
 \begin{minipage}[t]{0.3\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{empty}
-\end{minipage}\begin{minipage}[t]{0.6\textwidth}
+\end{minipage}\begin{minipage}[t]{0.69\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{extension}
 \end{minipage}
 \ExecuteMetaData[Data/Environment.tex]{envmap}
 %\caption{Combinators to Build Environments}\label{fig:baseenv}
-\end{center}
+\end{minipage}
 The empty environment (\AF{ε}) is implemented
 by remarking that there can be no variable of type
 {(\AD{Var} \AB{σ} \AIC{[]})} and to correspondingly dismiss the case with
@@ -516,14 +519,16 @@ between indexed types, to crisply encapsulate the additional quantification
 over environment extensions which is typical of Kripke semantics.
 %%%
 
-\paragraph*{The special case of thinnings}
-\begin{displaymath}
-  \begin{minipage}{0.5\linewidth}
+\paragraph*{The special case of thinnings}~
+
+\begin{agdasnippet}
+%  \begin{minipage}{0.5\linewidth}
     \ExecuteMetaData[Data/Environment.tex]{thinning}
-  \end{minipage}
+%  \end{minipage}
 % \caption{Thinnings: A Special Case of Environments}
 % \label{def:thinning}
-\end{displaymath}
+\end{agdasnippet}
+
 \AF{Thinning}s subsume more structured notions such as the Category of
 Weakenings~\cite{altenkirch1995categorical} or Order Preserving
 Embeddings~\cite{chapman2009type}. In particular, they do not prevent the
@@ -532,7 +537,8 @@ although we will not use such instances. However, such extra flexibility
 will not get in our way, and permits a representation as a function space
 which grants us monoid laws ``for free'' as per Jeffrey's
 observation~\citeyear{jeffrey2011assoc}. We define the following identity, extend and (generalised) transitivity combinators for \AF{Thinning}s:
-\begin{center}
+
+\begin{minipage}{0.95\textwidth}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Data/Environment.tex]{identity}
 \end{minipage}
@@ -541,12 +547,13 @@ observation~\citeyear{jeffrey2011assoc}. We define the following identity, exten
 \end{minipage}
   \ExecuteMetaData[Data/Environment.tex]{select}
 %\caption{Identity Thinning, context extension, and (generalised) transitivity}\label{fig:thincomb}
-\end{center}
+\end{minipage}
 
 
 Next, the \AF{□} combinator turns any (\AD{List} \AB{I})-indexed Set into one that can
 absorb thinnings.
-\begin{center}
+
+\begin{minipage}{0.95\textwidth}
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{box}
 \end{minipage}\hfill
@@ -554,18 +561,18 @@ absorb thinnings.
 \ExecuteMetaData[Data/Environment.tex]{thinnable}
 \end{minipage}
 
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.26\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{extract}
 \end{minipage}\hfill
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.37\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{duplicate}
 \end{minipage}\hfill
-\begin{minipage}{0.30\textwidth}
+\begin{minipage}{0.29\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{thBox}
 \end{minipage}
 
 %\caption{The \AF{□} comonad, Thinnable, and the cofree Thinnable. \label{fig:Thinnable}}
-\end{center}
+\end{minipage}
 This is accomplished by abstracting over all possible thinnings
 from the current scope, akin to an S4-style necessity modality. The axioms of S4
 modal logic incite us to observe that the functor \AF{□} is a comonad: \AF{extract}
@@ -690,9 +697,11 @@ We thus realise the promise made earlier, namely that any given
 {\semrec{} \AB{𝓥} \AB{𝓒}} induces
 a function which, given a value in \AB{𝓥} for each variable in scope,
 transforms a  \AD{Lam} term into a computation \AB{𝓒}. This function is the proof of the Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}:
-\begin{center}
+
+\begin{agdasnippet}
+  \addtolength{\leftskip}{\parindent}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{sem}
-\end{center}
+\end{agdasnippet}
 
 % \begin{figure}[h]
 % \caption{Fundamental Lemma of Semantics for \AD{Lam}, relative to a given \semrec{} \AB{𝓥} \AB{𝓒}}\label{figure:fdmlamsem}
@@ -704,22 +713,27 @@ Recall that each \AR{Semantics} is parametrised by two families: \AB{𝓥}
 and \AB{𝓒}. During the evaluation of a term, variables are replaced by
 values of type \AB{𝓥} and the overall result is a computation of type \AB{𝓒}.
 Coming back to renaming and substitution:
-\begin{center}
+
+\begin{minipage}{0.95\textwidth}
+  \centering
   \begin{minipage}{0.6\textwidth}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semrenfun}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsubfun}
   \end{minipage}
-\end{center}
+\end{minipage}
+
 we see that they both fit in the
 \semrec{} framework:
-\begin{center}
-  \begin{minipage}{0.5\linewidth}
+
+\begin{minipage}{0.95\textwidth}
+  \begin{minipage}{0.47\textwidth}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semren}
-  \end{minipage}%
-  \begin{minipage}{0.5\linewidth}
+  \end{minipage}\hfill
+  \begin{minipage}{0.53\textwidth}
     \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semsub}
   \end{minipage}
-\end{center}
+\end{minipage}
+
 The family \AB{𝓥} of values is respectively the family
 of variables for renaming, and the family of λ-terms for substitution.
 In both cases \AB{𝓒} is the family of λ-terms because the result of the
@@ -736,11 +750,10 @@ supply to highlight the fact that computations can very well be
 effectful. The ability to generate fresh names is given to us by a
 monad that here we decide to call \AF{Fresh}. Concretely, \AF{Fresh} is implemented as an instance of the State monad where
 the state is a stream of distinct strings:
-\begin{center}
-  \begin{minipage}{0.5\textwidth}
-    \ExecuteMetaData[StateOfTheArt/ACMM.tex]{monad}
-  \end{minipage}
-\end{center}
+
+\begin{agdasnippet}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{monad}
+\end{agdasnippet}
 
 The \AF{Printing} semantics is defined by using \AF{Name}s (i.e. \AD{String}s)
 as values and \AF{Printer}s (i.e. monadic actions in \AF{Fresh} returning a \AD{String})
@@ -749,20 +762,21 @@ in order to help Agda's inference propagate the appropriate constraints. We defi
 a function \AF{fresh} that fetches a name from the name supply and makes sure it is
 not available anymore.
 
-\begin{center}
-\begin{minipage}{0.6\textwidth}
+\begin{agdasnippet}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{valprint}
-\end{minipage}
+\end{agdasnippet}
 
+\noindent
+\begin{minipage}{0.95\textwidth}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{name}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printer}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{freshprint}
 \end{minipage}
 %\caption{Wrapper and fresh name generation}\label{fig:fresh}
-\end{center}
+\end{minipage}
 
 The wrapper \AR{Wrap} does not depend on the scope \AB{Γ} so it is
 automatically a thinnable functor, that is to say that we have the (used
@@ -796,28 +810,31 @@ body of the function to which we prepend a ``λ'' binding the name \AB{x}.
 
 Putting all of these pieces together, we get the \AF{Printing} semantics:
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{semprint}
 %\caption{Printing as an instance of \semrec{}}\label{fig:printing}
-\end{center}
+\end{agdasnippet}
 
 We show how one can use this newly defined semantics to implement \AF{print},
 a printer for closed terms assuming that we have already defined \AF{names},
 a stream of distinct strings used as our name supply. We show the result of
 running \AF{print} on the term \AF{apply}.
 
-\noindent
-\begin{minipage}[t]{0.5\textwidth}
 \begin{agdasnippet}
-\ExecuteMetaData[StateOfTheArt/ACMM.tex]{print}
-\end{agdasnippet}
-\end{minipage}
-\quad
-\begin{minipage}[t]{0.4\textwidth}
-\begin{agdasnippet}
+  \ExecuteMetaData[StateOfTheArt/ACMM.tex]{print}
   \ExecuteMetaData[StateOfTheArt/ACMM.tex]{applyprint}
 \end{agdasnippet}
-\end{minipage}
+
+% \noindent
+% \begin{minipage}[t]{0.5\textwidth}
+% \begin{agdasnippet}
+% \end{agdasnippet}
+% \end{minipage}
+% \quad
+% \begin{minipage}[t]{0.4\textwidth}
+% \begin{agdasnippet}
+% \end{agdasnippet}
+% \end{minipage}
 
 Both printing and renaming highlight the importance of distinguishing
 values and computations: the type of values in their respective
@@ -877,11 +894,11 @@ right-nested tuples terminated by equality constraints.
 
 \noindent
 \begin{minipage}{\textwidth}
-  \begin{minipage}{0.51\textwidth}
+  \begin{minipage}{0.52\textwidth}
     \noindent
     \ExecuteMetaData[StateOfTheArt/CDMM.tex]{desc}
-  \end{minipage}\quad
-  \begin{minipage}{0.4\textwidth}
+  \end{minipage}
+  \begin{minipage}{0.47\textwidth}
     \ExecuteMetaData[StateOfTheArt/CDMM.tex]{interp}
   \end{minipage}
 \end{minipage}
@@ -895,10 +912,9 @@ in $A$ and a recursive substructure, that is, the tail of the list. The \AD{List
 being unindexed, and we represent the lack of an index with the unit type \AD{$\top$}
 whose unique inhabitant is \AIC{tt}.
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{listD}
-%\caption{The Description of the base functor for \AD{List} \AB{A}}\label{figure:listD}
-\end{center}
+\end{agdasnippet}
 
 Indices can be used to enforce invariants. For example, the type {\AD{Vec} \AB{A} \AB{n}}
 of length-indexed lists. It has the same structure as the definition of \AF{listD}.
@@ -908,10 +924,9 @@ non-empty one in which case we store a natural number \AB{n}, the head of type
 \AB{A} and a tail of size \AB{n} (and the branch's index is enforced to be
 \AIC{suc} \AB{n}).
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{vecD}
-%\caption{The Description of the base functor for \AD{Vec} \AB{A} \AB{n}}\label{figure:vecD}
-\end{center}
+\end{agdasnippet}
 
 The pay-off for encoding our data types as descriptions is that we can define
 generic programs for whole classes of data types. The decoding function \AF{⟦\_⟧}
@@ -920,10 +935,9 @@ recursion over a code \AB{d}. It describes the action of the functor correspondi
 to \AB{d} over morphisms in $\Set{}^J$. This is the first example of generic
 programming over all the functors one can obtain as the meaning of a description.
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{fmap}
-%\caption{Action on Morphisms of the Functor corresponding to a \AF{Desc}ription\label{fig:fmapD}}
-\end{center}
+\end{agdasnippet}
 
 All the functors obtained as meanings of \AD{Desc}riptions are strictly
 positive. So we can build the least fixpoint of the ones that are endofunctors
@@ -937,11 +951,10 @@ termination checker to see that \AF{fold} is a total function.
 }
 .
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{mu}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{fold}
-%\caption{Least Fixpoint of an Endofunctor and Corresponding Generic Fold}\label{figure:datamu}
-\end{center}
+\end{agdasnippet}
 
 This least fixpoint allows us to recover the data types we would
 otherwise declare recursively and generatively. Pattern synonyms let us hide away the
@@ -950,16 +963,16 @@ conveniently resugars them when displaying a goal. Finally, we can get
 our hands on the types' eliminators by instantiating the generic
 \AF{fold}:
 
-\begin{center}
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}{0.95\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{list}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{nilcons}
 \end{minipage}
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.50\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{foldr}
 \end{minipage}
 %\caption{List, its constructors, and eliminator\label{fig:list}}
-\end{center}
+\end{minipage}
 
 The CDMM approach, therefore, allows us to generically define iteration principles
 for all data types that can be described. These are exactly the features we desire
@@ -1005,10 +1018,9 @@ list of the sorts of the newly bound variables will play a crucial role when
 defining the description's semantics as a binding structure below. % in
 % Figures~\ref{figure:syntaxmeaning}, \ref{figure:debruijnscope} and \ref{figure:freemonad}.
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Syntax.tex]{desc}
-%\caption{Syntax Descriptions\label{fig:Desc}}
-\end{center}
+\end{agdasnippet}
 
 The meaning function \AF{⟦\_⟧} we associate to a description follows closely
 its CDMM equivalent. It only departs from it in the \AIC{`X} case and the fact
@@ -1017,10 +1029,9 @@ The function takes an \AB{X} of type {\AD{List} \AB{I} $\rightarrow$ \AB{I} \AD{
 to interpret {\AIC{`X} \AB{Δ} \AB{j}} (i.e. substructures of sort \AB{j} with
 newly bound variables in \AB{Δ}) in an ambient scope \AB{Γ} as {\AB{X} \AB{Δ} \AB{j} \AB{Γ}}.
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Syntax.tex]{interp}
-%\caption{Descriptions' Meanings}\label{figure:syntaxmeaning}
-\end{center}
+\end{agdasnippet}
 
 The astute reader may have noticed that \AF{⟦\_⟧} is uniform in $X$ and $\Gamma$; however
 refactoring \AF{⟦\_⟧} to use the partially applied $X\,\_\,\_\,\Gamma$ following
@@ -1036,10 +1047,9 @@ of type \AD{List} \AB{I} \AS{→} \AB{I} \AF{─Scoped} by appending the two
 its action on morphisms is given by a function \AF{fmap} defined by induction over
 the description just as in Section~\ref{section:data}.
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Syntax.tex]{scope}
-%\caption{De Bruijn Scopes}\label{figure:debruijnscope}
-\end{center}
+\end{agdasnippet}
 
 The endofunctors thus defined are strictly positive and we can take their fixpoints.
 As we want to define the terms of a language with variables, instead of
@@ -1051,10 +1061,9 @@ the parallel substitution \AF{sub}) in the next section.
 % We have once more a \AD{Size} index to get all the benefits of type
 % based termination checking.
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Syntax.tex]{mu}
-%\caption{Term Trees: The Free \AF{Var}-Relative Monads on Descriptions}\label{figure:freemonad}
-\end{center}
+\end{agdasnippet}
 
 Coming back to our original examples, we now have the ability to give
 codes for the well scoped untyped λ-calculus and, just as well,
@@ -1073,10 +1082,9 @@ any extra argument and λ-abstraction which has exactly one substructure
 with precisely one extra bound variable. A single \AD{Bool}ean is enough to
 distinguish the two constructors.
 
-\begin{center}
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{ULC}
-  %\caption{Description for the Untyped λ-calculus\label{fig:descUTLC}}
-\end{center}
+\end{agdasnippet}
 
 \paragraph*{Bidirectional STLC}\label{par:bidirectional} Our second example is a
 bidirectional~\cite{pierce2000local} language hence the introduction of a
@@ -1091,15 +1099,14 @@ remaining constructors correspond to changes of direction: one can freely
 annotation when forming a \AIC{Cut} (we reuse the notion of \AD{Type} introduced
 in the STLC example at the end of Section~\ref{section:primer-term}). % Figure~\ref{fig:intrinsic-stlc}).
 
-\begin{center}
-\begin{minipage}[t]{0.35\textwidth}
+\begin{minipage}{0.95\textwidth}
+\begin{minipage}[t]{0.3\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{tagmode}
 \end{minipage}\quad
-\begin{minipage}[t]{0.5\textwidth}
+\begin{minipage}[t]{0.65\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{desc}
 \end{minipage}
-%  \caption{Description for the bidirectional STLC\label{fig:descBidiSTLC}}
-\end{center}
+\end{minipage}
 
 \paragraph*{Intrinsically typed STLC}\label{par:intrinsicSTLC}
 In the typed case (for the same notion of \AD{Type}), we are back to two
@@ -1108,15 +1115,14 @@ to distinguish between \AD{Mode}s anymore. We need our tags to carry extra
 information about the types involved so we use once more an ad hoc data type
 \AD{`STLC}, and define its decoding \AD{STLC} by a pattern-matching λ-expression.
 
-\begin{center}
-\begin{minipage}[t]{0.4\textwidth}
+\begin{minipage}{0.95\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{tag}
-\end{minipage}\qquad
-\begin{minipage}[t]{0.5\textwidth}
+\end{minipage}
+\begin{minipage}[t]{0.515\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{desc}
 \end{minipage}
- % \caption{Description for the intrinsically typed STLC\label{fig:descSTLC}}
-\end{center}
+\end{minipage}
 
 For convenience we use Agda's pattern synonyms corresponding to the
 original constructors in Section \ref{section:mech-reus}. These
@@ -1131,15 +1137,14 @@ language currently does not allow the user to specify type annotations
 for pattern synonyms. We only include examples of pattern synonyms
 for the two extreme examples, the definition for \AF{Bidi} are similar.
 
-\begin{center}
-\begin{minipage}{0.40\textwidth}
+\begin{minipage}{0.95\textwidth}
+\begin{minipage}{0.47\textwidth}
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCpat}
-\end{minipage}\hspace{2.5em}
-\begin{minipage}{0.50\textwidth}
+\end{minipage}
+\begin{minipage}{0.52\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{patST}
 \end{minipage}
-%\caption{Respective Pattern Synonyms for \AF{UTLC} and \AF{STLC}. \label{fig:patsLC}}
-\end{center}
+\end{minipage}
 
 As a usage example of these pattern synonyms, we define the identity
 function in all three languages, using the
@@ -1147,18 +1152,20 @@ same caret-based naming convention we introduced earlier. The code
 is virtually the same except for \AF{Bidi} which explicitly records
 the change of direction from \AIC{Check} to \AIC{Infer}.
 
-\begin{center}
+\noindent
+\begin{minipage}{\textwidth}
 \begin{minipage}{0.28\textwidth}
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCid}
-\end{minipage}\quad
-\begin{minipage}{0.30\textwidth}
+\end{minipage}
+\begin{minipage}{0.34\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{BDid}
-\end{minipage}\quad
-\begin{minipage}{0.32\textwidth}
+\end{minipage}
+\begin{minipage}{0.36\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{STid}
 \end{minipage}
-%\caption{Identity function in all three languages}\label{fig:identity}
-\end{center}
+\end{minipage}
+% \begin{minipage}{\textwidth}
+% \end{minipage}
 
 
 \paragraph*{A sum combinator for syntaxes}\label{desccomb}
@@ -1170,15 +1177,15 @@ between two constructors. We can abstract this common pattern as a combinator \A
 with an appropriate eliminator \AF{case} which, given two methods,
 picks the one corresponding to the chosen branch.
 
-\begin{center}
-\begin{minipage}[t]{0.35\textwidth}
+\begin{minipage}{0.95\textwidth}
+\begin{minipage}[t]{0.42\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{descsum}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.55\textwidth}
+\end{minipage}
+\begin{minipage}[t]{0.57\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{case}
 \end{minipage}
 %\caption{Descriptions are closed under Sum}\label{figure:descsum}
-\end{center}
+\end{minipage}
 
 % Closure under product does not hold in general. Indeed, the
 % equality constraints introduced by the two end tokens of two
@@ -1232,10 +1239,9 @@ have to abide by three constraints:
       by the \AF{Kripke} type-valued function defined below) into computations
 \end{itemize}
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics.tex]{semantics}
-%\caption{A Generic Notion of Semantics\label{defn:Semantics}}
-\end{center}
+\end{agdasnippet}
 
 Here we crucially use the fact that the meaning of a description is
 defined in terms of a function interpreting substructures which has
@@ -1253,10 +1259,9 @@ each one of the fresh variables.
     evaluation of the body of the binder.
 \end{itemize}
 
-\begin{center}
+\begin{agdasnippet}
 \ExecuteMetaData[Data/Environment.tex]{kripke}
-%\caption{Substructures as either Computations or Kripke Function Spaces\label{defn:Kripke}}
-\end{center}
+\end{agdasnippet}
 
 It is once more the case that the abstract notion of Semantics comes
 with a fundamental lemma: all \AB{I} \AF{─Scoped} families \AB{𝓥} and
@@ -1265,12 +1270,9 @@ to an evaluation function. We introduce a notion of computation
 \AF{\_─Comp} analogous to that of environments: instead of associating
 values to variables, it associates computations to terms.
 
-%\begin{figure}[h]
-\begin{center}
+\begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics.tex]{comp}
-\end{center}
-%\caption{\AF{\_─Comp}: Associating Computations to Terms}
-%\end{figure}
+\end{agdasnippet}
 
 \subsection{Fundamental lemma of semantics}\label{sec:fundamentallemma}
 
@@ -1282,10 +1284,9 @@ each de Bruijn \AF{Scope} (i.e. a substructure in a potentially extended
 context) it associates a \AF{Kripke} (i.e. a subcomputation expecting a
 value for each newly bound variable).
 
-\begin{center}
-\ExecuteMetaData[Generic/Semantics.tex]{semtype}
-%\caption{Statement of the Fundamental Lemma of \semrec{}\label{defn:semantics}}
-\end{center}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics.tex]{semtype}
+\end{agdasnippet}
 
 The \semfun{} proof is straightforward now that we have clearly
 identified the problem structure and the constraints we need to enforce.
@@ -1295,10 +1296,9 @@ If it is a non-variable constructor then we call \AF{fmap} to evaluate the
 substructures using \AF{body} and then call the \ARF{alg}ebra to combine
 these results.
 
-\begin{center}
-\ExecuteMetaData[Generic/Semantics.tex]{semproof}
-%\caption{Proof of the Fundamental Lemma of \semrec{} -- \semfun{}}
-\end{center}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics.tex]{semproof}
+\end{agdasnippet}
 
 The auxiliary lemma \AF{body} distinguishes two cases. If no new
 variable has been bound in the recursive substructure, it is
@@ -1309,10 +1309,9 @@ substructure in the thinned and extended evaluation environment
 {(\AB{Γ} \AR{─Env}) \AB{𝓥} \AB{Θ}} and {(\AB{Δ} \AR{─Env}) \AB{𝓥} \AB{Θ}}
 produces an environment {((\AB{Γ} \AF{++} \AB{Δ}) \AR{─Env}) \AB{𝓥} \AB{Θ})}.
 
-\begin{center}
-\ExecuteMetaData[Generic/Semantics.tex]{bodyproof}
-%\caption{Proof of the Fundamental Lemma of \semrec{} -- \AF{body}}\label{def:body}
-\end{center}
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics.tex]{bodyproof}
+\end{agdasnippet}
 
 Given that \AF{fmap} introduces one level of indirection between the
 recursive calls and the subterms they are acting upon, the fact
@@ -1322,10 +1321,11 @@ well founded.
 
 We immediately introduce \AF{closed}, a corollary of the fundamental lemma of
 semantics for the special cases of closed terms.
-\begin{center}
-\ExecuteMetaData[Generic/Semantics.tex]{closed}
-%\caption{Corollary: evaluation of closed terms}\label{fig:evalclosed}
-\end{center}
+
+\begin{agdasnippet}
+  \ExecuteMetaData[Generic/Semantics.tex]{closed}
+\end{agdasnippet}
+
 Given a \AR{Semantics} with value type \AB{𝓥} and computation type \AB{𝓒},
 we can evaluate a closed term of type \AB{σ} and obtain a computation of
 type {(\AB{𝓒} \AB{σ} \AIC{[]})} by kickstarting the evaluation with an
@@ -1353,7 +1353,8 @@ values, the first one corresponds to renaming and the second
 one is trivial. The algebra is once more defined by using \AF{fmap}
 and reifying the bodies of binders.
 
-\begin{center}
+\noindent
+\begin{minipage}{\textwidth}
 \begin{minipage}{0.5\textwidth}
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{renaming}
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{ren}
@@ -1362,7 +1363,7 @@ and reifying the bodies of binders.
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{substitution}
   \ExecuteMetaData[Generic/Semantics/Syntactic.tex]{sub}
 \end{minipage}
-\end{center}
+\end{minipage}
 
 The reification process mentioned in the definition of renaming and
 substitution can be implemented generically for \semrec{} families
@@ -1372,10 +1373,9 @@ almost immediate that both \AD{Var} and \AD{Tm} are \AR{VarLike} (with
 proofs \AF{vl\textasciicircum{}Var} and \AF{vl\textasciicircum{}Tm},
 respectively).
 
-\begin{center}
-\ExecuteMetaData[Data/Var/Varlike.tex]{varlike}
-%\caption{\AR{VarLike}: \AF{Thinnable} and with placeholder values\label{fig:VarLike}}
-\end{center}
+\begin{agdasnippet}
+  \ExecuteMetaData[Data/Var/Varlike.tex]{varlike}
+\end{agdasnippet}
 
 \label{sec:varlike:base}
 Given a proof that \AB{𝓥} is \AR{VarLike}, we can manufacture
@@ -1394,10 +1394,9 @@ Given a proof that \AB{𝓥} is \AR{VarLike}, we can manufacture
   which associates each variable to itself (seen as a term).
 Using these definitions, we can then implement \AF{reify} as follows:
 
-\begin{center}
-\ExecuteMetaData[Data/Var/Varlike.tex]{reify}
-%\caption{Generic Reification thanks to \AR{VarLike} Values}\label{fig:genericreify}
-\end{center}
+\begin{agdasnippet}
+  \ExecuteMetaData[Data/Var/Varlike.tex]{reify}
+\end{agdasnippet}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
