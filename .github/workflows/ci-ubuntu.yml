@@ -161,4 +161,4 @@ jobs:
 
         with:
           branch: gh-pages
-          folder: html
+          folder: src/html
