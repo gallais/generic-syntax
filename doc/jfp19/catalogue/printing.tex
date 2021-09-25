@@ -67,7 +67,7 @@ on these names to obtain the string representation of the subterm. We finally
 return the names we used together with this string.
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Semantics/Printing.tex]{reifypieces}
+  \ExecuteMetaData[Generic/Semantics/Printing.tex]{reifypieces}
 \end{agdasnippet}
 
 We can put all of these pieces together to obtain the \AF{Printing} semantics.
@@ -77,17 +77,14 @@ of term of our syntaxes with binding is always traversable to combine all of
 these results into a value we can apply our display function to.
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Semantics/Printing.tex]{printing}
-%\caption{Printing with \AF{Name}s as a \AR{Semantics}}\label{fig:genericprinting}
+  \ExecuteMetaData[Generic/Semantics/Printing.tex]{printing}
 \end{agdasnippet}
 
-This allows us to write a \AF{printer} for open terms.
+This allows us to write a \AF{printer} for open terms:
 
 \begin{agdasnippet}
-\ExecuteMetaData[Generic/Semantics/Printing.tex]{print}
-%\caption{Generic Printer for Open Terms}\label{fig:genericprint}
+  \ExecuteMetaData[Generic/Semantics/Printing.tex]{print}
 \end{agdasnippet}
-
 We start by using \AF{base} (defined in Section~\ref{sec:varlike:base})
 to generate an environment of \AR{Name}s for the free variables, then use
 our semantics to get a \AF{printer} which we can run using a stream \AF{names} of distinct

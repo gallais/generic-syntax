@@ -323,7 +323,6 @@ sets:
     \ExecuteMetaData[Stdlib.tex]{adjust}
   \end{minipage}
 \end{minipage}
-% \newline
 
 \noindent
 \begin{minipage}{\textwidth}
@@ -334,6 +333,7 @@ sets:
     \ExecuteMetaData[Stdlib.tex]{forall}
   \end{minipage}
 \end{minipage}
+
 We lift the function space pointwise with \AF{\_⇒\_}, silently
 threading the underlying scope. The \AF{\_⊢\_} makes explicit the
 \emph{adjustment} made to the index by a function, a generalisation
@@ -485,14 +485,16 @@ We can readily define some basic building blocks for environments:
 \noindent
 \begin{minipage}{0.99\textwidth}
   \centering
-\begin{minipage}[t]{0.3\textwidth}
-\ExecuteMetaData[Data/Environment.tex]{empty}
-\end{minipage}\begin{minipage}[t]{0.69\textwidth}
-\ExecuteMetaData[Data/Environment.tex]{extension}
+  \begin{minipage}[t]{0.3\textwidth}
+    \ExecuteMetaData[Data/Environment.tex]{empty}
+  \end{minipage}
+  \begin{minipage}[t]{0.69\textwidth}
+    \ExecuteMetaData[Data/Environment.tex]{extension}
+  \end{minipage}
 \end{minipage}
-\ExecuteMetaData[Data/Environment.tex]{envmap}
-%\caption{Combinators to Build Environments}\label{fig:baseenv}
-\end{minipage}
+\begin{agdasnippet}
+  \ExecuteMetaData[Data/Environment.tex]{envmap}
+\end{agdasnippet}
 The empty environment (\AF{ε}) is implemented
 by remarking that there can be no variable of type
 {(\AD{Var} \AB{σ} \AIC{[]})} and to correspondingly dismiss the case with
@@ -542,6 +544,7 @@ will not get in our way, and permits a representation as a function space
 which grants us monoid laws ``for free'' as per Jeffrey's
 observation~\citeyear{jeffrey2011assoc}. We define the following identity, extend and (generalised) transitivity combinators for \AF{Thinning}s:
 
+\noindent
 \begin{minipage}{0.95\textwidth}
 \begin{minipage}{0.45\textwidth}
   \ExecuteMetaData[Data/Environment.tex]{identity}
@@ -557,6 +560,7 @@ observation~\citeyear{jeffrey2011assoc}. We define the following identity, exten
 Next, the \AF{□} combinator turns any (\AD{List} \AB{I})-indexed Set into one that can
 absorb thinnings.
 
+\noindent
 \begin{minipage}{0.95\textwidth}
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Data/Environment.tex]{box}
@@ -967,6 +971,7 @@ conveniently resugars them when displaying a goal. Finally, we can get
 our hands on the types' eliminators by instantiating the generic
 \AF{fold}:
 
+\noindent
 \begin{minipage}{0.95\textwidth}
 \begin{minipage}[t]{0.48\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{list}
@@ -975,7 +980,6 @@ our hands on the types' eliminators by instantiating the generic
 \begin{minipage}[t]{0.50\textwidth}
   \ExecuteMetaData[StateOfTheArt/CDMM.tex]{foldr}
 \end{minipage}
-%\caption{List, its constructors, and eliminator\label{fig:list}}
 \end{minipage}
 
 The CDMM approach, therefore, allows us to generically define iteration principles
@@ -1103,6 +1107,7 @@ remaining constructors correspond to changes of direction: one can freely
 annotation when forming a \AIC{Cut} (we reuse the notion of \AD{Type} introduced
 in the STLC example at the end of Section~\ref{section:primer-term}). % Figure~\ref{fig:intrinsic-stlc}).
 
+\noindent
 \begin{minipage}{0.95\textwidth}
 \begin{minipage}[t]{0.3\textwidth}
   \ExecuteMetaData[Generic/Syntax/Bidirectional.tex]{tagmode}
@@ -1119,6 +1124,7 @@ to distinguish between \AD{Mode}s anymore. We need our tags to carry extra
 information about the types involved so we use once more an ad hoc data type
 \AD{`STLC}, and define its decoding \AD{STLC} by a pattern-matching λ-expression.
 
+\noindent
 \begin{minipage}{0.95\textwidth}
 \begin{minipage}[t]{0.48\textwidth}
   \ExecuteMetaData[Generic/Syntax/STLC.tex]{tag}
@@ -1141,7 +1147,8 @@ language currently does not allow the user to specify type annotations
 for pattern synonyms. We only include examples of pattern synonyms
 for the two extreme examples, the definition for \AF{Bidi} are similar.
 
-\begin{minipage}{0.95\textwidth}
+\noindent
+\begin{minipage}{0.99\textwidth}
 \begin{minipage}{0.47\textwidth}
   \ExecuteMetaData[Generic/Syntax/UTLC.tex]{LCpat}
 \end{minipage}
@@ -1181,6 +1188,7 @@ between two constructors. We can abstract this common pattern as a combinator \A
 with an appropriate eliminator \AF{case} which, given two methods,
 picks the one corresponding to the chosen branch.
 
+\noindent
 \begin{minipage}{0.95\textwidth}
 \begin{minipage}[t]{0.42\textwidth}
   \ExecuteMetaData[Generic/Syntax.tex]{descsum}
