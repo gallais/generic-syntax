@@ -17,7 +17,7 @@ as directly manipulating raw de Bruijn indices is notoriously
 error-prone. Solutions have been proposed that range from enforcing
 well-scopedness of variables to ensuring full type correctness. In
 short, these techniques use the host languages' types to ensure that
-``illegal states are unrepresentable'', where illegal states
+\scarequote{illegal states are unrepresentable}, where illegal states
 correspond to ill scoped or ill typed terms in the object language.
 
 Despite the large body of knowledge in how to use types to define well
@@ -232,8 +232,8 @@ unrepresentable.
 Since \AD{Lam} is defined to be a function $\AD{Set} \to \AD{Set}$, it
 makes sense to ask whether it is also a functor and a monad. Indeed it
 is, as Altenkirch and Reus showed. The functorial action corresponds
-to renaming, the monadic ``return'' corresponds to the use of variables
-(the \AIC{`var} constructor), and the monadic ``bind'' corresponds
+to renaming, the monadic \codequote{return} corresponds to the use of variables
+(the \AIC{`var} constructor), and the monadic \codequote{bind} corresponds
 to substitution. The functor and monad laws correspond to well known
 properties from the equational theories of renaming and
 substitution. We will revisit these properties, for our whole universe
@@ -541,7 +541,7 @@ Embeddings~\cite{chapman2009type}. In particular, they do not prevent the
 user from defining arbitrary permutations or from introducing contractions
 although we will not use such instances. However, such extra flexibility
 will not get in our way, and permits a representation as a function space
-which grants us monoid laws ``for free'' as per Jeffrey's
+which grants us monoid laws \literalquote{for free} as per Jeffrey's
 observation~\citeyear{jeffrey2011assoc}. We define the following identity, extend and (generalised) transitivity combinators for \AF{Thinning}s:
 
 \noindent
@@ -612,7 +612,7 @@ following type:
 Broadly speaking, a semantics turns our deeply embedded abstract syntax
 trees into the shallow embedding of the corresponding parametrised higher
 order abstract syntax term. We get a choice of useful type- and scope-safe
-traversals by using different ``host languages'' for this shallow embedding.
+traversals by using different \scarequote{host languages} for this shallow embedding.
 
 Semantics, specified in terms of a record \semrec{}, are defined in terms
 of a choice of values \AB{𝓥} and computations \AB{𝓒}. A semantics must
@@ -810,7 +810,7 @@ argument between parentheses.
 
 To print a λ-abstraction, we start by generating a fresh name, \AB{x}, for the
 newly bound variable, use that name to generate a string \AB{b} representing the
-body of the function to which we prepend a ``λ'' binding the name \AB{x}.
+body of the function to which we prepend a \literalquote{λ} binding the name \AB{x}.
 
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/ACMM.tex]{printlam}
@@ -915,7 +915,7 @@ These constructors give the programmer the ability to build up the data
 types they are used to. For instance, the functor corresponding
 to lists of elements in $A$ stores a \AD{Bool}ean which stands for whether
 the current node is the empty list or not. Depending on its value, the
-rest of the description is either the ``stop'' token or a pair of an element
+rest of the description is either the \codequote{stop} token or a pair of an element
 in $A$ and a recursive substructure, that is, the tail of the list. The \AD{List} type
 being unindexed, and we represent the lack of an index with the unit type \AD{$\top$}
 whose unique inhabitant is \AIC{tt}.
@@ -994,7 +994,7 @@ free monad construction from CDMM uniformly adding the variable case. While a
 good start, \AD{Desc} treats its index types as unstructured, so this construction
 is blind to what makes the {\AD{List} \AB{I}} index a \emph{scope}.
 The resulting
-``bind'' operator demands a function which maps variables in \emph{any} sort and
+\codequote{bind} operator demands a function which maps variables in \emph{any} sort and
 scope to terms in the \emph{same} sort and scope. However, the behaviour we need
 is to preserve sort while mapping between specific source and target scopes which
 may differ. We need to account for the fact that scopes change only by extension,
@@ -1140,7 +1140,7 @@ synonyms can be used when pattern-matching on a term and Agda resugars
 them when displaying a goal. This means that the end user can
 seamlessly work with encoded terms without dealing with the gnarly
 details of the encoding.  These pattern definitions can omit some
-arguments using ``\AS{\_}'', in which case they will be filled in
+arguments using \codequote{\AS{\_}}, in which case they will be filled in
 by unification just like any other implicit argument: there is no
 extra cost to using an encoding!  The only downside is that the
 language currently does not allow the user to specify type annotations
@@ -1352,7 +1352,7 @@ for all syntax descriptions as a semantics with \AF{Var} as values and \AD{Tm} a
 computations. The first two constraints on \AF{Var} described earlier are trivially
 satisfied. Observing that renaming strictly respects the structure of the term it
 goes through, it makes sense for the algebra to be implemented using \AF{fmap}.
-When dealing with the body of a binder, we ``reify'' the \AF{Kripke} function by
+When dealing with the body of a binder, we \scarequote{reify} the \AF{Kripke} function by
 evaluating it in an extended context and feeding it placeholder values corresponding to
 the extra variables introduced by that context. This is reminiscent both of what we
 did in Section~\ref{section:primer-program} and the definition of reification in
@@ -1455,7 +1455,7 @@ Substitution will naturally play a central role in giving these finite
 terms a semantics as their potentially infinite unfolding.
 
 We will then see that many of the standard traversals produced by the
-``deriving'' machinery familiar to Haskell programmers can be implemented
+\codequote{deriving} machinery familiar to Haskell programmers can be implemented
 on syntaxes too, sometimes with more informative types.
 
 \input{catalogue/unrolling.tex}
@@ -1726,8 +1726,8 @@ of computation in \AB{𝓒ᴮ} and \AB{𝓒ᴬᴮ}.
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Fusion.tex]{fusionrec}
 \end{agdasnippet}
-The first obstacle we face is the formal definition of ``running \AB{𝓢ᴮ}
-after \AB{𝓢ᴬ}'': for this statement to make sense, the result of running
+The first obstacle we face is the formal definition of \scarequote{running \AB{𝓢ᴮ}
+after \AB{𝓢ᴬ}}: for this statement to make sense, the result of running
 \AB{𝓢ᴬ} ought to be a term. Or rather, we ought to be able to extract a
 term from a \AB{𝓒ᴬ}. Hence the first constraint: the existence of a \ARF{reifyᴬ}
 function, which we supply as a field of the record \AR{Fusion}. When dealing with
@@ -1974,7 +1974,7 @@ generic programs over them is still an open problem.
 \subsection{Semantics of syntaxes with binding} An early foundational study
 of a general \emph{semantic} framework for signatures with binding, algebras
 for such signatures, and initiality of the term algebra, giving rise to a
-categorical ``program'' for substitution and proofs of its properties, was given
+categorical \scarequote{program} for substitution and proofs of its properties, was given
 by Fiore, Plotkin and Turi~\cite{FiorePlotkinTuri99}. They worked in the category of presheaves
 over renamings, (a skeleton of) the category of finite sets. The presheaf
 condition corresponds to our notion of being \AF{Thinnable}. Exhibiting
@@ -2206,8 +2206,8 @@ future research.
 \item Our work on the POPLMark Reloaded challenge highlights a need
   for generic notions of congruence closure which would come with
   guarantees (if the original relation is stable under renaming and
-  substitution so should the closure).  Similarly, the ``evaluation
-  contexts'' corresponding to a syntax could be derived automatically
+  substitution so should the closure).  Similarly, the \scarequote{evaluation
+  contexts} corresponding to a syntax could be derived automatically
   by building on the work of Huet~\citeyear{huet_1997} and Abbott,
   Altenkirch, McBride and
   Ghani~\citeyear{DBLP:journals/fuin/AbbottAMG05}, allowing us to

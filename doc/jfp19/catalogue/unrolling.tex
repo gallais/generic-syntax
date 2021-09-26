@@ -6,7 +6,7 @@ indices~\citeyear{altenkirch1999monadic} can be used to represent
 potentially cyclic structures by a finite object. In their
 representation each bound variable is a pointer to the node
 that introduced it. Given that we are, at the top-level, only
-interested in structures with no ``dangling pointers'', we introduce
+interested in structures with no \scarequote{dangling pointers}, we introduce
 the notation \AF{TM} \AB{d} to mean closed terms (i.e. terms of type
 \AD{Tm} \AB{d} \AF{∞} \AIC{[]}).
 
@@ -14,10 +14,10 @@ A basic example of such a structure is a potentially cyclic list which
 offers a choice of two constructors: \AIC{[]} which ends the list and
 \AIC{\_::\_} which combines a head and a tail but also acts as a binder
 for a self-reference; these pointers can be used by using the \AIC{var}
-constructor which we have renamed \AIC{↶} (pronounced ``backpointer'')
+constructor which we have renamed \AIC{↶} (pronounced \literalquote{backpointer})
 to match the domain-specific meaning.
 We can see this approach in action in the examples
-\AF{[0, 1]} and \AF{01↺} (pronounced ``0-1-cycle'') which describe
+\AF{[0, 1]} and \AF{01↺} (pronounced \literalquote{0-1-cycle}) which describe
 respectively a finite list containing
 0 followed by 1 and a cyclic list starting with 0, then 1, and then
 repeating the whole list again by referring to the first cons cell
