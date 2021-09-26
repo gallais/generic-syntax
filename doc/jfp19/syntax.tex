@@ -96,7 +96,7 @@ content of this paper: a universe of scope-safe syntaxes with binding
 semantics for these syntaxes (Section~\ref{section:semantics}).  This
 gives us the opportunity to write generic implementations of renaming
 and substitution (Section~\ref{section:renandsub}), a generic
-let binding removal transformation (generalising the problem stated
+let-binding removal transformation (generalising the problem stated
 above) (Section~\ref{section:letbinding}), and normalisation by
 evaluation (Section~\ref{section:nbyeval}). Further, we show how to
 construct generic proofs by formally describing what it means for one
@@ -1221,7 +1221,7 @@ picks the one corresponding to the chosen branch.
 
 A concrete use case for this combinator will be given in
 Section~\ref{section:letbinding}
-where we explain how to seamlessly enrich an existing syntax with let bindings
+where we explain how to seamlessly enrich an existing syntax with let-bindings
 and how to use the \semrec{} framework to elaborate them away.
 
 
@@ -1958,7 +1958,7 @@ with traversals and lemmas implemented \emph{once and for all}.
 Many other opportunities to enrich the notion of binder in our library are
 highlighted by Cheney~\citeyear{DBLP:conf/icfp/Cheney05a}. As we have demonstrated
 in Sections~\ref{section:letbinding} and \ref{section:inlining} we can already
-handle let bindings generically for all syntaxes. We are currently considering
+handle let-bindings generically for all syntaxes. We are currently considering
 the modification of our system to handle deeply nested patterns by removing the
 constraint that the binders' and variables' sorts are identical. A notion of
 binding corresponding to hierarchical namespaces would be an exciting addition.

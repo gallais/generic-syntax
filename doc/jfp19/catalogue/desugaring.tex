@@ -9,7 +9,7 @@ This is made extremely simple by the disjoint sum combinator
 An example of such an extension is the addition of let-bindings to
 an existing language.
 
-Let bindings allow the user to avoid repeating themselves by naming
+let-bindings allow the user to avoid repeating themselves by naming
 sub-expressions and then using these names to refer to the associated
 terms. Preprocessors adding these types of mechanisms to existing
 languages (from C to CSS) are rather popular. We introduce a
@@ -34,16 +34,16 @@ has type \AB{$\tau$} in a context extended with a fresh variable of type
 \AB{$\sigma$}. This defines a term of type \AB{$\tau$}.
 
 In a dependently typed language, a type may depend on a value which
-in the presence of let bindings may be a variable standing for an
+in the presence of let-bindings may be a variable standing for an
 expression. The user naturally does not want it to make any difference
 whether they used a variable referring to a let-bound expression or
 the expression itself. Various type checking strategies can accommodate
-this expectation: in Coq~\cite{Coq:manual} let bindings are primitive
+this expectation: in Coq~\cite{Coq:manual} let-bindings are primitive
 constructs of the language and have their own typing and reduction
 rules whereas in Agda they are elaborated away to the core language
 by inlining.
 
-This latter approach to extending a language \AB{d} with let bindings
+This latter approach to extending a language \AB{d} with let-bindings
 by inlining them before type checking can be implemented generically as
 a semantics over (\AB{d} \AF{`+} \AF{Let}). For this semantics values
 in the environment and computations are both let-free terms. The algebra

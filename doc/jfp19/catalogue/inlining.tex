@@ -1,6 +1,6 @@
 \subsection{Reference counting and inlining as a semantics}\label{section:inlining}
 
-Although useful in its own right, desugaring all let bindings can lead
+Although useful in its own right, desugaring all let-bindings can lead
 to an exponential blow-up in code size. Compiler passes typically try
 to maintain sharing by only inlining let-bound expressions which appear
 at most one time. Unused expressions are eliminated as dead code whilst
