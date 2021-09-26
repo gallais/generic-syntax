@@ -103,7 +103,7 @@ construct generic proofs by formally describing what it means for one
 semantics to simulate another (Section~\ref{section:simulation}), or
 for two semantics to be fusible (Section~\ref{section:fusion}). This
 allows us to prove the lemmas required above for renaming,
-substitution, and desugaring of let binders generically, for
+substitution, and desugaring of let-binders generically, for
 \emph{every} syntax in our universe.
 
 \medskip
@@ -2151,7 +2151,7 @@ given a semantics.
 \paragraph*{Flat binding structure} Our current set-up limits us to flat binding
 structures: variables and binders share the same sorts. This prevents us from
 representing languages with binding patterns, for instance pattern-matching
-let binders which can have arbitrarily nested patterns taking pairs apart.
+let-binders which can have arbitrarily nested patterns taking pairs apart.
 
 \paragraph*{Closure under derivation} One-hole contexts play a major role in the
 theory of programming languages. Just like the one-hole context of a data type is
