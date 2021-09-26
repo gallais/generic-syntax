@@ -27,8 +27,9 @@ designer or formaliser to redefine essential functions like renaming
 and substitution for each new syntax, and then to reprove essential
 lemmas about those functions. To reduce the burden of such repeated
 work and boilerplate, in this paper we apply the methodology of
-data type genericity to programming and proving with syntaxes with
-binding.
+data type genericity to programming and proving
+  in the domain of 
+syntaxes with binding.
 
 To motivate our approach, let us look at the formalisation of an
 apparently straightforward program transformation: the inlining of
@@ -250,7 +251,7 @@ monads~\citeyear{Altenkirch2010, JFR4389}.
 
 We pick as our index type $J$ the category whose objects are
 inhabitants of \AD{List} \AB{I} (\AB{I} is a parameter of the
-construction) and whose morphisms are thinnings (permutations that may
+construction) and whose morphisms are \emph{thinnings} (permutations that may
 forget elements, we give the definition in Section~\ref{sec:genenvironment}).  Values of type
 \AD{List} \AB{I} are intended to represent the list of the sorts (or
 kinds, or types, depending on the application) of the de Bruijn
