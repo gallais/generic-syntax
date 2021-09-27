@@ -543,7 +543,7 @@ user from defining arbitrary permutations or from introducing contractions
 although we will not use such instances. However, such extra flexibility
 will not get in our way, and permits a representation as a function space
 which grants us monoid laws \literalquote{for free} as per Jeffrey's
-observation~\citeyear{jeffrey2011assoc}. We define the following identity, extend and (generalised) transitivity combinators for \AF{Thinning}s:
+observation~\citeyear{jeffrey2011assoc}. We define the following identity, weaken and (generalised) transitivity combinators for \AF{Thinning}s:
 
 \noindent
 \begin{minipage}{0.95\textwidth}
@@ -750,7 +750,7 @@ operation will be a term.
 We notice that the definition of substitution depends on
 the definition of renaming: to be able to push terms under a binder, we need to
 have already proven that they are thinnable.
-In both cases we use \AF{extend} defined in Section~\ref{sec:genenvironment} as the definition of the
+In both cases we use \AF{weaken} defined in Section~\ref{sec:genenvironment} as the definition of the
 thinning which embeds \AB{Γ} into {(\AB{σ} \AIC{∷} \AB{Γ})}.
 
 \label{section:printing}
