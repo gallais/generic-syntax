@@ -930,8 +930,8 @@ of length-indexed lists. It has the same structure as the definition of \AF{list
 We start with a \AF{Bool}ean distinguishing the two constructors: either
 the empty list (in which case the branch's index is enforced to be $0$) or a
 non-empty one in which case we store a natural number \AB{n}, the head of type
-\AB{A} and a tail of size \AB{n} (and the branch's index is enforced to be
-\AIC{suc} \AB{n}).
+\AB{A} and a tail of size \AB{n} and the branch's index is enforced to be
+\AIC{suc} \AB{n}.
 
 \begin{agdasnippet}
 \ExecuteMetaData[StateOfTheArt/CDMM.tex]{vecD}
