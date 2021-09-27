@@ -99,7 +99,7 @@ constructor in isolation before putting everything together to get a
 \AR{Semantics}. These steps are very similar to the ones in the previous
 section.
 
-\paragraph*{Application} In the application case, we start by elaborating the
+\paragraph*{Application.} In the application case, we start by elaborating the
 function and we get its type together with its internal representation. We then
 check that the inferred type is indeed an \AD{Arrow} and elaborate the argument
 using the corresponding domain. We conclude by returning the codomain together
@@ -107,7 +107,7 @@ with the internal function applied to the internal argument.
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{app}
 \end{agdasnippet}
-\paragraph*{λ-abstraction} For the λ-abstraction case, we start by
+\paragraph*{λ-abstraction.} For the λ-abstraction case, we start by
 checking that the type candidate \AB{arr} is an \AD{Arrow}. We can
 then elaborate the body \AB{b} of the lambda in a context of modes extended
 with one \AIC{Infer} variable, and the corresponding \AF{Typing} extended
@@ -117,13 +117,13 @@ conclude by returning it wrapped in a \AIC{`lam} constructor.
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{lam}
 \end{agdasnippet}
-\paragraph*{Cut: A \AD{Check} in an \AD{Infer} position} For cut, we start by
+\paragraph*{Cut: A \AD{Check} in an \AD{Infer} position.} For cut, we start by
 elaborating the term with the type annotation provided and return them paired
 together.
 \begin{agdasnippet}
   \ExecuteMetaData[Generic/Semantics/Elaboration/Typed.tex]{cut}
 \end{agdasnippet}
-\paragraph*{Embedding of \AD{Infer} into \AD{Check}} For the change of direction
+\paragraph*{Embedding of \AD{Infer} into \AD{Check}.} For the change of direction
 \AIC{Emb} we not only want to check that the inferred type and the type candidate
 are equal: we need to cast the internal term labelled with the inferred type to
 match the type candidate. Luckily, Agda's dependent \AK{do}-notation make our

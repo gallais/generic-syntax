@@ -53,14 +53,14 @@ following code, \AF{\_<\$\_} is, following classic Haskell notations, the functi
 which takes an \AB{A} and a {\AD{Maybe} \AB{B}} and returns a {\AD{Maybe} \AB{A}}
 which has the same structure as its second argument.
 
-\paragraph*{Application} When facing an application: infer the type of the function,
+\paragraph*{Application.} When facing an application: infer the type of the function,
 make sure it is an arrow type, check the argument at the domain's type and return
 the codomain.
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{app}
 \end{agdasnippet}
 %
-\paragraph*{λ-abstraction} For a λ-abstraction: check that the input
+\paragraph*{λ-abstraction.} For a λ-abstraction: check that the input
 type \AB{arr} is an arrow type and check the body \AB{b} at the
 codomain type in the extended environment (using \AF{bind}) where the
 newly bound variable is of mode \AIC{Infer} and has the domain's type.
@@ -68,20 +68,20 @@ newly bound variable is of mode \AIC{Infer} and has the domain's type.
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{lam}
 \end{agdasnippet}
 %
-\paragraph*{Embedding of \AD{Infer} into \AD{Check}} The change of
+\paragraph*{Embedding of \AD{Infer} into \AD{Check}.} The change of
 direction from \AIC{Infer}rable to \AIC{Check}able is successful when the
 inferred type is equal to the expected one.
 \begin{agdasnippet}
 \ExecuteMetaData[Generic/Semantics/TypeChecking.tex]{emb}
 \end{agdasnippet}
 %
-\paragraph*{Cut: A \AD{Check} in an \AD{Infer} position} 
+\paragraph*{Cut: A \AD{Check} in an \AD{Infer} position.}
 So far, our bidirectional syntax only permits the construction
   of STLC terms in \emph{canonical
     form}~\cite{Pfenning:04,Dunfield:2004:TT:964001.964025}. In order to construct
   non-normal (redex) terms, whose semantics is given logically by the
   `cut' rule, we need to reverse direction.
-Our final semantic operation, \AF{cut}, 
+Our final semantic operation, \AF{cut},
 always comes with a type candidate against which to check the term and
 to be returned in case of success.
 \begin{agdasnippet}
