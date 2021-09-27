@@ -89,64 +89,67 @@
 <a id="2948" class="Comment">-- Renaming and Substitution as Semantics</a>
 <a id="2990" class="Keyword">import</a> <a id="2997" href="Generic.Semantics.Syntactic.html" class="Module">Generic.Semantics.Syntactic</a>
 
-<a id="3026" class="Comment">-- Generic Unsafe Normalization by Evaluation and Printing as Semantics</a>
-<a id="3098" class="Keyword">import</a> <a id="3105" href="Generic.Semantics.NbyE.html" class="Module">Generic.Semantics.NbyE</a>
-<a id="3128" class="Keyword">import</a> <a id="3135" href="Generic.Semantics.Printing.html" class="Module">Generic.Semantics.Printing</a>
-<a id="3162" class="Comment">-- use cases:</a>
-<a id="3176" class="Keyword">import</a> <a id="3183" href="Generic.Examples.NbyE.html" class="Module">Generic.Examples.NbyE</a>
-<a id="3205" class="Keyword">import</a> <a id="3212" href="Generic.Examples.Printing.html" class="Module">Generic.Examples.Printing</a>
+<a id="3026" class="Comment">-- Contraction as a Semantics</a>
+<a id="3056" class="Keyword">import</a> <a id="3063" href="Generic.Semantics.Contract.html" class="Module">Generic.Semantics.Contract</a>
 
-<a id="3239" class="Comment">-- Generic Elaboration of Let-binders (single &amp; parallel ones)</a>
-<a id="3302" class="Keyword">import</a> <a id="3309" href="Generic.Semantics.Elaboration.LetBinder.html" class="Module">Generic.Semantics.Elaboration.LetBinder</a>
-<a id="3349" class="Keyword">import</a> <a id="3356" href="Generic.Semantics.Elaboration.LetCounter.html" class="Module">Generic.Semantics.Elaboration.LetCounter</a>
-<a id="3397" class="Keyword">import</a> <a id="3404" href="Generic.Semantics.Elaboration.LetBinders.html" class="Module">Generic.Semantics.Elaboration.LetBinders</a>
+<a id="3091" class="Comment">-- Generic Unsafe Normalization by Evaluation and Printing as Semantics</a>
+<a id="3163" class="Keyword">import</a> <a id="3170" href="Generic.Semantics.NbyE.html" class="Module">Generic.Semantics.NbyE</a>
+<a id="3193" class="Keyword">import</a> <a id="3200" href="Generic.Semantics.Printing.html" class="Module">Generic.Semantics.Printing</a>
+<a id="3227" class="Comment">-- use cases:</a>
+<a id="3241" class="Keyword">import</a> <a id="3248" href="Generic.Examples.NbyE.html" class="Module">Generic.Examples.NbyE</a>
+<a id="3270" class="Keyword">import</a> <a id="3277" href="Generic.Examples.Printing.html" class="Module">Generic.Examples.Printing</a>
 
-<a id="3446" class="Comment">-- Specific Semantics relating various examples of Syntaxes</a>
-<a id="3506" class="Keyword">import</a> <a id="3513" href="Generic.Semantics.TypeChecking.html" class="Module">Generic.Semantics.TypeChecking</a>
-<a id="3544" class="Keyword">import</a> <a id="3551" href="Generic.Semantics.Elaboration.State.html" class="Module">Generic.Semantics.Elaboration.State</a>
-<a id="3587" class="Keyword">import</a> <a id="3594" href="Generic.Semantics.Elaboration.Typed.html" class="Module">Generic.Semantics.Elaboration.Typed</a>
+<a id="3304" class="Comment">-- Generic Elaboration of Let-binders (single &amp; parallel ones)</a>
+<a id="3367" class="Keyword">import</a> <a id="3374" href="Generic.Semantics.Elaboration.LetBinder.html" class="Module">Generic.Semantics.Elaboration.LetBinder</a>
+<a id="3414" class="Keyword">import</a> <a id="3421" href="Generic.Semantics.Elaboration.LetCounter.html" class="Module">Generic.Semantics.Elaboration.LetCounter</a>
+<a id="3462" class="Keyword">import</a> <a id="3469" href="Generic.Semantics.Elaboration.LetBinders.html" class="Module">Generic.Semantics.Elaboration.LetBinders</a>
 
-<a id="3631" class="Comment">-- PROPERTIES</a>
-<a id="3645" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="3511" class="Comment">-- Specific Semantics relating various examples of Syntaxes</a>
+<a id="3571" class="Keyword">import</a> <a id="3578" href="Generic.Semantics.TypeChecking.html" class="Module">Generic.Semantics.TypeChecking</a>
+<a id="3609" class="Keyword">import</a> <a id="3616" href="Generic.Semantics.Elaboration.State.html" class="Module">Generic.Semantics.Elaboration.State</a>
+<a id="3652" class="Keyword">import</a> <a id="3659" href="Generic.Semantics.Elaboration.Typed.html" class="Module">Generic.Semantics.Elaboration.Typed</a>
 
-<a id="3727" class="Comment">-- Relator: Head Constructors with Related Subterms</a>
-<a id="3779" class="Keyword">import</a> <a id="3786" href="Generic.Relator.html" class="Module">Generic.Relator</a>
+<a id="3696" class="Comment">-- PROPERTIES</a>
+<a id="3710" class="Comment">--------------------------------------------------------------------------------</a>
 
-<a id="3803" class="Comment">-- Fundamental Lemma of Logical Predicates</a>
-<a id="3846" class="Keyword">import</a> <a id="3853" href="Data.Pred.html" class="Module">Data.Pred</a> <a id="3863" class="Symbol">as</a> <a id="3866" class="Module">P</a>
-<a id="3868" class="Keyword">import</a> <a id="3875" href="Generic.Fundamental.html" class="Module">Generic.Fundamental</a>
+<a id="3792" class="Comment">-- Relator: Head Constructors with Related Subterms</a>
+<a id="3844" class="Keyword">import</a> <a id="3851" href="Generic.Relator.html" class="Module">Generic.Relator</a>
 
-<a id="3896" class="Comment">-- Generic Notion of Simulation Between Two Semantics</a>
-<a id="3950" class="Keyword">import</a> <a id="3957" href="Data.Relation.html" class="Module">Data.Relation</a> <a id="3971" class="Symbol">as</a> <a id="3974" class="Module">R</a>
-<a id="3976" class="Keyword">import</a> <a id="3983" href="Generic.Simulation.html" class="Module">Generic.Simulation</a>
-<a id="4002" class="Keyword">import</a> <a id="4009" href="Generic.Simulation.Syntactic.html" class="Module">Generic.Simulation.Syntactic</a>
+<a id="3868" class="Comment">-- Fundamental Lemma of Logical Predicates</a>
+<a id="3911" class="Keyword">import</a> <a id="3918" href="Data.Pred.html" class="Module">Data.Pred</a> <a id="3928" class="Symbol">as</a> <a id="3931" class="Module">P</a>
+<a id="3933" class="Keyword">import</a> <a id="3940" href="Generic.Fundamental.html" class="Module">Generic.Fundamental</a>
 
-<a id="4039" class="Comment">-- Applying the Identity Substitution is the Identity</a>
-<a id="4093" class="Keyword">import</a> <a id="4100" href="Generic.Identity.html" class="Module">Generic.Identity</a>
+<a id="3961" class="Comment">-- Generic Notion of Simulation Between Two Semantics</a>
+<a id="4015" class="Keyword">import</a> <a id="4022" href="Data.Relation.html" class="Module">Data.Relation</a> <a id="4036" class="Symbol">as</a> <a id="4039" class="Module">R</a>
+<a id="4041" class="Keyword">import</a> <a id="4048" href="Generic.Simulation.html" class="Module">Generic.Simulation</a>
+<a id="4067" class="Keyword">import</a> <a id="4074" href="Generic.Simulation.Syntactic.html" class="Module">Generic.Simulation.Syntactic</a>
 
-<a id="4118" class="Comment">-- FUSION</a>
+<a id="4104" class="Comment">-- Applying the Identity Substitution is the Identity</a>
+<a id="4158" class="Keyword">import</a> <a id="4165" href="Generic.Identity.html" class="Module">Generic.Identity</a>
 
-<a id="4129" class="Comment">-- Generic Notion of Fusible Semantics</a>
-<a id="4168" class="Keyword">import</a> <a id="4175" href="Generic.Fusion.html" class="Module">Generic.Fusion</a>
+<a id="4183" class="Comment">-- FUSION</a>
 
-<a id="4191" class="Comment">-- Renaming and Substitution interact well with each other and let-elaboration</a>
-<a id="4270" class="Keyword">import</a> <a id="4277" href="Generic.Fusion.Syntactic.html" class="Module">Generic.Fusion.Syntactic</a>
-<a id="4302" class="Keyword">import</a> <a id="4309" href="Generic.Fusion.Elaboration.LetBinder.html" class="Module">Generic.Fusion.Elaboration.LetBinder</a>
+<a id="4194" class="Comment">-- Generic Notion of Fusible Semantics</a>
+<a id="4233" class="Keyword">import</a> <a id="4240" href="Generic.Fusion.html" class="Module">Generic.Fusion</a>
 
-<a id="4347" class="Comment">-- Based on Kaiser, Schäfer, and Stark&#39;s remark, we can concoct an axiom-free</a>
-<a id="4425" class="Comment">-- specialised version of fusion for renaming-semantics interactions (it makes</a>
-<a id="4504" class="Comment">-- some of the previous proofs shorter).</a>
-<a id="4545" class="Comment">-- We can also use it to replicate their result assuming functional extensionality</a>
-<a id="4628" class="Keyword">import</a> <a id="4635" href="Generic.Fusion.Specialised.Propositional.html" class="Module">Generic.Fusion.Specialised.Propositional</a>
-<a id="4676" class="Keyword">import</a> <a id="4683" href="Generic.Fusion.Specialised.Replication.html" class="Module">Generic.Fusion.Specialised.Replication</a>
+<a id="4256" class="Comment">-- Renaming and Substitution interact well with each other and let-elaboration</a>
+<a id="4335" class="Keyword">import</a> <a id="4342" href="Generic.Fusion.Syntactic.html" class="Module">Generic.Fusion.Syntactic</a>
+<a id="4367" class="Keyword">import</a> <a id="4374" href="Generic.Fusion.Elaboration.LetBinder.html" class="Module">Generic.Fusion.Elaboration.LetBinder</a>
+
+<a id="4412" class="Comment">-- Based on Kaiser, Schäfer, and Stark&#39;s remark, we can concoct an axiom-free</a>
+<a id="4490" class="Comment">-- specialised version of fusion for renaming-semantics interactions (it makes</a>
+<a id="4569" class="Comment">-- some of the previous proofs shorter).</a>
+<a id="4610" class="Comment">-- We can also use it to replicate their result assuming functional extensionality</a>
+<a id="4693" class="Keyword">import</a> <a id="4700" href="Generic.Fusion.Specialised.Propositional.html" class="Module">Generic.Fusion.Specialised.Propositional</a>
+<a id="4741" class="Keyword">import</a> <a id="4748" href="Generic.Fusion.Specialised.Replication.html" class="Module">Generic.Fusion.Specialised.Replication</a>
 
 
 
-<a id="4725" class="Comment">-- SYNTAX AS A FINITE REPRESENTATION OF CYCLIC STRUCTURES</a>
-<a id="4783" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="4790" class="Comment">-- SYNTAX AS A FINITE REPRESENTATION OF CYCLIC STRUCTURES</a>
+<a id="4848" class="Comment">--------------------------------------------------------------------------------</a>
 
-<a id="4865" class="Keyword">import</a> <a id="4872" href="Generic.Cofinite.html" class="Module">Generic.Cofinite</a>
-<a id="4889" class="Keyword">import</a> <a id="4896" href="Generic.Examples.Colist.html" class="Module">Generic.Examples.Colist</a>
-<a id="4920" class="Keyword">import</a> <a id="4927" href="Generic.Bisimilar.html" class="Module">Generic.Bisimilar</a>
+<a id="4930" class="Keyword">import</a> <a id="4937" href="Generic.Cofinite.html" class="Module">Generic.Cofinite</a>
+<a id="4954" class="Keyword">import</a> <a id="4961" href="Generic.Examples.Colist.html" class="Module">Generic.Examples.Colist</a>
+<a id="4985" class="Keyword">import</a> <a id="4992" href="Generic.Bisimilar.html" class="Module">Generic.Bisimilar</a>
 
 </pre></body></html>
