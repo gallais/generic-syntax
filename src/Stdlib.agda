@@ -36,7 +36,11 @@ data Dec (P : Set) : Set where
   no   : (P → ⊥)  → Dec P
 
 
+variable
+  a : A
+  as : List A
+
 
 data All (P : A → Set) : List A → Set where
   []   : All P []
-  _∷_  : ∀ {a as} → P a → All P as → All P (a ∷ as)
+  _∷_  : P a → All P as → All P (a ∷ as)
