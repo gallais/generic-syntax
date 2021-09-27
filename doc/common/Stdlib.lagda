@@ -64,11 +64,15 @@ data Dec (P : Set) : Set where
 %</dec>
 \begin{code}
 
+variable
+  a : A
+  as : List A
+
 \end{code}
 %<*all>
 \begin{code}
 data All (P : A → Set) : List A → Set where
   []   : All P []
-  _∷_  : ∀ {a as} → P a → All P as → All P (a ∷ as)
+  _∷_  : P a → All P as → All P (a ∷ as)
 \end{code}
 %</all>
