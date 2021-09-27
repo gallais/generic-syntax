@@ -119,15 +119,15 @@ simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρᴿ (`β b u)    =
   ◅_ $  subst (Δ ⊢ _ ∋_↝⋆T _) (sym (unLetSub b eqᴿ))
   $ Simulation.sim UnLet^↝⋆T ρ∙uᴿ b where
 
-  eq′ᴿ : All Eqᴿ _ (select (th^Env th^Var (base vl^Var) extend) (unLet ρ u /0])) (base vl^Tm)
+  eq′ᴿ : All Eqᴿ _ (select (th^Env th^Var (base vl^Var) weaken) (unLet ρ u /0])) (base vl^Tm)
   lookupᴿ eq′ᴿ z     = refl
-  lookupᴿ eq′ᴿ (s v) = cong (ren extend ∘ lookup (base vl^Tm)) (lookup-base^Var v)
+  lookupᴿ eq′ᴿ (s v) = cong (ren weaken ∘ lookup (base vl^Tm)) (lookup-base^Var v)
 
   eqᴿ : All Eqᴿ _ (sub (unLet ρ u /0]) <$> (freshˡ vl^Tm Δ >> _))
                   (unLet ρ <$> (u /0]))
   lookupᴿ eqᴿ z     = refl
   lookupᴿ eqᴿ (s v) = begin
-    sub (unLet ρ u /0]) (ren (th^Env th^Var (base vl^Var) extend) (lookup ρ v))
+    sub (unLet ρ u /0]) (ren (th^Env th^Var (base vl^Var) weaken) (lookup ρ v))
       ≡⟨ Fusion.fusion (F.RenSub Target) eq′ᴿ (lookup ρ v) ⟩
     sub (base vl^Tm) (lookup ρ v)
       ≡⟨ sub-id (lookup ρ v) ⟩
@@ -160,7 +160,7 @@ simulation {Γ} {Δ} {ρ = ρ} {ρ′} ρᴿ (`lam r) = gmap lamT `lam (simulati
                    (freshˡ vl^Tm Δ >> th^Env th^Tm ρ′ (freshʳ vl^Var (_ ∷ [])))
   lookupᴿ ρ′ᴿ k with split (_ ∷ []) k
   ... | inj₁ kˡ = Star.ε
-  ... | inj₂ kʳ = th^↝⋆T (th^Env th^Var (base vl^Var) extend) (lookupᴿ ρᴿ kʳ)
+  ... | inj₂ kʳ = th^↝⋆T (th^Env th^Var (base vl^Var) weaken) (lookupᴿ ρᴿ kʳ)
 
 simulation ρᴿ (`appl r t) =
      gmap (λ f → appT f _) (λ r → `appl r _) (simulation ρᴿ r)

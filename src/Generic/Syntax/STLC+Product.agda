@@ -53,7 +53,7 @@ module PATTERNS where
   pattern ONE     = `con (One , refl)
 
   CUR : ∀ {σ τ ν} → ∀[ Tm STLCPr _ (σ `→ τ `→ ν) ⇒ Tm STLCPr _ (σ ⊗ τ `→ ν) ]
-  CUR t = LAM (APP (APP (ren extend t) (FST (`var z))) (SND (`var z)))
+  CUR t = LAM (APP (APP (ren weaken t) (FST (`var z))) (SND (`var z)))
 
   SWP : ∀ {σ τ} → ∀[ Tm STLCPr _ (σ ⊗ τ) ⇒ Tm STLCPr _ (τ ⊗ σ) ]
   SWP t = PRD (SND t) (FST t)

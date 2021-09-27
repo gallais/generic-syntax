@@ -28,7 +28,7 @@ record VarLike (𝓥 : I ─Scoped) : Set where
 
   base : (Γ ─Env) 𝓥 Γ
   base {Γ = []}    = ε
-  base {Γ = σ ∷ Γ} = th^Env th^𝓥 base extend ∙ new
+  base {Γ = σ ∷ Γ} = th^Env th^𝓥 base weaken ∙ new
 
   freshʳ : (Δ : List I) → (Γ ─Env) 𝓥 (Δ ++ Γ)
   freshʳ Δ = th^Env th^𝓥 base (pack (injectʳ Δ))
@@ -58,8 +58,8 @@ module _ (vl^𝓥 : VarLike 𝓥) where
   lift : ∀ Θ → (Γ ─Env) 𝓥 Δ → ((Θ ++ Γ) ─Env) 𝓥 (Θ ++ Δ)
   lift Θ ρ = freshˡ vl^𝓥 _ >> th^Env (th^𝓥 vl^𝓥) ρ (freshʳ vl^Var Θ)
 
-  extend-is-fresh : All Eqᴿ Γ extend (freshʳ vl^Var (σ ∷ []))
-  lookupᴿ extend-is-fresh k = cong s (sym (lookup-base^Var k))
+  weaken-is-fresh : All Eqᴿ Γ weaken (freshʳ vl^Var (σ ∷ []))
+  lookupᴿ weaken-is-fresh k = cong s (sym (lookup-base^Var k))
 
 module _ {I : Set} {𝓥 : I ─Scoped} where
  open ≡-Reasoning
@@ -84,7 +84,7 @@ module _ (𝓡^𝓥  : Rel 𝓥₁ 𝓥₂) where
 
    baseᴿ : All 𝓡^𝓥 Γ (base vl₁) (base vl₂)
    baseᴿ {[]   } = packᴿ λ ()
-   baseᴿ {i ∷ Γ} = (thᴿ extend <$>ᴿ baseᴿ) ∙ᴿ newᴿ
+   baseᴿ {i ∷ Γ} = (thᴿ weaken <$>ᴿ baseᴿ) ∙ᴿ newᴿ
 
    freshˡᴿ : ∀ Γ → All 𝓡^𝓥 Δ (freshˡ vl₁ Γ) (freshˡ vl₂ Γ)
    freshˡᴿ n = thᴿ _ <$>ᴿ baseᴿ

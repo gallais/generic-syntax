@@ -18,7 +18,7 @@ open import Function
 open import Relation.Unary
 open import Data.Var
 open import Data.Var.Varlike
-open import Data.Environment using (Kripke; th^Var; ε; _∙_; identity; extend; extract)
+open import Data.Environment using (Kripke; th^Var; ε; _∙_; identity; weaken; extract)
 open import Generic.Syntax.LetCounter
 open import Generic.Syntax.LetBinder
 open import Generic.Semantics
@@ -42,7 +42,7 @@ reify^Count Δ σ kr = let (scp , c) = reify vl^Var Δ σ kr in scp , drop Δ c
 
 clet :  ⟦ Let ⟧ (Kripke Var (Counted (Tm (d `+ CLet) ∞))) σ Γ →
         Counted (⟦ CLet ⟧ (Scope (Tm (d `+ CLet) ∞))) σ Γ
-clet (στ , (e , ce) , body , eq) = case body extend (ε ∙ z) of λ where
+clet (στ , (e , ce) , body , eq) = case body weaken (ε ∙ z) of λ where
   (t , cx ∷ ct) →  (cx , στ , e , t , eq) , merge (control cx ce) ct
 
 Annotate : Semantics (d `+ Let) Var (Counted (Tm (d `+ CLet) ∞))
@@ -62,7 +62,7 @@ Semantics.th^𝓥 Inline = th^Tm
 Semantics.var   Inline = id
 Semantics.alg   Inline = λ where
   (true , t)                       → `con (true , fmap d (reify vl^Tm) t)
-  (false , many , στ , e , b , eq) → `con (false , στ , e , b extend (ε ∙ `var z) , eq)
+  (false , many , στ , e , b , eq) → `con (false , στ , e , b weaken (ε ∙ `var z) , eq)
   (false , _ , στ , e , b , refl)  → extract b (ε ∙ e) -- cf Semantics.alg UnLet
 
 inline : Tm (d `+ CLet) ∞ σ Γ → Tm (d `+ Let) ∞ σ Γ
