@@ -89,6 +89,9 @@ import Generic.Semantics.Unit
 -- Renaming and Substitution as Semantics
 import Generic.Semantics.Syntactic
 
+-- Contraction as a Semantics
+import Generic.Semantics.Contract
+
 -- Generic Unsafe Normalization by Evaluation and Printing as Semantics
 import Generic.Semantics.NbyE
 import Generic.Semantics.Printing
