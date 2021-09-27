@@ -1510,7 +1510,7 @@ and computations to relations on environments, \AF{Kripke} function spaces or
 on \AB{d}-shaped terms whose subterms have been evaluated already.
 This is what the rest of this section focuses on.
 
-\paragraph*{Environment relator}
+\paragraph*{Environment relator.}
 Provided a relation \AB{𝓥ᴿ} for notions of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}, by
 pointwise lifting we can define a relation {(\AR{All} \AB{𝓥ᴿ} \AB{Γ})} on
 \AB{Γ}-environments of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ} respectively. We once more
@@ -1528,7 +1528,7 @@ The combinators we introduced in Section~\ref{sec:genenvironment} to build envir
 (\AF{ε}, \AF{\_∙\_}, etc.) have natural relational counterparts. We reuse the same
 names for them, simply appending an \AF{ᴿ} suffix.
 
-\paragraph*{Kripke relator}
+\paragraph*{Kripke relator.}
 We assume that we have two types of values \AB{𝓥ᴬ} and \AB{𝓥ᴮ}
 as well as a relation \AB{𝓥ᴿ} for pairs of such values, and two types of computations
 \AB{𝓒ᴬ} and \AB{𝓒ᴮ} whose notion of relatedness is given by \AB{𝓒ᴿ}. We can define
@@ -1542,7 +1542,7 @@ paragraph.
   \ExecuteMetaData[Data/Var/Varlike.tex]{kripkeR}
 \end{agdasnippet}
 
-\paragraph*{Desc relator}
+\paragraph*{Desc relator.}
 The relator (\AF{⟦} \AB{d} \AF{⟧ᴿ}) is a relation transformer which characterises
 structurally equal layers such that their substructures are themselves related
 by the relation it is passed as an argument. It inherits a lot of its relational
@@ -1689,7 +1689,7 @@ demonstrating that \AF{Tm} is a relative Monad~\cite{JFR4389} implies proving
 that two consecutive substitutions can be merged into a single one whose
 environment is the first one, where the second one has been applied in a
 pointwise manner. The \emph{Substitution Lemma} central
-to most model constructions (see e.g.,~\cite{mitchell1991kripke}) states
+to most model constructions \cite{mitchell1991kripke} states
 that a syntactic substitution followed by the evaluation of the resulting term
 into the model is equivalent to the evaluation of the original term with an
 environment corresponding to the evaluated substitution.
@@ -2132,7 +2132,7 @@ which suggest avenues for future work. We list these limitations from easiest
 to hardest to resolve. Remember that each modification to the universe of
 syntaxes needs to be given an appropriate semantics.
 
-\paragraph*{Closure under products} Our current universe of descriptions is
+\paragraph*{Closure under products.} Our current universe of descriptions is
 closed under sums as demonstrated in Section~\ref{desccomb}. It is however
 not closed under products: two arbitrary right-nested products conforming
 to a description may disagree on the sort of the term they are constructing.
@@ -2141,7 +2141,7 @@ constructors is computed (à la Dagand \citeyear{DBLP:phd/ethos/Dagand13} where,
 for instance, the \AIC{`lam} constructor is only offered if the input sort is
 a function type) would not suffer from this limitation.
 
-\paragraph*{Unrestricted variables} Our current notion of variable can be used
+\paragraph*{Unrestricted variables.} Our current notion of variable can be used
 to form a term of any sort. We remarked in Sections~\ref{section:typechecking}
 and \ref{section:elaboration} that in some languages we want to restrict this
 ability to one sort in particular. In that case, we wanted users to only be able
@@ -2150,18 +2150,18 @@ time-being we made do by restricting the environment values our \AR{Semantics}
 use to a subset of the sorts: terms with variables of the wrong sort will not be
 given a semantics.
 
-\paragraph*{Flat binding structure} Our current set-up limits us to flat binding
+\paragraph*{Flat binding structure.} Our current set-up limits us to flat binding
 structures: variables and binders share the same sorts. This prevents us from
 representing languages with binding patterns, for instance pattern-matching
 let-binders which can have arbitrarily nested patterns taking pairs apart.
 
-\paragraph*{Closure under derivation} One-hole contexts play a major role in the
+\paragraph*{Closure under derivation.} One-hole contexts play a major role in the
 theory of programming languages. Just like the one-hole context of a data type is
 a data type~\cite{DBLP:journals/fuin/AbbottAMG05}, we would like our universe to
 be closed under derivatives so that the formalisation of, for example, evaluation contexts
 could benefit directly from the existing machinery.
 
-\paragraph*{Closure under closures} Jander's work on formalising and certifying
+\paragraph*{Closure under closures.} Jander's work on formalising and certifying
 continuation-passing style transformations~\cite{Jander:Thesis:2019}
 highlighted the need for a notion of syntaxes with closures. Recalling
 that our notion of Semantics is always compatible with precomposition
