@@ -5,13 +5,13 @@
 * DONE Richard Eisenberg: Stitch reference
 * DONE grep ly- *.tex catalogue/*.tex
 * DONE grep kind
-* TODO Acknowledgements [3/5]
+* TODO Acknowledgements [4/5]
   - [X] Bob
   - [X] James McK
   - [ ] Conor
-  - [ ] James C
+  - [X] James C
   - [X] gallais
-* TODO Affiliations / emails
+* DONE Affiliations / emails
   Bob: https://orcid.org/0000-0002-4414-5047
   Guillaume: https://orcid.org/0000-0002-4091-657X
   Conor: https://orcid.org/0000-0003-1487-0886
@@ -21,7 +21,7 @@
     School of Mathematical and Computer Sciences
     Heriot-Watt University, Edinburgh EH14 4AS
     J.McKinna@hw.ac.uk
-* TODO General bibliography cleaning, following the JFP diff
+* DONE General bibliography cleaning, following the JFP diff
 * DONE grep datatype
 * DONE Hyphenation, and other minor copyedits
   - Yes: scope-safe, type-safe, sort-safe
