@@ -90,7 +90,7 @@ erase^coth : ∀ ms Δ (ρ : Thinning ms ns) →
              Var σ ⌞ coth^Typing Δ ρ ⌟ → Var σ ⌞ Δ ⌟
 erase^coth []       Δ ρ ()
 erase^coth (m ∷ ms) Δ ρ z     = lookup-fromVar Δ (lookup ρ z)
-erase^coth (m ∷ ms) Δ ρ (s v) = erase^coth ms Δ (select extend ρ) v
+erase^coth (m ∷ ms) Δ ρ (s v) = erase^coth ms Δ (select weaken ρ) v
 
 th^Var- : Thinnable (Var- m)
 th^Var- (`var infer) ρ = `var λ Δ →

@@ -113,32 +113,32 @@ lookup (select ren ρ) k = lookup ρ (lookup ren k)
 \end{code}
 %</select>
 
-%<*extend>
+%<*weaken>
 \begin{code}
-extend : Thinning Γ (σ ∷ Γ)
-lookup extend v = s v
+weaken : Thinning Γ (σ ∷ Γ)
+lookup weaken v = s v
 \end{code}
-%</extend>
+%</weaken>
 
 \begin{code}
 bind : ∀ σ → Thinning Γ (σ ∷ Γ)
-bind _ = extend
+bind _ = weaken
 
 -- Like the flipped version of _>>_ but it computes. Which is convenient when
 -- dealing with concrete Γs (cf. βred)
 _<+>_ : (Δ ─Env) 𝓥 Θ → (Γ ─Env) 𝓥 Θ → (Γ ++ Δ ─Env) 𝓥 Θ
 _<+>_ {Γ = []}    ρ₁ ρ₂ = ρ₁
-_<+>_ {Γ = _ ∷ Γ} ρ₁ ρ₂ = (ρ₁ <+> select extend ρ₂) ∙ lookup ρ₂ z
+_<+>_ {Γ = _ ∷ Γ} ρ₁ ρ₂ = (ρ₁ <+> select weaken ρ₂) ∙ lookup ρ₂ z
 
 injectˡ-<+> : ∀ Δ (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) (v : Var i Γ) →
               lookup (ρ₁ <+> ρ₂) (injectˡ Δ v) ≡ lookup ρ₂ v
 injectˡ-<+> Δ ρ₁ ρ₂ z     = refl
-injectˡ-<+> Δ ρ₁ ρ₂ (s v) = injectˡ-<+> Δ ρ₁ (select extend ρ₂) v
+injectˡ-<+> Δ ρ₁ ρ₂ (s v) = injectˡ-<+> Δ ρ₁ (select weaken ρ₂) v
 
 injectʳ-<+> : ∀ Γ (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) (v : Var i Δ) →
               lookup (ρ₁ <+> ρ₂) (injectʳ Γ v) ≡ lookup ρ₁ v
 injectʳ-<+> []      ρ₁ ρ₂ v = refl
-injectʳ-<+> (x ∷ Γ) ρ₁ ρ₂ v = injectʳ-<+> Γ ρ₁ (select extend ρ₂) v
+injectʳ-<+> (x ∷ Γ) ρ₁ ρ₂ v = injectʳ-<+> Γ ρ₁ (select weaken ρ₂) v
 
 
 \end{code}
@@ -285,5 +285,5 @@ module _ {A : Set → Set} {{app : RawApplicative A}} where
 
    go : ∀ Γ → (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
    go []       ρ = pure ε
-   go (σ ∷ Γ)  ρ = _∙_ A.<$> go Γ (select extend ρ) ⊛ lookup ρ z
+   go (σ ∷ Γ)  ρ = _∙_ A.<$> go Γ (select weaken ρ) ⊛ lookup ρ z
 \end{code}

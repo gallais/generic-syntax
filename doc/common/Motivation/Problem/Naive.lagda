@@ -42,7 +42,7 @@ data T : Type ─Scoped where
 \begin{code}
 th^T : Thinnable (T σ)
 th^T (`var v)    ρ = `var (lookup ρ v)
-th^T (`lam b)    ρ = `lam (th^T b (th^Env th^Var ρ extend ∙ z))
+th^T (`lam b)    ρ = `lam (th^T b (th^Env th^Var ρ weaken ∙ z))
 th^T (`app f t)  ρ = `app (th^T f ρ) (th^T t ρ)
 \end{code}
 %</thT>
@@ -50,7 +50,7 @@ th^T (`app f t)  ρ = `app (th^T f ρ) (th^T t ρ)
 \begin{code}
 unlet : (Γ ─Env) T Δ → S σ Γ → T σ Δ
 unlet ρ (`var v)    = lookup ρ v
-unlet ρ (`lam b)    = `lam (unlet (th^Env th^T ρ extend ∙ `var z) b)
+unlet ρ (`lam b)    = `lam (unlet (th^Env th^T ρ weaken ∙ `var z) b)
 unlet ρ (`app f t)  = `app (unlet ρ f) (unlet ρ t)
 unlet ρ (`let e t)  = unlet (ρ ∙ unlet ρ e) t
 \end{code}
@@ -59,25 +59,25 @@ unlet ρ (`let e t)  = unlet (ρ ∙ unlet ρ e) t
 \begin{code}
 th^S : Thinnable (S σ)
 th^S (`var v)    ρ = `var (lookup ρ v)
-th^S (`lam b)    ρ = `lam (th^S b (th^Env th^Var ρ extend ∙ z))
+th^S (`lam b)    ρ = `lam (th^S b (th^Env th^Var ρ weaken ∙ z))
 th^S (`app f t)  ρ = `app (th^S f ρ) (th^S t ρ)
-th^S (`let e t)  ρ = `let (th^S e ρ) (th^S t (th^Env th^Var ρ extend ∙ z))
+th^S (`let e t)  ρ = `let (th^S e ρ) (th^S t (th^Env th^Var ρ weaken ∙ z))
 \end{code}
 %</thS>
 %<*subS>
 \begin{code}
 sub^S : (Γ ─Env) S Δ → S σ Γ → S σ Δ
 sub^S ρ (`var v)    = lookup ρ v
-sub^S ρ (`lam b)    = `lam (sub^S (th^Env th^S ρ extend ∙ `var z) b)
+sub^S ρ (`lam b)    = `lam (sub^S (th^Env th^S ρ weaken ∙ `var z) b)
 sub^S ρ (`app f t)  = `app (sub^S ρ f) (sub^S ρ t)
-sub^S ρ (`let e t)  = `let (sub^S ρ e) (sub^S (th^Env th^S ρ extend ∙ `var z) t)
+sub^S ρ (`let e t)  = `let (sub^S ρ e) (sub^S (th^Env th^S ρ weaken ∙ `var z) t)
 \end{code}
 %</subS>
 %<*subT>
 \begin{code}
 sub^T : (Γ ─Env) T Δ → T σ Γ → T σ Δ
 sub^T ρ (`var v)    = lookup ρ v
-sub^T ρ (`lam b)    = `lam (sub^T (th^Env th^T ρ extend ∙ `var z) b)
+sub^T ρ (`lam b)    = `lam (sub^T (th^Env th^T ρ weaken ∙ `var z) b)
 sub^T ρ (`app f t)  = `app (sub^T ρ f) (sub^T ρ t)
 
 _⟨_/0⟩^S : ∀[ (σ ∷_) ⊢ S τ ⇒ S σ ⇒ S τ ]

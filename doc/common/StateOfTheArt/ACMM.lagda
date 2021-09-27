@@ -4,7 +4,7 @@
 module StateOfTheArt.ACMM where
 
 open import Data.Var hiding (_<$>_; get)
-open import Data.Environment as E hiding (_>>_ ; extend)
+open import Data.Environment as E hiding (_>>_)
 
 open import Data.Nat.Base
 open import Data.List.Base using (List; _∷_; [])
@@ -61,7 +61,7 @@ module Renaming where
 \begin{code}
 module Substitution where
  extendₛ : (Γ ─Env) Lam Δ → (σ ∷ Γ ─Env) Lam (σ ∷ Δ)
- extendₛ ρ = Renaming.ren E.extend <$> ρ ∙ `var z
+ extendₛ ρ = Renaming.ren E.weaken <$> ρ ∙ `var z
 
  varₛ : ∀[ Lam σ ⇒ Lam σ ]
  varₛ x = x
@@ -91,7 +91,7 @@ module _ where
    reflect : (σ : Type) → ∀[ Lam σ ⇒ Val σ ]
 
    reify   α = id
-   reify   (σ `→ τ) = λ b → `lam (reify τ (b E.extend (reflect σ (`var z))))
+   reify   (σ `→ τ) = λ b → `lam (reify τ (b E.weaken (reflect σ (`var z))))
 
    reflect α = id
    reflect (σ `→ τ) = λ b ρ v → reflect τ (`app (Renaming.ren ρ b) (reify σ v))
@@ -176,7 +176,7 @@ record Semantics (𝓥 𝓒 : Type ─Scoped) : Set where
 %</sem>
 
 \begin{code}
-open E using (extend)
+open E using (weaken)
 \end{code}
 
 %<*semren>
@@ -186,7 +186,7 @@ Renaming = record
   { th^𝓥  = th^Var
   ; var   = `var
   ; app   = `app
-  ; lam   = λ b → `lam (b extend z) }
+  ; lam   = λ b → `lam (b weaken z) }
 \end{code}
 %</semren>
 %<*semrenfun>
@@ -202,7 +202,7 @@ Substitution = record
    { th^𝓥  = λ t ρ → ren ρ t
    ; var   = id
    ; app   = `app
-   ; lam   = λ b → `lam (b extend (`var z)) }
+   ; lam   = λ b → `lam (b weaken (`var z)) }
 \end{code}
 %</semsub>
 %<*semsubfun>
@@ -299,7 +299,7 @@ module Printer where
    lam : ∀[ □ (Name σ ⇒ Printer τ) ⇒ Printer (σ `→ τ) ]
    lam {σ} mb = MkW do
      x ← fresh σ
-     b ← getW (mb extend x)
+     b ← getW (mb weaken x)
      return ("λ" ++ getW x ++ ". " ++ b)
 \end{code}
 %</printlam>

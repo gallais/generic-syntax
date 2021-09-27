@@ -82,7 +82,7 @@ Semantics.alg   UnState = let open Generic.Syntax.STLC+Product.PATTERNS in λ wh
   (One     , refl)         → ONE
   (Get     , refl)         → LAM (PRD (`var z) (`var z))
   (Put     , t , refl)     → LAM (PRD (`var z) ONE)
-  (Ret σ   , t , refl)     → LAM (PRD (`var z) (ren extend t))
-  (Bnd σ τ , m , f , refl) → let f′ = ren extend f ; m′ = ren extend m in
+  (Ret σ   , t , refl)     → LAM (PRD (`var z) (ren weaken t))
+  (Bnd σ τ , m , f , refl) → let f′ = ren weaken f ; m′ = ren weaken m in
                              LAM (APP (CUR f′) (SWP (APP m′ (`var z))))
 \end{code}
