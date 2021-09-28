@@ -9,8 +9,8 @@ The major changes are:
 2. Removing all the Figures in the original and replacing them with
 displayed blocks in the running text. This addresses Q6 in the
 original proof. Due to the need to do minor updates to the surrounding
-text in each case, ehis was the largest amount of work, and difficult
-to express as a list of s,all changes.
+text in each case, this was the largest amount of work, and difficult
+to express as a list of small changes.
 
 3. Incorporating almost all of the copy-edits identified in the
 tracked changes proof, apart from some minor differences in
