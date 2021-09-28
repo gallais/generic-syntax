@@ -1,0 +1,93 @@
+General notes: Thank you for the copyedited proof and the tracked
+changes version. We have prepared a new edited version of our original
+LaTeX source that incorporates most of the suggested modifications.
+
+The major changes are:
+
+1. Upgrading to the most recent jfp.cls file.
+
+2. Removing all the Figures in the original and replacing them with
+displayed blocks in the running text. This addresses Q6 in the
+original proof. Due to the need to do minor updates to the surrounding
+text in each case, ehis was the largest amount of work, and difficult
+to express as a list of s,all changes.
+
+3. Incorporating almost all of the copy-edits identified in the
+tracked changes proof, apart from some minor differences in
+hyphenation and preferring "associates to" over "associates with". We
+have also made sure that the title and all section headings are lower
+case, in accordance with JFP style.
+
+4. Some minor fixes throughout to improve grammar and remove
+ambiguity.
+
+5. Updates to bibliography to reflect previously unpublished work that
+has now been published.
+
+6. Added Acknowledgements and Conflict of Interest sections at the
+end.
+
+
+
+Specific answers to the questions in the original proof:
+
+Q1: We have checked the names and their order in the edited LaTeX. The
+surnames are:
+
+  1. Allais
+  2. Atkey
+  3. Chapman
+  4. McBride
+  5. McKinna
+
+Q2: The author affiliations are all correct in the edited LaTeX. Note
+that some of the affiliations have changed since the original. We also
+have the ORCids for everyone, but were not sure how to integrate that
+into the document:
+
+  1. Guillaume Allais: https://orcid.org/0000-0002-4091-657X
+  2. Robert Atkey: https://orcid.org/0000-0002-4414-5047
+  3. James Chapman: https://orcid.org/0000-0001-9036-8252
+  4. Conor McBride: https://orcid.org/0000-0003-1487-0886
+  5. James McKinna: https://orcid.org/0000-0001-6745-2560
+
+Q3: Emails have been provided for all authors in the edited LaTeX.
+
+Q4: We have checked all the occurrences of "type safe" and "scope
+safe" in the document and changed them to "type-safe" and
+"scope-safe".
+
+Q5: We have also removed the footnote "This paper is typeset in
+colour." in the edited LaTeX.
+
+Q6: Instead of providing in-text citations for all of the figures, we
+have changed the document so that all the figures are now inline in
+the main text. The text has been lightly edited to make sure this
+makes sense. There is no longer a need for figure reference.s
+
+Q7: We have expanded all the acronyms used in the document.
+
+Q8: The closing parenthesis is correct. Thank you.
+
+Q9: We have altered the sentence to read "intrinsically typed STLC",
+which we think reads better.
+
+Q10: We have replaced the citations to unpublished data to published
+versions, and updated the text.
+
+Q11: We have provided Acknowledgements in the edited LaTeX.
+
+Q12: There are no Conflicts of Interest, which is now explicitly
+stated in the edited LaTeX.
+
+Q13: There are no page numbers for either of these references, because
+they are for electronic-only journals. We have added 'e5' as the
+sub-issue reference for the JFP reference.
+
+Q14: We have added a URL for 'Atkey (2015)'.
+
+Q15: We have checked all of the references to make sure the names are
+correct.
+
+Q16: Eisenberg (2018) has now been published and we have replaced the
+old reference with the published one, which is now 'Eisenberg (2020)'.
