@@ -6,3 +6,4 @@ latex/
 latex-agda-output/
 *.o
 *.hi
+doc/jfp19/latex-sources.zip
