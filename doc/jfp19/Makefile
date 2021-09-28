@@ -1,5 +1,7 @@
 PAPER=jfp19
 
+.PHONY: all common
+
 all: latex/$(PAPER).pdf
 
 AGDA_FILES:=\
@@ -66,6 +68,10 @@ SLIDES_DEPENDENCIES:=\
   latex/$(SLIDES).tex\
   $(PAPER_DEPENDENCIES)
 
+LATEX_SOURCES:=\
+  $(patsubst latex/%,%,$(filter-out common,$(PAPER_DEPENDENCIES)))\
+  $(patsubst latex/%,%,$(AGDA_OUTPUT))
+
 common:
 	$(MAKE) -C ../common
 
@@ -75,6 +81,9 @@ latex/catalogue/%.tex: catalogue/%.tex
 
 latex/$(SLIDES).pdf: $(SLIDES_DEPENDENCIES)
 	cd latex; latexmk -pdf $(SLIDES).tex
+
+latex-sources.zip: $(PAPER_DEPENDENCIES)
+	cd latex; zip ../latex-sources.zip $(LATEX_SOURCES)
 
 latex/$(PAPER).pdf: $(PAPER_DEPENDENCIES)
 	cd latex; latexmk -pdf -bibtex $(PAPER).tex
