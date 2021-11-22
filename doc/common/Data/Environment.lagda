@@ -18,7 +18,8 @@ private
 
   variable
     I A : Set
-    i σ : I
+    i : Size
+    σ : I
     S T : List I → Set
     𝓥 𝓦 𝓒 : I ─Scoped
     Γ Δ Θ : List I
@@ -30,7 +31,7 @@ infix 3 _─Env
 \begin{code}
 record _─Env (Γ : List I) (𝓥 : I ─Scoped) (Δ : List I) : Set where
   constructor pack
-  field lookup : Var i Γ → 𝓥 i Δ
+  field lookup : Var σ Γ → 𝓥 σ Δ
 \end{code}
 %</env>
 \begin{code}
@@ -51,17 +52,17 @@ lookup ε ()
 %</empty>
 %<*envmap>
 \begin{code}
-_<$>_ : (∀ {i} → 𝓥 i Δ → 𝓦 i Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
+_<$>_ : (∀ {σ} → 𝓥 σ Δ → 𝓦 σ Θ) → (Γ ─Env) 𝓥 Δ → (Γ ─Env) 𝓦 Θ
 lookup (f <$> ρ) k = f (lookup ρ k)
 \end{code}
 %</envmap>
 \begin{code}
 
-data Split (i : I) Γ Δ : Var i (Γ ++ Δ) → Set where
-  inj₁ : (k : Var i Γ) → Split i Γ Δ (injectˡ Δ k)
-  inj₂ : (k : Var i Δ) → Split i Γ Δ (injectʳ Γ k)
+data Split (σ : I) Γ Δ : Var σ (Γ ++ Δ) → Set where
+  inj₁ : (k : Var σ Γ) → Split σ Γ Δ (injectˡ Δ k)
+  inj₂ : (k : Var σ Δ) → Split σ Γ Δ (injectʳ Γ k)
 
-split : ∀ Γ (k : Var i (Γ ++ Δ)) → Split i Γ Δ k
+split : ∀ Γ (k : Var σ (Γ ++ Δ)) → Split σ Γ Δ k
 split []      k     = inj₂ k
 split (σ ∷ Γ) z     = inj₁ z
 split (σ ∷ Γ) (s k) with split Γ k
@@ -81,11 +82,11 @@ lookup (_>>_ {Γ = Γ} ρ₁ ρ₂) k with split Γ k
 ... | inj₁ k₁ = lookup ρ₁ k₁
 ... | inj₂ k₂ = lookup ρ₂ k₂
 
-injectˡ->> : ∀ (ρ₁ : (Γ ─Env) 𝓥 Θ) (ρ₂ : (Δ ─Env) 𝓥 Θ) (v : Var i Γ) →
+injectˡ->> : ∀ (ρ₁ : (Γ ─Env) 𝓥 Θ) (ρ₂ : (Δ ─Env) 𝓥 Θ) (v : Var σ Γ) →
              lookup (ρ₁ >> ρ₂) (injectˡ Δ v) ≡ lookup ρ₁ v
 injectˡ->> {Δ = Δ} ρ₁ ρ₂ v rewrite split-injectˡ Δ v = refl
 
-injectʳ->> : ∀ (ρ₁ : (Γ ─Env) 𝓥 Θ) (ρ₂ : (Δ ─Env) 𝓥 Θ) (v : Var i Δ) →
+injectʳ->> : ∀ (ρ₁ : (Γ ─Env) 𝓥 Θ) (ρ₂ : (Δ ─Env) 𝓥 Θ) (v : Var σ Δ) →
              lookup (ρ₁ >> ρ₂) (injectʳ Γ v) ≡ lookup ρ₂ v
 injectʳ->> {Γ = Γ} ρ₁ ρ₂ v rewrite split-injectʳ Γ v = refl
 
@@ -130,12 +131,12 @@ _<+>_ : (Δ ─Env) 𝓥 Θ → (Γ ─Env) 𝓥 Θ → (Γ ++ Δ ─Env) 𝓥 �
 _<+>_ {Γ = []}    ρ₁ ρ₂ = ρ₁
 _<+>_ {Γ = _ ∷ Γ} ρ₁ ρ₂ = (ρ₁ <+> select weaken ρ₂) ∙ lookup ρ₂ z
 
-injectˡ-<+> : ∀ Δ (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) (v : Var i Γ) →
+injectˡ-<+> : ∀ Δ (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) (v : Var σ Γ) →
               lookup (ρ₁ <+> ρ₂) (injectˡ Δ v) ≡ lookup ρ₂ v
 injectˡ-<+> Δ ρ₁ ρ₂ z     = refl
 injectˡ-<+> Δ ρ₁ ρ₂ (s v) = injectˡ-<+> Δ ρ₁ (select weaken ρ₂) v
 
-injectʳ-<+> : ∀ Γ (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) (v : Var i Δ) →
+injectʳ-<+> : ∀ Γ (ρ₁ : (Δ ─Env) 𝓥 Θ) (ρ₂ : (Γ ─Env) 𝓥 Θ) (v : Var σ Δ) →
               lookup (ρ₁ <+> ρ₂) (injectʳ Γ v) ≡ lookup ρ₁ v
 injectʳ-<+> []      ρ₁ ρ₂ v = refl
 injectʳ-<+> (x ∷ Γ) ρ₁ ρ₂ v = injectʳ-<+> Γ ρ₁ (select weaken ρ₂) v
@@ -184,13 +185,13 @@ Thinnable T = ∀[ T ⇒ □ T ]
 %</thinnable>
 %<*thVar>
 \begin{code}
-th^Var : Thinnable (Var i)
+th^Var : Thinnable (Var σ)
 th^Var v ρ = lookup ρ v
 \end{code}
 %</thVar>
 %<*thEnv>
 \begin{code}
-th^Env : (∀ {i} → Thinnable (𝓥 i)) → Thinnable ((Γ ─Env) 𝓥)
+th^Env : (∀ {σ} → Thinnable (𝓥 σ)) → Thinnable ((Γ ─Env) 𝓥)
 lookup (th^Env th^𝓥 ρ ren) k = th^𝓥 (lookup ρ k) ren
 \end{code}
 %</thEnv>
@@ -264,12 +265,12 @@ Kripke 𝓥 𝓒 Δ   j = □ ((Δ ─Env) 𝓥 ⇒ 𝓒 j)
 %</kripke>
 \begin{code}
 
-_$$_ : ∀[ Kripke 𝓥 𝓒 Γ i ⇒ (Γ ─Env) 𝓥 ⇒ 𝓒 i ]
+_$$_ : ∀[ Kripke 𝓥 𝓒 Γ σ ⇒ (Γ ─Env) 𝓥 ⇒ 𝓒 σ ]
 _$$_ {Γ = []}    f ts = f
 _$$_ {Γ = _ ∷ _} f ts = extract f ts
 
-th^Kr : (Γ : List I) → (∀ {i} → Thinnable (𝓒 i)) →
-        Thinnable (Kripke 𝓥 𝓒 Γ i)
+th^Kr : (Γ : List I) → (∀ {σ} → Thinnable (𝓒 σ)) →
+        Thinnable (Kripke 𝓥 𝓒 Γ σ)
 th^Kr []       th^𝓒 = th^𝓒
 th^Kr (_ ∷ _)  th^𝓒 = th^□
 
@@ -280,10 +281,10 @@ module _ {A : Set → Set} {{app : RawApplicative A}} where
  private module A = RawApplicative app
  open A
 
- sequenceA : (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
+ sequenceA : (Γ ─Env) (λ σ Γ → A (𝓥 σ Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
  sequenceA = go _ where
 
-   go : ∀ Γ → (Γ ─Env) (λ i Γ → A (𝓥 i Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
+   go : ∀ Γ → (Γ ─Env) (λ σ Γ → A (𝓥 σ Γ)) Δ → A ((Γ ─Env) 𝓥 Δ)
    go []       ρ = pure ε
    go (σ ∷ Γ)  ρ = _∙_ A.<$> go Γ (select weaken ρ) ⊛ lookup ρ z
 \end{code}

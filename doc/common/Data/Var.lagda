@@ -41,7 +41,7 @@ data Var : I ─Scoped where
 %</var>
 \begin{code}
 infixl 3 _─_
-_─_ : {i : I} (Γ : List I) → Var i Γ → List I
+_─_ : {σ : I} (Γ : List I) → Var σ Γ → List I
 _ ∷ Γ ─ z   = Γ
 σ ∷ Γ ─ s v = σ ∷ (Γ ─ v)
 
