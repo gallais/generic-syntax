@@ -7,13 +7,13 @@ open import Size
 open import Data.Bool
 open import Data.List.Base as L hiding ([_])
 open import Data.List.Relation.Unary.All hiding (mapA; sequenceA)
-open import Data.Product as Prod
+open import Data.Product as Prod using (_×_; Σ-syntax; _,_)
 open import Function hiding (case_of_)
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
 open import Data.Var hiding (z; s)
 open import Relation.Unary
-open import Data.Environment as E hiding (sequenceA; uncurry)
+open import Data.Environment as E hiding (sequenceA; curry; uncurry)
 
 -- Descriptions and their Interpretation
 
@@ -117,6 +117,67 @@ module _ {I : Set} {d e : Desc I} {X : List I → I ─Scoped}
 %</case>
 \begin{code}
 
+-- Descriptions are closed under products
+
+module _ {I : Set} where
+
+ infixr 6 _`*_
+
+ _`%_ : Desc I → I → Desc I
+ `σ A d   `% v = `σ A (λ a → d a `% v)
+ `X Δ j d `% v = `X Δ j (d `% v)
+ `∎ i     `% v = `σ (i ≡ v) (λ _ → `∎ i)
+
+\end{code}
+%<*descprod>
+\begin{code}
+ _`*_ : Desc I → Desc I → Desc I
+ `σ A d   `* e = `σ A (λ a → d a `* e)
+ `X Δ j d `* e = `X Δ j (d `* e)
+ `∎ i     `* e = e `% i
+\end{code}
+%</descprod>
+\begin{code}
+module _ {I : Set} {X : List I → I ─Scoped}
+         {i : I} {Γ : List I} where
+
+ byRefl : ∀ {d} → ⟦ d ⟧ X i Γ → ⟦ d `% i ⟧ X i Γ
+ byRefl {`σ A d}   (a , t) = a , byRefl t
+ byRefl {`X Δ j d} (r , t) = r , byRefl t
+ byRefl {`∎ i}     eq      = sym eq , eq
+
+ eqView : ∀ {d v} → ⟦ d `% v ⟧ X i Γ → ⟦ d ⟧ X i Γ × i ≡ v
+ eqView {`σ A d}   (a , t)       = Prod.map₁ (a ,_) (eqView t)
+ eqView {`X Δ j d} (r , t)       = Prod.map₁ (r ,_) (eqView t)
+ eqView {`∎ i}     (refl , refl) = refl , refl
+
+\end{code}
+%<*uncurry>
+\begin{code}
+ uncurry : {d e : Desc I} {A : Set} →
+           (⟦ d ⟧ X i Γ → ⟦ e ⟧ X i Γ → A) →
+           (⟦ d `* e  ⟧ X i Γ → A)
+ uncurry {`σ A d}   f (a , t) = uncurry (f ∘ (a ,_)) t
+ uncurry {`X Δ j d} f (r , t) = uncurry (f ∘ (r ,_)) t
+ uncurry {`∎ i}     f t with eqView t
+ ... | u , eq = f eq u
+\end{code}
+%</uncurry>
+\begin{code}
+
+\end{code}
+%<*curry>
+\begin{code}
+ curry : {d e : Desc I} {A : Set} →
+         (⟦ d `* e  ⟧ X i Γ → A) →
+         (⟦ d ⟧ X i Γ → ⟦ e ⟧ X i Γ → A)
+ curry {`σ A d}   f (a , t) u = curry (f ∘ (a ,_)) t u
+ curry {`X Δ j d} f (r , t) u = curry (f ∘ (r ,_)) t u
+ curry {`∎ i}     f refl    u = f (byRefl u)
+\end{code}
+%</uncurry>
+\begin{code}
+
 module PAPERXS {I : Set} where
 -- Descriptions are closed under products of recursive positions
 
@@ -124,7 +185,7 @@ module PAPERXS {I : Set} where
 %<*xs>
 \begin{code}
  `Xs : List (List I × I) → Desc I → Desc I
- `Xs Δjs d = foldr (uncurry `X) d Δjs
+ `Xs Δjs d = foldr (Prod.uncurry `X) d Δjs
 \end{code}
 %</xs>
 \begin{code}
@@ -135,7 +196,7 @@ module PAPER {I : Set} {d : Desc I} {X : List I → I ─Scoped} {i : I} {Γ : L
 %<*unxs>
 \begin{code}
  unXs :  ∀ Δjs → ⟦ `Xs Δjs d ⟧ X i Γ →
-         All (uncurry $ λ Δ j → X Δ j Γ) Δjs × ⟦ d ⟧ X i Γ
+         All (Prod.uncurry $ λ Δ j → X Δ j Γ) Δjs × ⟦ d ⟧ X i Γ
 
  unXs []       v        = [] , v
  unXs (σ ∷ Δ)  (r , v)  = Prod.map₁ (r ∷_) (unXs Δ v)
