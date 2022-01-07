@@ -10,7 +10,7 @@ open import Agda.Builtin.Equality
 open import Function
 open import Relation.Unary
 
-open import Generic.Syntax
+open import Generic.Syntax hiding (curry; uncurry)
 
 module _ {I : Set} where
 
